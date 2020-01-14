@@ -1,0 +1,578 @@
+# ==============================================================================
+# prosail
+# Lib_PROSAIL.R
+# ==============================================================================
+# PROGRAMMERS:
+# Jean-Baptiste FERET <jb.feret@irstea.fr>
+# Copyright 2019/11 Jean-Baptiste FERET
+# ==============================================================================
+# This Library includes functions dedicated to PROSAIL simulation
+# ==============================================================================
+
+
+#' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+#' The direct and diffuse light are taken into account as proposed by:
+#' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
+#' measurements into total shortwave broadband albedo using a canopy
+#' radiative transfer model, Agronomie
+#' Es = direct
+#' Ed = diffuse
+#'
+#' @param rdot numeric. Hemispherical-directional reflectance factor in viewing direction
+#' @param rsot numeric. Bi-directional reflectance factor
+#' @param tts numeric. Solar zenith angle
+#' @param SpecATM_Sensor list. direct and diffuse light for clear conditions
+#' @return BRF numeric. Bidirectional reflectance factor
+#' @export
+Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
+
+  ##############################
+  ##	direct / diffuse light	##
+  ##############################
+  Es <- SpecATM_Sensor$Direct_Light
+  Ed <- SpecATM_Sensor$Diffuse_Light
+  rd <- pi/180
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  PARdiro <- (1-skyl)*Es
+  PARdifo <- skyl*Ed
+  BRF <- (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
+  return(BRF)
+}
+
+#' Performs PROSAIL simulation based on a set of combinations of input parameters
+#' @param SpecPROSPECT_Sensor list. Includes optical constants required for PROSPECT
+#' refractive index, specific absorption coefficients and corresponding spectral bands
+#' @param Input_PROSPECT  list. PROSPECT input variables
+#' @param N numeric. Leaf structure parameter
+#' @param CHL numeric. Chlorophyll content (microg.cm-2)
+#' @param CAR numeric. Carotenoid content (microg.cm-2)
+#' @param ANT numeric. Anthocyain content (microg.cm-2)
+#' @param BROWN numeric. Brown pigment content (Arbitrary units)
+#' @param EWT numeric. Equivalent Water Thickness (g.cm-2)
+#' @param LMA numeric. Leaf Mass per Area (g.cm-2)
+#' @param PROT numeric. protein content  (g.cm-2)
+#' @param CBC numeric. NonProtCarbon-based constituent content (g.cm-2)
+#' @param alpha numeric. Solid angle for incident light at surface of leaf (simulation of roughness)
+#' @param TypeLidf numeric. Type of leaf inclination distribution function:
+#' @param LIDFa numeric.
+#' @param LIDFb numeric.
+#' @param lai numeric. Leaf Area Index
+#' @param q numeric. Hot Spot parameter
+#' @param tts numeric. Sun zeith angle
+#' @param tto numeric. Observer zeith angle
+#' @param psi numeric. Azimuth Sun / Observer
+#' @param rsoil numeric. Soil reflectance
+#'
+#' @return list. rdot,rsot,rddt,rsdt
+#' rdot: hemispherical-directional reflectance factor in viewing direction
+#' rsot: bi-directional reflectance factor
+#' rsdt: directional-hemispherical reflectance factor for solar incident flux
+#' rddt: bi-hemispherical reflectance factor
+#' @import prospect
+#' @export
+
+PRO4SAIL  <- function(SpecPROSPECT_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
+                      CAR = 8.0,ANT = 0.0,BROWN = 0.0,EWT = 0.01,
+                      LMA = 0.008,PROT = 0.0,CBC = 0.0,alpha = 40.0,
+                      TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,lai = NULL,
+                      q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL){
+
+  ##############################
+  #	LEAF OPTICAL PROPERTIES	##
+  ##############################
+  LRT <- prospect::PROSPECT(SpecPROSPECT = SpecPROSPECT_Sensor,Input_PROSPECT=Input_PROSPECT,
+                            N=N,CHL=CHL,CAR=CAR,ANT=ANT,BROWN=BROWN,EWT=EWT,
+                            LMA=LMA,PROT=PROT,CBC=CBC,alpha=alpha)
+  rho <- LRT$Reflectance
+  tau <- LRT$Transmittance
+
+  #	Geometric quantities
+  rd <- pi/180
+  cts <- cos(rd*tts)
+  cto <- cos(rd*tto)
+  ctscto <- cts*cto
+  tants <- tan(rd*tts)
+  tanto <- tan(rd*tto)
+  cospsi <- cos(rd*psi)
+  dso <- sqrt(tants*tants+tanto*tanto-2.*tants*tanto*cospsi)
+
+  #	Generate leaf angle distribution from average leaf angle (ellipsoidal) or (a,b) parameters
+  if (TypeLidf==1){
+    foliar_distrib <- dladgen(LIDFa,LIDFb)
+    lidf <- foliar_distrib$lidf
+    litab <- foliar_distrib$litab
+
+  } else if (TypeLidf==2){
+    foliar_distrib <- campbell(LIDFa)
+    lidf <- foliar_distrib$lidf
+    litab <- foliar_distrib$litab
+  }
+
+  # angular distance, compensation of shadow length
+	#	Calculate geometric factors associated with extinction and scattering
+	#	Initialise sums
+	ks <- 0
+	ko <- 0
+	bf <- 0
+	sob <- 0
+	sof <- 0
+
+	#	Weighted sums over LIDF
+  na <- length(litab)
+	for (i in 1:na){
+	  ttl <- litab[i]	    # leaf inclination discrete values
+	  ctl <- cos(rd*ttl)
+	  #	SAIL volume scattering phase function gives interception and portions to be
+	  #	multiplied by rho and tau
+	  resVolscatt <- volscatt(tts,tto,psi,ttl)
+	  chi_s <- resVolscatt$chi_s
+	  chi_o <- resVolscatt$chi_o
+	  frho <- resVolscatt$frho
+	  ftau <- resVolscatt$ftau
+
+	  #********************************************************************************
+	  #*                   SUITS SYSTEM COEFFICIENTS
+	  #*
+	  #*	ks  : Extinction coefficient for direct solar flux
+	  #*	ko  : Extinction coefficient for direct observed flux
+	  #*	att : Attenuation coefficient for diffuse flux
+	  #*	sigb : Backscattering coefficient of the diffuse downward flux
+	  #*	sigf : Forwardscattering coefficient of the diffuse upward flux
+	  #*	sf  : Scattering coefficient of the direct solar flux for downward diffuse flux
+	  #*	sb  : Scattering coefficient of the direct solar flux for upward diffuse flux
+	  #*	vf   : Scattering coefficient of upward diffuse flux in the observed direction
+	  #*	vb   : Scattering coefficient of downward diffuse flux in the observed direction
+	  #*	w   : Bidirectional scattering coefficient
+	  #********************************************************************************
+
+	  #	Extinction coefficients
+	  ksli <- chi_s/cts
+	  koli <- chi_o/cto
+
+	  #	Area scattering coefficient fractions
+	  sobli <- frho*pi/ctscto
+	  sofli <- ftau*pi/ctscto
+	  bfli <- ctl*ctl
+	  ks <- ks+ksli*lidf[i]
+	  ko <- ko+koli*lidf[i]
+	  bf <- bf+bfli*lidf[i]
+	  sob <- sob+sobli*lidf[i]
+	  sof <- sof+sofli*lidf[i]
+	}
+
+	#	Geometric factors to be used later with rho and tau
+	sdb <- 0.5*(ks+bf)
+	sdf <- 0.5*(ks-bf)
+	dob <- 0.5*(ko+bf)
+	dof <- 0.5*(ko-bf)
+	ddb <- 0.5*(1.+bf)
+	ddf <- 0.5*(1.-bf)
+
+	#	Here rho and tau come in
+	sigb <- ddb*rho+ddf*tau
+	sigf <- ddf*rho+ddb*tau
+	att <- 1-sigf
+	m2 <- (att+sigb)*(att-sigb)
+	m2[which(m2<=0)]=0
+	m <- sqrt(m2)
+
+	sb <- sdb*rho+sdf*tau
+	sf <- sdf*rho+sdb*tau
+	vb <- dob*rho+dof*tau
+	vf <- dof*rho+dob*tau
+	w <- sob*rho+sof*tau
+
+	#	Here the LAI comes in
+	#   Outputs for the case LAI = 0
+	if (lai<0){
+	  tss <- 1
+	  too <- 1
+	  tsstoo <- 1
+	  rdd <- 0
+	  tdd <- 1
+	  rsd <- 0
+	  tsd <- 0
+	  rdo <- 0
+	  tdo <- 0
+	  rso <- 0
+	  rsos <- 0
+	  rsod <- 0
+
+	  rddt <- rsoil
+	  rsdt <- rsoil
+	  rdot <- rsoil
+	  rsodt <- 0*rsoil
+	  rsost <- rsoil
+	  rsot <- rsoil
+	} else {
+	  #	Other cases (LAI > 0)
+	  e1 <- exp(-m*lai)
+	  e2 <- e1*e1
+	  rinf <- (att-m)/sigb
+	  rinf2 <- rinf*rinf
+	  re <- rinf*e1
+	  denom <- 1.-rinf2*e2
+
+	  J1ks <- Jfunc1(ks,m,lai)
+	  J2ks <- Jfunc2(ks,m,lai)
+	  J1ko <- Jfunc1(ko,m,lai)
+	  J2ko <- Jfunc2(ko,m,lai)
+
+	  Ps <- (sf+sb*rinf)*J1ks
+	  Qs <- (sf*rinf+sb)*J2ks
+	  Pv <- (vf+vb*rinf)*J1ko
+	  Qv <- (vf*rinf+vb)*J2ko
+
+	  rdd <- rinf*(1.-e2)/denom
+	  tdd <- (1.-rinf2)*e1/denom
+	  tsd <- (Ps-re*Qs)/denom
+	  rsd <- (Qs-re*Ps)/denom
+	  tdo <- (Pv-re*Qv)/denom
+	  rdo <- (Qv-re*Pv)/denom
+
+	  tss <- exp(-ks*lai)
+	  too <- exp(-ko*lai)
+	  z <- Jfunc3(ks,ko,lai)
+	  g1 <- (z-J1ks*too)/(ko+m)
+	  g2 <- (z-J1ko*tss)/(ks+m)
+
+	  Tv1 <- (vf*rinf+vb)*g1
+	  Tv2 <- (vf+vb*rinf)*g2
+	  T1 <- Tv1*(sf+sb*rinf)
+	  T2 <- Tv2*(sf*rinf+sb)
+	  T3 <- (rdo*Qs+tdo*Ps)*rinf
+
+	  #	Multiple scattering contribution to bidirectional canopy reflectance
+	  rsod <- (T1+T2-T3)/(1.-rinf2)
+
+	  #	Treatment of the hotspot-effect
+	  alf <- 1e6
+	  #	Apply correction 2/(K+k) suggested by F.-M. Breon
+	  if (q>0){
+	    alf <- (dso/q)*2./(ks+ko)
+	  }
+	  if (alf>200){
+	    # inserted H. Bach 1/3/04
+	    alf <- 200
+	  }	else if (alf==0){
+	    #	The pure hotspot - no shadow
+	    tsstoo <- tss
+	    sumint <- (1-tss)/(ks*lai)
+	  } else {
+	    #	Outside the hotspot
+	    fhot <- lai*sqrt(ko*ks)
+	    #	Integrate by exponential Simpson method in 20 steps
+	    #	the steps are arranged according to equal partitioning
+	    #	of the slope of the joint probability function
+	    x1 <- 0
+	    y1 <- 0
+	    f1 <- 1
+	    fint <- (1.-exp(-alf))*0.05
+	    sumint <- 0
+	    for (i in 1:20){
+	      if (i<20){
+	        x2 <- -log(1.-i*fint)/alf
+	      } else {
+	        x2 <- 1
+	      }
+        y2 <- -(ko+ks)*lai*x2+fhot*(1.-exp(-alf*x2))/alf
+        f2 <- exp(y2)
+        sumint <- sumint+(f2-f1)*(x2-x1)/(y2-y1)
+        x1 <- x2
+        y1 <- y2
+        f1 <- f2
+      }
+	    tsstoo=f1
+	  }
+	  #	Bidirectional reflectance
+	  #	Single scattering contribution
+	  rsos <- w*lai*sumint
+	  #	Total canopy contribution
+	  rso <- rsos+rsod
+	  #	Interaction with the soil
+	  dn <- 1.-rsoil*rdd
+	  # rddt: bi-hemispherical reflectance factor
+	  rddt <- rdd+tdd*rsoil*tdd/dn
+	  # rsdt: directional-hemispherical reflectance factor for solar incident flux
+	  rsdt <- rsd+(tsd+tss)*rsoil*tdd/dn
+	  # rdot: hemispherical-directional reflectance factor in viewing direction
+	  rdot <- rdo+tdd*rsoil*(tdo+too)/dn
+	  # rsot: bi-directional reflectance factor
+	  rsodt <- rsod+((tss+tsd)*tdo+(tsd+tss*rsoil*rdd)*too)*rsoil/dn
+	  rsost <- rsos+tsstoo*rsoil
+	  rsot <- rsost+rsodt
+	}
+	my_list <- list("rdot" = rdot,"rsot" =rsot,"rddt" =rddt,"rsdt" =rsdt)
+	return(my_list)
+}
+
+#' Computes the leaf angle distribution function value (freq)
+#' Ellipsoidal distribution function caracterised by the average leaf
+#' inclination angle in degree (ala)
+#' Campbell 1986
+#' @param ala average leaf angle
+#' @return foliar_distrib list. lidf and litab
+#' @export
+campbell  <- function(ala){
+
+  tx1 <- c(10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.,90.)
+  tx2 <- c(0.,10.,20.,30.,40.,50.,60.,70.,80.,82.,84.,86.,88.)
+  litab <- (tx2+tx1)/2
+  n <- length(litab)
+  tl1 <- tx1*(pi/180)
+  tl2 <- tx2*(pi/180)
+  excent <- exp(-1.6184e-5*ala**3+2.1145e-3*ala**2-1.2390e-1*ala+3.2491)
+  sum0 <- 0
+
+  freq=c()
+  for (i in 1:n){
+    x1 <- excent/(sqrt(1.+excent**2.*tan(tl1[i])**2))
+    x2 <- excent/(sqrt(1.+excent**2.*tan(tl2[i])**2))
+    if (excent==1){
+      freq[i] <- abs(cos(tl1[i])-cos(tl2[i]))
+    } else {
+      alpha <- excent/sqrt(abs(1-excent**2))
+      alpha2 <- alpha**2
+      x12 <- x1**2
+      x22 <- x2**2
+      alpx1   = 0*alpha2
+      alpx2   = 0*alpha2
+      almx1   = 0*alpha2
+      almx2   = 0*alpha2
+      if (excent>1){
+        alpx1 <- sqrt(alpha2[excent>1]+x12[excent>1])
+        alpx2[excent>1] <- sqrt(alpha2[excent>1]+x22[excent>1])
+        dum <- x1*alpx1+alpha2*log(x1+alpx1)
+        freq[i] <- abs(dum-(x2*alpx2+alpha2*log(x2+alpx2)))
+      } else {
+        almx1 <- sqrt(alpha2-x12)
+        almx2 <- sqrt(alpha2-x22)
+        dum <- x1*almx1+alpha2*asin(x1/alpha)
+        freq[i] <- abs(dum-(x2*almx2+alpha2*asin(x2/alpha)))
+      }
+    }
+  }
+  sum0 <- sum(freq)
+  freq0 <- freq/sum0
+  foliar_distrib <- list("lidf" = freq0,"litab" =litab)
+  return(foliar_distrib)
+}
+
+#' Computes the leaf angle distribution function value (freq)
+#' using the original bimodal distribution function initially proposed in SAIL
+#'  References
+#'  ----------
+#'  (Verhoef1998) Verhoef, Wout. Theory of radiative transfer models applied
+#'  in optical remote sensing of vegetation canopies.
+#'  Nationaal Lucht en Ruimtevaartlaboratorium, 1998.
+#'  http://library.wur.nl/WebQuery/clc/945481.
+#' @param a controls the average leaf slope
+#' @param b controls the distribution's bimodality
+#' LIDF type 		  a 		b
+#' Planophile 	  1		  0
+#' Erectophile    -1	 	0
+#' Plagiophile 	  0		  -1
+#' Extremophile 	0		  1
+#' Spherical 	    -0.35 -0.15
+#' Uniform        0     0
+#' requirement: |LIDFa| + |LIDFb| < 1
+#'
+#' @return foliar_distrib list. lidf and litab
+#' @export
+dladgen  <- function(a,b){
+  litab=c(5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.)
+  for (i1 in 1:8){
+    t <- i1*10
+    freq[i1] <- dcum(a,b,t)
+  }
+  for (i2 in 9:12){
+    t <- 80.+(i2-8)*2.
+    freq[i2] <- dcum(a,b,t)
+  }
+  freq[13] <- 1
+  for (i in 13:-1:2){
+    freq[i] <- freq[i]-freq[i-1]
+  }
+  foliar_distrib <- list("lidf" = freq,"litab" =litab)
+  return(foliar_distrib)
+}
+
+#' dcum function
+#' @param a numeric. controls the average leaf slope
+#' @param b numeric. controls the distribution's bimodality
+#' @param t numeric. angle
+#' @return f
+#' @export
+dcum <- function(a,b,t){
+  rd <- pi/180
+  if (a>=1){
+    f <- 1-cos(rd*t)
+  } else {
+    eps <- 1e-8
+    delx <- 1
+    x <- 2*rd*t
+    p <- x
+    while (delx >= eps){
+      y <- a*sin(x)+.5*b*sin(2.*x)
+      dx <- .5*(y-x+p)
+      x <- x+dx
+      delx <- abs(dx)
+    }
+    f <- (2.*y+p)/pi
+  }
+  return(f)
+}
+
+#' J1 function with avoidance of singularity problem
+#'
+#' @param k numeric. Extinction coefficient for direct (solar or observer) flux
+#' @param l numeric.
+#' @param t numeric. Leaf Area Index
+#' @return Jout numeric.
+#' @export
+Jfunc1 <- function(k,l,t){
+  # J1 function with avoidance of singularity problem
+  del <- (k-l)*t
+  Jout = 0*l
+  Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t)-exp(-k*t))/(k-l[which(abs(del)>1e-3)])
+  Jout[which(abs(del)<=1e-3)] <- 0.5*t*(exp(-k*t)+exp(-l[which(abs(del)<=1e-3)]*t))*(1-del[which(abs(del)<=1e-3)]*del[which(abs(del)<=1e-3)]/12)
+  return(Jout)
+}
+
+#' J2 function with avoidance of singularity problem
+#'
+#' @param k numeric. Extinction coefficient for direct (solar or observer) flux
+#' @param l numeric.
+#' @param t numeric. Leaf Area Index
+#' @return Jout numeric.
+#' @export
+Jfunc2 <- function(k,l,t){
+  #	J2 function
+  Jout <- (1.-exp(-(k+l)*t))/(k+l)
+  return(Jout)
+}
+
+#' J3 function with avoidance of singularity problem
+#'
+#' @param k numeric. Extinction coefficient for direct (solar or observer) flux
+#' @param l numeric.
+#' @param t numeric. Leaf Area Index
+#' @return Jout numeric.
+#' @export
+Jfunc3 <- function(k,l,t){
+  out <- (1.-exp(-(k+l)*t))/(k+l)
+  return(out)
+}
+
+
+#' Compute volume scattering functions and interception coefficients
+#' for given solar zenith, viewing zenith, azimuth and leaf inclination angle.
+#'
+#' @param tts numeric. solar zenith
+#' @param tto numeric. viewing zenith
+#' @param psi numeric. azimuth
+#' @param ttl numeric. leaf inclination angle
+#' @return res list. includes chi_s, chi_o, frho, ftau
+#' @export
+volscatt  <- function(tts,tto,psi,ttl){
+  #********************************************************************************
+  #*	chi_s	= interception functions
+  #*	chi_o	= interception functions
+  #*	frho	= function to be multiplied by leaf reflectance rho
+  #*	ftau	= functions to be multiplied by leaf transmittance tau
+  #********************************************************************************
+  #	Wout Verhoef, april 2001, for CROMA
+
+  rd <- pi/180
+  costs <- cos(rd*tts)
+  costo <- cos(rd*tto)
+  sints <- sin(rd*tts)
+  sinto <- sin(rd*tto)
+  cospsi <- cos(rd*psi)
+  psir <- rd*psi
+  costl <- cos(rd*ttl)
+  sintl <- sin(rd*ttl)
+  cs <- costl*costs
+  co <- costl*costo
+  ss <- sintl*sints
+  so <- sintl*sinto
+
+  #c ..............................................................................
+  #c     betas -bts- and betao -bto- computation
+  #c     Transition angles (beta) for solar (betas) and view (betao) directions
+  #c     if thetav+thetal>pi/2, bottom side of the leaves is observed for leaf azimut
+  #c     interval betao+phi<leaf azimut<2pi-betao+phi.
+  #c     if thetav+thetal<pi/2, top side of the leaves is always observed, betao=pi
+  #c     same consideration for solar direction to compute betas
+  #c ..............................................................................
+
+  cosbts <- 5
+  if (abs(ss)>1e-6){
+    cosbts <- -cs/ss
+  }
+  cosbto <- 5
+  if (abs(so)>1e-6){
+    cosbto <- -co/so
+  }
+
+  if (abs(cosbts)<1){
+    bts <- acos(cosbts)
+    ds <- ss
+  } else {
+    bts <- pi
+    ds <- cs
+  }
+  chi_s <- 2./pi*((bts-pi*.5)*cs+sin(bts)*ss)
+  if (abs(cosbto)<1){
+    bto <- acos(cosbto)
+    doo <- so
+  } else if(tto<90) {
+    bto <- pi
+    doo <- co
+  } else {
+    bto <- 0
+    doo <- -co
+  }
+  chi_o <- 2./pi*((bto-pi*.5)*co+sin(bto)*so)
+
+  #c ..............................................................................
+  #c   Computation of auxiliary azimut angles bt1, bt2, bt3 used
+  #c   for the computation of the bidirectional scattering coefficient w
+  #c .............................................................................
+
+  btran1 <- abs(bts-bto)
+  btran2 <- pi-abs(bts+bto-pi)
+
+  if (psir<=btran1){
+    bt1 <- psir
+    bt2 <- btran1
+    bt3 <- btran2
+  } else {
+    bt1 <- btran1
+    if (psir<=btran2) {
+      bt2 <- psir
+      bt3 <- btran2
+    } else {
+      bt2 <- btran2
+      bt3 <- psir
+    }
+  }
+  t1 <- 2.*cs*co+ss*so*cospsi
+  t2 <- 0
+  if (bt2>0) {
+    t2 <- sin(bt2)*(2.*ds*doo+ss*so*cos(bt1)*cos(bt3))
+  }
+
+  denom <- 2.*pi*pi
+  frho <- ((pi-bt2)*t1+t2)/denom
+  ftau <- (-bt2*t1+t2)/denom
+
+  if (frho<0){
+    frho <- 0
+  }
+  if (ftau<0){
+    ftau <- 0
+  }
+  res <- list("chi_s" = chi_s,"chi_o" =chi_o,"frho" =frho,"ftau" =ftau)
+  return(res)
+}
