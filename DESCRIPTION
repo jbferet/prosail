@@ -24,6 +24,5 @@ Suggests: knitr,
 Imports: 
     expint,
     pracma,
-    prospect,
     utils
 VignetteBuilder: knitr
