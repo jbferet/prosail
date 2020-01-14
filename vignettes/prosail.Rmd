@@ -1,0 +1,113 @@
+---
+title: "Tutorial for prospect"
+author: "Jean-Baptiste Féret, Florian de Boissieu"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval=FALSE
+)
+```
+
+
+This tutorial briefly describes the different functionalities of the R package __prospect__ based on the leaf physical model.
+PROSPECT aims at simulating leaf optical properties (directional-hemispherical reflectance and transmittance) in the optical domain from 400 nm to 2500 nm based on their biophysical properties, including a limited number of biochemical constituents and a unique structure parameter, N. 
+
+The current version of the model implemented in __prospect__ is PROSPECT-PRO, which includes the following biochemical constituents:
+
+* Chlorophyll a + b
+* Carotenoids
+* Anthocyanins
+* Prown pigments
+* Equivalent water thickness (EWT)
+* Leaf mass per area (LMA) 
+* proteins
+* carbon-based consituents (CBC, constituents of dry matter other than proteins)
+
+The specific absoprtion coefficients corresponding to these constituents are recorded in the variable `SpecPROSPECT` available when loading the package __prospect__. 
+
+# Running __prospect__ in direct mode
+
+## Input variables
+The function `PROSPECT` runs PROSPECT for individual samples and expects the following input variables.
+
+* `SpecPROSPECT`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`
+* The biochemical and biophysical input variables of PROSPECT can then be introduced following two possible ways:
+
+    * as individual values : these input variables include `N`, `CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. If no value, their default value is set
+    * `Input_PROSPECT`: a dataframe including the full list of PROSPECT input parameters defind earlier. 
+
+## Output variables
+`PROSPECT` returns a list containing directional-hemispherical reflectance and transmittance (`reflectance` and `transmittance`) corresponding to the input variables.
+
+
+```{r prospect direct mode}
+library(biodivMapR)
+#############################################################
+###         run PROSPECT using default parameters         ###
+#############################################################
+LRT   = PROSPECT(SpecPROSPECT)
+
+#############################################################
+###   run PROSPECT using user defind set of parameters    ###
+#############################################################
+LRT2   = PROSPECT(SpecPROSPECT,N = 1.4,CHL = 30,CAR = 10,EWT = 0.02,LMA = 0.01)
+```
+
+
+# Computing a Look-Up-Table with __prospect__
+
+The function `PROSPECT_LUT` allows computation of a LUT dirctly based on a list of input parameters
+
+
+```{r prospect LUT}
+#############################################################
+###         run PROSPECT in order to produce a LUT        ###
+### if some parameters are not set, their default value   ###
+###               will be added automatically             ###
+#############################################################
+CHL = 100*runif(1000)
+CAR = 25*runif(1000)
+ANT = 2*runif(1000)
+EWT = 0.04*runif(1000)
+LMA = 0.02*runif(1000)
+N   = 1+2*runif(1000)
+Input_PROSPECT  = data.frame('CHL'=CHL,'CAR'=CAR,'ANT'=ANT,'EWT'=EWT,'LMA'=LMA,'N'=N)
+LUT             = PROSPECT_LUT(SpecPROSPECT,Input_PROSPECT)
+```
+
+
+# Running __prospect__ in inverse mode
+
+`PROSPECT` can be inverted using iterative optimization, by calling the function `Invert_PROSPECT`.
+By default, the merit function used for the inversion minimizes RMSE bewen simulated and measured leaf optical properties. 
+However, users can define their own merit function with associated criterion to minimize by defining their own merit function and adding it as input variable, such as `MeritFunction = MyOwnMeritFunction`
+
+## Input variables
+The function `Invert_PROSPECT` requires either reflectance, or transmittance, or both.
+Use can define which input variable of `PROSPECT` should be estimated during inversion, and which ones should be set. 
+The list of input variables for inversion is :
+
+* `SpecPROSPECT`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`
+* `Refl`: numeric: individual leaf reflectance corresponding to the spectral domain defined in `SpecPROSPECT`. Set to NULL if inversion on transmittance only
+* `Tran`: numeric: individual leaf transmittance corresponding to the spectral domain defined in `SpecPROSPECT`. Set to NULL if inversion on reflectance only
+* `Parms2Estimate` Parms2Estimate list. Parameters to estimate. Set to 'ALL' by default. the leaf structure parameter N is systematically estimated, unless defined in `ParmSet`
+* `ParmSet` list of PROSPECT parameters which should be set to a given value
+* `PROSPECT_version` character. corresponds to the PROSPECT version. should be one of the following versions: '5', '5B', 'D', 'DB', 'PRO', 'PROB'. Use the vesion ending with 'B' if you want to estimate brown pigments
+* `MeritFunction` character. name of the function to be used as merit function with given criterion to minimize (default = RMSE)
+
+
+## Output variables
+`Invert_PROSPECT` returns a list containing estimated values of PROSPECT input parameters
+
+

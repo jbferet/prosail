@@ -68,7 +68,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' rsot: bi-directional reflectance factor
 #' rsdt: directional-hemispherical reflectance factor for solar incident flux
 #' rddt: bi-hemispherical reflectance factor
-#' @import prospect
+# @' @import prospect
 #' @export
 
 PRO4SAIL  <- function(SpecPROSPECT_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
@@ -80,9 +80,12 @@ PRO4SAIL  <- function(SpecPROSPECT_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0
   ##############################
   #	LEAF OPTICAL PROPERTIES	##
   ##############################
-  LRT <- prospect::PROSPECT(SpecPROSPECT = SpecPROSPECT_Sensor,Input_PROSPECT=Input_PROSPECT,
+  LRT <- PROSPECT(SpecPROSPECT = SpecPROSPECT_Sensor,Input_PROSPECT=Input_PROSPECT,
                             N=N,CHL=CHL,CAR=CAR,ANT=ANT,BROWN=BROWN,EWT=EWT,
                             LMA=LMA,PROT=PROT,CBC=CBC,alpha=alpha)
+  # LRT <- prospect::PROSPECT(SpecPROSPECT = SpecPROSPECT_Sensor,Input_PROSPECT=Input_PROSPECT,
+  #                           N=N,CHL=CHL,CAR=CAR,ANT=ANT,BROWN=BROWN,EWT=EWT,
+  #                           LMA=LMA,PROT=PROT,CBC=CBC,alpha=alpha)
   rho <- LRT$Reflectance
   tau <- LRT$Transmittance
 

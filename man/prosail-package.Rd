@@ -6,6 +6,8 @@
 \alias{prosail-package}
 \title{prosail: PROSAIL leaf and canopy radiative transfer model and inversion routines}
 \description{
+\if{html}{\figure{logo.png}{options: align='right'}}
+
 The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
               It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.
 }
