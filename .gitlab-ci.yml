@@ -1,0 +1,47 @@
+image: thomaschln/r-devtools
+
+# gitlab-ci file copied from https://www.r-bloggers.com/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
+
+variables:
+  R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
+  CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
+  BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+
+cache:
+  paths:
+  - $R_LIBS_USER
+
+before_script:
+  - apt-get update
+  - apt-get install -y qpdf pandoc
+  - R -e 'devtools::install_cran("pkgdown")'
+
+stages:
+- check
+- deploy
+
+check:
+  stage: check
+  script:
+  - R -e 'print(Sys.getenv("R_LIBS_USER"))'
+  - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  # - R -e 'devtools::install_gitlab("prospect")'
+  # - R -e "install.packages(c('devtools', 'testthat', 'roxygen2'))"
+  - R -e 'devtools::install_deps(dep = T)'
+  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"))'
+  - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
+  - R -e 'devtools::install()'
+
+
+pages:
+  stage: deploy
+  script:
+  - R -e 'pkgdown::build_site()'
+  - mv docs public
+  artifacts:
+    paths:
+    - public
+
+  only:
+  - master
+  
