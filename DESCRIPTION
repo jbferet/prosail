@@ -26,3 +26,5 @@ Imports:
     pracma,
     utils
 VignetteBuilder: knitr
+URL: https://gitlab.com/jbferet/prosail
+BugReports: https://gitlab.com/jbferet/prosail/issues
