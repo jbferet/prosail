@@ -311,7 +311,7 @@ PRO4SAIL  <- function(SpecPROSPECT_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0
 }
 
 #' Computes the leaf angle distribution function value (freq)
-#' Ellipsoidal distribution function caracterised by the average leaf
+#' Ellipsoidal distribution function characterised by the average leaf
 #' inclination angle in degree (ala)
 #' Campbell 1986
 #' @param ala average leaf angle

@@ -3,7 +3,7 @@
 \name{campbell}
 \alias{campbell}
 \title{Computes the leaf angle distribution function value (freq)
-Ellipsoidal distribution function caracterised by the average leaf
+Ellipsoidal distribution function characterised by the average leaf
 inclination angle in degree (ala)
 Campbell 1986}
 \usage{
@@ -17,7 +17,7 @@ foliar_distrib list. lidf and litab
 }
 \description{
 Computes the leaf angle distribution function value (freq)
-Ellipsoidal distribution function caracterised by the average leaf
+Ellipsoidal distribution function characterised by the average leaf
 inclination angle in degree (ala)
 Campbell 1986
 }
