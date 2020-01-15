@@ -14,7 +14,8 @@ cache:
 before_script:
   - apt-get update
   - apt-get install -y qpdf pandoc
-  - R -e 'devtools::install_cran("pkgdown")'
+  # - R -e 'devtools::install_cran("pkgdown")'
+  - R -e 'devtools::install_github("floriandeboissieu/pkgdown", ref = "patch-1")' # for gitlab link support
 
 stages:
 - check
