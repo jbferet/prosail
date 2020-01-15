@@ -2,8 +2,8 @@
 
 # An R package for the simulation of leaf optical properties based on their biochemical and biophysical properties using the PROSPECT leaf model. 
 
-[![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
-[![Build Status](https://gitlab.com/jbferet/prospect/badges/master/pipeline.svg)]
+![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
+![Build Status](https://gitlab.com/jbferet/prospect/badges/master/pipeline.svg)
 
 # 1 Install
 
