@@ -11,6 +11,14 @@
 The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
               It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://gitlab.com/jbferet/prosail}
+  \item Report bugs at \url{https://gitlab.com/jbferet/prosail/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Jean-Baptiste Feret \email{jb.feret@teledetection.fr} (0000-0002-0151-1334) [copyright holder]
 

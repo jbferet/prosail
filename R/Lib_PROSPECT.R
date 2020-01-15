@@ -41,6 +41,21 @@ PROSPECT  <- function(SpecPROSPECT,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
     Input_PROSPECT = data.frame('CHL'= CHL, 'CAR'= CAR, 'ANT'=ANT, 'BROWN'= BROWN, 'EWT'=EWT,
                                 'LMA'=LMA, 'PROT'= PROT, 'CBC'= CBC, 'N'=N, 'alpha'= alpha)
   }
+  if (is.null(Input_PROSPECT$alpha)){
+    Input_PROSPECT$alpha = alpha
+  }
+
+  if (!is.null(Input_PROSPECT$PROT) | !is.null(Input_PROSPECT$CBC)){
+    if (Input_PROSPECT$LMA>0 & (Input_PROSPECT$PROT >0 | Input_PROSPECT$CBC >0)){
+      message('PROT and/or CBC are not set to 0')
+      message('LMA is not set to 0 neither, which is physically incorrect')
+      message('(LMA = PROT + CBC)')
+      message('We assume that PROSPECT-PRO was called and set LMA to 0')
+      message('Please correct input parameters LMA, PROT and/or CBC if needed')
+      Input_PROSPECT$LMA <- 0
+    }
+  }
+
   Kall <-   (Input_PROSPECT$CHL*SpecPROSPECT$SAC_CHL + Input_PROSPECT$CAR*SpecPROSPECT$SAC_CAR+
                Input_PROSPECT$ANT*SpecPROSPECT$SAC_ANT + Input_PROSPECT$BROWN*SpecPROSPECT$SAC_BROWN+
                Input_PROSPECT$EWT*SpecPROSPECT$SAC_EWT + Input_PROSPECT$LMA*SpecPROSPECT$SAC_LMA+

@@ -1,5 +1,5 @@
 ---
-title: "Tutorial for prospect"
+title: "Tutorial for prosail"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output: 
@@ -20,23 +20,15 @@ knitr::opts_chunk$set(
 ```
 
 
-This tutorial briefly describes the different functionalities of the R package __prospect__ based on the leaf physical model.
-PROSPECT aims at simulating leaf optical properties (directional-hemispherical reflectance and transmittance) in the optical domain from 400 nm to 2500 nm based on their biophysical properties, including a limited number of biochemical constituents and a unique structure parameter, N. 
+This tutorial briefly describes the different functionalities of the R package `prosail`, based on the canopy reflectance model __4SAIL__ coupled with the leaf model __PROSPECT__.
+The package `prosail` includes the package `prospect`, so please check the briefl tutorial from [this package](https://jbferet.gitlab.io/prospect/articles/prospect.html) if you need specific information on __PROSPECT__.
 
-The current version of the model implemented in __prospect__ is PROSPECT-PRO, which includes the following biochemical constituents:
+The current version of the model PROSPECT implemented in `prosail` is __PROSPECT-PRO__.
 
-* Chlorophyll a + b
-* Carotenoids
-* Anthocyanins
-* Prown pigments
-* Equivalent water thickness (EWT)
-* Leaf mass per area (LMA) 
-* proteins
-* carbon-based consituents (CBC, constituents of dry matter other than proteins)
+The current version of the model SAIL implemented in `prosail` is __4SAIL__.
 
-The specific absoprtion coefficients corresponding to these constituents are recorded in the variable `SpecPROSPECT` available when loading the package __prospect__. 
 
-# Running __prospect__ in direct mode
+# Running `prosail` in direct mode
 
 ## Input variables
 The function `PROSPECT` runs PROSPECT for individual samples and expects the following input variables.

@@ -36,7 +36,7 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 
 \item{alpha}{numeric. Solid angle for incident light at surface of leaf (simulation of roughness)}
 
-\item{TypeLidf}{numeric. Type of leaf inclination distribution function:}
+\item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
 \item{LIDFa}{numeric.}
 

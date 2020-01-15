@@ -26,7 +26,7 @@
 #' @export
 Invert_PROSPECT  <- function(SpecPROSPECT,Refl = NULL,Tran = NULL,
                              Parms2Estimate = 'ALL',ParmSet = NULL,
-                             PROSPECT_version = 'D',MeritFunction = 'Merit_RMSE'){
+                             PROSPECT_version = 'D',MeritFunction = 'Merit_RMSE_PROSPECT'){
 
   # define PROSPECT input parameters
   InPROSPECT  = data.frame('CHL'=0,'CAR'=0,'ANT'=0,'BROWN'=0,'EWT'=0,
@@ -71,7 +71,6 @@ Invert_PROSPECT  <- function(SpecPROSPECT,Refl = NULL,Tran = NULL,
     if ('LMA'%in%Parms2Estimate){Vars2Estimate = c(Vars2Estimate,6)}
     if ('PROT'%in%Parms2Estimate){Vars2Estimate = c(Vars2Estimate,7)}
     if ('CBC'%in%Parms2Estimate){Vars2Estimate = c(Vars2Estimate,8)}
-    if ('N'%in%Parms2Estimate){Vars2Estimate = c(Vars2Estimate,9)}
     if (!'N'%in%Parms2Estimate & !'N'%in%names(ParmSet)){Vars2Estimate = c(Vars2Estimate,9)}
     if ('alpha'%in%Parms2Estimate){Vars2Estimate = c(Vars2Estimate,10)}
   }
@@ -92,7 +91,7 @@ Invert_PROSPECT  <- function(SpecPROSPECT,Refl = NULL,Tran = NULL,
   return(OutPROSPECT)
 }
 
-#' Merit function for PROSPECT-D and estimation of EWT or LMA
+#' Merit function for PROSPECT inversion
 #'
 #' @param xinit numeric. Vector of input variables to estimate
 #' @param SpecPROSPECT list. Includes optical constants
@@ -105,7 +104,7 @@ Invert_PROSPECT  <- function(SpecPROSPECT,Refl = NULL,Tran = NULL,
 #'
 #' @return fc estimates of the parameters
 #' @export
-Merit_RMSE <- function(xinit,SpecPROSPECT,Refl,Tran,Input_PROSPECT,WhichVars2Estimate) {
+Merit_RMSE_PROSPECT <- function(xinit,SpecPROSPECT,Refl,Tran,Input_PROSPECT,WhichVars2Estimate) {
 
   xinit[xinit<0] = 0
   Input_PROSPECT[WhichVars2Estimate] = xinit

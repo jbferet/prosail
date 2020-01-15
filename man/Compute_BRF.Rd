@@ -19,7 +19,7 @@ Compute_BRF(rdot, rsot, tts, SpecATM_Sensor)
 
 \item{tts}{numeric. Solar zenith angle}
 
-\item{SpecATM_Sensor}{list. direct and diffuse light for clear conditions}
+\item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
 }
 \value{
 BRF numeric. Bidirectional reflectance factor

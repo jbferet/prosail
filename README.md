@@ -1,15 +1,15 @@
-# __prospect__ <img src="man/figures/logo.png" align="right" alt="" width="200" />
+# __prosail__ <img src="man/figures/logo.png" align="right" alt="" width="200" />
 
-# An R package for the simulation of leaf optical properties based on their biochemical and biophysical properties using the PROSPECT leaf model. 
+# An R package for the simulation of canopy reflectance using the model PROSAIL (PROSPECT+SAIL).
 
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
 ![Build Status](https://gitlab.com/jbferet/prospect/badges/master/pipeline.svg)
 
 # 1 Install
 
-After installing package `devtools`, the package `prospect` can be installed with the following command line in R session:
+After installing package `devtools`, the package `prosail` can be installed with the following command line in R session:
 ```
-devtools::install_gitlab('jbferet/prospect')
+devtools::install_gitlab('jbferet/prosail')
 ```
 # 2 Tutorial
 
@@ -24,12 +24,17 @@ devtools::install_gitlab('jbferet/prospect')
 <!-- ) -->
 <!-- ``` -->
 
-A tutorial vignette is available [here](https://jbferet.gitlab.io/prospect/articles/prospect.html).
+A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articles/prosail.html).
 
 # 3 Citation
 
-If you use **prospect**, please cite the following references:
+If you use **prosail**, please cite the following references:
 
-Féret, J.-B., Berger, K., de Boissieu, F. & Malenovský 2020. Estimation of leaf protein and carbon-based constituent content from optical properties with the PROSPECT-PRO model. Remote Sensing of Environment.
+## PROSPECT
+Féret J-B, Berger K, de Boissieu F & Malenovský Z 2020. Estimation of leaf protein and carbon-based constituent content from optical properties with the PROSPECT-PRO model. Remote Sensing of Environment.
 
-Féret, J.-B., Gitelson, A.A., Noble, S.D. & Jacquemoud, S. 2017. PROSPECT-D: Towards modeling leaf optical properties through a complete lifecycle. Remote Sensing of Environment. 193, 204–215. http://dx.doi.org/10.1016/j.rse.2017.03.004
+## 4SAIL
+Verhoef W & Bach H 2007. Coupled soil–leaf-canopy and atmosphere radiative transfer modeling to simulate hyperspectral multi-angular surface reflectance and TOA radiance data. Remote Sensing of Environment, 109:166-182. doi:10.1016/j.rse.2006.12.013
+
+## PROSAIL
+Berger K, Atzberger C, Danner M, D’Urso G, Mauser W, Vuolo F & Hank T 2018. Evaluation of the PROSAIL Model Capabilities for Future Hyperspectral Model Environments: A Review Study. Remote Sensing, 10:85. https://doi.org/10.3390/rs10010085

@@ -112,3 +112,25 @@ applySensorCharacteristics <- function(wvl,InRefl,SRF){
   OutRefl <-do.call('rbind',OutRefl)
   return(OutRefl)
 }
+
+#' Computes spectral response function based on wavelength and FWHM characteristics
+#' @param wvl numeric. spectral sampling of the sensor
+#' @param FWHM numeric. Full Width Half Maximum for each spectral band
+#' @return SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
+#' @importFrom stats dnorm
+#' @export
+Compute_SRF <- function(wvl,FWHM){
+
+  # define full spectral domain in optical domain
+  lambda <- seq(400,2500,by = 1)
+  VoidSpectrum <- matrix(0,nrow = length(lambda),ncol = 1)
+  Spectral_Response <- matrix(0,nrow = length(wvl),ncol = length(lambda))
+  for (i in 1:length(wvl)){
+    y <- dnorm(lambda,wvl[i],FWHM[i]/2.355)
+    Spectral_Response[i,] <- y/max(y)
+  }
+  Spectral_Response[which(Spectral_Response<0.001)] <- 0
+  SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=wvl,'OriginalBands'=lambda)
+  return(SRF)
+}
+

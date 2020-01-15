@@ -21,7 +21,7 @@
 #' @param rdot numeric. Hemispherical-directional reflectance factor in viewing direction
 #' @param rsot numeric. Bi-directional reflectance factor
 #' @param tts numeric. Solar zenith angle
-#' @param SpecATM_Sensor list. direct and diffuse light for clear conditions
+#' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
 #' @return BRF numeric. Bidirectional reflectance factor
 #' @export
 Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
@@ -53,7 +53,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @param PROT numeric. protein content  (g.cm-2)
 #' @param CBC numeric. NonProtCarbon-based constituent content (g.cm-2)
 #' @param alpha numeric. Solid angle for incident light at surface of leaf (simulation of roughness)
-#' @param TypeLidf numeric. Type of leaf inclination distribution function:
+#' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' @param LIDFb numeric.
 #' @param lai numeric. Leaf Area Index
@@ -257,7 +257,8 @@ PRO4SAIL  <- function(SpecPROSPECT_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0
 	  if (alf>200){
 	    # inserted H. Bach 1/3/04
 	    alf <- 200
-	  }	else if (alf==0){
+	  }
+	  if (alf==0){
 	    #	The pure hotspot - no shadow
 	    tsstoo <- tss
 	    sumint <- (1-tss)/(ks*lai)
