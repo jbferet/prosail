@@ -1,5 +1,5 @@
 ---
-title: "Tutorial for prosail"
+title: "Tutorial for `prosail`"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output: 
@@ -25,7 +25,17 @@ The package `prosail` includes the package `prospect`, so please check the brief
 
 The current version of the model PROSPECT implemented in `prosail` is __PROSPECT-PRO__.
 
-The current version of the model SAIL implemented in `prosail` is __4SAIL__.
+The current version of the model SAIL implemented in `prosail` is __4SAIL__. 
+
+The SAIL model is an example of four-stream representations of the radiative transfer equation, in which case one distinguishes two direct fluxes (incident solar flux and radiance in the viewing direction) and two diffuse fluxes (upward and downward hemispherical flux). Detailed description of the functioning of SAIL can be found in [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which th figure below is taken.
+
+<center>
+  <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">
+</center> 
+<center>
+  Fig. 1. Four-stream RT modeling concept as applied in SAIL model
+</center> 
+
 
 # Running `prosail` in direct mode
 
@@ -63,6 +73,9 @@ The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expe
 *	`rdot`: hemispherical-directional reflectance factor in viewing direction
 * `rsot`: bi-directional reflectance factor
 
+
+
+
 ```{r prosail direct mode}
 library(prosail)
 
@@ -94,7 +107,7 @@ The direct and diffuse light are taken into account as proposed by [Francois et 
 BRF <-Compute_BRF(Ref$rdot,Ref$rsot,tts,SpecATM)
 ```
 
-# simulating sensor BRF
+# Simulating sensor BRF
 
 The simulation of sensor BRF requires the Spectral Response Function (SRF) of the sensor. 
 `prosail` includes the SRF of [Sentinel-2A and Sentinel-2B satellites](https://earth.esa.int/documents/247904/685211/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.0.xlsx).

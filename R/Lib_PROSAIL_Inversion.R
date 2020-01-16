@@ -74,7 +74,6 @@ Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,
 
   xinit[xinit<0] = 0
   InVar[Parms2Estimate] <- xinit
-  print(InVar)
   rsoil <- InVar$psoil*SpecSOIL_Sensor$Dry_Soil+(1-InVar$psoil)*SpecSOIL_Sensor$Wet_Soil
   # call PROSAIL to get reflectance from 4 fluxes
   Ref <- PRO4SAIL(SpecPROSPECT_Sensor,CHL = InVar$CHL, CAR = InVar$CAR, ANT = InVar$ANT,
