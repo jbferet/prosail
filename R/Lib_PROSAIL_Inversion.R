@@ -23,7 +23,9 @@
 #' @param ParmSet  list. Parameters set to a fixed value by user
 #' @param MeritFunction  character. name of the function to be used as merit function
 #' with given criterion to minimize (default = RMSE)
-#' @param PriorInfo  list. Prior info on some PROSAIL parameters (includes Mean and SD)
+#' @param PriorInfoMean list. prior mean value of parameters defined as xprior
+#' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
+#' @param WeightPrior numeric. Weight to be applied on prior information to modulate its importance
 #'
 #' @return OutPROSPECT estimated values corresponding to Parms2Estimate
 #' @importFrom pracma fmincon
@@ -31,10 +33,16 @@
 
 Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
                             SpecPROSPECT_Sensor,SpecATM_Sensor,SpecSOIL_Sensor,TypeLidf,
-                            ParmSet,MeritFunction = 'Merit_RMSE_PROSAIL',PriorInfo = NULL){
+                            ParmSet,MeritFunction = 'Merit_RMSE_PROSAIL',PriorInfoMean=NULL,PriorInfoSD=NULL,WeightPrior = 0.01){
 
   # define parameters included in inversion or set
   ParmInv <- WhichParameters2Invert(InitialGuess,LowerBound,UpperBound,ParmSet)
+  if (!is.null(PriorInfoMean) & !is.null(PriorInfoSD)){
+    PriorInfo <- WhichParmPRior(PriorInfoMean,PriorInfoSD)
+    PriorInfoMean <- PriorInfo$PriorInfoMean
+    PriorInfoSD <- PriorInfo$PriorInfoSD
+    Parms2Prior <- PriorInfo$Parms2Prior
+  }
   ParmInv$InVar[ParmInv$Parms2Set] <- ParmInv$ParmSet
 
   # update init value and lower/upper boundaries for inversion based on Vars2Estimate
@@ -43,7 +51,9 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
   ub    = as.vector(ParmInv$UpperBound,mode='numeric')
   resInv   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,brfMES = brfMES,
                   SpecPROSPECT_Sensor=SpecPROSPECT_Sensor, SpecSOIL_Sensor=SpecSOIL_Sensor, SpecATM_Sensor=SpecATM_Sensor,
-                  Parms2Estimate=ParmInv$Parms2Estimate, Parm2Set=ParmInv$Parms2Set, ParmSet=ParmInv$ParmSet ,InVar=ParmInv$InVar ,TypeLidf=TypeLidf,
+                  Parms2Estimate=ParmInv$Parms2Estimate, Parm2Set=ParmInv$Parms2Set, ParmSet=ParmInv$ParmSet ,
+                  InVar=ParmInv$InVar ,TypeLidf=TypeLidf,
+                  PriorInfoMean =PriorInfoMean,PriorInfoSD =PriorInfoSD,Parms2Prior=Parms2Prior,WeightPrior=WeightPrior,
                   method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
                   lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-08,
                   maxfeval = 2000, maxiter = 2000)
@@ -66,14 +76,20 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
 #' @param ParmSet  list. value of variables to be set out of inversion
 #' @param InVar dataframe. full set of PROSAIL input variables
 #' @param TypeLidf  numeric. tyoe of leaf inclination distribution function
+#' @param PriorInfoMean list. prior mean value of parameters defined as xprior
+#' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
+#' @param Parms2Prior numeric. rank of the parameters which should be used with prior information
+#' @param WeightPrior numeric. Weight to be applied on prior information to modulate its importance
 #'
 #' @return fc estimates of the parameters
 #' @export
-Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,
-                               SpecATM_Sensor,Parms2Estimate,Parm2Set,ParmSet,InVar,TypeLidf) {
+Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,SpecATM_Sensor,
+                               Parms2Estimate,Parm2Set,ParmSet,InVar,TypeLidf,
+                               PriorInfoMean=NULL,PriorInfoSD=NULL,Parms2Prior=NULL,WeightPrior=0.01){
 
   xinit[xinit<0] = 0
   InVar[Parms2Estimate] <- xinit
+  xprior <-InVar[Parms2Prior]
   rsoil <- InVar$psoil*SpecSOIL_Sensor$Dry_Soil+(1-InVar$psoil)*SpecSOIL_Sensor$Wet_Soil
   # call PROSAIL to get reflectance from 4 fluxes
   Ref <- PRO4SAIL(SpecPROSPECT_Sensor,CHL = InVar$CHL, CAR = InVar$CAR, ANT = InVar$ANT,
@@ -83,7 +99,7 @@ Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,
   # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
   brfMOD <- Compute_BRF(Ref$rdot,Ref$rsot,InVar$tts,SpecATM_Sensor)
   # compute cost
-  fc <- CostVal_RMSE_PROSAIL(brfMES,brfMOD)
+  fc <- CostVal_RMSE_PROSAIL(brfMES,brfMOD,xprior,PriorInfoMean=PriorInfoMean,PriorInfoSD=PriorInfoSD,WeightPrior=WeightPrior)
   return(fc)
 }
 
@@ -91,29 +107,31 @@ Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,
 #' Value of the cost criterion to minimize during PROSAIL inversion
 #' @param brfMES numeric. Measured bidirectional reflectance
 #' @param brfMOD numeric. Simulated bidirectional reflectance
+#' @param xprior list. values of the parameters for which prior information is provided
+#' @param PriorInfoMean list. prior mean value of parameters defined as xprior
+#' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
+#' @param WeightPrior numeric. Weight to be applied on prior information to modulate its importance
 #'
 #' @return res list. Includes Parms2Estimate, Parms2Set,
 #' InitialGuess, LowerBound, UpperBound, ParmSet, InVar
 #' @export
-CostVal_RMSE_PROSAIL  <- function(brfMES,brfMOD) {
+CostVal_RMSE_PROSAIL  <- function(brfMES,brfMOD,xprior,PriorInfoMean=NULL,PriorInfoSD=NULL,WeightPrior=0.01){
 
   fc = sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
+  if (!is.null(PriorInfoMean)){
+    # message('fc')
+    # print(fc)
+    fc = fc + WeightPrior*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2)
+    # message('prior')
+    # print(0.01*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2))
+    # print(PriorInfoMean)
+    # print(PriorInfoSD)
+    # print((((xprior-PriorInfoMean)/PriorInfoSD)**2))
+    # print(mean(((xprior-PriorInfoMean)/PriorInfoSD)**2))
+    # print(0.01*mean(((xprior-PriorInfoMean)/PriorInfoSD)**2))
+  }
   return(fc)
 }
-
-#' Value of the cost criterion to minimize during PROSAIL inversion
-#' This function includes prior information (mean & SD) about a selection of variables
-#' @param brfMES numeric. Measured bidirectional reflectance
-#' @param brfMOD numeric. Simulated bidirectional reflectance
-#'
-#' @return fc sum of squared difference between simulated and measured leaf optical properties
-#' @export
-CostVal_RMSE_PROSAIL_PRIOR  <- function(brfMES,brfMOD) {
-
-  fc = sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
-  return(fc)
-}
-
 
 #' function identifying which parameters should be estimated during inversion
 #'
@@ -122,7 +140,15 @@ CostVal_RMSE_PROSAIL_PRIOR  <- function(brfMES,brfMOD) {
 #' @param UpperBound list. Upper bound values during inversion
 #' @param ParmSet list. Values for variables out of inversion
 #'
-#' @return fc estimates of the parameters
+#' @return res list. includes
+#' - Parms2Estimate
+#' - Parms2Set
+#' - InitialGuess
+#' - LowerBound
+#' - UpperBound
+#' - ParmSet
+#' - InVar
+#' fc estimates of the parameters
 #' @export
 WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
 
@@ -298,8 +324,116 @@ WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
                       'LIDFa'=0,'LIDFb'=0,'lai'=0,'q'=0,
                       'tts'=0,'tto'=0,'psi'=0,'psoil'=0)
 
-  res = list('Parms2Estimate'=Parms2Estimate,'Parms2Set'=ParmSet_Final,
+  res <- list('Parms2Estimate'=Parms2Estimate,'Parms2Set'=ParmSet_Final,
              'InitialGuess'=InitialGuess_Update,'LowerBound'= LowerBound_Update,
              'UpperBound'=UpperBound_Update,'ParmSet'= ParmSet_Update,'InVar'= InVar)
+  return(res)
+}
+
+#' function identifying for which parameters prior information is known
+#'
+#' @param PriorInfoMean list. mean value expected for a list of parameters
+#' @param PriorInfoSD list. dtandard deviation to the mean expected for a list of parameters
+#'
+#' @return fc estimates of the parameters
+#' @export
+WhichParmPRior <- function(PriorInfoMean,PriorInfoSD) {
+
+  Parms2Prior <- c()
+  PriorInfoMean_Update <- data.frame(row.names = c('Val'))
+  PriorInfoSD_Update <- data.frame(row.names = c('Val'))
+
+  # set parameters to user value defined in ParmSet
+  if ('CHL'%in%names(PriorInfoMean) & 'CHL'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,1)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CHL' = PriorInfoMean$CHL)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CHL' = PriorInfoSD$CHL)
+  }
+  if ('CAR'%in%names(PriorInfoMean) & 'CAR'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,2)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CAR' = PriorInfoMean$CAR)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CAR' = PriorInfoSD$CAR)
+  }
+  if ('ANT'%in%names(PriorInfoMean) & 'ANT'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,3)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'ANT' = PriorInfoMean$ANT)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'ANT' = PriorInfoSD$ANT)
+  }
+  if ('BROWN'%in%names(PriorInfoMean) & 'BROWN'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,4)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'BROWN' = PriorInfoMean$BROWN)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'BROWN' = PriorInfoSD$BROWN)
+  }
+  if ('EWT'%in%names(PriorInfoMean) & 'EWT'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,5)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'EWT' = PriorInfoMean$EWT)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'EWT' = PriorInfoSD$EWT)
+  }
+  if ('LMA'%in%names(PriorInfoMean) & 'LMA'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,6)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LMA' = PriorInfoMean$LMA)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LMA' = PriorInfoSD$LMA)
+  }
+  if ('PROT'%in%names(PriorInfoMean) & 'PROT'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,7)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'PROT' = PriorInfoMean$PROT)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'PROT' = PriorInfoSD$PROT)
+  }
+  if ('CBC'%in%names(PriorInfoMean) & 'CBC'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,8)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CBC' = PriorInfoMean$CBC)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CBC' = PriorInfoSD$CBC)
+  }
+  if ('N'%in%names(PriorInfoMean) & 'N'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,9)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'N' = PriorInfoMean$N)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'N' = PriorInfoSD$N)
+  }
+  if ('alpha'%in%names(PriorInfoMean) & 'alpha'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,10)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'alpha' = PriorInfoMean$alpha)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'alpha' = PriorInfoSD$alpha)
+  }
+  if ('LIDFa'%in%names(PriorInfoMean) & 'LIDFa'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,11)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LIDFa' = PriorInfoMean$LIDFa)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LIDFa' = PriorInfoSD$LIDFa)
+  }
+  if ('LIDFb'%in%names(PriorInfoMean) & 'LIDFb'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,12)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LIDFb' = PriorInfoMean$LIDFb)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LIDFb' = PriorInfoSD$LIDFb)
+  }
+  if ('lai'%in%names(PriorInfoMean) & 'lai'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,13)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'lai' = PriorInfoMean$lai)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'lai' = PriorInfoSD$lai)
+  }
+  if ('q'%in%names(PriorInfoMean) & 'q'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,14)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'q' = PriorInfoMean$q)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'q' = PriorInfoSD$q)
+  }
+  if ('tts'%in%names(PriorInfoMean) & 'tts'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,15)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'tts' = PriorInfoMean$tts)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'tts' = PriorInfoSD$tts)
+  }
+  if ('tto'%in%names(PriorInfoMean) & 'tto'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,16)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'tto' = PriorInfoMean$tto)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'tto' = PriorInfoSD$tto)
+  }
+  if ('psi'%in%names(PriorInfoMean) & 'psi'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,17)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psi' = PriorInfoMean$psi)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psi' = PriorInfoSD$psi)
+  }
+  if ('psoil'%in%names(PriorInfoMean) & 'psoil'%in%names(PriorInfoSD)){
+    Parms2Prior <- c(Parms2Prior,18)
+    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psoil' = PriorInfoMean$psoil)
+    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psoil' = PriorInfoSD$psoil)
+  }
+  res = list('Parms2Prior'=Parms2Prior,'PriorInfoMean'=PriorInfoMean_Update,'PriorInfoSD'=PriorInfoSD_Update)
   return(res)
 }

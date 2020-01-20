@@ -7,7 +7,8 @@ in order to define estimate a set of user defined parameters}
 \usage{
 Invert_PROSAIL(brfMES, InitialGuess, LowerBound, UpperBound,
   SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor, TypeLidf, ParmSet,
-  MeritFunction = "Merit_RMSE_PROSAIL", PriorInfo = NULL)
+  MeritFunction = "Merit_RMSE_PROSAIL", PriorInfoMean = NULL,
+  PriorInfoSD = NULL, WeightPrior = 0.01)
 }
 \arguments{
 \item{brfMES}{numeric. measured BRF to be used during inversion}
@@ -32,7 +33,11 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 \item{MeritFunction}{character. name of the function to be used as merit function
 with given criterion to minimize (default = RMSE)}
 
-\item{PriorInfo}{list. Prior info on some PROSAIL parameters (includes Mean and SD)}
+\item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
+
+\item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
+
+\item{WeightPrior}{numeric. Weight to be applied on prior information to modulate its importance}
 }
 \value{
 OutPROSPECT estimated values corresponding to Parms2Estimate

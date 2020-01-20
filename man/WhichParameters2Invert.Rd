@@ -16,7 +16,17 @@ WhichParameters2Invert(InitialGuess, LowerBound, UpperBound, ParmSet)
 \item{ParmSet}{list. Values for variables out of inversion}
 }
 \value{
+res list. includes
+\itemize{
+\item Parms2Estimate
+\item Parms2Set
+\item InitialGuess
+\item LowerBound
+\item UpperBound
+\item ParmSet
+\item InVar
 fc estimates of the parameters
+}
 }
 \description{
 function identifying which parameters should be estimated during inversion

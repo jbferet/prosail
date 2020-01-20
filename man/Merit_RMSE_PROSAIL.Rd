@@ -5,7 +5,9 @@
 \title{Merit function for PROSAIL inversion}
 \usage{
 Merit_RMSE_PROSAIL(xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
-  SpecATM_Sensor, Parms2Estimate, Parm2Set, ParmSet, InVar, TypeLidf)
+  SpecATM_Sensor, Parms2Estimate, Parm2Set, ParmSet, InVar, TypeLidf,
+  PriorInfoMean = NULL, PriorInfoSD = NULL, Parms2Prior = NULL,
+  WeightPrior = 0.01)
 }
 \arguments{
 \item{xinit}{numeric. Vector of input variables to estimate}
@@ -29,6 +31,14 @@ to be estimated through inversion}
 \item{InVar}{dataframe. full set of PROSAIL input variables}
 
 \item{TypeLidf}{numeric. tyoe of leaf inclination distribution function}
+
+\item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
+
+\item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
+
+\item{Parms2Prior}{numeric. rank of the parameters which should be used with prior information}
+
+\item{WeightPrior}{numeric. Weight to be applied on prior information to modulate its importance}
 }
 \value{
 fc estimates of the parameters
