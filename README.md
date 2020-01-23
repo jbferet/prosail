@@ -2,8 +2,8 @@
 
 # An R package for the simulation of canopy reflectance using the model PROSAIL (PROSPECT+SAIL).
 
-![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
-![Build Status](https://gitlab.com/jbferet/prospect/badges/master/pipeline.svg)
+[![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
+[![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
 # 1 Install
 
