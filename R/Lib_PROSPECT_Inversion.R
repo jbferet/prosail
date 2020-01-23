@@ -79,17 +79,67 @@ Invert_PROSPECT  <- function(SpecPROSPECT,Refl = NULL,Tran = NULL,
   xinit = xinit_All[Vars2Estimate]
   lb    = lb_All[Vars2Estimate]
   ub    = ub_All[Vars2Estimate]
-  res   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,
-                  SpecPROSPECT=SpecPROSPECT,Refl=Refl,Tran=Tran,
-                  Input_PROSPECT = InPROSPECT,WhichVars2Estimate=Vars2Estimate,
-                  method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
-                  lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-07,
-                  maxfeval = 2000, maxiter = 1000)
+  # run inversion procedure with standard parameterization
+  res <- tryInversion(xinit,MeritFunction,SpecPROSPECT,Refl,Tran,
+                           InPROSPECT,Vars2Estimate,lb,ub)
+  # res   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,
+  #                 SpecPROSPECT=SpecPROSPECT,Refl=Refl,Tran=Tran,
+  #                 Input_PROSPECT = InPROSPECT,WhichVars2Estimate=Vars2Estimate,
+  #                 method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
+  #                 lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-07,
+  #                 maxfeval = 2000, maxiter = 1000)
 
   OutPROSPECT  = InPROSPECT
   OutPROSPECT[Vars2Estimate]= res$par
   return(OutPROSPECT)
 }
+
+
+#' Function handling error during inversion
+#'
+#' @param xinit numeric. Vector of input variables to estimate
+#' @param MeritFunction  character. name of the function to be used as merit function
+#' @param SpecPROSPECT list. Includes optical constants
+#' refractive index, specific absorption coefficients and corresponding spectral bands
+#' @param Refl  numeric. measured reflectance data
+#' @param Tran  numeric. measured Transmittance data
+#' @param InPROSPECT dataframe. set of PROSPECT input variables
+#' @param Vars2Estimate  numeric. location of variables from Input_PROSPECT
+#' to be estimated through inversion
+#' @param lb numeric. Lower bound
+#' @param ub numeric. Upper bound
+#'
+#' @return fc estimates of the parameters
+#' @export
+
+tryInversion <- function(xinit,MeritFunction,SpecPROSPECT,Refl,Tran,
+                         InPROSPECT,Vars2Estimate,lb,ub) {
+  res <- tryCatch(
+    {
+      res   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,
+                      SpecPROSPECT=SpecPROSPECT,Refl=Refl,Tran=Tran,
+                      Input_PROSPECT = InPROSPECT,WhichVars2Estimate=Vars2Estimate,
+                      method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
+                      lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-07,
+                      maxfeval = 2000, maxiter = 1000)
+    },
+    error=function(cond) {
+      message("Inversion failed on a sample")
+      message("Error message obtained:")
+      message(cond)
+      message("")
+      message("NA values will be set for this sample")
+      # Choose a return value in case of error
+      res <- list()
+      res$par <- NA*xinit
+      return(res)
+    },
+    finally={
+    }
+  )
+  return(res)
+}
+
 
 #' Merit function for PROSPECT inversion
 #'

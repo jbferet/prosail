@@ -122,7 +122,7 @@ PROSPECT  <- function(SpecPROSPECT,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
   denom       = 1-Rsub*r
   tran        = Ta*Tsub/denom
   refl        = Ra+(Ta*Rsub*t)/denom
-  my_list <- list("Reflectance" = refl,"Transmittance" =tran)
+  my_list <- list("Reflectance" = refl,"Transmittance" =tran,"wvl"=SpecPROSPECT$lambda)
   return(my_list)
 }
 
