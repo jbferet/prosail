@@ -19,6 +19,7 @@ then install the `getPass` package, and run this command line:
 devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::cred_user_pass('Your_Gitlab_UserName',getPass::getPass())) 
 ```
 
+
 # 2 Tutorial
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
