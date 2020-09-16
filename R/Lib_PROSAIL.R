@@ -385,6 +385,7 @@ campbell  <- function(ala){
 #' @export
 dladgen  <- function(a,b){
   litab=c(5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.)
+  freq=c()
   for (i1 in 1:8){
     t <- i1*10
     freq[i1] <- dcum(a,b,t)
