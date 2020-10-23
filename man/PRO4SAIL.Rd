@@ -4,11 +4,29 @@
 \alias{PRO4SAIL}
 \title{Performs PROSAIL simulation based on a set of combinations of input parameters}
 \usage{
-PRO4SAIL(SpecPROSPECT_Sensor, Input_PROSPECT = NULL, N = 1.5,
-  CHL = 40, CAR = 8, ANT = 0, BROWN = 0, EWT = 0.01,
-  LMA = 0.008, PROT = 0, CBC = 0, alpha = 40, TypeLidf = 2,
-  LIDFa = NULL, LIDFb = NULL, lai = NULL, q = NULL, tts = NULL,
-  tto = NULL, psi = NULL, rsoil = NULL)
+PRO4SAIL(
+  SpecPROSPECT_Sensor,
+  Input_PROSPECT = NULL,
+  N = 1.5,
+  CHL = 40,
+  CAR = 8,
+  ANT = 0,
+  BROWN = 0,
+  EWT = 0.01,
+  LMA = 0.008,
+  PROT = 0,
+  CBC = 0,
+  alpha = 40,
+  TypeLidf = 2,
+  LIDFa = NULL,
+  LIDFb = NULL,
+  lai = NULL,
+  q = NULL,
+  tts = NULL,
+  tto = NULL,
+  psi = NULL,
+  rsoil = NULL
+)
 }
 \arguments{
 \item{SpecPROSPECT_Sensor}{list. Includes optical constants required for PROSPECT

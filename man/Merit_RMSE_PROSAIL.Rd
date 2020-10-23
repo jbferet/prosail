@@ -4,10 +4,22 @@
 \alias{Merit_RMSE_PROSAIL}
 \title{Merit function for PROSAIL inversion}
 \usage{
-Merit_RMSE_PROSAIL(xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
-  SpecATM_Sensor, Parms2Estimate, Parm2Set, ParmSet, InVar, TypeLidf,
-  PriorInfoMean = NULL, PriorInfoSD = NULL, Parms2Prior = NULL,
-  WeightPrior = 0.01)
+Merit_RMSE_PROSAIL(
+  xinit,
+  brfMES,
+  SpecPROSPECT_Sensor,
+  SpecSOIL_Sensor,
+  SpecATM_Sensor,
+  Parms2Estimate,
+  Parm2Set,
+  ParmSet,
+  InVar,
+  TypeLidf,
+  PriorInfoMean = NULL,
+  PriorInfoSD = NULL,
+  Parms2Prior = NULL,
+  WeightPrior = 0.01
+)
 }
 \arguments{
 \item{xinit}{numeric. Vector of input variables to estimate}

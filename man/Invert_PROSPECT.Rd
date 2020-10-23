@@ -5,9 +5,15 @@
 \title{Performs PROSPECT inversion using iterative optimization
 in order to define estimate a set of user defined parameters}
 \usage{
-Invert_PROSPECT(SpecPROSPECT, Refl = NULL, Tran = NULL,
-  Parms2Estimate = "ALL", ParmSet = NULL, PROSPECT_version = "D",
-  MeritFunction = "Merit_RMSE_PROSPECT")
+Invert_PROSPECT(
+  SpecPROSPECT,
+  Refl = NULL,
+  Tran = NULL,
+  Parms2Estimate = "ALL",
+  ParmSet = NULL,
+  PROSPECT_version = "D",
+  MeritFunction = "Merit_RMSE_PROSPECT"
+)
 }
 \arguments{
 \item{SpecPROSPECT}{list. Includes optical constants

@@ -4,12 +4,14 @@
 \name{Sentinel_2A}
 \alias{Sentinel_2A}
 \title{Spectral response function (SRF) for Sentinel-2A}
-\format{A list including
+\format{
+A list including
 \itemize{
 \item \emph{Spectral_Response}: the SRF of each spectral band of the sensor for a spectral domain compatible with PROSAIL
-\item \emph{Spectral_Bands}: the spectral bands of the sensor (i.e. wavelength or name of teh band as character)
+\item \emph{Spectral_Bands}: the spectral bands of the sensor (i.e. wavelength or name of the band as character)
 \item \emph{OriginalBands}: original spectral bands for which SRF is defined (compatible with PROSAIL == 1 nm spectral sampling)
-}}
+}
+}
 \usage{
 Sentinel_2A
 }

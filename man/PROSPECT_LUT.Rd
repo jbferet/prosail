@@ -5,9 +5,20 @@
 \title{computation of a LUT of leaf optical properties using a set of
 leaf chemical & structural parameters}
 \usage{
-PROSPECT_LUT(SpecPROSPECT, Input_PROSPECT = NULL, N = NULL,
-  CHL = NULL, CAR = NULL, ANT = NULL, BROWN = NULL, EWT = NULL,
-  LMA = NULL, PROT = NULL, CBC = NULL, alpha = NULL)
+PROSPECT_LUT(
+  SpecPROSPECT,
+  Input_PROSPECT = NULL,
+  N = NULL,
+  CHL = NULL,
+  CAR = NULL,
+  ANT = NULL,
+  BROWN = NULL,
+  EWT = NULL,
+  LMA = NULL,
+  PROT = NULL,
+  CBC = NULL,
+  alpha = NULL
+)
 }
 \arguments{
 \item{SpecPROSPECT}{dataframe. Includes optical constants

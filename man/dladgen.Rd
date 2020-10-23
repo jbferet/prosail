@@ -2,12 +2,15 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{dladgen}
 \alias{dladgen}
-\title{Computes the leaf angle distribution function value (freq)using the original bimodal distribution function initially proposed in SAILReferences
+\title{\subsection{Computes the leaf angle distribution function value (freq)
+using the original bimodal distribution function initially proposed in SAIL
+References}{
 
 (Verhoef1998) Verhoef, Wout. Theory of radiative transfer models applied
 in optical remote sensing of vegetation canopies.
 Nationaal Lucht en Ruimtevaartlaboratorium, 1998.
-http://library.wur.nl/WebQuery/clc/945481.}
+http://library.wur.nl/WebQuery/clc/945481.
+}}
 \usage{
 dladgen(a, b)
 }
@@ -28,10 +31,13 @@ requirement: |LIDFa| + |LIDFb| < 1}
 foliar_distrib list. lidf and litab
 }
 \description{
-Computes the leaf angle distribution function value (freq)using the original bimodal distribution function initially proposed in SAILReferences
+\subsection{Computes the leaf angle distribution function value (freq)
+using the original bimodal distribution function initially proposed in SAIL
+References}{
 
 (Verhoef1998) Verhoef, Wout. Theory of radiative transfer models applied
 in optical remote sensing of vegetation canopies.
 Nationaal Lucht en Ruimtevaartlaboratorium, 1998.
 http://library.wur.nl/WebQuery/clc/945481.
+}
 }

@@ -5,10 +5,21 @@
 \title{Performs PROSAIL inversion using iterative optimization
 in order to define estimate a set of user defined parameters}
 \usage{
-Invert_PROSAIL(brfMES, InitialGuess, LowerBound, UpperBound,
-  SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor, TypeLidf, ParmSet,
-  MeritFunction = "Merit_RMSE_PROSAIL", PriorInfoMean = NULL,
-  PriorInfoSD = NULL, WeightPrior = 0.01)
+Invert_PROSAIL(
+  brfMES,
+  InitialGuess,
+  LowerBound,
+  UpperBound,
+  SpecPROSPECT_Sensor,
+  SpecATM_Sensor,
+  SpecSOIL_Sensor,
+  TypeLidf,
+  ParmSet,
+  MeritFunction = "Merit_RMSE_PROSAIL",
+  PriorInfoMean = NULL,
+  PriorInfoSD = NULL,
+  WeightPrior = 0.01
+)
 }
 \arguments{
 \item{brfMES}{numeric. measured BRF to be used during inversion}

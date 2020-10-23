@@ -4,8 +4,14 @@
 \alias{CostVal_RMSE_PROSAIL}
 \title{Value of the cost criterion to minimize during PROSAIL inversion}
 \usage{
-CostVal_RMSE_PROSAIL(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
-  PriorInfoSD = NULL, WeightPrior = 0.01)
+CostVal_RMSE_PROSAIL(
+  brfMES,
+  brfMOD,
+  xprior,
+  PriorInfoMean = NULL,
+  PriorInfoSD = NULL,
+  WeightPrior = 0.01
+)
 }
 \arguments{
 \item{brfMES}{numeric. Measured bidirectional reflectance}

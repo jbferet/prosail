@@ -6,7 +6,7 @@
 \alias{prosail-package}
 \title{prosail: PROSAIL leaf and canopy radiative transfer model and inversion routines}
 \description{
-\if{html}{\figure{logo.png}{options: align='right'}}
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
               It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.
@@ -20,11 +20,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jean-Baptiste Feret \email{jb.feret@teledetection.fr} (0000-0002-0151-1334) [copyright holder]
+\strong{Maintainer}: Jean-Baptiste Feret \email{jb.feret@teledetection.fr} (\href{https://orcid.org/0000-0002-0151-1334}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
-  \item Florian de Boissieu \email{florian.deboissieu@irstea.fr} (0000-0002-2185-9952)
+  \item Florian de Boissieu \email{florian.deboissieu@irstea.fr} (\href{https://orcid.org/0000-0002-2185-9952}{ORCID})
 }
 
 }

@@ -4,12 +4,14 @@
 \name{SpecSOIL}
 \alias{SpecSOIL}
 \title{soil reflectance for PROSAIL simulations}
-\format{A dataframe including 2101 rows and 10 columns
+\format{
+A dataframe including 2101 rows and 10 columns
 \itemize{
 \item \emph{lambda}: wavelength, between 400 nm and 2500 nm
 \item \emph{Dry_Soil}: reflectance of dry soil
 \item \emph{Wet_Soil}: reflectance of wet soil
-}}
+}
+}
 \usage{
 SpecSOIL
 }

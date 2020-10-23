@@ -34,6 +34,11 @@ GetRadiometry <- function(SensorName,Path_SensorResponse = NULL){
     Spectral_Response <- Sentinel_2B$Spectral_Response
     Spectral_Bands <- Sentinel_2B$Spectral_Bands
     OriginalBands <- Sentinel_2B$OriginalBands
+    # if sensor is Venus
+  } else if (SensorName=='Venus'){
+    Spectral_Response <- Venus$Spectral_Response
+    Spectral_Bands <- Venus$Spectral_Bands
+    OriginalBands <- Venus$OriginalBands
     # if sensor is not SENTINEL-2
   }  else {
     # identify file containing spectral response
