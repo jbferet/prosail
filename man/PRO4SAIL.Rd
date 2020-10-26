@@ -5,7 +5,7 @@
 \title{Performs PROSAIL simulation based on a set of combinations of input parameters}
 \usage{
 PRO4SAIL(
-  SpecPROSPECT_Sensor,
+  Spec_Sensor,
   Input_PROSPECT = NULL,
   N = 1.5,
   CHL = 40,
@@ -25,11 +25,17 @@ PRO4SAIL(
   tts = NULL,
   tto = NULL,
   psi = NULL,
-  rsoil = NULL
+  rsoil = NULL,
+  fraction_brown = 0.5,
+  diss = 0.5,
+  Cv = 1,
+  Zeta = 1,
+  SAILversion = "4SAIL",
+  BrownVegetation = NULL
 )
 }
 \arguments{
-\item{SpecPROSPECT_Sensor}{list. Includes optical constants required for PROSPECT
+\item{Spec_Sensor}{list. Includes optical constants required for PROSPECT
 refractive index, specific absorption coefficients and corresponding spectral bands}
 
 \item{Input_PROSPECT}{list. PROSPECT input variables}
@@ -56,9 +62,13 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
-\item{LIDFa}{numeric.}
+\item{LIDFa}{numeric.
+if TypeLidf ==1, controls the average leaf slope
+if TypeLidf ==2, corresponds to average leaf angle}
 
-\item{LIDFb}{numeric.}
+\item{LIDFb}{numeric.
+if TypeLidf ==1, unused
+if TypeLidf ==2, controls the distribution's bimodality}
 
 \item{lai}{numeric. Leaf Area Index}
 
@@ -71,6 +81,24 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 \item{psi}{numeric. Azimuth Sun / Observer}
 
 \item{rsoil}{numeric. Soil reflectance}
+
+\item{fraction_brown}{numeric. Fraction of brown leaf area}
+
+\item{diss}{numeric. Layer dissociation factor}
+
+\item{Cv}{numeric. vertical crown cover percentage
+= \% ground area covered with crowns as seen from nadir direction}
+
+\item{Zeta}{numeric. Tree shape factor
+= ratio of crown diameter to crown height}
+
+\item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
+
+\item{BrownVegetation}{list. Defines optical properties for brown vegetation, if not NULL
+\itemize{
+\item WVL, Reflectance, Transmittance
+\item Set to NULL if use PROSPECT to generate it
+}}
 }
 \value{
 list. rdot,rsot,rddt,rsdt

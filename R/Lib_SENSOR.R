@@ -16,6 +16,7 @@
 #' @param SensorName character. name of the sensor
 #' @param Path_SensorResponse character.
 #' @return SRF list. Spectral response function, corresponding spectral bands, and Original Bands
+#' @import utils
 #' @importFrom utils read.csv
 #'
 #' @export

@@ -31,10 +31,16 @@ knitr::opts_chunk$set(
 ## Input variables
 The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expects the following input variables.
 
-* `SpecPROSPECT`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). Simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`
+* `SAILversion`: the version of SAIL to be used. The default version is __4SAIL__. __4SAIL2__ can also be called from the same function with additional parameters. Both versions include the following input parameters:
 
-* The biochemical and biophysical input variables of PROSPECT, including `N`, `CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. If no value, their default value is set
+* `Spec_Sensor`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). Simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`, which is loaded by default when calling the package `prospect`.
 
+* The biochemical and biophysical input variables of PROSPECT, including `N`, `CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. If no value, their default value is set.
+
+    * Note that a unique value (or no value) is expected for each of the leaf consituents when running __4SAIL__. __4SAIL2__ allows introduction of two distinct sets of leaf optical properties. In the original version, one type is dedicated to 'Green leaves', and the other type is dedicated to 'Brown leaves'. User can decide either to simulate both types of leaf optical properties using PROSPECT, or to directly define these leaf optical properties with the `BrownVegetation` input parameter, defined as follows
+
+    * `BrownVegetation` is a parameter specific to  __4SAIL2__. It should be a list including `Reflectance` and `Transmittance`, with the spectral sampling corresponding to the sampling defined in `Spec_Sensor`
+    
 * `TypeLidf`: two leaf inclination distribution functions are implemented here. 
 
     * Define `TypeLidf=1` if you want to use the original LIDF introduced by [Verhoef (1998)](https://edepot.wur.nl/210943).
@@ -54,6 +60,18 @@ The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expe
 
 * `rsoil`: soil reflectance
 
+Additionally, __4SAIL2__ also includes the following parameters
+
+* `fraction_brown`: the Fraction of LAI corresponding to brown leaf area, between 0 and 1
+
+* `diss`: Layer dissociation factor
+
+* `Cv`: vertical crown cover percentage (= % ground area covered with crowns as seen from nadir direction)
+
+* `Zeta`: Tree shape factor (= ratio of crown diameter to crown height)
+
+* `BrownVegetation`: optional input parameter. If user defined brown vegetation such as experimental measurements is available. If PROSPECT is used to define both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
+
 ## Output variables
 `PRO4SAIL` returns a list containing four reflectance factors 
 
@@ -62,7 +80,10 @@ The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expe
 *	`rdot`: hemispherical-directional reflectance factor in viewing direction
 * `rsot`: bi-directional reflectance factor
 
+Additionally, __4SAIL2__ returns the two following parameters: 
 
+* `alfast`: canopy absorptance for direct solar incident flux
+* `alfadt`: canopy absorptance for hemispherical diffuse incident flux
 
 
 ```{r prosail direct mode}
@@ -78,10 +99,31 @@ q <- 0.01;      # Hot spot parameter
 TypeLidf <- 2;  LIDFa <- 30;    LIDFb <- NULL;  # leaf inclination distribution function parameters
 tts <- 30;      tto <- 10;      psi <- 90;      # geometry of acquisition
 rsoil <- SpecSOIL$Dry_Soil                      # soil reflectance (SpecSOIL includes Dry_Soil and Wet_Soil properties)
-# run PROSAIL
-Ref <- PRO4SAIL(SpecPROSPECT,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-               TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
-               q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
+# run PROSAIL with 4SAIL
+Ref_4SAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                      CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+                      TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
+                      q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
+
+# run PROSAIL with 4SAIL2
+fraction_brown <- 0.5
+diss <- 0.5
+Cv <- 1
+Zeta <- 1
+# define a couple of leaf chemical constituents corresponding to green and brown leaves
+CHL <- c(40,5)
+CAR <- c(8,5)
+ANT <- c(0,1)
+EWT <- c(0.01,0.005)
+LMA <- c(0.009,0.008)
+N = c(1.5,2)
+
+Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',Spec_Sensor = SpecPROSPECT,
+                       CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+                       TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
+                       q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil,
+                       fraction_brown = fraction_brown, diss = diss, Cv = Cv, Zeta = Zeta)
+
 ```
 
 
@@ -122,9 +164,9 @@ Then, optical values used to compute reflectance (specifica absorption constitue
 
 ```{r Conversion}
 # apply sensor characteristics to PROSPECT optical constants
-SpecPROSPECT_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-SpecPROSPECT_Sensor = split(SpecPROSPECT_Sensor, rep(1:ncol(SpecPROSPECT_Sensor), each = nrow(SpecPROSPECT_Sensor))) # split matrix into list
-names(SpecPROSPECT_Sensor)=names(SpecPROSPECT) # keep names for elements of list
+Spec_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
+Spec_Sensor = split(Spec_Sensor, rep(1:ncol(Spec_Sensor), each = nrow(Spec_Sensor))) # split matrix into list
+names(Spec_Sensor)=names(SpecPROSPECT) # keep names for elements of list
 # apply sensor characteristics to atmospheric properties
 SpecATM_Sensor = applySensorCharacteristics(wvl,SpecATM,SRF)
 SpecATM_Sensor = split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor))) # split matrix into list
@@ -142,7 +184,7 @@ names(SpecSOIL_Sensor)=names(SpecSOIL) # keep names for elements of list
 # WL is a vector giving central wavelength for each band in nanometer
 # FWHM is a vector giving FWHM for each band in nanometer
 rsoil2 <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(SpecPROSPECT_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+Ref_Sensor <- PRO4SAIL(Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
                TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
                q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
 # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
