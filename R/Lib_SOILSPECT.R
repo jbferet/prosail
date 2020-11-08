@@ -1,16 +1,16 @@
-# ==============================================================================
+# ============================================================================== =
 # prosail
 # Lib_SOILSPECT.R
-# ==============================================================================
+# ============================================================================== =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
-# ==============================================================================
+# ============================================================================== =
 # This Library includes the SOILSPECT model
 # reference: Jacquemoud, S., Baret, F., Hanocq, J.F., 1992.
 # Modeling spectral and bidirectional soil reflectance. Remote Sens. Environ.
 # 41, 123–132. https://doi.org/10.1016/0034-4257(92)90072-R
-# ==============================================================================
+# ============================================================================== =
 
 #' Computation of soil optical properties with SOILSPECT
 #' (derived from Hapke) for a given single scattering albedo spectrum:

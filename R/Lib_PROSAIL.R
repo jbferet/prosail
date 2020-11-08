@@ -1,14 +1,14 @@
-# ==============================================================================
+# ============================================================================= =
 # prosail
 # Lib_PROSAIL.R
-# ==============================================================================
+# ============================================================================= =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
-# ==============================================================================
+# ============================================================================= =
 # This Library includes functions dedicated to PROSAIL simulation
 # SAIL versions available are 4SAIL and 4SAIL2
-# ==============================================================================
+# ============================================================================= =
 
 
 #' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
@@ -27,9 +27,9 @@
 #' @export
 Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 
-  ##############################
+  ############################## #
   ##	direct / diffuse light	##
-  ##############################
+  ############################## #
   Es <- SpecATM_Sensor$Direct_Light
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
@@ -93,9 +93,9 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
                      fraction_brown = 0.5, diss = 0.5, Cv = 1,Zeta = 1,
                      SAILversion = '4SAIL',BrownVegetation = NULL){
 
-  ##############################
+  ############################ #
   #	LEAF OPTICAL PROPERTIES	##
-  ##############################
+  ############################ #
   if (is.null(Input_PROSPECT)){
     Input_PROSPECT = data.frame('CHL'= CHL, 'CAR'= CAR, 'ANT'=ANT, 'BROWN'= BROWN, 'EWT'=EWT,
                                 'LMA'=LMA, 'PROT'= PROT, 'CBC'= CBC, 'N'=N, 'alpha'= alpha)
@@ -210,9 +210,9 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
 fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai = NULL,
                       q = NULL, tts = NULL, tto = NULL, psi = NULL, rsoil = NULL){
 
-  ##############################
+  ############################ #
   #	LEAF OPTICAL PROPERTIES	##
-  ##############################
+  ############################ #
   rho <- LeafOptics$Reflectance
   tau <- LeafOptics$Transmittance
 

@@ -1,45 +1,45 @@
-# ==============================================================================
+# ============================================================================= =
 # prosail
 # Lib_SENSOR.R
-# ==============================================================================
+# ============================================================================= =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
-# ==============================================================================
+# ============================================================================= =
 # This Library includes functions dedicated to convrsion from high resolution
 # reflectance to sensor reflectance
 # using either known snsor response, or gaussian filters
-# ==============================================================================
+# ============================================================================= =
 
 #' reads spectral response from known sensor
 #' spectral response from Sentinel-2 is already defined
 #' @param SensorName character. name of the sensor
 #' @param Path_SensorResponse character.
 #' @return SRF list. Spectral response function, corresponding spectral bands, and Original Bands
-#' @import utils
+# @import utils
 #' @importFrom utils read.csv
-#'
 #' @export
+
 GetRadiometry <- function(SensorName,Path_SensorResponse = NULL){
 
   # if sensor is SENTINEL-2
   if (SensorName=='Sentinel_2'){
-    Spectral_Response <- Sentinel_2$Spectral_Response
-    Spectral_Bands <- Sentinel_2$Spectral_Bands
-    OriginalBands <- Sentinel_2$OriginalBands
+    Spectral_Response <- prosail::Sentinel_2$Spectral_Response
+    Spectral_Bands <- prosail::Sentinel_2$Spectral_Bands
+    OriginalBands <- prosail::Sentinel_2$OriginalBands
   } else if (SensorName=='Sentinel_2A'){
-    Spectral_Response <- Sentinel_2A$Spectral_Response
-    Spectral_Bands <- Sentinel_2A$Spectral_Bands
-    OriginalBands <- Sentinel_2A$OriginalBands
+    Spectral_Response <- prosail::Sentinel_2A$Spectral_Response
+    Spectral_Bands <- prosail::Sentinel_2A$Spectral_Bands
+    OriginalBands <- prosail::Sentinel_2A$OriginalBands
   } else if (SensorName=='Sentinel_2B'){
-    Spectral_Response <- Sentinel_2B$Spectral_Response
-    Spectral_Bands <- Sentinel_2B$Spectral_Bands
-    OriginalBands <- Sentinel_2B$OriginalBands
+    Spectral_Response <- prosail::Sentinel_2B$Spectral_Response
+    Spectral_Bands <- prosail::Sentinel_2B$Spectral_Bands
+    OriginalBands <- prosail::Sentinel_2B$OriginalBands
     # if sensor is Venus
   } else if (SensorName=='Venus'){
-    Spectral_Response <- Venus$Spectral_Response
-    Spectral_Bands <- Venus$Spectral_Bands
-    OriginalBands <- Venus$OriginalBands
+    Spectral_Response <- prosail::Venus$Spectral_Response
+    Spectral_Bands <- prosail::Venus$Spectral_Bands
+    OriginalBands <- prosail::Venus$OriginalBands
     # if sensor is not SENTINEL-2
   }  else {
     # identify file containing spectral response

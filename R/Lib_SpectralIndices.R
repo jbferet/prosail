@@ -1,14 +1,14 @@
-# ==============================================================================
+# ============================================================================== =
 # prosail
 # Lib_SpectralIndices.R
-# ==============================================================================
+# ============================================================================== =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Florian de BOISSIEU <fdeboiss@gmail.com>
 # Copyright 2019/11 Jean-Baptiste FERET
-# ==============================================================================
+# ============================================================================== =
 # This Library includes aims at computing spectral indices from reflectance data
-# ==============================================================================
+# ============================================================================== =
 
 #' this function aims at computing spectral indices from Sensor reflectance data in raster object
 #' it computes the spectral indices based on their computation with Sentinel-2
@@ -26,7 +26,7 @@
 #' - SpectralIndices: List of spectral indices computed from the reflectance initially provided
 #' - listIndices: list of spectral indices computable with the function
 #' @importFrom methods is
-#' @import raster
+#' @importFrom raster stack brick
 #' @export
 
 ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', StackOut=T){
@@ -42,7 +42,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     Refl <- raster::stack(Refl[Sen2S2]) # checks that all rasters have same crs/extent
   Refl <- subset(Refl, Sen2S2)
   if(is(Refl, 'RasterStack'))
-    Refl = raster::brick(Refl) # loads the data: much faster than stack that is loading raster each time it is used
+    Refl <- raster::brick(Refl) # loads the data: much faster than stack that is loading raster each time it is used
   if(!is(Refl, 'RasterBrick'))
     stop('Refl is expected to be a RasterStack or a list of rasters')
 
@@ -63,7 +63,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
                       'NDVI705','NDWI','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
                       'SAVI','SIPI','SR','CR_SWIR')
   if (Sel_Indices[1]=='ALL'){
-    Sel_Indices = listIndices
+    Sel_Indices <- listIndices
   }
   if ('ARI1'%in%Sel_Indices){
     ARI1 <- (1/Refl[["B3"]])-(1/Refl[["B5"]])
@@ -78,123 +78,123 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     SpectralIndices$ARVI <- ARVI
   }
   if ('BAI'%in%Sel_Indices){
-    BAI     = (1/((0.1-Refl[["B4"]])**2+(0.06-Refl[["B8"]])**2))
+    BAI <- (1/((0.1-Refl[["B4"]])**2+(0.06-Refl[["B8"]])**2))
     SpectralIndices$BAI <- BAI
   }
   if ('CHL_RE'%in%Sel_Indices){
-    CHL_RE  = Refl[["B5"]]/Refl[["B8"]]
+    CHL_RE <- Refl[["B5"]]/Refl[["B8"]]
     SpectralIndices$CHL_RE <- CHL_RE
   }
   if ('CRI1'%in%Sel_Indices){
-    CRI1    = (1/Refl[["B2"]])-(1/Refl[["B3"]])
+    CRI1 <- (1/Refl[["B2"]])-(1/Refl[["B3"]])
     SpectralIndices$CRI1 <- CRI1
   }
   if ('CRI2'%in%Sel_Indices){
-    CRI2    = (1/Refl[["B2"]])-(1/Refl[["B5"]])
+    CRI2 <- (1/Refl[["B2"]])-(1/Refl[["B5"]])
     SpectralIndices$CRI2 <- CRI2
   }
   if ('EVI'%in%Sel_Indices){
-    EVI     = 2.5*(Refl[["B8"]]-Refl[["B4"]])/((Refl[["B8"]]+6*Refl[["B4"]]-(7.5*Refl[["B2"]]+1)))
+    EVI <- 2.5*(Refl[["B8"]]-Refl[["B4"]])/((Refl[["B8"]]+6*Refl[["B4"]]-(7.5*Refl[["B2"]]+1)))
     SpectralIndices$EVI <- EVI
   }
   if ('EVI2'%in%Sel_Indices){
-    EVI2    = 2.5*(Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+2.4*Refl[["B4"]]+1)
+    EVI2 <- 2.5*(Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+2.4*Refl[["B4"]]+1)
     SpectralIndices$EVI2 <- EVI2
   }
   if ('GRVI1'%in%Sel_Indices){
-    GRVI1   = (Refl[["B4"]]-Refl[["B3"]])/(Refl[["B4"]]+Refl[["B3"]])
+    GRVI1 <- (Refl[["B4"]]-Refl[["B3"]])/(Refl[["B4"]]+Refl[["B3"]])
     SpectralIndices$GRVI1 <- GRVI1
   }
   if ('GNDVI'%in%Sel_Indices){
-    GNDVI   = (Refl[["B8"]]-Refl[["B3"]])/(Refl[["B8"]]+Refl[["B3"]])
+    GNDVI <- (Refl[["B8"]]-Refl[["B3"]])/(Refl[["B8"]]+Refl[["B3"]])
     SpectralIndices$GNDVI <- GNDVI
   }
   if ('IRECI'%in%Sel_Indices){
-    IRECI   = (Refl[["B7"]]-Refl[["B4"]])*(Refl[["B6"]]/(Refl[["B5"]]))
+    IRECI <- (Refl[["B7"]]-Refl[["B4"]])*(Refl[["B6"]]/(Refl[["B5"]]))
     SpectralIndices$IRECI <- IRECI
   }
   if ('LAI_SAVI'%in%Sel_Indices){
-    LAI_SAVI = -log(0.371 + 1.5 * (Refl[["B8"]] - Refl[["B4"]]) / (Refl[["B8"]]+ Refl[["B4"]]+ 0.5)) / 2.4
+    LAI_SAVI <- -log(0.371 + 1.5 * (Refl[["B8"]] - Refl[["B4"]]) / (Refl[["B8"]]+ Refl[["B4"]]+ 0.5)) / 2.4
     SpectralIndices$LAI_SAVI <- LAI_SAVI
   }
   if  ('MCARI'%in%Sel_Indices){
-    MCARI   = (1-0.2*(Refl[["B5"]]-Refl[["B3"]])/(Refl[["B5"]]-Refl[["B4"]]))
+    MCARI <- (1-0.2*(Refl[["B5"]]-Refl[["B3"]])/(Refl[["B5"]]-Refl[["B4"]]))
     SpectralIndices$MCARI <- MCARI
   }
   if ('mNDVI705'%in%Sel_Indices){
-    mNDVI705 = (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B6"]]+Refl[["B5"]]-2*Refl[["B2"]])
+    mNDVI705 <- (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B6"]]+Refl[["B5"]]-2*Refl[["B2"]])
     SpectralIndices$mNDVI705 <- mNDVI705
   }
   if ('MSAVI2'%in%Sel_Indices){
-    MSAVI2  = ((Refl[["B8"]]+1)-0.5*sqrt(((2*Refl[["B8"]])-1)**2+8*Refl[["B4"]]))
+    MSAVI2 <- ((Refl[["B8"]]+1)-0.5*sqrt(((2*Refl[["B8"]])-1)**2+8*Refl[["B4"]]))
     SpectralIndices$MSAVI2 <- MSAVI2
   }
   if ('MSI'%in%Sel_Indices){
-    MSI     = Refl[["B11"]]/Refl[["B8A"]]
+    MSI <- Refl[["B11"]]/Refl[["B8A"]]
     SpectralIndices$MSI <- MSI
   }
   if ('mSR705'%in%Sel_Indices){
-    mSR705  = (Refl[["B6"]]-Refl[["B2"]])/(Refl[["B5"]]-Refl[["B2"]])
+    mSR705 <- (Refl[["B6"]]-Refl[["B2"]])/(Refl[["B5"]]-Refl[["B2"]])
     SpectralIndices$mSR705 <- mSR705
   }
   if ('MTCI'%in%Sel_Indices){
-    MTCI    = (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B5"]]+Refl[["B4"]])
+    MTCI <- (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B5"]]+Refl[["B4"]])
     SpectralIndices$MTCI <- MTCI
   }
   if ('nBR_RAW'%in%Sel_Indices){
-    nBR_RAW = (Refl[["B8"]]-Refl[["B12"]])/(Refl[["B8"]]+Refl[["B12"]])
+    nBR_RAW <- (Refl[["B8"]]-Refl[["B12"]])/(Refl[["B8"]]+Refl[["B12"]])
     SpectralIndices$nBR_RAW <- nBR_RAW
   }
   if ('NDI_45'%in%Sel_Indices){
-    NDI_45  = (Refl[["B5"]]-Refl[["B4"]])/(Refl[["B5"]]+Refl[["B4"]])
+    NDI_45 <- (Refl[["B5"]]-Refl[["B4"]])/(Refl[["B5"]]+Refl[["B4"]])
     SpectralIndices$NDI_45 <- NDI_45
   }
   if ('NDII'%in%Sel_Indices){
-    NDII    = (Refl[["B8A"]]-Refl[["B11"]])/(Refl[["B8A"]]+Refl[["B11"]])
+    NDII <- (Refl[["B8A"]]-Refl[["B11"]])/(Refl[["B8A"]]+Refl[["B11"]])
     SpectralIndices$NDII <- NDII
   }
   if ('NDVI'%in%Sel_Indices){
-    NDVI   = (Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+Refl[["B4"]])
+    NDVI <- (Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+Refl[["B4"]])
     SpectralIndices$NDVI <- NDVI
   }
   if ('NDVI_G'%in%Sel_Indices){
-    NDVI_G  = Refl[["B3"]]*(Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+Refl[["B4"]])
+    NDVI_G <- Refl[["B3"]]*(Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+Refl[["B4"]])
     SpectralIndices$NDVI_G <- NDVI_G
   }
   if ('NDVI705'%in%Sel_Indices){
-    NDVI705 = (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B6"]]+Refl[["B5"]])
+    NDVI705 <- (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B6"]]+Refl[["B5"]])
     SpectralIndices$NDVI705 <- NDVI705
   }
   if ('NDWI'%in%Sel_Indices){
-    NDWI    = (Refl[["B3"]]-Refl[["B8"]])/(Refl[["B3"]]+Refl[["B8"]])
+    NDWI <- (Refl[["B3"]]-Refl[["B8"]])/(Refl[["B3"]]+Refl[["B8"]])
     SpectralIndices$NDWI <- NDWI
   }
   if ('PSRI'%in%Sel_Indices){
-    PSRI    = (Refl[["B4"]]-Refl[["B2"]])/(Refl[["B5"]])
+    PSRI <- (Refl[["B4"]]-Refl[["B2"]])/(Refl[["B5"]])
     SpectralIndices$PSRI <- PSRI
   }
   if ('PSRI_NIR'%in%Sel_Indices){
-    PSRI_NIR = (Refl[["B4"]]-Refl[["B2"]])/(Refl[["B8"]])
+    PSRI_NIR <- (Refl[["B4"]]-Refl[["B2"]])/(Refl[["B8"]])
     SpectralIndices$PSRI_NIR <- PSRI_NIR
   }
   if ('RE_NDVI'%in%Sel_Indices){
-    RE_NDVI = (Refl[["B8"]]-Refl[["B6"]])/(Refl[["B8"]]+Refl[["B6"]])
+    RE_NDVI <- (Refl[["B8"]]-Refl[["B6"]])/(Refl[["B8"]]+Refl[["B6"]])
     SpectralIndices$RE_NDVI <- RE_NDVI
   }
   if ('RE_NDWI'%in%Sel_Indices){
-    RE_NDWI = (Refl[["B4"]]-Refl[["B6"]])/(Refl[["B4"]]+Refl[["B6"]])
+    RE_NDWI <- (Refl[["B4"]]-Refl[["B6"]])/(Refl[["B4"]]+Refl[["B6"]])
     SpectralIndices$RE_NDWI <- RE_NDWI
   }
   if ('S2REP'%in%Sel_Indices){
-    S2REP   = 705+35*(0.5*(Refl[["B8"]]+Refl[["B5"]])-Refl[["B6"]])/(Refl[["B7"]]-Refl[["B6"]])
+    S2REP <- 705+35*(0.5*(Refl[["B8"]]+Refl[["B5"]])-Refl[["B6"]])/(Refl[["B7"]]-Refl[["B6"]])
     SpectralIndices$S2REP <- S2REP
   }
   if ('SAVI'%in%Sel_Indices){
-    SAVI    = 1.5*(Refl[["B8"]]-Refl[["B5"]])/(Refl[["B8"]]+Refl[["B5"]]+0.5)
+    SAVI <- 1.5*(Refl[["B8"]]-Refl[["B5"]])/(Refl[["B8"]]+Refl[["B5"]]+0.5)
     SpectralIndices$SAVI <- SAVI
   }
   if ('SIPI'%in%Sel_Indices){
-    SIPI    = (Refl[["B8"]]-Refl[["B2"]])/(Refl[["B8"]]-Refl[["B4"]])
+    SIPI <- (Refl[["B8"]]-Refl[["B2"]])/(Refl[["B8"]]-Refl[["B4"]])
     SpectralIndices$SIPI <- SIPI
   }
   if ('SR'%in%Sel_Indices){
@@ -207,9 +207,9 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
   }
 
   if(StackOut)
-    SpectralIndices = raster::stack(SpectralIndices)
+    SpectralIndices <- raster::stack(SpectralIndices)
 
-  res = list('SpectralIndices'=SpectralIndices,'listIndices'=listIndices)
+  res <- list('SpectralIndices'=SpectralIndices,'listIndices'=listIndices)
   return(res)
 }
 
