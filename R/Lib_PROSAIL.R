@@ -3,10 +3,11 @@
 # Lib_PROSAIL.R
 # ==============================================================================
 # PROGRAMMERS:
-# Jean-Baptiste FERET <jb.feret@irstea.fr>
+# Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
 # ==============================================================================
 # This Library includes functions dedicated to PROSAIL simulation
+# SAIL versions available are 4SAIL and 4SAIL2
 # ==============================================================================
 
 

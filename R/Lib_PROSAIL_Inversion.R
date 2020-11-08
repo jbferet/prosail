@@ -1,12 +1,13 @@
 # ==============================================================================
-# prospect
+# prosail
 # Lib_PROSAIL_Inversion.R
 # ==============================================================================
 # PROGRAMMERS:
-# Jean-Baptiste FERET <jb.feret@irstea.fr>
+# Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
 # ==============================================================================
-# This Library includes functions dedicated to PROSAIL inversion
+# This Library includes functions dedicated to PROSAIL inversion using iterative
+# optimization
 # ==============================================================================
 
 #' Performs PROSAIL inversion using iterative optimization
