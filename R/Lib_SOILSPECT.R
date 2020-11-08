@@ -29,7 +29,7 @@
 #'          hemhem = soil bihemispherical reflectance
 #' @export
 
-soilspect <- function(albss,rugo,thetav,thetas,psi,phase1,phase2,phase3=NULL,phase4=NULL){
+soilspect <- function(albss,rugo,thetav,thetas,phi,phase1,phase2,phase3=NULL,phase4=NULL){
 
 
   p1 <- 2.9430946*10^4
@@ -44,7 +44,6 @@ soilspect <- function(albss,rugo,thetav,thetas,psi,phase1,phase2,phase3=NULL,pha
   p10 <- -1.0823175*10^2
   p11 <- 5.7691497
 
-  phi <- psi
   if (thetav < 0){
     thetav <- -thetav
     phi <- phi +180
