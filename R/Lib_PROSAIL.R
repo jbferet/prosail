@@ -10,7 +10,6 @@
 # SAIL versions available are 4SAIL and 4SAIL2
 # ============================================================================= =
 
-
 #' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
 #' The direct and diffuse light are taken into account as proposed by:
 #' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo

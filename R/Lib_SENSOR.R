@@ -6,9 +6,9 @@
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
 # Copyright 2019/11 Jean-Baptiste FERET
 # ============================================================================= =
-# This Library includes functions dedicated to convrsion from high resolution
-# reflectance to sensor reflectance
-# using either known snsor response, or gaussian filters
+# This Library includes functions dedicated to conversion from high resolution
+# reflectance to sensor reflectance using either known sensor response,
+# or gaussian filters
 # ============================================================================= =
 
 #' reads spectral response from known sensor
@@ -117,6 +117,35 @@ applySensorCharacteristics <- function(wvl,InRefl,SRF){
   }
   OutRefl <-do.call('rbind',OutRefl)
   return(OutRefl)
+}
+
+#' This function converts high resolution spectral info into broader spectral characteristics
+#'
+#' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
+#' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
+#' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
+#' @param SRF list. Spectral response function, corresponding spectral bands, and Original Bands
+#'
+#' @return SpecSensor list. list of input specs with sensor resolution
+#' @export
+PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
+
+  # adjust optical constants
+  wvl <- SpecPROSPECT$lambda
+  # leaf properties
+  SpecPROSPECT_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
+  SpecPROSPECT_Sensor = split(SpecPROSPECT_Sensor, rep(1:ncol(SpecPROSPECT_Sensor), each = nrow(SpecPROSPECT_Sensor)))
+  names(SpecPROSPECT_Sensor)=names(SpecPROSPECT)
+  # atmospheric properties
+  SpecATM_Sensor = applySensorCharacteristics(wvl,SpecATM,SRF)
+  SpecATM_Sensor = split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor)))
+  names(SpecATM_Sensor)=names(SpecATM)
+  # soil properties
+  SpecSOIL_Sensor = applySensorCharacteristics(wvl,SpecSOIL,SRF)
+  SpecSOIL_Sensor = split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nrow(SpecSOIL_Sensor)))
+  names(SpecSOIL_Sensor)=names(SpecSOIL)
+  SpecSensor <- list('SpecPROSPECT_Sensor' = SpecPROSPECT_Sensor,'SpecATM_Sensor' = SpecATM_Sensor,'SpecSOIL_Sensor' = SpecSOIL_Sensor)
+  return(list(SpecSensor))
 }
 
 #' Computes spectral response function based on wavelength and FWHM characteristics
