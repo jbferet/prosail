@@ -25,6 +25,8 @@ Imports:
     expint,
     pracma,
     utils,
+    raster,
+    methods,
 	prospect
 Remotes: gitlab::jbferet/prospect
 VignetteBuilder: knitr
