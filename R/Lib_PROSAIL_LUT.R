@@ -116,6 +116,7 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
         repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
         InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
       }
+      InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
   return(InputPROSAIL)
@@ -134,13 +135,22 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
 #' - Set to NULL if use PROSPECT to generate it
 #'
 #' @return BRF_LUT numeric. matrix of BRF corresponding to InputPROSAIL
+#' @importFrom progress progress_bar
 #' @export
 
 Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILversion='4SAIL',BrownVegetation = NULL){
 
-  nbSamples = length(InputPROSAIL[[1]])
-  BRF_LUT = c()
+  nbSamples <- length(InputPROSAIL[[1]])
+  BRF <- list()
+  Split <- round(nbSamples/10)
+  pb <- progress_bar$new(
+    format = "Generate LUT [:bar] :percent in :elapsed",
+    total = 10, clear = FALSE, width= 100)
   for (i in 1:nbSamples){
+    if (i%%Split==0){
+      pb$tick()
+      Sys.sleep(1 / 10)
+    }
     rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
@@ -165,8 +175,33 @@ Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILvers
     }
 
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-    BRF <-Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
-    BRF_LUT <- cbind(BRF_LUT,BRF)
+    BRF[[i]] <-Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
   }
-  return(BRF_LUT)
+  BRF <- do.call(cbind,BRF)
+  return(BRF)
 }
+
+#' This function applied noise on a matrix
+#'
+#' @param LUT numeric. Matrix including data to add noise to
+#' @param NoiseLevel numeric. value of teh normal noise proportional to LUT to apply on LUT
+#' @param NoiseType character.
+#' - relative: noise proportional to actual value to add noise to
+#' - absolute: noise not proportional to actual value to add noise to
+#'
+#' @return LUT_Noise numeric. Matrix including data with added noise
+#' @export
+
+Apply_Noise_LUT <- function(LUT,NoiseLevel,NoiseType = 'relative'){
+  nbFeatures <- nrow(LUT)
+  nbSamples <- ncol(LUT)
+  if (NoiseType == 'relative'){
+    LUT_Noise <- LUT + LUT*matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
+  } else if (NoiseType == 'relative'){
+    LUT_Noise <- LUT + matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
+  }
+  return(LUT_Noise)
+}
+
+
+

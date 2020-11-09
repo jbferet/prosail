@@ -1,5 +1,5 @@
 ---
-title: "3. Inverse mode"
+title: "3. Hybrid model inversion"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
@@ -27,143 +27,254 @@ knitr::opts_chunk$set(
 ```
 
 
-This tutorial briefly describes the different functionalities of the R package `prosail`, based on the canopy reflectance model __4SAIL__ coupled with the leaf model __PROSPECT__.
-The package `prosail` includes the package `prospect`, so please check the brief tutorial from [this package](https://jbferet.gitlab.io/prospect/articles/prospect.html) if you need specific information on __PROSPECT__.
+This tutorial describes how to run a hybrid inversion using the package `prosail`.
 
-The current version of the model PROSPECT implemented in `prosail` is __PROSPECT-PRO__.
+currently, the hybrid inversion implemented in  `prosail` is built around __4SAIL__ and support vector regression (SVR) as machine learning algorithm.
 
-The current version of the model SAIL implemented in `prosail` is __4SAIL__. 
+This hybrid inversion consists in bagging prediction of biophysical properties: a LUT is simulated with PROSAIL and resampled in order to produce multiple datasets including a limited number of samples. Then a set of individual SVR models is trained from each reduced dataset. The following example illustrates how to proceed to train and apply this inversion. 
 
-The SAIL model is an example of four-stream representations of the radiative transfer equation, in which case one distinguishes two direct fluxes (incident solar flux and radiance in the viewing direction) and two diffuse fluxes (upward and downward hemispherical flux). Detailed description of the functioning of SAIL can be found in [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which th figure below is taken.
+# Definition of sensor characteristics
 
-<center>
-  <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">
-</center> 
-<center>
-  Fig. 1. Four-stream RT modeling concept as applied in SAIL model
-</center> 
-
-
-# Running `prosail` in direct mode
-
-## Input variables
-The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expects the following input variables.
-
-* `SpecPROSPECT`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). Simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`
-
-* The biochemical and biophysical input variables of PROSPECT, including `N`, `CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. If no value, their default value is set
-
-* `TypeLidf`: two leaf inclination distribution functions are implemented here. 
-
-    * Define `TypeLidf=1` if you want to use the original LIDF introduced by [Verhoef (1998)](https://edepot.wur.nl/210943).
-        * if `TypeLidf=1` then `LIDFa` controls the average leaf slope and `LIDFb` controls the distribution's bimodality
-    * Define `TypeLidf=2` if you want to use the [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) characterised by the average leaf inclination angle in degree
-        * if `TypeLidf=2` then `LIDFa` controls the average leaf angle
-
-* `lai`: leaf area angle
-
-* `q`: hot spot parameter
-
-* `tts`: sun zenith angle (0 degres = sun at the vertical of surface)
-
-* `tto`: observer zenith angle (0 degres = nadir observation)
-
-* `psi`: azimuth between sun and observer (in degrees)
-
-* `rsoil`: soil reflectance
-
-## Output variables
-`PRO4SAIL` returns a list containing four reflectance factors 
-
-* `rddt`: bi-hemispherical reflectance factor
-* `rsdt`: directional-hemispherical reflectance factor for solar incident flux
-*	`rdot`: hemispherical-directional reflectance factor in viewing direction
-* `rsot`: bi-directional reflectance factor
-
-
-
-
-```{r prosail direct mode}
+```{r define_sensor}
 library(prosail)
-
-# define input variables for PROSPECT. 
-# refer to prospect tutorial for default values corresponding to undefined PROSPECT variables
-CHL <- 40; CAR <- 8; ANT <- 0.0; EWT <- 0.01; LMA <- 0.009; N = 1.5;
-
-# define input variables for SAIL. 
-lai <- 5;       # LAI
-q <- 0.01;      # Hot spot parameter
-TypeLidf <- 2;  LIDFa <- 30;    LIDFb <- NULL;  # leaf inclination distribution function parameters
-tts <- 30;      tto <- 10;      psi <- 90;      # geometry of acquisition
-rsoil <- SpecSOIL$Dry_Soil                      # soil reflectance (SpecSOIL includes Dry_Soil and Wet_Soil properties)
-# run PROSAIL
-Ref <- PRO4SAIL(SpecPROSPECT,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-               TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
-               q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
-```
-
-
-# Computing a simplified bidirectional reflectance factor under the assumption of clear conditions conditions
-
-The function `Compute_BRF` computes the bi-directional reflectance factor in the direction of the observer, by combining both hemispherical-diretcional and bi-directional reflectance factors.
-The direct and diffuse light are taken into account as proposed by [Francois et al. (2002)](https://doi.org/10.1051/agro:2002033), by computing the share of diffuse flux in global radiation `skyl` based on the equation proposed by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
-
-```{r compute BRF}
-# Ref is the variable obtained when running PRO4SAIL as in the previous illustration
-# SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF <-Compute_BRF(Ref$rdot,Ref$rsot,tts,SpecATM)
-```
-
-# Simulating sensor BRF
-
-The simulation of sensor BRF requires the Spectral Response Function (SRF) of the sensor. 
-`prosail` includes the SRF of [Sentinel-2A and Sentinel-2B satellites](https://earth.esa.int/documents/247904/685211/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.0.xlsx).
-
-Other stellites can be simulated as long as the SRF is provided as CSV file, following the same template as for the SRF of Sentinel-2 satellites. 
-
-```{r SRF 1}
-# get the spectral response for Sentinel-2A
-SensorName = 'Sentinel_2A'
-# if interested in a different satellite, please use Path_SensorResponse to locate the SRF file expected to be named 'SensorName_Spectral_Response.csv' (separator = tabulations)
+# Define output directory
+Path.Results <- 'Hybrid_Inversion'
+dir.create(Path.Results,showWarnings = FALSE)
+# Define S2 Spectral Response Function based on ESA specifications
+SensorName <- 'Sentinel_2'
 SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
-```
-
-SRF can also be directly computed for any sensor under the hypothesis of normal response for each spectral band, and information about the central wavelength and FWHM corresponding to each spectral band
-
-```{r SRF 2}
-# WL is a vector giving central wavelength for each band in nanometer
-# FWHM is a vector giving FWHM for each band in nanometer
-SRF = Compute_SRF(WL,FWHM)
-```
-
-Then, optical values used to compute reflectance (specifica absorption constituents, soil properties, direct/diffuse radiation) can be converted at solar resolution before simulation of reflectance:
-
-```{r Conversion}
-# apply sensor characteristics to PROSPECT optical constants
-SpecPROSPECT_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-SpecPROSPECT_Sensor = split(SpecPROSPECT_Sensor, rep(1:ncol(SpecPROSPECT_Sensor), each = nrow(SpecPROSPECT_Sensor))) # split matrix into list
-names(SpecPROSPECT_Sensor)=names(SpecPROSPECT) # keep names for elements of list
-# apply sensor characteristics to atmospheric properties
-SpecATM_Sensor = applySensorCharacteristics(wvl,SpecATM,SRF)
-SpecATM_Sensor = split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor))) # split matrix into list
-names(SpecATM_Sensor)=names(SpecATM) # keep names for elements of list
-# apply sensor characteristics to soil properties
-SpecSOIL_Sensor = applySensorCharacteristics(wvl,SpecSOIL,SRF)
-SpecSOIL_Sensor = split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nrow(SpecSOIL_Sensor))) # split matrix into list
-names(SpecSOIL_Sensor)=names(SpecSOIL) # keep names for elements of list
+# convert 1nm reflectance into Sentinel-2 reflectance
+# adjust optical constants
+SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+SpecPROSPECT_Sensor <- SpecSensor[[1]]$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- SpecSensor[[1]]$SpecSOIL_Sensor
+SpecATM_Sensor <- SpecSensor[[1]]$SpecATM_Sensor
 ```
 
 
-... and BRF can be computed based on these values
+# Prepare distribution of input PROSAIL parameters used to generate a training LUT
 
-```{r BRF new res}
-# WL is a vector giving central wavelength for each band in nanometer
-# FWHM is a vector giving FWHM for each band in nanometer
-rsoil2 <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(SpecPROSPECT_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-               TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
-               q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
-# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-BRF_Sensor <-Compute_BRF(Ref_Sensor$rdot,Ref_Sensor$rsot,tts,SpecATM_Sensor)
+```{r prepare_LUT_InputParms}
+# Define distribution for PROSAIL input variables: choose between 'Gaussian' and 'Uniform'
+TypeDistrib <- data.frame('CHL'='Gaussian', 'CAR'='Uniform','EWT' = 'Uniform','ANT' = 'Uniform','LMA' = 'Uniform','N' = 'Uniform', 'BROWN'='Uniform',
+                          'psoil' = 'Uniform','LIDFa' = 'Uniform', 'lai' = 'Gaussian','q'='Uniform','tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
+
+# define mean and STD for gaussian distributions
+Mean <- data.frame('CHL'=35,'CAR'=8,'lai' = 1.75)
+Std <- Mean/2.0
+
+# define min and max values for all parameters defined in TypeDistrib
+minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.001,'ANT' = 0,'LMA' = 0.001,'N' = 1.4,'psoil' = 0.0, 'BROWN'=0.01,
+                     'LIDFa' = 30, 'lai' = 0.01,'q'=0.01,'tto' = 0,'tts' = 20, 'psi' = 100)
+maxval <- data.frame('CHL'=60,'CAR'=15,'EWT' = 0.045,'ANT' = 10,'LMA' = 0.040,'N' = 1.7, 'psoil' = 1.0, 'BROWN'=0.01,
+                     'LIDFa' = 70, 'lai' = 3.5,'q'=0.01,'tto' = 5,'tts' = 30, 'psi' = 150)
+
+# define parameters to be set to unique value
+# ... other undefined parameters wil be set to default automatically 
+ParmSet <- data.frame('TypeLidf' = 2, 'alpha' = 40)
+
+# define number of samples to be simulated in the LUT
+nbSamples <- 2000
+# get random distribution based on previously defined parameters
+InputPROSAIL <- get_distribution_input_prosail(minval = minval, maxval = maxval, 
+                                               ParmSet = ParmSet ,nbSamples = nbSamples,
+                                               TypeDistrib = TypeDistrib, Mean = Mean, Std = Std)
 ```
 
+
+# Simulation of BRF following user defined distribution
+
+```{r simulate_LUT}
+# produce BRF LUT based on InputPROSAIL
+BRF_LUT <- Generate_LUT_BRF(InputPROSAIL = InputPROSAIL,SpecPROSPECT = SpecPROSPECT_Sensor,
+                            SpecSOIL = SpecSOIL_Sensor,SpecATM = SpecATM_Sensor,SAILversion = '4SAIL')
+```
+
+
+# Biophysical variables of interest 
+Definition of the biophysical variables of interest using hybrid inversion.
+
+```{r define_biophysical_props}
+Parms2Estimate <- c('CHL','EWT','LMA','lai')
+```
+
+# Refine spectral properties
+The reflectance data used for inversion needs application of gaussian noise in order to improve applicability on experimental data. 
+Specific spectral bands may also be defined for each biophysical variable of interest. 
+
+```{r refine_spectral}
+# Define spectral bands of interest for each biophysical variable
+Bands2Select <- list()
+Bands2Select$CHL <- c(2,3,4,5,6,7,8,9,10)
+Bands2Select$EWT <- c(2,3,4,5,6,7,8,9,10)
+Bands2Select$LMA <- c(2,3,4,5,6,7,8,9,10)
+Bands2Select$lai <- c(2,3,4,5,6,7,8,9,10)
+
+# Define gaussian noise to be applied on reflectance
+NoiseLevel <- list()
+NoiseLevel$CHL <- 0.01
+NoiseLevel$EWT <- 0.02
+NoiseLevel$LMA <- 0.05
+NoiseLevel$lai <- 0.05
+
+# Apply gaussian noise to be applied on reflectance
+BRF_LUT_Noise   = list()
+for (parm in Parms2Estimate){
+  BRF_LUT_Noise[[parm]] <- Apply_Noise_LUT(BRF_LUT[Bands2Select[[parm]],],NoiseLevel[[parm]],NoiseType = 'relative')
+}
+```
+
+
+# Train hybrid inversion
+
+Train a set of SVR models for each variable with the function `PROSAIL_Hybrid_Train`.
+
+```{r Train_Hybrid}
+modelSVR <- list()
+# bagging with replacement for each subset
+Replacement <- TRUE
+# number of samples used for training of each submodel
+nbSamplesPerRun <- 100
+nbEnsemble <- round(nbSamples/nbSamplesPerRun)
+# for each parameter to estimate
+for (parm in Parms2Estimate){
+  InputVar <- InputPROSAIL[[parm]]
+  modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
+                                           FigPlot = FALSE, nbEnsemble =  nbEnsemble,
+                                           WithReplacement=Replacement)
+}
+```
+
+
+# Apply hybrid inversion
+
+Apply the set of SVR models on a dataset for each variable with the function `PROSAIL_Hybrid_Apply`.
+
+```{r Apply_Hybrid}
+###########################################################
+# perform prediction based on models in previous steps
+# the prediction returns mean value obtained form the ensemble of regression models for each sample, 
+# as well as corresponding standard deviation
+MeanEstimate <- StdEstimate <- list()
+for (parm in Parms2Estimate){
+  HybridRes <- PROSAIL_Hybrid_Apply(modelSVR[[parm]],BRF_LUT_Noise[[parm]])
+  MeanEstimate[[parm]] <- HybridRes$MeanEstimate
+  StdEstimate[[parm]] <- HybridRes$StdEstimate
+}
+```
+
+# Plot results
+
+Plot the results obtained when applying the regression models on training data. 
+
+__(!!! Only for illustration. Always use independent dataset to assess performance of your model !!!).__
+
+```{r Plot_Results}
+# put all field observations and results in a dataframe
+Results <- data.frame('CABMES' = InputPROSAIL$CHL,'CABMOD' = MeanEstimate$CHL,'CABStd' = StdEstimate$CHL,
+                      'EWTMES' = InputPROSAIL$EWT,'EWTMOD' = MeanEstimate$EWT,'EWTStd' = StdEstimate$EWT,
+                      'LMAMES' = InputPROSAIL$LMA,'LMAMOD' = MeanEstimate$LMA,'LMAStd' = StdEstimate$LMA,
+                      'LAIMES' = InputPROSAIL$lai,'LAIMOD' = MeanEstimate$lai,'LAIStd' = StdEstimate$lai)
+
+# filename = file.path(Path.Results,'Experimental_Datapoints.txt')
+# write.table(x = Results,file = filename,append = F, quote = F,
+#             row.names = F,sep = '\t')
+
+
+###########################################################
+# plot resulting estimated values
+library(ggplot2)
+library(ggpmisc)
+library(ggpubr)
+library(pracma)
+
+# plot LAI
+statsReg1 <- cor.test(Results$LAIMES, Results$LAIMOD)$estimate
+statsReg2 <- rmserr(Results$LAIMES, Results$LAIMOD)$rmse
+statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,2))
+
+ggplot(data = Results, aes(x=LAIMES, y=LAIMOD)) +
+  geom_point(alpha=0.6) +
+  geom_smooth(method=lm, aes(group = 1)) +
+  coord_fixed(ratio = 1,xlim = c(0.0,3.5), ylim = c(-0.0,3.5)) +
+  geom_abline(intercept = 0, slope = 1,linetype="dashed", size=0.5,color='gray')+
+  ggtitle(statsReg) +
+  xlab("Measured PAI") +
+  ylab("Estimated LAI")
+filename = file.path(Path.Results,'LAI.png')
+ggsave(filename, plot = last_plot(), device = 'png', path = NULL,
+       scale = 1, width = 5.5, height = 5, units = "in",
+       dpi = 600, limitsize = TRUE)
+
+# plot CAB
+statsReg1 <- cor.test(Results$CABMES, Results$CABMOD)$estimate
+statsReg2 <- rmserr(Results$CABMES, Results$CABMOD)$rmse
+statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,2))
+ggplot(data = Results, aes(x=CABMES, y=CABMOD)) +
+  geom_point(alpha=0.6) +
+  geom_smooth(method=lm, aes(group = 1)) +
+  coord_fixed(ratio = 1,xlim = c(0,60), ylim = c(0,60)) +
+  geom_abline(intercept = 0, slope = 1,linetype="dashed", size=0.5,color='gray')+
+  ggtitle(statsReg) +
+  xlab("Measured CHL") +
+  ylab("Estimated CHL")
+filename = file.path(Path.Results,'CHL.png')
+ggsave(filename, plot = last_plot(), device = 'png', path = NULL,
+       scale = 1, width = 5.5, height = 5, units = "in",
+       dpi = 600, limitsize = TRUE)
+
+# plot EWT
+statsReg1 = cor.test(Results$EWTMES, Results$EWTMOD)$estimate
+statsReg2 = rmserr(Results$EWTMES, Results$EWTMOD)$rmse
+statsReg = paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,4))
+
+ggplot(data = Results, aes(x=EWTMES, y=EWTMOD)) +
+  geom_point(alpha=0.6) +
+  geom_smooth(method=lm, aes(group = 1)) +
+  coord_fixed(ratio = 1,xlim = c(0,0.04), ylim = c(0,0.04)) +
+  geom_abline(intercept = 0, slope = 1,linetype="dashed", size=0.5,color='gray')+
+  ggtitle(statsReg) +
+  xlab("Measured EWT") +
+  ylab("Estimated EWT")
+filename = file.path(Path.Results,'EWT.png')
+ggsave(filename, plot = last_plot(), device = 'png', path = NULL,
+       scale = 1, width = 5.5, height = 5, units = "in",
+       dpi = 600, limitsize = TRUE)
+
+
+# plot LMA
+statsReg1 = cor.test(Results$LMAMES, Results$LMAMOD)$estimate
+statsReg2 = rmserr(Results$LMAMES, Results$LMAMOD)$rmse
+statsReg = paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,4))
+
+ggplot(data = Results, aes(x=LMAMES, y=LMAMOD)) +
+  geom_point(alpha=0.6) +
+  geom_smooth(method=lm, aes(group = 1)) +
+  coord_fixed(ratio = 1,xlim = c(0,0.04), ylim = c(0,0.04)) +
+  geom_abline(intercept = 0, slope = 1,linetype="dashed", size=0.5,color='gray')+
+  ggtitle(statsReg) +
+  xlab("Measured LMA") +
+  ylab("Estimated LMA")
+filename = file.path(Path.Results,'LMA.png')
+ggsave(filename, plot = last_plot(), device = 'png', path = NULL,
+       scale = 1, width = 5.5, height = 5, units = "in",
+       dpi = 600, limitsize = TRUE)
+
+
+```
+
+The resulting estimated values are displayed: 
+
+
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/CHL.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/LAI.png" width="50%" />
+</p>
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/EWT.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/LMA.png" width="50%" />
+</p>
+<center>
+  Fig. 1. Estimation of `CHL`, `LAI`, `EWT` and `LMA` from a simulated dataset corresponding to Sentinel-2 BRF using PROSAIL-D Hybrid inversion based on bagged SVR.
+</center> 
+<p>&nbsp;</p>

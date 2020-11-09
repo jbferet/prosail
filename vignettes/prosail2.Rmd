@@ -111,19 +111,18 @@ diss <- 0.5
 Cv <- 1
 Zeta <- 1
 # define a couple of leaf chemical constituents corresponding to green and brown leaves
-CHL <- c(40,5)
-CAR <- c(8,5)
-ANT <- c(0,1)
-EWT <- c(0.01,0.005)
-LMA <- c(0.009,0.008)
-N = c(1.5,2)
+CHL2 <- c(40,5)
+CAR2 <- c(8,5)
+ANT2 <- c(0,1)
+EWT2 <- c(0.01,0.005)
+LMA2 <- c(0.009,0.008)
+N2 <- c(1.5,2)
 
 Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',Spec_Sensor = SpecPROSPECT,
-                       CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+                       CHL = CHL2, CAR = CAR2, ANT = ANT2, EWT = EWT2, LMA = LMA2, N = N2,
                        TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
                        q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, Cv = Cv, Zeta = Zeta)
-
 ```
 
 
@@ -135,7 +134,9 @@ The direct and diffuse light are taken into account as proposed by [Francois et 
 ```{r compute BRF}
 # Ref is the variable obtained when running PRO4SAIL as in the previous illustration
 # SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF <-Compute_BRF(Ref$rdot,Ref$rsot,tts,SpecATM)
+BRF_4SAIL <-Compute_BRF(Ref_4SAIL$rdot,Ref_4SAIL$rsot,tts,SpecATM)
+BRF_4SAIL2 <-Compute_BRF(Ref_4SAIL2$rdot,Ref_4SAIL2$rsot,tts,SpecATM)
+
 ```
 
 # Simulating sensor BRF
@@ -152,7 +153,7 @@ SensorName = 'Sentinel_2A'
 SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
 ```
 
-SRF can also be directly computed for any sensor under the hypothesis of normal response for each spectral band, and information about the central wavelength and FWHM corresponding to each spectral band
+SRF can also be directly computed for any sensor under the hypothesis of Gaussian response for each spectral band, and information about the central wavelength and FWHM corresponding to each spectral band
 
 ```{r SRF 2}
 # WL is a vector giving central wavelength for each band in nanometer
@@ -160,10 +161,11 @@ SRF can also be directly computed for any sensor under the hypothesis of normal 
 SRF = Compute_SRF(WL,FWHM)
 ```
 
-Then, optical values used to compute reflectance (specifica absorption constituents, soil properties, direct/diffuse radiation) can be converted at solar resolution before simulation of reflectance:
+Then, optical values used to compute reflectance (specifica absorption constituents, soil properties, direct/diffuse radiation) can be converted from 1 nm spectral sampling (default sampling) to sensor sampling before simulation of reflectance:
 
 ```{r Conversion}
 # apply sensor characteristics to PROSPECT optical constants
+wvl <- SpecPROSPECT$lambda
 Spec_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
 Spec_Sensor = split(Spec_Sensor, rep(1:ncol(Spec_Sensor), each = nrow(Spec_Sensor))) # split matrix into list
 names(Spec_Sensor)=names(SpecPROSPECT) # keep names for elements of list
@@ -177,16 +179,25 @@ SpecSOIL_Sensor = split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nro
 names(SpecSOIL_Sensor)=names(SpecSOIL) # keep names for elements of list
 ```
 
+This conversion can also be done using a unique function `PrepareSensorSimulation`:
 
-... and BRF can be computed based on these values
+```{r Conversion_all}
+# apply sensor characteristics to PROSPECT optical constants
+PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+Spec_Sensor <- PropSensor[[1]]$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- PropSensor[[1]]$SpecSOIL_Sensor
+SpecATM_Sensor <- PropSensor[[1]]$SpecATM_Sensor
+```
+
+... Then BRF can be computed based on these values:
 
 ```{r BRF new res}
 # WL is a vector giving central wavelength for each band in nanometer
 # FWHM is a vector giving FWHM for each band in nanometer
-rsoil2 <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-               TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,lai = lai,
-               q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
+rsoil <- SpecSOIL_Sensor$Dry_Soil
+Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+                       TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,
+                       lai = lai,q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
 # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
 BRF_Sensor <-Compute_BRF(Ref_Sensor$rdot,Ref_Sensor$rsot,tts,SpecATM_Sensor)
 ```

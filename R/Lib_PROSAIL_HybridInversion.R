@@ -56,7 +56,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
   tunedModelYAll <- list()
   pb <- progress_bar$new(
     format = "Training SVR on subsets [:bar] :percent in :elapsed",
-    total = nbEnsemble, clear = FALSE, width= 60)
+    total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
     pb$tick()
     Sys.sleep(1 / nbEnsemble)
@@ -106,11 +106,17 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
 
 PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
+  # make sure Refl is right dimensions
+  Refl <- t(Refl)
+  nbFeatures <- RegressionModels[[1]]$dim
+  if (!ncol(Refl)==nbFeatures & nrow(Refl)==nbFeatures){
+    Refl <- t(Refl)
+  }
   nbEnsemble <- length( RegressionModels)
   EstimatedVal <- list()
   pb <- progress_bar$new(
     format = "Applying SVR models [:bar] :percent in :elapsed",
-    total = nbEnsemble, clear = FALSE, width= 60)
+    total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
     pb$tick()
     Sys.sleep(1 / nbEnsemble)
