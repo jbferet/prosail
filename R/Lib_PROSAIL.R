@@ -4,6 +4,7 @@
 # ============================================================================= =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
+# Florian de BOISSIEU <fdeboiss@gmail.com>
 # Copyright 2019/11 Jean-Baptiste FERET
 # ============================================================================= =
 # This Library includes functions dedicated to PROSAIL simulation
@@ -89,7 +90,7 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
                      LMA = 0.008,PROT = 0.0,CBC = 0.0,alpha = 40.0,
                      TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,lai = NULL,
                      q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
-                     fraction_brown = 0.5, diss = 0.5, Cv = 1,Zeta = 1,
+                     fraction_brown = 0.0, diss = 0.0, Cv = 1,Zeta = 1,
                      SAILversion = '4SAIL',BrownVegetation = NULL){
 
   ############################ #
@@ -132,12 +133,22 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
           message('Only first set of leaf chemical properties will be used to simulate green vegetation')
         }
       }
+    # if no leaf optical properties brown vegetation defined
     } else if (is.null(BrownVegetation)){
+      # if all PROSPECT input parameters have the same length
       if (length(unique(lengths(Input_PROSPECT)))==1){
+        # if all PROSPECT input parameters are unique (no possibility to simulate 2 types of leaf optics)
         if (unique(lengths(Input_PROSPECT))==1){
-          message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-          message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
-          SAILversion <- '4SAIL'
+          # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
+          if (fraction_brown==0){
+            BrownVegetation <- GreenVegetation
+          # else run 4SAIL
+          } else {
+            message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
+            message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
+            SAILversion <- '4SAIL'
+          }
+        # if all PROSPECT parameters have at least 2 elements
         } else if (unique(lengths(Input_PROSPECT))>=2){
           # compute leaf optical properties
           BrownVegetation <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,

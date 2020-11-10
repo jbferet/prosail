@@ -4,6 +4,7 @@
 # ============================================================================== =
 # PROGRAMMERS:
 # Jean-Baptiste FERET <jb.feret@teledetection.fr>
+# Florian de BOISSIEU <fdeboiss@gmail.com>
 # Copyright 2019/11 Jean-Baptiste FERET
 # ============================================================================== =
 # This Library includes functions dedicated to PROSAIL inversion using iterative

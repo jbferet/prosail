@@ -7,7 +7,12 @@
 
 # 1 Install
 
-After installing package `devtools`, the package `prosail` can be installed with the following command line in R session:
+After installing package `devtools`, you need to install the package `prospect` with the following command line in R session:
+```
+devtools::install_gitlab('jbferet/prospect')
+```
+
+The package `prosail` can then be installed with the following command line in R session:
 ```
 devtools::install_gitlab('jbferet/prosail')
 ```
