@@ -112,7 +112,12 @@ applySensorCharacteristics <- function(wvl,InRefl,SRF){
       message('Please make sure that the spectral resolution for sensor response function ')
       message('__ is compatible ewith model (1 nm spectral sampling from 400 to 2500 m) __')
       message('______________________ This is currently not the case _____________________')
-      stop()
+
+      message('_____ The follwing spectral band is not within accepted spectral range ____')
+      print(SRF$Spectral_Bands[i])
+      message('_________________________ Values will be set to 0  ________________________')
+      OutRefl[[i]] <-matrix(0,ncol = ncol(InRefl),nrow =1)
+
     }
   }
   OutRefl <-do.call('rbind',OutRefl)
