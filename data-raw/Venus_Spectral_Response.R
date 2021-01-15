@@ -1,4 +1,4 @@
-## code to prepare `Sentinel_2A` spectral response
+## code to prepare `Venus` spectral response
 # 1- define sensor name
 SensorName <-'Venus'
 Path_SRF <- file.path('data-raw',paste(SensorName,'_Spectral_Response.csv',sep=''))
@@ -17,5 +17,9 @@ SensorRadiometry <-SRFraw[,-1]
 SensorRadiometry <- t(SensorRadiometry)
 Venus <- list("Spectral_Response"=SensorRadiometry, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
 
-## code to prepare `Sentinel_2B_Spectral_Response` dataset goes here
-usethis::use_data(Venus,compress = 'xz')
+## code to prepare `Venus_Spectral_Response` dataset goes here
+usethis::use_data(Venus,compress = 'xz',overwrite = TRUE)
+save(Venus,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
+
+
+
