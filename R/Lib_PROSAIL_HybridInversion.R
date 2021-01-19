@@ -60,7 +60,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
     total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
     pb$tick()
-    Sys.sleep(1 / nbEnsemble)
+    Sys.sleep(1 / 100)
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
@@ -120,7 +120,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
     total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
     pb$tick()
-    Sys.sleep(1 / nbEnsemble)
+    Sys.sleep(1 / 100)
     EstimatedVal[[i]] <- predict(RegressionModels[[i]], Refl)
   }
   EstimatedVal <- do.call(cbind,EstimatedVal)

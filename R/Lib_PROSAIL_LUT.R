@@ -148,9 +148,9 @@ Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILvers
     format = "Generate LUT [:bar] :percent in :elapsed",
     total = 10, clear = FALSE, width= 100)
   for (i in 1:nbSamples){
-    if (i%%Split==0){
-      pb$tick()
-      Sys.sleep(1 / 10)
+    if (i%%Split==0 & nbSamples>100){
+        pb$tick()
+      Sys.sleep(1 / 100)
     }
     rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
     # if 4SAIL
