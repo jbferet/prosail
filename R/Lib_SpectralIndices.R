@@ -37,10 +37,11 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
   SpectralIndices <- list()
   Sen2S2 <- get_bands_close2s2(SensorBands,S2Bands)
 
-
-  if(is.list(Refl))
+  if(is.list(Refl)){
     Refl <- raster::stack(Refl[Sen2S2]) # checks that all rasters have same crs/extent
-  Refl <- subset(Refl, Sen2S2)
+  } else {
+    Refl <- raster::subset(Refl, Sen2S2)
+  }
   if(is(Refl, 'RasterStack'))
     Refl <- raster::brick(Refl) # loads the data: much faster than stack that is loading raster each time it is used
   if(!is(Refl, 'RasterBrick'))

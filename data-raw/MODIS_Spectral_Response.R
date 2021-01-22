@@ -19,4 +19,4 @@ MODIS <- list("Spectral_Response"=SensorRadiometry, "Spectral_Bands"=Spectral_Ba
 
 ## code to prepare `MODIS_Spectral_Response` dataset goes here
 usethis::use_data(MODIS,compress = 'xz',overwrite = TRUE)
-save(Venus,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
+save(MODIS,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
