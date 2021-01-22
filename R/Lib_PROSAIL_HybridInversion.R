@@ -32,6 +32,7 @@
 #trainSVR_Hybrid <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 20,WithReplacement=FALSE){
 PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 20,WithReplacement=FALSE){
 
+  x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # library(dplyr)
   # split the LUT into nbEnsemble subsets
   nbSamples <- length(InputVar)
@@ -79,9 +80,9 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
     # plot prediction
     df <- data.frame(x = rep(1:nbSamples,nbEnsemble), y = as.numeric(matrix(tunedModelYAll,ncol = 1)))
     df.summary <- df %>% dplyr::group_by(x) %>%
-      summarize(ymin = min(y),ystdmin = mean(y)-sd(y),
-                ymax = max(y),ystdmax = mean(y)+sd(y),
-                ymean = mean(y))
+      summarize( ymin = min(y),ystdmin = mean(y)-sd(y),
+                 ymax = max(y),ystdmax = mean(y)+sd(y),
+                 ymean = mean(y))
     par(mar=rep(.1, 4))
     p <- ggplot(df.summary, aes(x = InputVar, y = ymean)) +
       geom_point(size = 2) +
