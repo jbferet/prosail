@@ -60,7 +60,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
   listIndices <- list('ARI1','ARI2','ARVI','BAI','CHL_RE','CRI1','CRI2','EVI','EVI2',
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
-                      'NDVI705','NDWI','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
+                      'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
                       'SAVI','SIPI','SR','CR_SWIR')
   if (Sel_Indices[1]=='ALL'){
     Sel_Indices <- listIndices
@@ -165,9 +165,13 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     NDVI705 <- (Refl[["B6"]]-Refl[["B5"]])/(Refl[["B6"]]+Refl[["B5"]])
     SpectralIndices$NDVI705 <- NDVI705
   }
-  if ('NDWI'%in%Sel_Indices){
-    NDWI <- (Refl[["B3"]]-Refl[["B8"]])/(Refl[["B3"]]+Refl[["B8"]])
-    SpectralIndices$NDWI <- NDWI
+  if ('NDWI1'%in%Sel_Indices){
+    NDWI1 <- (Refl[["B8A"]]-Refl[["B11"]])/(Refl[["B8A"]]+Refl[["B11"]])
+    SpectralIndices$NDWI1 <- NDWI1
+  }
+  if ('NDWI2'%in%Sel_Indices){
+    NDWI2 <- (Refl[["B8A"]]-Refl[["B12"]])/(Refl[["B8A"]]+Refl[["B12"]])
+    SpectralIndices$NDWI2 <- NDWI2
   }
   if ('PSRI'%in%Sel_Indices){
     PSRI <- (Refl[["B4"]]-Refl[["B2"]])/(Refl[["B5"]])
@@ -247,7 +251,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   listIndices <- list('ARI1','ARI2','ARVI','BAI','CHL_RE','CRI1','CRI2','EVI','EVI2',
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
-                      'NDVI705','NDWI','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
+                      'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
                       'SAVI','SIPI','SR','CR_SWIR')
   if (Sel_Indices=='ALL'){
     Sel_Indices = listIndices
@@ -352,9 +356,13 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
     NDVI705 <- (Refl[,Sen2S2[["B6"]]]-Refl[,Sen2S2[["B5"]]])/(Refl[,Sen2S2[["B6"]]]+Refl[,Sen2S2[["B5"]]])
     SpectralIndices$NDVI705 <- NDVI705
   }
-  if ('NDWI'%in%Sel_Indices){
-    NDWI <- (Refl[,Sen2S2[["B3"]]]-Refl[,Sen2S2[["B8"]]])/(Refl[,Sen2S2[["B3"]]]+Refl[,Sen2S2[["B8"]]])
-    SpectralIndices$NDWI <- NDWI
+  if ('NDWI1'%in%Sel_Indices){
+    NDWI1 <- (Refl[,Sen2S2[["B8A"]]]-Refl[,Sen2S2[["B11"]]])/(Refl[,Sen2S2[["B8A"]]]+Refl[,Sen2S2[["B11"]]])
+    SpectralIndices$NDWI1 <- NDWI1
+  }
+  if ('NDWI2'%in%Sel_Indices){
+    NDWI2 <- (Refl[,Sen2S2[["B8A"]]]-Refl[,Sen2S2[["B12"]]])/(Refl[,Sen2S2[["B8A"]]]+Refl[,Sen2S2[["B12"]]])
+    SpectralIndices$NDWI2 <- NDWI2
   }
   if ('PSRI'%in%Sel_Indices){
     PSRI <- (Refl[,Sen2S2[["B4"]]]-Refl[,Sen2S2[["B2"]]])/(Refl[,Sen2S2[["B5"]]])

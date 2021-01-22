@@ -40,7 +40,27 @@ GetRadiometry <- function(SensorName,Path_SensorResponse = NULL){
     Spectral_Response <- prosail::Venus$Spectral_Response
     Spectral_Bands <- prosail::Venus$Spectral_Bands
     OriginalBands <- prosail::Venus$OriginalBands
-    # if sensor is not SENTINEL-2
+  # if sensor is Landsat-7
+  } else if (SensorName=='Landsat_7'){
+    Spectral_Response <- prosail::Landsat_7$Spectral_Response
+    Spectral_Bands <- prosail::Landsat_7$Spectral_Bands
+    OriginalBands <- prosail::Landsat_7$OriginalBands
+  # if sensor is Landsat-8
+  } else if (SensorName=='Landsat_8'){
+    Spectral_Response <- prosail::Landsat_8$Spectral_Response
+    Spectral_Bands <- prosail::Landsat_8$Spectral_Bands
+    OriginalBands <- prosail::Landsat_8$OriginalBands
+  # if sensor is MODIS
+  } else if (SensorName=='MODIS'){
+    Spectral_Response <- prosail::MODIS$Spectral_Response
+    Spectral_Bands <- prosail::MODIS$Spectral_Bands
+    OriginalBands <- prosail::MODIS$OriginalBands
+  # if sensor is SPOT_6_7
+  } else if (SensorName=='SPOT_6_7'){
+    Spectral_Response <- prosail::SPOT_6_7$Spectral_Response
+    Spectral_Bands <- prosail::SPOT_6_7$Spectral_Bands
+    OriginalBands <- prosail::SPOT_6_7$OriginalBands
+    # if sensor is none of the above
   }  else {
     # identify file containing spectral response
     if (!is.null(Path_SensorResponse)){
