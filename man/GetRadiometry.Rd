@@ -5,10 +5,16 @@
 \title{reads spectral response from known sensor
 spectral response from Sentinel-2 is already defined}
 \usage{
-GetRadiometry(SensorName, Path_SensorResponse = NULL)
+GetRadiometry(
+  SensorName = "MyCustomSensor",
+  SpectralProps = NULL,
+  Path_SensorResponse = NULL
+)
 }
 \arguments{
 \item{SensorName}{character. name of the sensor}
+
+\item{SpectralProps}{list. list of spectral properties including wl = central wavelength and fwhm = corresponding FWHM}
 
 \item{Path_SensorResponse}{character.}
 }

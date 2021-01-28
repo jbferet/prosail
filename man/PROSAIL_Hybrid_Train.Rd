@@ -24,7 +24,7 @@ PROSAIL_Hybrid_Train(
 \item{WithReplacement}{Boolean. should subsets be generated with or without replacement?}
 }
 \value{
-modelsSVR list. regression models trained for the retroeval of InputVar based on BRF_LUT
+modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 }
 \description{
 This function trains a suppot vector regression for a set of variables based on spectral data
