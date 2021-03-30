@@ -95,7 +95,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     SpectralIndices$CRI2 <- CRI2
   }
   if ('EVI'%in%Sel_Indices){
-    EVI <- 2.5*(Refl[["B8"]]-Refl[["B4"]])/((Refl[["B8"]]+6*Refl[["B4"]]-(7.5*Refl[["B2"]]+1)))
+    EVI <- 2.5*(Refl[["B8"]]-Refl[["B4"]])/((Refl[["B8"]]+6*Refl[["B4"]]-7.5*Refl[["B2"]]+1))
     SpectralIndices$EVI <- EVI
   }
   if ('EVI2'%in%Sel_Indices){
@@ -286,7 +286,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
     SpectralIndices$CRI2 <- CRI2
   }
   if ('EVI'%in%Sel_Indices){
-    EVI <- 2.5*(Refl[,Sen2S2[["B8"]]]-Refl[,Sen2S2[["B4"]]])/((Refl[,Sen2S2[["B8"]]]+6*Refl[,Sen2S2[["B4"]]]-(7.5*Refl[,Sen2S2[["B2"]]]+1)))
+    EVI <- 2.5*(Refl[,Sen2S2[["B8"]]]-Refl[,Sen2S2[["B4"]]])/((Refl[,Sen2S2[["B8"]]]+6*Refl[,Sen2S2[["B4"]]]-7.5*Refl[,Sen2S2[["B2"]]]+1))
     SpectralIndices$EVI <- EVI
   }
   if ('EVI2'%in%Sel_Indices){
