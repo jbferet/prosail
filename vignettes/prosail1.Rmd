@@ -1,5 +1,5 @@
 ---
-title: "1. introduction to `prosail`"
+title: "1. Introduction to `prosail`"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
@@ -13,7 +13,7 @@ output:
     toc_depth: 2
 vignette: >
   \usepackage[utf8]{inputenc}
-  %\VignetteIndexEntry{1. introduction}
+  %\VignetteIndexEntry{1. Introduction to `prosail`}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

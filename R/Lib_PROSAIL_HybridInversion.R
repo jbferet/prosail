@@ -31,6 +31,8 @@
 #' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
 #' @param Path_Results character. path for results
+#' @param FigPlot boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step
+#'
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @export
@@ -41,7 +43,7 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
                                     SAILversion='4SAIL',
                                     Parms2Estimate='lai',Bands2Select=NULL,NoiseLevel=NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
-                                    Path_Results='./'){
+                                    Path_Results='./',FigPlot=FALSE){
 
   #########################################################################
   ###           1- PRODUCE A LUT TO TRAIN THE HYBRID INVERSION          ###
@@ -141,7 +143,7 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
   for (parm in Parms2Estimate){
     ColParm <- which(parm==names(InputPROSAIL))
     InputVar <- InputPROSAIL[[ColParm]]
-    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT_Noise[[parm]],InputVar,FigPlot = TRUE,nbEnsemble = nbModels,WithReplacement=Replacement)
+    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT_Noise[[parm]],InputVar,FigPlot = FigPlot,nbEnsemble = nbModels,WithReplacement=Replacement)
   }
   return(modelSVR)
 }
@@ -266,27 +268,3 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
   HybridRes <- list("MeanEstimate" = MeanEstimate,"StdEstimate" =StdEstimate)
   return(HybridRes)
 }
-
-#
-# write_raster <- function(Image, HDR, ImagePath,parm) {
-#
-#   # Write image with resolution corresponding to window_size
-#   HDR_output <- HDR
-#   HDR_output$bands <- 1
-#   HDR_output$`data type` <- 4
-#   HDR_output$`band names` <- parm
-#   Image_Format <- ENVI_type2bytes(HDR_output)
-#   headerFpath <- paste(ImagePath, ".hdr", sep = "")
-#   write_ENVI_header(HDR_output, headerFpath)
-#   Image_Format <- ENVI_type2bytes(HDR_output)
-#   ImgWrite <- array(Image, c(HDR_output$lines, HDR_output$samples, 1))
-#   # ImgWrite <- aperm(ImgWrite, c(2, 3, 1))
-#   fidOUT <- file(
-#     description = ImagePath, open = "wb", blocking = TRUE,
-#     encoding = getOption("encoding"), raw = FALSE
-#   )
-#   writeBin(c(ImgWrite), fidOUT, size = Image_Format$Bytes, endian = .Platform$endian, useBytes = FALSE)
-#   close(fidOUT)
-#   return("")
-# }
-

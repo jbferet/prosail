@@ -22,7 +22,8 @@ train_prosail_inversion(
   SpecPROSPECT = NULL,
   SpecSOIL = NULL,
   SpecATM = NULL,
-  Path_Results = "./"
+  Path_Results = "./",
+  FigPlot = FALSE
 )
 }
 \arguments{
@@ -59,6 +60,8 @@ train_prosail_inversion(
 \item{SpecATM}{list. Includes direct and diffuse radiation for clear conditions}
 
 \item{Path_Results}{character. path for results}
+
+\item{FigPlot}{boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT

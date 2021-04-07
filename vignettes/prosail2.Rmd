@@ -13,7 +13,7 @@ output:
     toc_depth: 2
 vignette: >
   \usepackage[utf8]{inputenc}
-  %\VignetteIndexEntry{2. forward}
+  %\VignetteIndexEntry{2. Forward mode}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

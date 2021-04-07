@@ -5,7 +5,18 @@
 [![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
-# 1 Install
+# 1 Requirements
+`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package  [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+
+In order to avoid errors when installing `liquidSVM` then `prosail`, we recommend using the following command for the installation of `liquidSVM`: 
+
+```
+install.packages("liquidSVM", repos=http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R, INSTALL_opts=c("--no-multiarch"))
+```
+
+This allows installation of 64bit version only.
+
+# 2 Install `prosail`
 
 After installing package `devtools`, you need to install the package `prospect` with the following command line in R session:
 ```
@@ -25,7 +36,7 @@ devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::
 ```
 
 
-# 2 Tutorial
+# 3 Tutorial
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
