@@ -51,7 +51,7 @@ devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::
 
 A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articles/prosail.html).
 
-# 3 Citation
+# 4 Citation
 
 If you use **prosail**, please cite the following references:
 
