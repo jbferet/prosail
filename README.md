@@ -11,7 +11,7 @@
 In order to avoid errors when installing `liquidSVM` then `prosail`, we recommend using the following command for the installation of `liquidSVM`: 
 
 ```
-install.packages("liquidSVM", repos=http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R, INSTALL_opts=c("--no-multiarch"))
+install.packages("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", INSTALL_opts=c("--no-multiarch"))
 ```
 
 This allows installation of 64bit version only.
