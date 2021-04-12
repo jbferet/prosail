@@ -30,7 +30,7 @@ check:
   # - R -e 'devtools::install_gitlab("prospect")'
   # - R -e "install.packages(c('devtools', 'testthat', 'roxygen2'))"
   - R -e 'devtools::install_deps(dep = T)'
-  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"))'
+  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = c( "error", "warning"))'
   # - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
   - R -e 'devtools::install()'
 
