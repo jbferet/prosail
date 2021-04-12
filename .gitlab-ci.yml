@@ -12,6 +12,7 @@ cache:
   - $R_LIBS_USER
 
 before_script:
+  - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update
   - apt-get install -y qpdf pandoc
   # - R -e 'devtools::install_cran("pkgdown")'
