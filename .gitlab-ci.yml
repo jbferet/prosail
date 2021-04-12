@@ -16,7 +16,7 @@ before_script:
   - apt-get install -y qpdf pandoc
   # - R -e 'devtools::install_cran("pkgdown")'
   - R -e 'devtools::install_github("floriandeboissieu/pkgdown", ref = "patch-1")' # for gitlab link support
-  - R -e 'install.packages("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", INSTALL_opts=c("--no-multiarch"))'
+  - R -e 'devtools::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts='--no-multiarch')'
 
 stages:
 - check
