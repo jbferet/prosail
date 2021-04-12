@@ -21,6 +21,7 @@
 #' @param SensorBands numeric. wavelength in nanometers of the spectral bands of Refl.
 #' @param Sel_Indices  list. list of spectral indices to be computed
 #' @param StackOut logical. If TRUE returns a stack, otherwise a list of rasters.
+#' @param ReflFactor numeric. multiplying factor used to write reflectance in image (==10000 for S2)
 #'
 #' @return list. includes
 #' - SpectralIndices: List of spectral indices computed from the reflectance initially provided
@@ -29,24 +30,29 @@
 #' @importFrom raster stack brick
 #' @export
 
-ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', StackOut=T){
+ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', StackOut=T,ReflFactor=1){
 
   S2Bands <- c('B2'=496.6, 'B3'=560.0, 'B4'=664.5, 'B5'=703.9, 'B6'=740.2,
                'B7' = 782.5, 'B8' = 835.1, 'B8A' = 864.8, 'B11' = 1613.7, 'B12' = 2202.4)
 
   SpectralIndices <- list()
   Sen2S2 <- get_bands_close2s2(SensorBands,S2Bands)
-
-  if(is.list(Refl)){
+  ClassRaster <- class(Refl)
+  if (ClassRaster=='RasterBrick' | ClassRaster=='RasterStack' | ClassRaster=='stars'){
+    # if !ReflFactor == 1 then apply a reflectance factor
+    if (!ReflFactor==1){
+      Refl <- Refl/ReflFactor
+    }
+    if (ClassRaster=='stars'){
+      Refl <- Refl[Sen2S2]
+    } else {
+      Refl <- raster::subset(Refl, Sen2S2)
+  }
+  } else if(is.list(Refl)){
     Refl <- raster::stack(Refl[Sen2S2]) # checks that all rasters have same crs/extent
   } else {
-    Refl <- raster::subset(Refl, Sen2S2)
+    stop('Refl is expected to be a RasterStack, RasterBrick, Stars object or a list of rasters')
   }
-  if(is(Refl, 'RasterStack'))
-    Refl <- raster::brick(Refl) # loads the data: much faster than stack that is loading raster each time it is used
-  if(!is(Refl, 'RasterBrick'))
-    stop('Refl is expected to be a RasterStack or a list of rasters')
-
   names(Refl) <- names(Sen2S2)
 
   IndexAll <- list()

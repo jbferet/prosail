@@ -80,9 +80,15 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
     ParmSet <- data.frame('TypeLidf' = 2, 'alpha' = 40)
   }
   # produce input parameters distribution
-  InputPROSAIL <- get_distribution_input_prosail(minval,maxval,ParmSet,nbSamples,
-                                                 TypeDistrib = TypeDistrib,
-                                                 Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std)
+  if (SAILversion=='4SAIL'){
+    InputPROSAIL <- get_distribution_input_prosail(minval,maxval,ParmSet,nbSamples,
+                                                   TypeDistrib = TypeDistrib,
+                                                   Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std)
+  } else if (SAILversion=='4SAIL2'){
+    InputPROSAIL <- get_distribution_input_prosail2(minval,maxval,ParmSet,nbSamples,
+                                                    TypeDistrib = TypeDistrib,
+                                                    Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std)
+  }
   if (SAILversion=='4SAIL2'){
     # Definition of Cv & update LAI
     MaxLAI <- min(c(maxval$lai),4)
@@ -143,7 +149,8 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
   for (parm in Parms2Estimate){
     ColParm <- which(parm==names(InputPROSAIL))
     InputVar <- InputPROSAIL[[ColParm]]
-    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT_Noise[[parm]],InputVar,FigPlot = FigPlot,nbEnsemble = nbModels,WithReplacement=Replacement)
+    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
+                                             FigPlot = FigPlot,nbEnsemble = nbModels,WithReplacement=Replacement)
   }
   return(modelSVR)
 }
@@ -162,6 +169,8 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
 #' @importFrom stats predict
 #' @importFrom progress progress_bar
 #' @importFrom graphics par
+#' @importFrom expandFunctions reset.warnings
+#' @importFrom stringr str_split
 #' @import dplyr
 #' @import ggplot2
 # @' @import caret
@@ -204,7 +213,23 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
     # liquidSVM
+    reset.warnings()
     tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y)
+    if (length(warnings())>0){
+      Msg <- names(warnings())
+      ValGamma <- str_split(string = Msg,pattern = 'gamma=')[[1]][2]
+      ValLambda <- str_split(string = Msg,pattern = 'lambda=')[[1]][2]
+      if (!is.na(as.numeric(ValGamma))){
+        message('Adjusting Gamma accordingly')
+        ValGamma <- as.numeric(ValGamma)
+        tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
+      }
+      if (!is.na(as.numeric(ValLambda))){
+        message('Adjusting Lambda accordingly')
+        ValLambda <- as.numeric(ValLambda)
+        tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
+      }
+    }
     modelsSVR[[i]] <- tunedModel
   }
 

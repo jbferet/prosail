@@ -32,7 +32,9 @@ Imports:
     progress,
     matrixStats,
     ggplot2,
-	prospect
+	prospect,
+	expandFunctions,
+	stringr
 Remotes: gitlab::jbferet/prospect
 VignetteBuilder: knitr
 URL: https://gitlab.com/jbferet/prosail
