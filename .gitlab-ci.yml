@@ -29,7 +29,7 @@ check:
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   # - R -e 'devtools::install_gitlab("prospect")'
   # - R -e "install.packages(c('devtools', 'testthat', 'roxygen2'))"
-  - R -e 'remotes::install_deps()'
+  - R -e 'remotes::install_deps(lib=Sys.getenv("R_LIBS_USER"))'
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "warning")'
   # - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
   - R -e 'devtools::install()'
