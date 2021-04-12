@@ -39,9 +39,10 @@ check:
 pages:
   stage: deploy
   script:
-  - R -e 'Sys.getenv("R_LIBS_USER"); remotes::install_cran("pkgdown", lib=lib)'
+  - R -e 'remotes::install_github("r-lib/pkgdown", lib=Sys.getenv("R_LIBS_USER"))'
   - R -e 'devtools::document()'
   - R -e 'pkgdown::build_site(new_process=F)'
+  # - grep
   - mv docs public
   artifacts:
     paths:
