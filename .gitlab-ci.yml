@@ -41,8 +41,8 @@ pages:
   script:
   - R -e 'remotes::install_github("r-lib/pkgdown", lib=Sys.getenv("R_LIBS_USER"))'
   - R -e 'devtools::document()'
-  - R -e 'pkgdown::build_site(new_process=F)'
-  # - grep
+  - R -e 'pkgdown::build_site()'
+  - grep gitlab reference/PRO4SAIL.html
   - mv docs public
   artifacts:
     paths:
