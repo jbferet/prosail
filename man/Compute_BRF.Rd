@@ -2,13 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{Compute_BRF}
 \alias{Compute_BRF}
-\title{Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-The direct and diffuse light are taken into account as proposed by:
-Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
-measurements into total shortwave broadband albedo using a canopy
-radiative transfer model, Agronomie
-Es = direct
-Ed = diffuse}
+\title{Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position}
 \usage{
 Compute_BRF(rdot, rsot, tts, SpecATM_Sensor)
 }
@@ -25,7 +19,6 @@ Compute_BRF(rdot, rsot, tts, SpecATM_Sensor)
 BRF numeric. Bidirectional reflectance factor
 }
 \description{
-Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
 The direct and diffuse light are taken into account as proposed by:
 Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
 measurements into total shortwave broadband albedo using a canopy

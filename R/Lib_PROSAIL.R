@@ -12,6 +12,7 @@
 # ============================================================================= =
 
 #' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+#'
 #' The direct and diffuse light are taken into account as proposed by:
 #' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
 #' measurements into total shortwave broadband albedo using a canopy
@@ -942,6 +943,7 @@ ConservativeScattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
 
 
 #' Computes the leaf angle distribution function value (freq)
+#'
 #' Ellipsoidal distribution function characterised by the average leaf
 #' inclination angle in degree (ala)
 #' Campbell 1986
@@ -994,7 +996,8 @@ campbell  <- function(ala){
 }
 
 #' Computes the leaf angle distribution function value (freq)
-#' using the original bimodal distribution function initially proposed in SAIL
+#'
+#' Using the original bimodal distribution function initially proposed in SAIL
 #'  References
 #'  ----------
 #'  (Verhoef1998) Verhoef, Wout. Theory of radiative transfer models applied

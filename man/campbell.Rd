@@ -2,10 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{campbell}
 \alias{campbell}
-\title{Computes the leaf angle distribution function value (freq)
-Ellipsoidal distribution function characterised by the average leaf
-inclination angle in degree (ala)
-Campbell 1986}
+\title{Computes the leaf angle distribution function value (freq)}
 \usage{
 campbell(ala)
 }
@@ -16,7 +13,6 @@ campbell(ala)
 foliar_distrib list. lidf and litab
 }
 \description{
-Computes the leaf angle distribution function value (freq)
 Ellipsoidal distribution function characterised by the average leaf
 inclination angle in degree (ala)
 Campbell 1986
