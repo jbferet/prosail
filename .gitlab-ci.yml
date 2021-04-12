@@ -16,21 +16,24 @@ before_script:
   - apt-get update
   - apt-get install -y qpdf pandoc
   # - R -e 'devtools::install_cran("pkgdown")'
-  - R -e 'devtools::install_github("floriandeboissieu/pkgdown", ref = "patch-1")' # for gitlab link support
-  - R -e 'devtools::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts='--no-multiarch')'
 
 stages:
-- check
-- deploy
+  - deps
+  - check
+  - deploy
 
-check:
-  stage: check
-  script:
+deps:
   - R -e 'print(Sys.getenv("R_LIBS_USER"))'
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   # - R -e 'devtools::install_gitlab("prospect")'
   # - R -e "install.packages(c('devtools', 'testthat', 'roxygen2'))"
+  - R -e 'devtools::install_github("floriandeboissieu/pkgdown", ref = "patch-1")' # for gitlab link support
+  - R -e 'devtools::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts='--no-multiarch')'
   - R -e 'remotes::install_deps(lib=Sys.getenv("R_LIBS_USER"))'
+
+check:
+  stage: check
+  script:
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "warning")'
   # - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
   - R -e 'devtools::install()'
