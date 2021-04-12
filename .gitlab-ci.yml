@@ -23,6 +23,8 @@ stages:
   - deploy
 
 deps:
+  stage: deps
+  script:
   - R -e 'print(Sys.getenv("R_LIBS_USER"))'
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   # - R -e 'devtools::install_gitlab("prospect")'
