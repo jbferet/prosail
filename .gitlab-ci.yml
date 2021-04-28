@@ -12,7 +12,8 @@ cache:
   - $R_LIBS_DIR
 
 before_script:
-  - R -e 'R_LIBS_USER=file.path(Sys.getenv("R_LIBS_DIR"), strsplit(version[["version.string"]], " ")[[1]][3]); Sys.setenv(R_LIBS_USER = R_LIBS_USER)'
+  - export R_LIBS_USER=$R_LIBS_DIR/$(R --version | sed -n 1p| sed -r 's/.*([0-9]\.[0-9]\.[0-9]).*/\1/')
+  # - R -e 'R_LIBS_USER=file.path(Sys.getenv("R_LIBS_DIR"), strsplit(version[["version.string"]], " ")[[1]][3]); Sys.setenv(R_LIBS_USER = R_LIBS_USER)'
   - R -e 'print(Sys.getenv("R_LIBS_USER"))'
   - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
