@@ -1,6 +1,6 @@
 image: thomaschln/r-devtools
 
-# gitlab-ci file copied from https://www.r-bloggers.com/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
+# gitlab-ci file inspired from https://www.r-bloggers.com/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
 
 variables:
   R_LIBS_DIR: "$CI_PROJECT_DIR/ci/lib"
@@ -14,9 +14,9 @@ cache:
 before_script:
   - export R_LIBS_USER=$R_LIBS_DIR/$(R --version | sed -n 1p| sed -r 's/.*([0-9]\.[0-9]\.[0-9]).*/\1/')
   - echo $R_LIBS_USER
-  - rm -r $R_LIBS_USER
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   - ls $R_LIBS_DIR
+  # delete other R version libs
   - find $R_LIBS_DIR/* -maxdepth 0 ! -name $(basename $R_LIBS_USER) -type d -exec rm -r {} +
   - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
@@ -31,7 +31,7 @@ stages:
 deps:
   stage: deps
   script:
-  - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch", lib=Sys.getenv("R_LIBS_USER"))'
+  - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch")'
   - R -e 'remotes::install_deps(dependencies=T)'
 
 check:
@@ -43,7 +43,7 @@ check:
 pages:
   stage: deploy
   script:
-  - R -e 'remotes::install_github("r-lib/pkgdown", lib=Sys.getenv("R_LIBS_USER"))'
+  - R -e 'remotes::install_github("r-lib/pkgdown")'
   - R -e 'devtools::document()'
   - R -e 'pkgdown::build_site()'
   # - grep gitlab docs/reference/PRO4SAIL.html
