@@ -32,6 +32,7 @@
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
 #' @param Path_Results character. path for results
 #' @param FigPlot boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step
+#' @param Force4LowLAI boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI
 #'
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
@@ -43,7 +44,7 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
                                     SAILversion='4SAIL',
                                     Parms2Estimate='lai',Bands2Select=NULL,NoiseLevel=NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
-                                    Path_Results='./',FigPlot=FALSE){
+                                    Path_Results='./',FigPlot=FALSE,Force4LowLAI = TRUE){
 
   #########################################################################
   ###           1- PRODUCE A LUT TO TRAIN THE HYBRID INVERSION          ###
@@ -83,11 +84,13 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
   if (SAILversion=='4SAIL'){
     InputPROSAIL <- get_distribution_input_prosail(minval,maxval,ParmSet,nbSamples,
                                                    TypeDistrib = TypeDistrib,
-                                                   Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std)
+                                                   Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std,
+                                                   Force4LowLAI = Force4LowLAI)
   } else if (SAILversion=='4SAIL2'){
     InputPROSAIL <- get_distribution_input_prosail2(minval,maxval,ParmSet,nbSamples,
                                                     TypeDistrib = TypeDistrib,
-                                                    Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std)
+                                                    Mean = GaussianDistrib$Mean,Std = GaussianDistrib$Std,
+                                                    Force4LowLAI = Force4LowLAI)
   }
   if (SAILversion=='4SAIL2'){
     # Definition of Cv & update LAI

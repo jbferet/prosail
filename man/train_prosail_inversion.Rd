@@ -23,7 +23,8 @@ train_prosail_inversion(
   SpecSOIL = NULL,
   SpecATM = NULL,
   Path_Results = "./",
-  FigPlot = FALSE
+  FigPlot = FALSE,
+  Force4LowLAI = TRUE
 )
 }
 \arguments{
@@ -62,6 +63,8 @@ train_prosail_inversion(
 \item{Path_Results}{character. path for results}
 
 \item{FigPlot}{boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step}
+
+\item{Force4LowLAI}{boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT

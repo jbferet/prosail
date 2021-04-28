@@ -39,7 +39,7 @@ if TypeLidf ==2, controls the distribution's bimodality}
 
 \item{lai}{numeric. Leaf Area Index}
 
-\item{hot}{numeric. Hot Spot parameter}
+\item{hot}{numeric. Hot Spot parameter = ratio of the correlation length of leaf projections in the horizontal plane and the canopy height (doi:10.1016/j.rse.2006.12.013)}
 
 \item{tts}{numeric. Sun zeith angle}
 

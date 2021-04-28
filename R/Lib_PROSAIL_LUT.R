@@ -19,6 +19,7 @@
 #' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
 #' @param Mean list. mean value for parameters with Gaussian distribution
 #' @param Std list. standard deviation for parameters with Gaussian distribution
+#' @param Force4LowLAI boolean. set to TRUE if needed to force distribution of leaf chemistry to low values for low LAI
 #'
 #' @return InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
 #' @importFrom stats runif rnorm sd
@@ -42,7 +43,7 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
                                                                     'tts' = 'Uniform',
                                                                     'psi' = 'Uniform',
                                                                     'alpha' = 'Uniform'),
-                                           Mean = NULL,Std = NULL){
+                                           Mean = NULL,Std = NULL,Force4LowLAI=TRUE){
 
   # define all input parameters from PROSAIL
   InVar <- c('CHL','CAR','ANT','BROWN','EWT','LMA',
@@ -120,9 +121,20 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
       InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
+  if (Force4LowLAI==T){
+    MaxLAI <- 2
+    LowLAI <- which(InputPROSAIL$lai<MaxLAI)
+    if (length(LowLAI)>0){
+      for (BP in AllParm){
+        if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
+          InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.25*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+                                                      + InputPROSAIL$lai[LowLAI]*(0.75/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+        }
+      }
+    }
+  }
   return(InputPROSAIL)
 }
-
 
 #' This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL
 #'
@@ -133,6 +145,7 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
 #' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
 #' @param Mean list. mean value for parameters with Gaussian distribution
 #' @param Std list. standard deviation for parameters with Gaussian distribution
+#' @param Force4LowLAI boolean. set to TRUE if needed to force distribution of leaf chemistry to low values for low LAI
 #'
 #' @return InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
 #' @importFrom stats runif rnorm sd
@@ -160,7 +173,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
                                                                      'diss' = 'Uniform',
                                                                      'Cv' = 'Uniform',
                                                                      'Zeta' = 'Uniform'),
-                                            Mean = NULL,Std = NULL){
+                                            Mean = NULL,Std = NULL,Force4LowLAI=TRUE){
 
   # define all input parameters from PROSAIL
   InVar <- c('CHL','CAR','ANT','BROWN','EWT','LMA',
@@ -239,6 +252,21 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
         InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
       }
       InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
+    }
+  }
+
+  if (Force4LowLAI==T){
+    MaxLAI <- 2
+    LowLAI <- which(InputPROSAIL$lai<MaxLAI)
+    if (length(LowLAI)>0){
+      for (BP in InVar){
+        if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
+          if (length(unique(InputPROSAIL[[BP]]))>1){
+            InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.20*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]]) +
+                                                          InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+          }
+        }
+      }
     }
   }
   return(InputPROSAIL)

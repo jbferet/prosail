@@ -15,7 +15,8 @@ get_distribution_input_prosail2(
     q = "Uniform", tto = "Uniform", tts = "Uniform", psi = "Uniform", alpha = "Uniform",
     fraction_brown = "Uniform", diss = "Uniform", Cv = "Uniform", Zeta = "Uniform"),
   Mean = NULL,
-  Std = NULL
+  Std = NULL,
+  Force4LowLAI = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ get_distribution_input_prosail2(
 \item{Mean}{list. mean value for parameters with Gaussian distribution}
 
 \item{Std}{list. standard deviation for parameters with Gaussian distribution}
+
+\item{Force4LowLAI}{boolean. set to TRUE if needed to force distribution of leaf chemistry to low values for low LAI}
 }
 \value{
 InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation

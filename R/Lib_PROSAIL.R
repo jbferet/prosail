@@ -459,7 +459,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' if TypeLidf ==1, unused
 #' if TypeLidf ==2, controls the distribution's bimodality
 #' @param lai numeric. Leaf Area Index
-#' @param hot numeric. Hot Spot parameter
+#' @param hot numeric. Hot Spot parameter = ratio of the correlation length of leaf projections in the horizontal plane and the canopy height (doi:10.1016/j.rse.2006.12.013)
 #' @param tts numeric. Sun zeith angle
 #' @param tto numeric. Observer zeith angle
 #' @param psi numeric. Azimuth Sun / Observer

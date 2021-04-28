@@ -64,7 +64,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
   # }
 
   # inelegant but meeeeh
-  listIndices <- list('ARI1','ARI2','ARVI','BAI','CHL_RE','CRI1','CRI2','EVI','EVI2',
+  listIndices <- list('ARI1','ARI2','ARVI','BAI','BAIS2','CHL_RE','CRI1','CRI2','EVI','EVI2',
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
                       'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
@@ -87,6 +87,10 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
   if ('BAI'%in%Sel_Indices){
     BAI <- (1/((0.1-Refl[["B4"]])**2+(0.06-Refl[["B8"]])**2))
     SpectralIndices$BAI <- BAI
+  }
+  if ('BAIS2'%in%Sel_Indices){
+    BAIS2 <-  (1-((Refl[["B6"]]*Refl[["B7"]]*Refl[["B8A"]])/Refl[["B4"]])**0.5)*((Refl[["B12"]]-Refl[["B8A"]])/((Refl[["B12"]]+Refl[["B8A"]])**0.5)+1)
+    SpectralIndices$BAIS2 <- BAIS2
   }
   if ('CHL_RE'%in%Sel_Indices){
     CHL_RE <- Refl[["B5"]]/Refl[["B8"]]
@@ -255,7 +259,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   }
 
   # inelegant but meeeeh
-  listIndices <- list('ARI1','ARI2','ARVI','BAI','CHL_RE','CRI1','CRI2','EVI','EVI2',
+  listIndices <- list('ARI1','ARI2','ARVI','BAI','BAIS2','CHL_RE','CRI1','CRI2','EVI','EVI2',
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
                       'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
@@ -278,6 +282,10 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   if ('BAI'%in%Sel_Indices){
     BAI <- (1/((0.1-Refl[,Sen2S2[["B4"]]])**2+(0.06-Refl[,Sen2S2[["B8"]]])**2))
     SpectralIndices$BAI <- BAI
+  }
+  if ('BAIS2'%in%Sel_Indices){
+    BAIS2 <-  (1-((Refl[,Sen2S2[["B6"]]]*Refl[,Sen2S2[["B7"]]]*Refl[,Sen2S2[["B8A"]]])/Refl[,Sen2S2[["B4"]]])**0.5)*((Refl[,Sen2S2[["B12"]]]-Refl[,Sen2S2[["B8A"]]])/((Refl[,Sen2S2[["B12"]]]+Refl[,Sen2S2[["B8A"]]])**0.5)+1)
+    SpectralIndices$BAIS2 <- BAIS2
   }
   if ('CHL_RE'%in%Sel_Indices){
     CHL_RE <- Refl[,Sen2S2[["B5"]]]/Refl[,Sen2S2[["B8"]]]
