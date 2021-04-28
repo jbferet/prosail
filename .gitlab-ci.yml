@@ -16,7 +16,7 @@ before_script:
   - echo $R_LIBS_USER
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   - ls $R_LIBS_DIR
-  - find $R_LIBS_DIR/* -maxdepth 0 ! -name $(basename $R_LIBS_USER) -type d -exec rm -r {} +
+  - find $R_LIBS_DIR/* -maxdepth 0 -type d -exec rm -r {} + # ! -name $(basename $R_LIBS_USER)
   - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update
