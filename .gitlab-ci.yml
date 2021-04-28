@@ -13,6 +13,8 @@ cache:
 
 before_script:
   - R -e 'R_LIBS_USER=file.path(Sys.getenv("R_LIBS_DIR"), strsplit(version[["version.string"]], " ")[[1]][3]); Sys.setenv(R_LIBS_USER = R_LIBS_USER)'
+  - R -e 'print(Sys.getenv("R_LIBS_USER"))'
+  - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update
   - apt-get install -y qpdf pandoc
@@ -25,9 +27,9 @@ stages:
 deps:
   stage: deps
   script:
-  - R -e 'print(Sys.getenv("R_LIBS_USER"))'
+  - echo $R_LIBS_USER
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
-  - ls $R_LIBS_USER
+  - ls $R_LIBS_DIR
   - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch", lib=Sys.getenv("R_LIBS_USER"))'
   - R -e 'lib=Sys.getenv("R_LIBS_USER"); print(lib); remotes::install_deps(lib=lib, dependencies=T)'
 
