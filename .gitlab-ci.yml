@@ -17,6 +17,7 @@ before_script:
   - R -e 'print(Sys.getenv("R_LIBS_USER"))'
   - ls $R_LIBS_DIR
   - find $R_LIBS_DIR/* ! -name $(basename $R_LIBS_USER) -type d -exec rm -r {} +
+  - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update
   - apt-get install -y qpdf pandoc
