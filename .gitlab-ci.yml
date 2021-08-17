@@ -32,6 +32,7 @@ deps:
   stage: deps
   script:
   - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch")'
+  - R -e 'remotes::install_packages("rgdal")'
   # - R -e 'remotes::install_github("r-spatial/stars")'
   - R -e 'remotes::install_deps(dependencies=T)'
 
