@@ -38,7 +38,7 @@ deps:
 check:
   stage: check
   script:
-  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "warning")'
+  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "error")'
   - R -e 'devtools::install()'
 
 pages:
