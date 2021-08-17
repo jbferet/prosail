@@ -1,3 +1,10 @@
+# prosail v1.0.0
+
+## Changes
+- application of hybrid inversion on rasters
+- updated spectral indices computed from reflectance matrix
+- added function to get S2 geometry from MTD_TL.xml files
+
 # prosail v0.9.0
 
 ## Changes

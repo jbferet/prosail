@@ -34,7 +34,7 @@ The current version of the model PROSPECT implemented in `prosail` is __PROSPECT
 
 There are currently two versions of the model SAIL implemented in `prosail`:  __4SAIL__ and __4SAIL2__. 
 
-The SAIL model is an example of four-stream representations of the radiative transfer equation, in which case one distinguishes two direct fluxes (incident solar flux and radiance in the viewing direction) and two diffuse fluxes (upward and downward hemispherical flux). Detailed description of the functioning of the different SAIL versions can be found in  [Verhoef & Bach, 2007](https://doi.org/10.1016/j.rse.2006.12.013) and [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which th figure below is taken.
+The SAIL model is an example of four-stream representations of the radiative transfer equation, in which case one distinguishes two direct fluxes (incident solar flux and radiance in the viewing direction) and two diffuse fluxes (upward and downward hemispherical flux). Detailed description of the functioning of the different SAIL versions can be found in [Verhoef & Bach, 2007](https://doi.org/10.1016/j.rse.2006.12.013) and [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which th figure below is taken.
 
 <center>
   <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">

@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 
 This tutorial describes how to run a hybrid inversion using the package `prosail`.
 
-currently, the hybrid inversion implemented in  `prosail` is built around __4SAIL__ and support vector regression (SVR) as machine learning algorithm.
+Currently, the default hybrid inversion implemented in  `prosail` is built around __4SAIL__ and support vector regression (SVR) as machine learning algorithm. It is also possible to use __4SAIL2__ as alternative version. 
 
 This hybrid inversion consists in bagging prediction of biophysical properties: a LUT is simulated with PROSAIL and resampled in order to produce multiple datasets including a limited number of samples. Then a set of individual SVR models is trained from each reduced dataset. The following example illustrates how to proceed to train and apply this inversion. 
 

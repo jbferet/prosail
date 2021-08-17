@@ -24,9 +24,9 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
                           SpectralProps = NULL,
                           Path_SensorResponse = NULL){
 
-  ###########################################################################
+  # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
-  ###########################################################################
+  # == == == == == == == == == == == == == == == == == == == == == == == == =
   if (SensorName=='Sentinel_2'){                                  # if sensor is SENTINEL-2
     Spectral_Response <- prosail::Sentinel_2$Spectral_Response
     Spectral_Bands <- prosail::Sentinel_2$Spectral_Bands
@@ -68,10 +68,10 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
     OriginalBands <- prosail::SPOT_6_7$OriginalBands
     SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
 
-    ###########################################################################
+    # == == == == == == == == == == == == == == == == == == == == == == == == =
     ### if the spectral response function of the sensor is not defined      ###
     ###       but spectral characteristics (wl & FWHM) are provided         ###
-    ###########################################################################
+    # == == == == == == == == == == == == == == == == == == == == == == == == =
   }  else {                                                       # if sensor is none of the above
     # check if spectral properties are provided in order to compute spectral response based on gaussian assumption
     if (!is.null(SpectralProps)){
@@ -108,11 +108,11 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
       }
       SRF$Spectral_Response <- t(SRF$Spectral_Response)
 
-    ###########################################################################
+    ### == == == == == == == == == == == == == == == == == == == == == == ==###
     ### if the spectral response function of the sensor is not defined      ###
     ###     and no spectral characteristics (wl & FWHM) are provided        ###
     ###   but a file corresponding to sensor characteristics is found       ###
-    ###########################################################################
+    ### == == == == == == == == == == == == == == == == == == == == == == ==###
     } else {
       if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
         Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
@@ -136,11 +136,11 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
         Spectral_Response <- t(Spectral_Response)
         SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
 
-    ###########################################################################
+    ### == == == == == == == == == == == == == == == == == == == == == == ==###
     ### if the spectral response function of the sensor is not defined      ###
     ###     and no spectral characteristics (wl & FWHM) are provided        ###
     ###   and no file corresponding to sensor characteristics is found      ###
-    ###########################################################################
+    ### == == == == == == == == == == == == == == == == == == == == == == ==###
       } else {
         message('___ Spectral response of the sensor expected here: ____')
         print(Path_SRF)
@@ -234,6 +234,7 @@ PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
 #' Computes spectral response function based on wavelength and FWHM characteristics
 #' @param wvl numeric. spectral sampling of the sensor
 #' @param FWHM numeric. Full Width Half Maximum for each spectral band
+#'
 #' @return SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
 #' @importFrom stats dnorm
 #' @export
@@ -257,6 +258,7 @@ Compute_SRF <- function(wvl,FWHM){
 #' @param SensorName character. name of the sensor. Either already defined, or to be defined based on other inputs
 #' @param SpectralProps list. Sensor spectral characteristics including wl = central wavelength and fwhm = corresponding FWHM
 #' @param Path_SensorResponse character. Path where to get or save spectral response function
+#'
 #' @return SRF list. Spectral response function, corresponding spectral bands, and Original Bands
 #' @export
 get_spec_sensor <- function(SensorName = 'MyCustomSensor',
@@ -272,4 +274,49 @@ get_spec_sensor <- function(SensorName = 'MyCustomSensor',
                                         prosail::SpecSOIL,
                                         prosail::SpecATM,SRF)
   return(SpecSensor)
+}
+
+#' This function returns geometry of acquisition for S2 image
+#' - SZA = list of sun zenith angle
+#' - SAA = list of sun azimuth angle
+#' - VZA = list of viewer zenith angle
+#' - VAA = list of viewer azimuth angle
+#' @param MTD_TL_xml character. Path for metadata file MTD_TL.xml
+#'
+#' @return List of S2 angles (SZA, SAA, VZA, VAA)
+#' @importFrom XML xml xmlToList
+#' @export
+get_S2geometry <- function(MTD_TL_xml){
+  # read XML file containing info about geometry of acquisition
+  s2xml <- XML::xml(MTD_TL_xml)
+  s2xml <- XML::xmlToList(s2xml)
+  Distrib_SunAngle <- Distrib_ViewAngle <- list()
+  # SZA
+  Distrib_SunAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
+  SZA <- c()
+  for (i in 1:length(Distrib_SunAngle$Zenith)){
+    SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
+  }
+  SZA <- SZA[which(!is.na(SZA))]
+  # SAA
+  Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
+  SAA <- c()
+  for (i in 1:length(Distrib_SunAngle$Zenith)){
+    SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
+  }
+  SAA <- SAA[which(!is.na(SAA))]
+  Distrib_ViewAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Zenith$Values_List
+  VZA <- c()
+  for (i in 1:length(Distrib_ViewAngle$Zenith)){
+    VZA <- c(VZA,as.numeric(strsplit(x = Distrib_ViewAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
+  }
+  VZA <- VZA[which(!is.na(VZA))]
+  # VAA
+  Distrib_ViewAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
+  VAA <- c()
+  for (i in 1:length(Distrib_ViewAngle$Azimuth)){
+    VAA <- c(VAA,as.numeric(strsplit(x = Distrib_ViewAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
+  }
+  VAA <- VAA[which(!is.na(VAA))]
+  return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
 }
