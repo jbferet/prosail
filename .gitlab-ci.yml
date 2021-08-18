@@ -33,17 +33,21 @@ deps:
   script:
   - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch")'
   - R -e 'remotes::install_deps(dependencies=T)'
+  only:
+  - master
 
 check:
   stage: check
   script:
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "warning")'
   - R -e 'devtools::install()'
+  only:
+  - master
 
 pages:
   stage: deploy
   script:
-  - R -e 'remotes::install_github("r-lib/pkgdown")'
+  - R -e 'remotes::install_git("https://github.com/r-lib/pkgdown", upgrade="never")'
   - R -e 'devtools::document()'
   - R -e 'pkgdown::build_site()'
   # - grep gitlab docs/reference/PRO4SAIL.html
@@ -52,6 +56,6 @@ pages:
     paths:
     - public
 
-  only:
-  - master
+  # only:
+  # - master
 
