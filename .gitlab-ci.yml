@@ -21,7 +21,7 @@ before_script:
   - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update
-  - apt-get install -y qpdf pandoc
+  - apt-get install -y qpdf pandoc libcurl4-openssl-dev libgit2-dev libudunits2-dev libnetcdf-dev libproj-dev libgeos-dev libgdal-dev netcdf-bin
 
 stages:
   - deps
@@ -39,7 +39,7 @@ deps:
 check:
   stage: check
   script:
-  - R -e 'install.packages("rgdal")'
+  # - R -e 'install.packages("rgdal")'
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "error")'
   - R -e 'devtools::install()'
 
