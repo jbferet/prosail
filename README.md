@@ -5,36 +5,49 @@
 [![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
-# 1 Requirements
-`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package  [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+# 1 Prerequirements
 
-In order to avoid errors when installing `liquidSVM` then `prosail`, we recommend using the following command for the installation of `liquidSVM`: 
+## Install from repository
 
+First, install the package `devtools` following the [instructions](https://www.r-project.org/nosvn/pandoc/devtools.html) depending on your operating system. 
+
+Then install `git2r`:
 ```
-install.packages("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", INSTALL_opts=c("--no-multiarch"))
+install.packages("git2r")
 ```
 
-This allows installation of 64bit version only.
+## Install liquidSVM
 
-# 2 Install `prosail`
+`prosail` uses Support Vector Regression (SVR) for hybrid inversion, currently based on the package  [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
 
-After installing package `devtools`, you need to install the package `prospect` with the following command line in R session:
+Please follow installation instructions provided in the documentation webpage. 
+
+### !!! WINDOWS USERS !!!
+
+Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R library. this [`i386`](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) directory should be copied into the local  'Path_For_My_R_distribution\library\liquidSVM\libs\' directory on your computer.
+
+## Install `prospect`
+You need to install the package `prospect` with the following command line in R session:
+
 ```
 devtools::install_gitlab('jbferet/prospect')
 ```
+
+# 2 Install `prosail`
 
 The package `prosail` can then be installed with the following command line in R session:
 ```
 devtools::install_gitlab('jbferet/prosail')
 ```
 
+<!-- 
 ... if you are already on this webpage, but `prosail` is still not publicly available... Lucky you!!!
 then install the `getPass` package, and run this command line:
 
 ```
 devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::cred_user_pass('Your_Gitlab_UserName',getPass::getPass())) 
 ```
-
+-->
 
 # 3 Tutorial
 
@@ -69,7 +82,6 @@ Verhoef W, Jia L, Xiao Q & Su Z, 2007. Unified optical-thermal four-stream radia
 Jacquemoud S, Verhoef W, Baret F, Bacour C, Zarco-Tejada PJ, Asner GP, François C & Ustin SL, 2009. PROSPECT+ SAIL models: A review of use for vegetation characterization. Remote Sensing of Environment, 113:S56–S66. https://doi.org/doi:10.1016/j.rse.2008.01.026
 
 Berger K, Atzberger C, Danner M, D’Urso G, Mauser W, Vuolo F & Hank T 2018. Evaluation of the PROSAIL Model Capabilities for Future Hyperspectral Model Environments: A Review Study. Remote Sensing, 10:85. https://doi.org/10.3390/rs10010085
-
 
 ## SOILSPECT
 Jacquemoud S, Baret F, Hanocq J-F, 1992. Modeling spectral and bidirectional soil reflectance. Remote Sensing of Environment, 41, 123–132. https://doi.org/10.1016/0034-4257(92)90072-R

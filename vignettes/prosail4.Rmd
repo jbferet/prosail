@@ -191,10 +191,10 @@ xmlfile <- file.path(dirname(Refl_path),'MTD_TL.xml')
 S2Geom <- get_S2geometry(MTD_TL_xml = xmlfile)
 
 # Train PROSAIL inversion
-minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.005,'ANT' = 0,'LMA' = 0.005,'N' = 1.5,'psoil' = 0.0, 'BROWN'=0.0,
-                     'LIDFa' = 50, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = min(S2Geom$SZA), 'psi' = 5)
-maxval <- data.frame('CHL'=90,'CAR'=20,'EWT' = 0.03,'ANT' = 3,'LMA' = 0.03,'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
-                     'LIDFa' = 70, 'lai' = 7,'q'=0.2,'tto' = 7,'tts' = max(S2Geom$SZA), 'psi' = 355)
+minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.005,'ANT' = 0,'LMA' = 0.005,'N' = 1.0,'psoil' = 0.0, 'BROWN'=0.0,
+                     'LIDFa' = 30, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = min(S2Geom$SZA), 'psi' = 5)
+maxval <- data.frame('CHL'=90,'CAR'=20,'EWT' = 0.04,'ANT' = 3,'LMA' = 0.04,'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
+                     'LIDFa' = 70, 'lai' = 7,'q'=0.25,'tto' = 7,'tts' = max(S2Geom$SZA), 'psi' = 355)
 
 # get sensor response for Sentinel-2
 SensorName <- HDR_Refl$`sensor type`

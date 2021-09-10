@@ -282,15 +282,100 @@ get_spec_sensor <- function(SensorName = 'MyCustomSensor',
 #' - VZA = list of viewer zenith angle
 #' - VAA = list of viewer azimuth angle
 #' @param MTD_TL_xml character. Path for metadata file MTD_TL.xml
+#' @param verbose Boolean. Should messages be displayed?
 #'
 #' @return List of S2 angles (SZA, SAA, VZA, VAA)
 #' @importFrom XML xml xmlToList
 #' @export
-get_S2geometry <- function(MTD_TL_xml){
+get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
+
   # read XML file containing info about geometry of acquisition
   s2xml <- XML::xml(MTD_TL_xml)
   s2xml <- XML::xmlToList(s2xml)
-  Distrib_SunAngle <- Distrib_ViewAngle <- list()
+  if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
+    if (verbose==TRUE){
+      message('identification of S2 image produced by THEIA')
+      message(s2xml$Dataset_Identification$IDENTIFIER)
+    }
+    GeomS2 <- get_S2geometry_from_THEIA(s2xml)
+  } else {
+    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
+  }
+  return(list('SAA'=GeomS2$SAA,'SZA'=GeomS2$SZA,'VAA'=GeomS2$VAA,'VZA'=GeomS2$VZA))
+}
+
+#' This function returns geometry of acquisition for S2 image processed with MAJA
+#' - SZA = list of sun zenith angle
+#' - SAA = list of sun azimuth angle
+#' - VZA = list of viewer zenith angle
+#' - VAA = list of viewer azimuth angle
+#' @param s2xml list. list produced from reading XML metadata file with package XML
+#'
+#' @return List of S2 angles (SZA, SAA, VZA, VAA)
+#' @export
+get_S2geometry_from_THEIA <- function(s2xml){
+
+  Distrib_SunAngle <- list()
+  # SZA
+  Distrib_SunAngle$Zenith <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Zenith$Values_List
+  SZA <- c()
+  for (i in 1:length(Distrib_SunAngle$Zenith)){
+    SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
+  }
+  SZA <- SZA[which(!is.na(SZA))]
+
+  # SAA
+  Distrib_SunAngle$Azimuth <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Azimuth$Values_List
+  SAA <- c()
+  for (i in 1:length(Distrib_SunAngle$Zenith)){
+    SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
+  }
+  SAA <- SAA[which(!is.na(SAA))]
+
+  # VZA
+  VZA <- c()
+  band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
+  for (i in 1:length(band)) {
+    detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
+    for (j in 1:(length(detector)-1)) {
+      values  <- detector[j]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
+      for (k in 1:length(values)) {
+        VZA <- c(VZA,as.numeric(strsplit(x = values[k]$VALUES,split = ' ')[[1]]))
+      }
+    }
+  }
+  VZA <- VZA[which(!is.na(VZA))]
+
+  # VAA
+  VAA <- c()
+  band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
+  for (i in 1:length(band)) {
+    detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
+    for (j in 1:(length(detector)-1)) {
+      values  <- detector[j]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
+      for (k in 1:length(values)) {
+        VAA <- c(VAA,as.numeric(strsplit(x = values[k]$VALUES,split = ' ')[[1]]))
+      }
+    }
+  }
+  VAA <- VAA[which(!is.na(VAA))]
+
+  # return
+  return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
+}
+
+#' This function returns geometry of acquisition for S2 image processed with Sen2Cor
+#' - SZA = list of sun zenith angle
+#' - SAA = list of sun azimuth angle
+#' - VZA = list of viewer zenith angle
+#' - VAA = list of viewer azimuth angle
+#' @param s2xml list. list produced from reading XML metadata file with package XML
+#'
+#' @return List of S2 angles (SZA, SAA, VZA, VAA)
+#' @export
+get_S2geometry_from_SAFE <- function(s2xml){
+
+  Distrib_SunAngle <- list()
   # SZA
   Distrib_SunAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
   SZA <- c()
@@ -298,6 +383,7 @@ get_S2geometry <- function(MTD_TL_xml){
     SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
   }
   SZA <- SZA[which(!is.na(SZA))]
+
   # SAA
   Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
   SAA <- c()
@@ -305,18 +391,29 @@ get_S2geometry <- function(MTD_TL_xml){
     SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
   }
   SAA <- SAA[which(!is.na(SAA))]
-  Distrib_ViewAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Zenith$Values_List
+
+  # VZA
   VZA <- c()
-  for (i in 1:length(Distrib_ViewAngle$Zenith)){
-    VZA <- c(VZA,as.numeric(strsplit(x = Distrib_ViewAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
+  band_detector <- s2xml$Geometric_Info$Tile_Angles
+  for (i in 3:(length(band_detector)-2)) {
+    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
+    for (j in 1:length(values)){
+      VZA <- c(VZA,as.numeric(strsplit(x = values[j]$VALUES,split = ' ')[[1]]))
+    }
   }
   VZA <- VZA[which(!is.na(VZA))]
+
   # VAA
-  Distrib_ViewAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
   VAA <- c()
-  for (i in 1:length(Distrib_ViewAngle$Azimuth)){
-    VAA <- c(VAA,as.numeric(strsplit(x = Distrib_ViewAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
+  band_detector <- s2xml$Geometric_Info$Tile_Angles
+  for (i in 3:(length(band_detector)-2)) {
+    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
+    for (j in 1:length(values)){
+      VAA <- c(VAA,as.numeric(strsplit(x = values[j]$VALUES,split = ' ')[[1]]))
+    }
   }
   VAA <- VAA[which(!is.na(VAA))]
+
+  # return
   return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
 }
