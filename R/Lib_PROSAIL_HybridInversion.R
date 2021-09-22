@@ -195,7 +195,6 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
     total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
     pb$tick()
-    Sys.sleep(1 / 100)
     EstimatedVal[[i]] <- predict(RegressionModels[[i]], Refl)
   }
   EstimatedVal <- do.call(cbind,EstimatedVal)
