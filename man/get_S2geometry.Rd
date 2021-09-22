@@ -10,12 +10,10 @@
 \item VAA = list of viewer azimuth angle
 }}
 \usage{
-get_S2geometry(MTD_TL_xml, verbose = FALSE)
+get_S2geometry(MTD_TL_xml)
 }
 \arguments{
 \item{MTD_TL_xml}{character. Path for metadata file MTD_TL.xml}
-
-\item{verbose}{Boolean. Should messages be displayed?}
 }
 \value{
 List of S2 angles (SZA, SAA, VZA, VAA)

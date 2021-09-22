@@ -616,6 +616,7 @@ get_closest_bands <- function(SensorBands,listBands){
 #' as a criterion for outlier detection
 #'
 #' @param DistVal numeric. vector of distribution of values
+#' @param weightIRQ numeric. weighting factor appplied to IRQ to define lower and upper boudaries for outliers
 #'
 #' @return outlier_IQR numeric. band numbers of original sensor corresponding to S2
 #' @importFrom stats IQR quantile
