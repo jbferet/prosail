@@ -449,8 +449,8 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 }
 
 #' Performs PRO4SAIL2 simulation based on a set of combinations of input parameters
-#' @param leafgreen list. includes relfectance and transmittance for vegetation #1 (e.g. green vegetation)
-#' @param leafbrown list. includes relfectance and transmittance for vegetation #2 (e.g. brown vegetation)
+#' @param leafgreen list. includes reflectance and transmittance for vegetation #1 (e.g. green vegetation)
+#' @param leafbrown list. includes reflectance and transmittance for vegetation #2 (e.g. brown vegetation)
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope

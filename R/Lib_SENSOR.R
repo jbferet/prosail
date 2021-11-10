@@ -292,7 +292,10 @@ get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
   # read XML file containing info about geometry of acquisition
   s2xml <- XML::xml(MTD_TL_xml)
   s2xml <- XML::xmlToList(s2xml)
-  if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
+
+  if (is.null(s2xml$Dataset_Identification$AUTHORITY)){
+    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
+  } else if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
     if (verbose==TRUE){
       message('identification of S2 image produced by THEIA')
       message(s2xml$Dataset_Identification$IDENTIFIER)

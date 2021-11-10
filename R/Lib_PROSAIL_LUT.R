@@ -263,7 +263,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
         if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
           if (length(unique(InputPROSAIL[[BP]]))>1){
             InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.20*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]]) +
-                                                          InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+              InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
           }
         }
       }
@@ -297,8 +297,7 @@ Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILvers
     total = 10, clear = FALSE, width= 100)
   for (i in 1:nbSamples){
     if (i%%Split==0 & nbSamples>100){
-        pb$tick()
-      Sys.sleep(1 / 100)
+      pb$tick()
     }
     rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
     # if 4SAIL
