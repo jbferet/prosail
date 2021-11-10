@@ -108,11 +108,11 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
       }
       SRF$Spectral_Response <- t(SRF$Spectral_Response)
 
-    ### == == == == == == == == == == == == == == == == == == == == == == ==###
-    ### if the spectral response function of the sensor is not defined      ###
-    ###     and no spectral characteristics (wl & FWHM) are provided        ###
-    ###   but a file corresponding to sensor characteristics is found       ###
-    ### == == == == == == == == == == == == == == == == == == == == == == ==###
+      ### == == == == == == == == == == == == == == == == == == == == == == ==###
+      ### if the spectral response function of the sensor is not defined      ###
+      ###     and no spectral characteristics (wl & FWHM) are provided        ###
+      ###   but a file corresponding to sensor characteristics is found       ###
+      ### == == == == == == == == == == == == == == == == == == == == == == ==###
     } else {
       if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
         Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
@@ -136,11 +136,11 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
         Spectral_Response <- t(Spectral_Response)
         SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
 
-    ### == == == == == == == == == == == == == == == == == == == == == == ==###
-    ### if the spectral response function of the sensor is not defined      ###
-    ###     and no spectral characteristics (wl & FWHM) are provided        ###
-    ###   and no file corresponding to sensor characteristics is found      ###
-    ### == == == == == == == == == == == == == == == == == == == == == == ==###
+        ### == == == == == == == == == == == == == == == == == == == == == == ==###
+        ### if the spectral response function of the sensor is not defined      ###
+        ###     and no spectral characteristics (wl & FWHM) are provided        ###
+        ###   and no file corresponding to sensor characteristics is found      ###
+        ### == == == == == == == == == == == == == == == == == == == == == == ==###
       } else {
         message('___ Spectral response of the sensor expected here: ____')
         print(Path_SRF)
@@ -282,103 +282,15 @@ get_spec_sensor <- function(SensorName = 'MyCustomSensor',
 #' - VZA = list of viewer zenith angle
 #' - VAA = list of viewer azimuth angle
 #' @param MTD_TL_xml character. Path for metadata file MTD_TL.xml
-#' @param verbose Boolean. Should messages be displayed?
 #'
 #' @return List of S2 angles (SZA, SAA, VZA, VAA)
 #' @importFrom XML xml xmlToList
 #' @export
-get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
-
+get_S2geometry <- function(MTD_TL_xml){
   # read XML file containing info about geometry of acquisition
   s2xml <- XML::xml(MTD_TL_xml)
   s2xml <- XML::xmlToList(s2xml)
-
-  if (is.null(s2xml$Dataset_Identification$AUTHORITY)){
-    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
-  } else if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
-    if (verbose==TRUE){
-      message('identification of S2 image produced by THEIA')
-      message(s2xml$Dataset_Identification$IDENTIFIER)
-    }
-    GeomS2 <- get_S2geometry_from_THEIA(s2xml)
-  } else {
-    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
-  }
-  return(list('SAA'=GeomS2$SAA,'SZA'=GeomS2$SZA,'VAA'=GeomS2$VAA,'VZA'=GeomS2$VZA))
-}
-
-#' This function returns geometry of acquisition for S2 image processed with MAJA
-#' - SZA = list of sun zenith angle
-#' - SAA = list of sun azimuth angle
-#' - VZA = list of viewer zenith angle
-#' - VAA = list of viewer azimuth angle
-#' @param s2xml list. list produced from reading XML metadata file with package XML
-#'
-#' @return List of S2 angles (SZA, SAA, VZA, VAA)
-#' @export
-get_S2geometry_from_THEIA <- function(s2xml){
-
-  Distrib_SunAngle <- list()
-  # SZA
-  Distrib_SunAngle$Zenith <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Zenith$Values_List
-  SZA <- c()
-  for (i in 1:length(Distrib_SunAngle$Zenith)){
-    SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
-  }
-  SZA <- SZA[which(!is.na(SZA))]
-
-  # SAA
-  Distrib_SunAngle$Azimuth <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Azimuth$Values_List
-  SAA <- c()
-  for (i in 1:length(Distrib_SunAngle$Zenith)){
-    SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
-  }
-  SAA <- SAA[which(!is.na(SAA))]
-
-  # VZA
-  VZA <- c()
-  band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
-  for (i in 1:length(band)) {
-    detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
-    for (j in 1:(length(detector)-1)) {
-      values  <- detector[j]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
-      for (k in 1:length(values)) {
-        VZA <- c(VZA,as.numeric(strsplit(x = values[k]$VALUES,split = ' ')[[1]]))
-      }
-    }
-  }
-  VZA <- VZA[which(!is.na(VZA))]
-
-  # VAA
-  VAA <- c()
-  band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
-  for (i in 1:length(band)) {
-    detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
-    for (j in 1:(length(detector)-1)) {
-      values  <- detector[j]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
-      for (k in 1:length(values)) {
-        VAA <- c(VAA,as.numeric(strsplit(x = values[k]$VALUES,split = ' ')[[1]]))
-      }
-    }
-  }
-  VAA <- VAA[which(!is.na(VAA))]
-
-  # return
-  return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
-}
-
-#' This function returns geometry of acquisition for S2 image processed with Sen2Cor
-#' - SZA = list of sun zenith angle
-#' - SAA = list of sun azimuth angle
-#' - VZA = list of viewer zenith angle
-#' - VAA = list of viewer azimuth angle
-#' @param s2xml list. list produced from reading XML metadata file with package XML
-#'
-#' @return List of S2 angles (SZA, SAA, VZA, VAA)
-#' @export
-get_S2geometry_from_SAFE <- function(s2xml){
-
-  Distrib_SunAngle <- list()
+  Distrib_SunAngle <- Distrib_ViewAngle <- list()
   # SZA
   Distrib_SunAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
   SZA <- c()
@@ -386,7 +298,6 @@ get_S2geometry_from_SAFE <- function(s2xml){
     SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
   }
   SZA <- SZA[which(!is.na(SZA))]
-
   # SAA
   Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
   SAA <- c()
@@ -394,29 +305,18 @@ get_S2geometry_from_SAFE <- function(s2xml){
     SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
   }
   SAA <- SAA[which(!is.na(SAA))]
-
-  # VZA
+  Distrib_ViewAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Zenith$Values_List
   VZA <- c()
-  band_detector <- s2xml$Geometric_Info$Tile_Angles
-  for (i in 3:(length(band_detector)-2)) {
-    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
-    for (j in 1:length(values)){
-      VZA <- c(VZA,as.numeric(strsplit(x = values[j]$VALUES,split = ' ')[[1]]))
-    }
+  for (i in 1:length(Distrib_ViewAngle$Zenith)){
+    VZA <- c(VZA,as.numeric(strsplit(x = Distrib_ViewAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
   }
   VZA <- VZA[which(!is.na(VZA))]
-
   # VAA
+  Distrib_ViewAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
   VAA <- c()
-  band_detector <- s2xml$Geometric_Info$Tile_Angles
-  for (i in 3:(length(band_detector)-2)) {
-    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
-    for (j in 1:length(values)){
-      VAA <- c(VAA,as.numeric(strsplit(x = values[j]$VALUES,split = ' ')[[1]]))
-    }
+  for (i in 1:length(Distrib_ViewAngle$Azimuth)){
+    VAA <- c(VAA,as.numeric(strsplit(x = Distrib_ViewAngle$Azimuth[i]$VALUES,split = ' ')[[1]]))
   }
   VAA <- VAA[which(!is.na(VAA))]
-
-  # return
   return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
 }
