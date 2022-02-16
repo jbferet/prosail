@@ -14,7 +14,8 @@ ComputeSpectralIndices_Raster(
   SensorBands,
   Sel_Indices = "ALL",
   StackOut = T,
-  ReflFactor = 1
+  ReflFactor = 1,
+  Offset = 0
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ ComputeSpectralIndices_Raster(
 \item{StackOut}{logical. If TRUE returns a stack, otherwise a list of rasters.}
 
 \item{ReflFactor}{numeric. multiplying factor used to write reflectance in image (==10000 for S2)}
+
+\item{Offset}{numeric. offset (when Refl between 0 and 1) to be applied on reflectance. Useful to avoid zero values}
 }
 \value{
 list. includes
