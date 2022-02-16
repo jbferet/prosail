@@ -26,9 +26,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Running `prosail` in direct mode
+## Running `prosail` in direct mode
 
-## Input variables
+### Input variables
 The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expects the following input variables.
 
 * `SAILversion`: the version of SAIL to be used. The default version is __4SAIL__. __4SAIL2__ can also be called from the same function with additional parameters. Both versions include the following input parameters:
@@ -72,7 +72,7 @@ Additionally, __4SAIL2__ also includes the following parameters
 
 * `BrownVegetation`: optional input parameter. If user defined brown vegetation such as experimental measurements is available. If PROSPECT is used to define both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
 
-## Output variables
+### Output variables
 `PRO4SAIL` returns a list containing four reflectance factors 
 
 * `rddt`: bi-hemispherical reflectance factor
@@ -126,7 +126,7 @@ Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',Spec_Sensor = SpecPROSPECT,
 ```
 
 
-# Computing a simplified bidirectional reflectance factor under the assumption of clear conditions conditions
+## Computing a simplified bidirectional reflectance factor under the assumption of clear conditions conditions
 
 The function `Compute_BRF` computes the bi-directional reflectance factor in the direction of the observer, by combining both hemispherical-directional and bi-directional reflectance factors.
 The direct and diffuse light are taken into account as proposed by [Francois et al. (2002)](https://doi.org/10.1051/agro:2002033), by computing the share of diffuse flux in global radiation `skyl` based on the equation proposed by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
@@ -139,12 +139,21 @@ BRF_4SAIL2 <-Compute_BRF(Ref_4SAIL2$rdot,Ref_4SAIL2$rsot,tts,SpecATM)
 
 ```
 
-# Simulating sensor BRF
+## Simulating sensor BRF
 
-The simulation of sensor BRF requires the Spectral Response Function (SRF) of the sensor. 
-`prosail` includes the SRF of [Sentinel-2A and Sentinel-2B satellites](https://earth.esa.int/documents/247904/685211/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.0.xlsx).
+The simulation of sensor BRF requires the Spectral Response Function (SRF) of the sensor.
 
-Other stellites can be simulated as long as the SRF is provided as CSV file, following the same template as for the SRF of Sentinel-2 satellites. 
+`prosail` includes the SRF corresponding to multiple sensors, including: 
+
+* [Sentinel-2A and Sentinel-2B satellites](https://earth.esa.int/documents/247904/685211/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.0.xlsx)
+
+* [Landsat-7](https://landsat.usgs.gov/landsat/spectral_viewer/bands/L7_ETM_RSR.xlsx) and Landsat-8
+
+* [MODIS](https://nwpsaf.eu/downloads/rtcoef_rttov12/ir_srf/rtcoef_eos_1_modis-shifted_srf.html)
+
+* [Venus](https://labo.obs-mip.fr/multitemp/ven%c2%b5s-characteristics/)
+
+* SPOT-6 and SPOT-7
 
 ```{r SRF 1}
 # get the spectral response for Sentinel-2A
@@ -153,15 +162,17 @@ SensorName = 'Sentinel_2A'
 SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
 ```
 
-SRF can also be directly computed for any sensor under the hypothesis of Gaussian response for each spectral band, and information about the central wavelength and FWHM corresponding to each spectral band
+Other satellites can be simulated as long as the SRF is provided as CSV file, following the same [template](https://gitlab.com/jbferet/prosail/-/blob/master/data-raw/Sentinel_2_Spectral_Response.csv) as for the SRF of Sentinel-2 satellites. 
+
+SRF can also be directly computed for any sensor under the hypothesis of Gaussian response for each spectral band, and information about the central wavelength and FWHM corresponding to each spectral band:
 
 ```{r SRF 2}
 # WL is a vector giving central wavelength for each band in nanometer
 # FWHM is a vector giving FWHM for each band in nanometer
-SRF = Compute_SRF(WL,FWHM)
+SRF <- Compute_SRF(WL,FWHM)
 ```
 
-Then, optical values used to compute reflectance (specifica absorption constituents, soil properties, direct/diffuse radiation) can be converted from 1 nm spectral sampling (default sampling) to sensor sampling before simulation of reflectance:
+Then, optical values used to compute reflectance (specific absorption constituents, soil properties, direct/diffuse radiation) can be converted from 1 nm spectral sampling (default sampling) to sensor sampling before simulation of reflectance:
 
 ```{r Conversion}
 # apply sensor characteristics to PROSPECT optical constants

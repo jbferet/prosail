@@ -195,6 +195,7 @@ ComputeSpectralIndices_fromExpression <- function(Refl, SensorBands, ExpressInde
 #' @param Sel_Indices  list. list of spectral indices to be computed
 #' @param StackOut logical. If TRUE returns a stack, otherwise a list of rasters.
 #' @param ReflFactor numeric. multiplying factor used to write reflectance in image (==10000 for S2)
+#' @param Offset numeric. offset (when Refl between 0 and 1) to be applied on reflectance. Useful to avoid zero values
 #'
 #' @return list. includes
 #' - SpectralIndices: List of spectral indices computed from the reflectance initially provided
@@ -203,7 +204,8 @@ ComputeSpectralIndices_fromExpression <- function(Refl, SensorBands, ExpressInde
 #' @importFrom raster stack brick
 #' @export
 
-ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', StackOut=T,ReflFactor=1){
+ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL',
+                                          StackOut = T, ReflFactor = 1, Offset = 0){
 
   S2Bands <- c('B2'=496.6, 'B3'=560.0, 'B4'=664.5, 'B5'=703.9, 'B6'=740.2,
                'B7' = 782.5, 'B8' = 835.1, 'B8A' = 864.8, 'B11' = 1613.7, 'B12' = 2202.4)
@@ -221,10 +223,16 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     if (!ReflFactor==1){
       Refl <- Refl/ReflFactor
     }
+    if (!Offset==0){
+      Refl <- Refl+Offset
+    }
   } else if(is.list(Refl)){
     Refl <- raster::stack(Refl[Sen2S2]) # checks that all rasters have same crs/extent
     if (!ReflFactor==1){
       Refl <- Refl/ReflFactor
+    }
+    if (!Offset==0){
+      Refl <- Refl+Offset
     }
   } else {
     stop('Refl is expected to be a RasterStack, RasterBrick, Stars object or a list of rasters')
@@ -392,12 +400,12 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL', 
     SR <- Refl[["B8"]]/Refl[["B4"]]
     SpectralIndices$SR <- SR
   }
-  if ('TCARI'%in%Sel_Indices){
-    SR <-
-
-      Refl[["B8"]]/Refl[["B4"]]
-    SpectralIndices$SR <- SR
-  }
+  # if ('TCARI'%in%Sel_Indices){
+  #   SR <-
+  #
+  #     Refl[["B8"]]/Refl[["B4"]]
+  #   SpectralIndices$SR <- SR
+  # }
   if ('CR_SWIR'%in%Sel_Indices){
     CR_SWIR <- Refl[["B11"]]/(Refl[["B8A"]]+(S2Bands['B11']-S2Bands['B8A'])*(Refl[["B12"]]-Refl[["B8A"]])/(S2Bands['B12']-S2Bands['B8A']))
     SpectralIndices$CR_SWIR <- CR_SWIR

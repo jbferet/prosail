@@ -39,6 +39,7 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
 
   # define parameters included in inversion or set
   ParmInv <- WhichParameters2Invert(InitialGuess,LowerBound,UpperBound,ParmSet)
+  Parms2Prior <- NULL
   if (!is.null(PriorInfoMean) & !is.null(PriorInfoSD)){
     PriorInfo <- WhichParmPRior(PriorInfoMean,PriorInfoSD)
     PriorInfoMean <- PriorInfo$PriorInfoMean
@@ -53,7 +54,7 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
   ub    = as.vector(ParmInv$UpperBound,mode='numeric')
   resInv   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,brfMES = brfMES,
                   SpecPROSPECT_Sensor=SpecPROSPECT_Sensor, SpecSOIL_Sensor=SpecSOIL_Sensor, SpecATM_Sensor=SpecATM_Sensor,
-                  Parms2Estimate=ParmInv$Parms2Estimate, Parm2Set=ParmInv$Parms2Set, ParmSet=ParmInv$ParmSet ,
+                  Parms2Estimate=ParmInv$Parms2Estimate, Parm2Set=ParmInv$Parms2Set, ParmSet=ParmInv$ParmSet,
                   InVar=ParmInv$InVar ,TypeLidf=TypeLidf,
                   PriorInfoMean =PriorInfoMean,PriorInfoSD =PriorInfoSD,Parms2Prior=Parms2Prior,WeightPrior=WeightPrior,
                   method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
