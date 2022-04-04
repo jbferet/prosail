@@ -8,7 +8,8 @@ spectral response from Sentinel-2 is already defined}
 GetRadiometry(
   SensorName = "MyCustomSensor",
   SpectralProps = NULL,
-  Path_SensorResponse = NULL
+  Path_SensorResponse = NULL,
+  SaveSRF = TRUE
 )
 }
 \arguments{
@@ -16,7 +17,9 @@ GetRadiometry(
 
 \item{SpectralProps}{list. list of spectral properties including wl = central wavelength and fwhm = corresponding FWHM}
 
-\item{Path_SensorResponse}{character.}
+\item{Path_SensorResponse}{character. path for the file where SRF should be saved as CSV}
+
+\item{SaveSRF}{boolean. Should SRF be saved in file?}
 }
 \value{
 SRF list. Spectral response function, corresponding spectral bands, and Original Bands

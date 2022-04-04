@@ -15,14 +15,16 @@
 #' spectral response from Sentinel-2 is already defined
 #' @param SensorName character. name of the sensor
 #' @param SpectralProps list. list of spectral properties including wl = central wavelength and fwhm = corresponding FWHM
-#' @param Path_SensorResponse character.
+#' @param Path_SensorResponse character. path for the file where SRF should be saved as CSV
+#' @param SaveSRF boolean. Should SRF be saved in file?
 #' @return SRF list. Spectral response function, corresponding spectral bands, and Original Bands
 # @import utils
 #' @importFrom utils read.csv write.table
 #' @export
 GetRadiometry <- function(SensorName = 'MyCustomSensor',
                           SpectralProps = NULL,
-                          Path_SensorResponse = NULL){
+                          Path_SensorResponse = NULL,
+                          SaveSRF = TRUE){
 
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
@@ -93,18 +95,20 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
         # save SRF as csv
         SRFsave <- cbind(SRF$OriginalBands,format(SRF$Spectral_Response, digits = 4, scientific = FALSE))
         colnames(SRFsave) <- c('SR_WL',SRF$Spectral_Bands)
-        if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
-          Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
-          message('Saving spectral response function of sensor ')
-          message('in following directory defined by "Path_SensorResponse" : ')
-        } else {                                                      # if no path is provided to find the sensor, assuming it is in the WD
-          Path_SRF <- file.path(paste(SensorName,'_Spectral_Response.csv',sep=''))
-          message('Saving spectral response function of sensor ')
-          message('in current working directory as file : ')
+        if (!SaveSRF==F){
+          if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
+            Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
+            message('Saving spectral response function of sensor ')
+            message('in following directory defined by "Path_SensorResponse" : ')
+          } else {                                                      # if no path is provided to find the sensor, assuming it is in the WD
+            Path_SRF <- file.path(paste(SensorName,'_Spectral_Response.csv',sep=''))
+            message('Saving spectral response function of sensor ')
+            message('in current working directory as file : ')
+          }
+          print(Path_SRF)
+          write.table(x = SRFsave,file = Path_SRF,
+                      quote = FALSE,sep = '\t',col.names = TRUE,row.names = FALSE)
         }
-        print(Path_SRF)
-        write.table(x = SRFsave,file = Path_SRF,
-                    quote = FALSE,sep = '\t',col.names = TRUE,row.names = FALSE)
       }
       SRF$Spectral_Response <- t(SRF$Spectral_Response)
 
@@ -199,6 +203,9 @@ applySensorCharacteristics <- function(wvl,InRefl,SRF){
     }
   }
   OutRefl <-do.call('rbind',OutRefl)
+  if (!is.null(colnames(InRefl))){
+    colnames(OutRefl) <- colnames(InRefl)
+  }
   return(OutRefl)
 }
 
