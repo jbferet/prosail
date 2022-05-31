@@ -252,7 +252,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL',
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
                       'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
-                      'SAVI','SIPI','SR','CR_SWIR')
+                      'SAVI','SIPI','SR','CR_SWIR','CR_RE')
   if (Sel_Indices[1]=='ALL'){
     Sel_Indices <- listIndices
   }
@@ -410,6 +410,10 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL',
     CR_SWIR <- Refl[["B11"]]/(Refl[["B8A"]]+(S2Bands['B11']-S2Bands['B8A'])*(Refl[["B12"]]-Refl[["B8A"]])/(S2Bands['B12']-S2Bands['B8A']))
     SpectralIndices$CR_SWIR <- CR_SWIR
   }
+  if ('CR_RE'%in%Sel_Indices){
+    CR_RE <- Refl[["B5"]]/(Refl[["B4"]]+(S2Bands['B5']-S2Bands['B4'])*(Refl[["B6"]]-Refl[["B4"]])/(S2Bands['B6']-S2Bands['B4']))
+    SpectralIndices$CR_RE <- CR_RE
+  }
 
   if(StackOut)
     SpectralIndices <- raster::stack(SpectralIndices)
@@ -453,7 +457,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
                       'GRVI1','GNDVI','IRECI','LAI_SAVI','MCARI','mNDVI705','MSAVI2',
                       'MSI','mSR705','MTCI','nBR_RAW','NDI_45','NDII','NDVI','NDVI_G',
                       'NDVI705','NDWI1','NDWI2','PSRI','PSRI_NIR','RE_NDVI','RE_NDWI','S2REP',
-                      'SAVI','SIPI','SR','CR_SWIR')
+                      'SAVI','SIPI','SR','CR_SWIR','CR_RE')
   if (Sel_Indices=='ALL'){
     Sel_Indices = listIndices
   }
@@ -604,6 +608,10 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   if ('CR_SWIR'%in%Sel_Indices){
     CR_SWIR <- Refl[,Sen2S2[["B11"]]]/(Refl[,Sen2S2[["B8A"]]]+(S2Bands$B11-S2Bands$B8A)*(Refl[,Sen2S2[["B12"]]]-Refl[,Sen2S2[["B8A"]]])/(S2Bands$B12-S2Bands$B8A))
     SpectralIndices$CR_SWIR <- CR_SWIR
+  }
+  if ('CR_RE'%in%Sel_Indices){
+    CR_RE <- Refl[,Sen2S2[["B5"]]]/(Refl[,Sen2S2[["B4"]]]+(S2Bands$B5-S2Bands$B4)*(Refl[,Sen2S2[["B6"]]]-Refl[,Sen2S2[["B4"]]])/(S2Bands$B6-S2Bands$B4))
+    SpectralIndices$CR_RE <- CR_RE
   }
   res <- list('SpectralIndices'=SpectralIndices,'listIndices'=listIndices)
   return(res)

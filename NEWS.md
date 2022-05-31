@@ -1,3 +1,8 @@
+# prosail v1.1.1
+
+## Changes
+- added CR_RE in spectral indices
+
 # prosail v1.0.0
 
 ## Changes
