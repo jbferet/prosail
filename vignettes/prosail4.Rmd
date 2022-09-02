@@ -120,9 +120,8 @@ dir.create(path = Refl_dir,showWarnings = FALSE,recursive = TRUE)
 Refl_path <- file.path(Refl_dir,paste(basename(S2obj$S2_Bands$GRANULE),'_Refl',sep = ''))
 
 # Save Reflectance file as ENVI image with BIL interleaves
-tileS2 <- substring(strsplit(basename(S2obj$S2_Bands$GRANULE),'_')[[1]][2],2)
-dateAcqS2 <- as.Date(substring(strsplit(basename(S2obj$S2_Bands$GRANULE),'_')[[1]][4],1,8),format="%Y%m%d")
-
+tile_S2 <- preprocS2::get_tile(S2obj$S2_Bands$GRANULE)
+dateAcq_S2 <- preprocS2::get_date(S2obj$S2_Bands$GRANULE)
 preprocS2::save_reflectance_s2(S2_stars = S2obj$S2_Stack, 
                                Refl_path = Refl_path,
                                S2Sat = NULL, 
