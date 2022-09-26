@@ -6,7 +6,7 @@
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
 # 1 Requirements
-`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package  [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
 
 In order to avoid errors when installing `liquidSVM` then `prosail`, we recommend using the following command for the installation of `liquidSVM`: 
 
@@ -51,7 +51,13 @@ devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::
 
 A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articles/prosail1.html).
 
-# 4 Citation
+
+# 4 Acknowledgments / Fundings
+
+This research was supported by the Agence Nationale de la Recherche ([ANR](https://anr.fr/en/open-calls-and-preannouncements/), France) through the young researchers project **BioCop** (ANR-17-CE32-0001)
+
+
+# 5 Citation
 
 If you use **prosail**, please cite the following references:
 
