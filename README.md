@@ -5,7 +5,12 @@
 [![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
+<<<<<<< HEAD
 # 1 Prerequirements
+=======
+# 1 Requirements
+`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+>>>>>>> dev
 
 ## Install from repository
 
@@ -64,7 +69,13 @@ devtools::install_git('https://gitlab.com/jbferet/prosail',credentials = git2r::
 
 A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articles/prosail1.html).
 
-# 4 Citation
+
+# 4 Acknowledgments / Fundings
+
+This research was supported by the Agence Nationale de la Recherche ([ANR](https://anr.fr/en/open-calls-and-preannouncements/), France) through the young researchers project **BioCop** (ANR-17-CE32-0001)
+
+
+# 5 Citation
 
 If you use **prosail**, please cite the following references:
 
