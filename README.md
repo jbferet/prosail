@@ -6,28 +6,39 @@
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
 # 1 Requirements
-`prosail` uses Support Vector Regression (SVR) for hybrid inversion, based on the package [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
 
-In order to avoid errors when installing `liquidSVM` then `prosail`, we recommend using the following command for the installation of `liquidSVM`: 
+## Install from repository
 
+First, install the package `devtools` following the [instructions](https://www.r-project.org/nosvn/pandoc/devtools.html) depending on your operating system. 
+
+Then install `git2r`:
 ```
-install.packages("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", INSTALL_opts=c("--no-multiarch"))
+install.packages("git2r")
 ```
 
-This allows installation of 64bit version only.
+## Install liquidSVM
 
-# 2 Install `prosail`
+`prosail` uses Support Vector Regression (SVR) for hybrid inversion, currently based on the package  [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
 
-After installing package `devtools`, you need to install the package `prospect` with the following command line in R session:
+Please follow installation instructions provided in the documentation webpage. 
+
+### !!! WINDOWS USERS !!!
+
+Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R library. this [`i386`](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) directory should be copied into the local  'Path_For_My_R_distribution\library\liquidSVM\libs\' directory on your computer.
+
+## Install `prospect`
+You need to install the package `prospect` with the following command line in R session:
+
 ```
 devtools::install_gitlab('jbferet/prospect')
 ```
+
+# 2 Install `prosail`
 
 The package `prosail` can then be installed with the following command line in R session:
 ```
 devtools::install_gitlab('jbferet/prosail')
 ```
-
 
 # 3 Tutorial
 
