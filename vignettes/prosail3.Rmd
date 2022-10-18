@@ -56,18 +56,20 @@ SpecATM_Sensor <- SpecSensor[[1]]$SpecATM_Sensor
 
 ```{r prepare_LUT_InputParms}
 # Define distribution for PROSAIL input variables: choose between 'Gaussian' and 'Uniform'
-TypeDistrib <- data.frame('CHL'='Gaussian', 'CAR'='Uniform','EWT' = 'Uniform','ANT' = 'Uniform','LMA' = 'Uniform','N' = 'Uniform', 'BROWN'='Uniform',
-                          'psoil' = 'Uniform','LIDFa' = 'Uniform', 'lai' = 'Gaussian','q'='Uniform','tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
+TypeDistrib <- data.frame('CHL'='Gaussian', 'CAR'='Uniform','EWT' = 'Uniform','ANT' = 'Uniform',
+                          'LMA' = 'Uniform','N' = 'Uniform', 'BROWN'='Uniform',
+                          'psoil' = 'Uniform','LIDFa' = 'Uniform', 'lai' = 'Gaussian',
+                          'q'='Uniform','tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
 
 # define mean and STD for gaussian distributions
 Mean <- data.frame('CHL'=35,'CAR'=8,'lai' = 1.75)
 Std <- Mean/2.0
 
 # define min and max values for all parameters defined in TypeDistrib
-minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.001,'ANT' = 0,'LMA' = 0.001,'N' = 1.4,'psoil' = 0.0, 'BROWN'=0.01,
-                     'LIDFa' = 30, 'lai' = 0.01,'q'=0.01,'tto' = 0,'tts' = 20, 'psi' = 100)
-maxval <- data.frame('CHL'=60,'CAR'=15,'EWT' = 0.045,'ANT' = 10,'LMA' = 0.040,'N' = 1.7, 'psoil' = 1.0, 'BROWN'=0.01,
-                     'LIDFa' = 70, 'lai' = 3.5,'q'=0.01,'tto' = 5,'tts' = 30, 'psi' = 150)
+minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.001,'ANT' = 0,'LMA' = 0.001,'N' = 1.4, 'BROWN'=0.01,
+                     'psoil' = 0.0, 'LIDFa' = 30, 'lai' = 0.01,'q'=0.01,'tto' = 0,'tts' = 20, 'psi' = 100)
+maxval <- data.frame('CHL'=60,'CAR'=15,'EWT' = 0.045,'ANT' = 10,'LMA' = 0.040,'N' = 1.7, 'BROWN'=0.01,
+                     'psoil' = 1.0, 'LIDFa' = 70, 'lai' = 3.5,'q'=0.01,'tto' = 5,'tts' = 30, 'psi' = 150)
 
 # define parameters to be set to unique value
 # ... other undefined parameters wil be set to default automatically 
@@ -87,7 +89,8 @@ InputPROSAIL <- get_distribution_input_prosail(minval = minval, maxval = maxval,
 ```{r simulate_LUT}
 # produce BRF LUT based on InputPROSAIL
 BRF_LUT <- Generate_LUT_BRF(InputPROSAIL = InputPROSAIL,SpecPROSPECT = SpecPROSPECT_Sensor,
-                            SpecSOIL = SpecSOIL_Sensor,SpecATM = SpecATM_Sensor,SAILversion = '4SAIL')
+                            BandNames = SpecSensor$BandNames, SpecSOIL = SpecSOIL_Sensor,
+                            SpecATM = SpecATM_Sensor, SAILversion = '4SAIL')
 ```
 
 
@@ -131,8 +134,10 @@ Train a set of SVR models for each variable with the function `PROSAIL_Hybrid_Tr
 
 ```{r Train_Hybrid}
 modelSVR <- list()
+# define algorighm 
+method <- 'liquidSVM'
 # bagging with replacement for each subset
-Replacement <- TRUE
+Replacement <- FALSE
 # number of samples used for training of each submodel
 nbSamplesPerRun <- 100
 nbEnsemble <- round(nbSamples/nbSamplesPerRun)
@@ -140,11 +145,14 @@ nbEnsemble <- round(nbSamples/nbSamplesPerRun)
 for (parm in Parms2Estimate){
   InputVar <- InputPROSAIL[[parm]]
   modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
-                                           FigPlot = FALSE, nbEnsemble =  nbEnsemble,
-                                           WithReplacement=Replacement)
+                                           FigPlot = FALSE, nbEnsemble = nbEnsemble,
+                                           WithReplacement = Replacement, method = method)
 }
 ```
 
+The default machine learning algorithm is support vector regression from the package `liquidSVM`. However, multiple users experienced difficulties installing this package. Therefore, an alternative SVR implementation based on the package `caret` is also implemented.
+
+Set `method <- 'svmLinear'` or `method <- 'svmRadial'` to choose between the alternative implementations. 
 
 # Apply hybrid inversion
 
