@@ -278,6 +278,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 #' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
 #' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
+#' @param BandNames character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
 #' @param BrownVegetation list. Defines optical properties for brown vegetation, if not NULL
 #' - WVL, Reflectance, Transmittance
@@ -287,7 +288,8 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 #' @importFrom progress progress_bar
 #' @export
 
-Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILversion='4SAIL',BrownVegetation = NULL){
+Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
+                             SAILversion='4SAIL', BrownVegetation = NULL){
 
   nbSamples <- length(InputPROSAIL[[1]])
   BRF <- list()
@@ -298,7 +300,6 @@ Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILvers
   for (i in 1:nbSamples){
     if (i%%Split==0 & nbSamples>100){
         pb$tick()
-      Sys.sleep(1 / 100)
     }
     rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
     # if 4SAIL
@@ -322,11 +323,11 @@ Generate_LUT_BRF <- function(InputPROSAIL,SpecPROSPECT,SpecSOIL,SpecATM,SAILvers
                           fraction_brown = InputPROSAIL$fraction_brown[[i]], diss = InputPROSAIL$diss[[i]], Cv = InputPROSAIL$Cv[[i]],Zeta = InputPROSAIL$Zeta[[i]],
                           BrownVegetation = BrownVegetation)
     }
-
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
     BRF[[i]] <-Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
   }
   BRF <- do.call(cbind,BRF)
+  row.names(BRF) <- BandNames
   return(BRF)
 }
 

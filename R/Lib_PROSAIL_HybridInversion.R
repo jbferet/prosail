@@ -106,7 +106,6 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         BlockVal <- BlockVal/MultiplyingFactor
         modelSVR_Estimate <- list()
         for (modind in 1:length(HybridModel[[parm]])){
-          # print(c(i,modind))
           pb$tick()
           modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]], BlockVal)
         }
@@ -184,7 +183,11 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
   # make sure Refl is right dimensions
   Refl <- t(Refl)
-  nbFeatures <- RegressionModels[[1]]$dim
+  if (class(RegressionModels[[1]])=='liquidSVM'){
+    nbFeatures <- RegressionModels[[1]]$dim
+  } else {
+    nbFeatures <- ncol(RegressionModels[[1]]$trainingData) - 1
+  }
   if (!ncol(Refl)==nbFeatures & nrow(Refl)==nbFeatures){
     Refl <- t(Refl)
   }
@@ -204,13 +207,15 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
   return(HybridRes)
 }
 
-#' This function trains a suppot vector regression for a set of variables based on spectral data
+#' This function trains a support vector regression for a set of variables based on spectral data
 #'
 #' @param BRF_LUT numeric. LUT of bidirectional reflectances factors used for training
 #' @param InputVar numeric. biophysical parameter corresponding to the reflectance
 #' @param FigPlot Boolean. Set to TRUE if you want a scatterplot
 #' @param nbEnsemble numeric. Number of individual subsets should be generated from BRF_LUT
 #' @param WithReplacement Boolean. should subsets be generated with or without replacement?
+#' @param method character. which machine learning regression method should be used?
+#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @importFrom liquidSVM svmRegression
@@ -220,12 +225,13 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @importFrom expandFunctions reset.warnings
 #' @importFrom stringr str_split
 #' @importFrom simsalapar tryCatch.W.E
+#' @importFrom caret train trainControl
 #' @import dplyr
 #' @import ggplot2
-# @' @import caret
 #' @export
 
-PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 20,WithReplacement=FALSE){
+PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble = 20,
+                                 WithReplacement = FALSE, method = 'liquidSVM'){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # library(dplyr)
@@ -248,43 +254,73 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT,InputVar,FigPlot = FALSE,nbEnsemble = 2
   }
 
   # run training for each subset
-  modelsSVR <- list()
-  predictedYAll <- list()
-  tunedModelYAll <- list()
+  modelsSVR <- predictedYAll <- tunedModelYAll <- list()
   pb <- progress_bar$new(
-    format = "Training SVR on subsets [:bar] :percent in :elapsed",
+    format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
     total = nbEnsemble, clear = FALSE, width= 100)
   for (i in 1:nbEnsemble){
-    pb$tick()
-    Sys.sleep(1 / 100)
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
-    # liquidSVM
-    r1 <- tryCatch.W.E(tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y))
-    # reset.warnings()
-    # tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y)
-    if (!is.null(r1$warning)){
-      Msg <- r1$warning$message
-      ValGamma <- str_split(string = Msg,pattern = 'gamma=')[[1]][2]
-      ValLambda <- str_split(string = Msg,pattern = 'lambda=')[[1]][2]
-      if (!is.na(as.numeric(ValGamma))){
-        message('Adjusting Gamma accordingly')
-        ValGamma <- as.numeric(ValGamma)
-        tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
+    if (method == 'liquidSVM'){
+      # liquidSVM
+      r1 <- tryCatch.W.E(tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y))
+      # reset.warnings()
+      # tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y)
+      if (!is.null(r1$warning)){
+        Msg <- r1$warning$message
+        ValGamma <- str_split(string = Msg,pattern = 'gamma=')[[1]][2]
+        ValLambda <- str_split(string = Msg,pattern = 'lambda=')[[1]][2]
+        if (!is.na(as.numeric(ValGamma))){
+          message('Adjusting Gamma accordingly')
+          ValGamma <- as.numeric(ValGamma)
+          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
+        }
+        if (!is.na(as.numeric(ValLambda))){
+          message('Adjusting Lambda accordingly')
+          ValLambda <- as.numeric(ValLambda)
+          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
+        }
       }
-      if (!is.na(as.numeric(ValLambda))){
-        message('Adjusting Lambda accordingly')
-        ValLambda <- as.numeric(ValLambda)
-        tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
+    } else {
+      ctrl <- caret::trainControl(
+        method = "cv",
+        number = 5,
+      )
+      if (is.null(colnames(TrainingSet$X))){
+        colnames(TrainingSet$X) <- paste('var',seq(1,ncol(TrainingSet$X)),sep = '_')
       }
+      target <- matrix(TrainingSet$Y,ncol = 1)
+      if (is.null(colnames(target))){
+        colnames(target) <- 'target'
+      }
+      TrainingData <- cbind(target,TrainingSet$X)
+      if (method =='svmRadial'){
+        tuneGrid <- expand.grid(
+          C = exp(seq(-10,0,by=1)),
+          sigma = exp(seq(-10,0,by=1))
+        )
+      } else if (method =='svmLinear'){
+        tuneGrid <- expand.grid(
+          C = exp(seq(-10,0,by=1))
+        )
+      }
+      tunedModel <- caret::train(target ~ .,
+                                 data = TrainingData,
+                                 method = method,
+                                 preProcess = c("center", "scale"),
+                                 trControl = ctrl,
+                                 tuneGrid = tuneGrid)
     }
     modelsSVR[[i]] <- tunedModel
+    pb$tick()
   }
-
   # if scatterplots needed
   if (FigPlot==TRUE){
     # predict for full BRF_LUT
+    if (is.null(colnames(BRF_LUT))){
+      colnames(BRF_LUT) <- paste('var',seq(1,ncol(BRF_LUT)),sep = '_')
+    }
     for (i in 1:nbEnsemble){
       tunedModelY <- stats::predict(modelsSVR[[i]], BRF_LUT)
       tunedModelYAll = cbind(tunedModelYAll,matrix(tunedModelY,ncol = 1))

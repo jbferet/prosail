@@ -1,3 +1,8 @@
+# prosail v1.2.0
+
+## Changes
+- added SVM from caret as alternative to liquidSVM
+
 # prosail v1.1.1
 
 ## Changes
