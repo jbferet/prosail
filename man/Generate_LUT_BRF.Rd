@@ -9,6 +9,7 @@ Generate_LUT_BRF(
   SpecPROSPECT,
   SpecSOIL,
   SpecATM,
+  BandNames = NULL,
   SAILversion = "4SAIL",
   BrownVegetation = NULL
 )
@@ -21,6 +22,8 @@ Generate_LUT_BRF(
 \item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted}
 
 \item{SpecATM}{list. Includes direct and diffuse radiation for clear conditions}
+
+\item{BandNames}{character. Name of the spectral bands of the sensor}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 

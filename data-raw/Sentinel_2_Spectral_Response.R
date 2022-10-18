@@ -18,4 +18,5 @@ SensorRadiometry <- t(SensorRadiometry)
 Sentinel_2 <- list("Spectral_Response"=SensorRadiometry, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
 
 ## code to prepare `Sentinel_2_Spectral_Response` dataset goes here
-usethis::use_data(Sentinel_2,compress = 'xz')
+usethis::use_data(Sentinel_2,compress = 'xz',overwrite = TRUE)
+save(Sentinel_2,file =  file.path('data',paste(SensorName,'.RData',sep = '')))

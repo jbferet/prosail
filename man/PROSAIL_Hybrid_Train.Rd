@@ -2,14 +2,15 @@
 % Please edit documentation in R/Lib_PROSAIL_HybridInversion.R
 \name{PROSAIL_Hybrid_Train}
 \alias{PROSAIL_Hybrid_Train}
-\title{This function trains a suppot vector regression for a set of variables based on spectral data}
+\title{This function trains a support vector regression for a set of variables based on spectral data}
 \usage{
 PROSAIL_Hybrid_Train(
   BRF_LUT,
   InputVar,
   FigPlot = FALSE,
   nbEnsemble = 20,
-  WithReplacement = FALSE
+  WithReplacement = FALSE,
+  method = "liquidSVM"
 )
 }
 \arguments{
@@ -22,10 +23,13 @@ PROSAIL_Hybrid_Train(
 \item{nbEnsemble}{numeric. Number of individual subsets should be generated from BRF_LUT}
 
 \item{WithReplacement}{Boolean. should subsets be generated with or without replacement?}
+
+\item{method}{character. which machine learning regression method should be used?
+default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 }
 \description{
-This function trains a suppot vector regression for a set of variables based on spectral data
+This function trains a support vector regression for a set of variables based on spectral data
 }
