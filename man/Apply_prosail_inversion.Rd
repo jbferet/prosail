@@ -12,7 +12,8 @@ Apply_prosail_inversion(
   SelectedBands,
   bandname,
   MaskRaster = FALSE,
-  MultiplyingFactor = 10000
+  MultiplyingFactor = 10000,
+  method = "liquidSVM"
 )
 }
 \arguments{
@@ -31,6 +32,9 @@ each element of the list corresponds to a set of hybrid models for a vegetation 
 
 \item{MultiplyingFactor}{numeric. multiplying factor used to write reflectance in the raster
 --> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range}
+
+\item{method}{character. which machine learning regression method should be used?
+default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
 }
 \value{
 None

@@ -208,13 +208,13 @@ SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
 # adjust optical constants from 1nm sampling into spectral S2 spectral sampling
 wvl <- SpecPROSPECT$lambda
 SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-SpecPROSPECT_Sensor <- SpecSensor[[1]]$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- SpecSensor[[1]]$SpecSOIL_Sensor
-SpecATM_Sensor <- SpecSensor[[1]]$SpecATM_Sensor
+SpecPROSPECT_Sensor <- SpecSensor$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- SpecSensor$SpecSOIL_Sensor
+SpecATM_Sensor <- SpecSensor$SpecATM_Sensor
 
 # define spectral bands required to train SVR model for each variable
 S2BandSelect <- list()
-S2BandSelect$CHL <- S2BandSelect$lai <- S2BandSelect$EWT <- S2BandSelect$LMA <- c('B03','B04','B05','B06','B07','B08','B11','B12')
+S2BandSelect$CHL <- S2BandSelect$lai <- S2BandSelect$EWT <- S2BandSelect$LMA <- c('B3','B4','B5','B6','B7','B8','B11','B12')
 ImgBandNames <- strsplit(HDR_Refl$`band names`,split = ',')[[1]]
 # get variable ID for train_prosail_inversion
 Bands2Select <- list()
@@ -232,18 +232,19 @@ NoiseLevel$LMA <- NoiseLevel$lai <- 0.05
 PROSAIL_ResPath <- file.path(results_site_path,'PRO4SAIL_INVERSION')
 dir.create(path = PROSAIL_ResPath,showWarnings = FALSE,recursive = TRUE)
 
-modelSVR <- train_prosail_inversion(minval=minval,maxval=maxval,Parms2Estimate=c('CHL','EWT','LMA','lai'),
-                                    Bands2Select=Bands2Select,NoiseLevel=NoiseLevel, SAILversion = '4SAIL',
+method <- 'liquidSVM' # use 'svmRadial' or 'svmLinear' if you have difficulties with installing liquidSVM
+Parms2Estimate <- c('CHL','EWT','LMA','lai')
+modelSVR <- train_prosail_inversion(minval = minval, maxval = maxval, Parms2Estimate = Parms2Estimate,
+                                    Bands2Select = Bands2Select, NoiseLevel = NoiseLevel, SAILversion = '4SAIL',
                                     SpecPROSPECT = SpecPROSPECT_Sensor, SpecSOIL = SpecSOIL_Sensor, SpecATM = SpecATM_Sensor,
-                                    Path_Results=PROSAIL_ResPath,nbModels = 10,nbSamples = 1000,FigPlot = FALSE)
+                                    Path_Results = PROSAIL_ResPath, nbModels = 10, nbSamples = 1000,
+                                    FigPlot = FALSE, method = method)
 
 # Apply SVR model on Sentinel-2 data
 Apply_prosail_inversion(raster_path = Refl_path, HybridModel = modelSVR, PathOut = PROSAIL_ResPath,
-                        SelectedBands = S2BandSelect,bandname = ImgBandNames,
-                        MaskRaster = Cloud_File, MultiplyingFactor = 10000)
+                        SelectedBands = S2BandSelect, bandname = ImgBandNames, MaskRaster = Cloud_File, 
+                        MultiplyingFactor = 10000, method = method)
 ```
 
 
 The function `Apply_prosail_inversion` then writes output files corresponding to individual biophysical variables, including mean value and standard deviation.
-
-
