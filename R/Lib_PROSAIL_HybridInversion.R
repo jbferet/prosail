@@ -25,7 +25,7 @@
 #' @param MultiplyingFactor numeric. multiplying factor used to write reflectance in the raster
 #' --> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range
 #' @param method character. which machine learning regression method should be used?
-#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
+#' default = svmRadial, and svmLinear also available from caret package also implemented. More to come
 #'
 #' @return None
 #' @importFrom progress progress_bar
@@ -37,7 +37,7 @@
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname,
                                     MaskRaster = FALSE,MultiplyingFactor=10000,
-                                    method = 'liquidSVM'){
+                                    method = 'svmRadial'){
 
   # explain which biophysical variables will be computed
   BPvar <- names(HybridModel)
@@ -105,9 +105,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         BlockVal <- BlockVal[SelectPixels,Selbands]
       }
       # add name for variables
-      if (!method =='liquidSVM'){
-        colnames(BlockVal) <- colnames(HybridModel[[parm]][[1]]$trainingData)[-1]
-      }
+      colnames(BlockVal) <- colnames(HybridModel[[parm]][[1]]$trainingData)[-1]
 
       Mean_EstimateFull <- NA*vector(length = FullLength)
       STD_EstimateFull <- NA*vector(length = FullLength)
@@ -192,11 +190,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
   # make sure Refl is right dimensions
   Refl <- t(Refl)
-  if (class(RegressionModels[[1]])=='liquidSVM'){
-    nbFeatures <- RegressionModels[[1]]$dim
-  } else {
-    nbFeatures <- ncol(RegressionModels[[1]]$trainingData) - 1
-  }
+  nbFeatures <- ncol(RegressionModels[[1]]$trainingData) - 1
   if (!ncol(Refl)==nbFeatures & nrow(Refl)==nbFeatures){
     Refl <- t(Refl)
   }
@@ -224,10 +218,9 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @param nbEnsemble numeric. Number of individual subsets should be generated from BRF_LUT
 #' @param WithReplacement Boolean. should subsets be generated with or without replacement?
 #' @param method character. which machine learning regression method should be used?
-#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
+#' default = svmRadial, and svmLinear also available from caret package also implemented. More to come
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
-#' @importFrom liquidSVM svmRegression
 #' @importFrom stats predict
 #' @importFrom progress progress_bar
 #' @importFrom graphics par
@@ -240,7 +233,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @export
 
 PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble = 20,
-                                 WithReplacement = FALSE, method = 'liquidSVM'){
+                                 WithReplacement = FALSE, method = 'svmRadial'){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # library(dplyr)
@@ -271,56 +264,34 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
-    if (method == 'liquidSVM'){
-      # liquidSVM
-      r1 <- tryCatch.W.E(tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y))
-      # reset.warnings()
-      # tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y)
-      if (!is.null(r1$warning)){
-        Msg <- r1$warning$message
-        ValGamma <- str_split(string = Msg,pattern = 'gamma=')[[1]][2]
-        ValLambda <- str_split(string = Msg,pattern = 'lambda=')[[1]][2]
-        if (!is.na(as.numeric(ValGamma))){
-          message('Adjusting Gamma accordingly')
-          ValGamma <- as.numeric(ValGamma)
-          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
-        }
-        if (!is.na(as.numeric(ValLambda))){
-          message('Adjusting Lambda accordingly')
-          ValLambda <- as.numeric(ValLambda)
-          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
-        }
-      }
-    } else {
-      ctrl <- caret::trainControl(
-        method = "cv",
-        number = 5,
-      )
-      if (is.null(colnames(TrainingSet$X))){
-        colnames(TrainingSet$X) <- paste('var',seq(1,ncol(TrainingSet$X)),sep = '_')
-      }
-      target <- matrix(TrainingSet$Y,ncol = 1)
-      if (is.null(colnames(target))){
-        colnames(target) <- 'target'
-      }
-      TrainingData <- cbind(target,TrainingSet$X)
-      if (method =='svmRadial'){
-        tuneGrid <- expand.grid(
-          C = exp(seq(-10,0,by=1)),
-          sigma = exp(seq(-10,0,by=1))
-        )
-      } else if (method =='svmLinear'){
-        tuneGrid <- expand.grid(
-          C = exp(seq(-10,0,by=1))
-        )
-      }
-      tunedModel <- caret::train(target ~ .,
-                                 data = TrainingData,
-                                 method = method,
-                                 preProcess = c("center", "scale"),
-                                 trControl = ctrl,
-                                 tuneGrid = tuneGrid)
+    ctrl <- caret::trainControl(
+      method = "cv",
+      number = 5,
+    )
+    if (is.null(colnames(TrainingSet$X))){
+      colnames(TrainingSet$X) <- paste('var',seq(1,ncol(TrainingSet$X)),sep = '_')
     }
+    target <- matrix(TrainingSet$Y,ncol = 1)
+    if (is.null(colnames(target))){
+      colnames(target) <- 'target'
+    }
+    TrainingData <- cbind(target,TrainingSet$X)
+    if (method =='svmRadial'){
+      tuneGrid <- expand.grid(
+        C = exp(seq(-10,0,by=1)),
+        sigma = exp(seq(-10,0,by=1))
+      )
+    } else if (method =='svmLinear'){
+      tuneGrid <- expand.grid(
+        C = exp(seq(-10,0,by=1))
+      )
+    }
+    tunedModel <- caret::train(target ~ .,
+                               data = TrainingData,
+                               method = method,
+                               preProcess = c("center", "scale"),
+                               trControl = ctrl,
+                               tuneGrid = tuneGrid)
     modelsSVR[[i]] <- tunedModel
     pb$tick()
   }
@@ -458,7 +429,7 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @param FigPlot boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step
 #' @param Force4LowLAI boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI
 #' @param method character. which machine learning regression method should be used?
-#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
+#' default = svmRadial, and svmLinear lso available from caret package also implemented. More to come
 #'
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
@@ -471,7 +442,7 @@ train_prosail_inversion <- function(minval = NULL, maxval = NULL,
                                     Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
                                     Path_Results = './', FigPlot = FALSE, Force4LowLAI = TRUE,
-                                    method = 'liquidSVM'){
+                                    method = 'svmRadial'){
 
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###           1- PRODUCE A LUT TO TRAIN THE HYBRID INVERSION          ###
