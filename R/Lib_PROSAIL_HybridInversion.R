@@ -24,16 +24,20 @@
 #' @param MaskRaster character. path for binary mask defining ON (1) and OFF (0) pixels in the raster
 #' @param MultiplyingFactor numeric. multiplying factor used to write reflectance in the raster
 #' --> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range
+#' @param method character. which machine learning regression method should be used?
+#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #'
 #' @return None
 #' @importFrom progress progress_bar
 #' @importFrom stars read_stars
 #' @importFrom raster raster brick blockSize readStart readStop getValues writeStart writeStop writeValues
+#' @importFrom matrixStats rowSds
 #' @import rgdal
 #' @export
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname,
-                                    MaskRaster = FALSE,MultiplyingFactor=10000){
+                                    MaskRaster = FALSE,MultiplyingFactor=10000,
+                                    method = 'liquidSVM'){
 
   # explain which biophysical variables will be computed
   BPvar <- names(HybridModel)
@@ -100,6 +104,11 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         SelectPixels <- which(MaskVal ==1)
         BlockVal <- BlockVal[SelectPixels,Selbands]
       }
+      # add name for variables
+      if (!method =='liquidSVM'){
+        colnames(BlockVal) <- colnames(HybridModel[[parm]][[1]]$trainingData)[-1]
+      }
+
       Mean_EstimateFull <- NA*vector(length = FullLength)
       STD_EstimateFull <- NA*vector(length = FullLength)
       if (length(SelectPixels)>0){
@@ -113,7 +122,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         # final estimated value = mean parm value for all models
         Mean_Estimate <- rowMeans(modelSVR_Estimate)
         # 'uncertainty' = STD value for all models
-        STD_Estimate <- rowSds(modelSVR_Estimate)
+        STD_Estimate <- matrixStats::rowSds(modelSVR_Estimate)
         Mean_EstimateFull[SelectPixels] <- Mean_Estimate
         STD_EstimateFull[SelectPixels] <- STD_Estimate
       } else {
@@ -448,18 +457,21 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @param Path_Results character. path for results
 #' @param FigPlot boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step
 #' @param Force4LowLAI boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI
+#' @param method character. which machine learning regression method should be used?
+#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #'
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @export
 
-train_prosail_inversion <- function(minval=NULL,maxval=NULL,
-                                    TypeDistrib=NULL,GaussianDistrib= NULL,ParmSet=NULL,
-                                    nbSamples=2000,nbSamplesPerRun=100,nbModels=20,Replacement=TRUE,
-                                    SAILversion='4SAIL',
-                                    Parms2Estimate='lai',Bands2Select=NULL,NoiseLevel=NULL,
+train_prosail_inversion <- function(minval = NULL, maxval = NULL,
+                                    TypeDistrib = NULL, GaussianDistrib = NULL, ParmSet = NULL,
+                                    nbSamples = 2000, nbSamplesPerRun = 100, nbModels = 20,
+                                    Replacement=TRUE, SAILversion='4SAIL',
+                                    Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
-                                    Path_Results='./',FigPlot=FALSE,Force4LowLAI = TRUE){
+                                    Path_Results = './', FigPlot = FALSE, Force4LowLAI = TRUE,
+                                    method = 'liquidSVM'){
 
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###           1- PRODUCE A LUT TO TRAIN THE HYBRID INVERSION          ###
@@ -524,8 +536,8 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
   }
 
   # generate LUT of BRF corresponding to InputPROSAIL, for a sensor
-  BRF_LUT <- Generate_LUT_BRF(SAILversion=SAILversion,InputPROSAIL = InputPROSAIL,
-                              SpecPROSPECT = SpecPROSPECT,SpecSOIL = SpecSOIL,SpecATM = SpecATM)
+  BRF_LUT <- Generate_LUT_BRF(SAILversion = SAILversion, InputPROSAIL = InputPROSAIL,
+                              SpecPROSPECT = SpecPROSPECT, SpecSOIL = SpecSOIL, SpecATM = SpecATM)
 
   # write parameters LUT
   output <- matrix(unlist(InputPROSAIL), ncol = length(InputPROSAIL), byrow = FALSE)
@@ -568,7 +580,8 @@ train_prosail_inversion <- function(minval=NULL,maxval=NULL,
     ColParm <- which(parm==names(InputPROSAIL))
     InputVar <- InputPROSAIL[[ColParm]]
     modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
-                                             FigPlot = FigPlot,nbEnsemble = nbModels,WithReplacement=Replacement)
+                                             FigPlot = FigPlot,nbEnsemble = nbModels,
+                                             WithReplacement = Replacement, method = method)
   }
   return(modelSVR)
 }

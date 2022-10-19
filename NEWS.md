@@ -1,3 +1,8 @@
+# prosail v1.2.1
+
+## Changes
+- implemented caret for function Apply_prosail_inversion used for raster processing
+
 # prosail v1.2.0
 
 ## Changes

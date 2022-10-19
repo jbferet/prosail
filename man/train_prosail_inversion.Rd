@@ -24,7 +24,8 @@ train_prosail_inversion(
   SpecATM = NULL,
   Path_Results = "./",
   FigPlot = FALSE,
-  Force4LowLAI = TRUE
+  Force4LowLAI = TRUE,
+  method = "liquidSVM"
 )
 }
 \arguments{
@@ -65,6 +66,9 @@ train_prosail_inversion(
 \item{FigPlot}{boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step}
 
 \item{Force4LowLAI}{boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI}
+
+\item{method}{character. which machine learning regression method should be used?
+default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
