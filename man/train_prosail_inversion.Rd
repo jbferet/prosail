@@ -25,7 +25,8 @@ train_prosail_inversion(
   Path_Results = "./",
   FigPlot = FALSE,
   Force4LowLAI = TRUE,
-  method = "liquidSVM"
+  method = "liquidSVM",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -69,6 +70,8 @@ train_prosail_inversion(
 
 \item{method}{character. which machine learning regression method should be used?
 default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
+
+\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
