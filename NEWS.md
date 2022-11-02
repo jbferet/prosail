@@ -2,6 +2,7 @@
 
 ## Changes
 - implemented caret for function Apply_prosail_inversion used for raster processing
+- added verbose parameter to control printed message when hyperparameter adjustment performed during training of liquidSVM
 
 # prosail v1.2.0
 

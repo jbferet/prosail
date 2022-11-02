@@ -225,6 +225,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @param WithReplacement Boolean. should subsets be generated with or without replacement?
 #' @param method character. which machine learning regression method should be used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
+#' @param verbose boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @importFrom liquidSVM svmRegression
@@ -240,7 +241,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @export
 
 PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble = 20,
-                                 WithReplacement = FALSE, method = 'liquidSVM'){
+                                 WithReplacement = FALSE, method = 'liquidSVM', verbose = FALSE){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # library(dplyr)
@@ -281,12 +282,12 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
         ValGamma <- str_split(string = Msg,pattern = 'gamma=')[[1]][2]
         ValLambda <- str_split(string = Msg,pattern = 'lambda=')[[1]][2]
         if (!is.na(as.numeric(ValGamma))){
-          message('Adjusting Gamma accordingly')
+          if (verbose==T) { message('Adjusting Gamma accordingly')}
           ValGamma <- as.numeric(ValGamma)
           tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
         }
         if (!is.na(as.numeric(ValLambda))){
-          message('Adjusting Lambda accordingly')
+          if (verbose==T) { message('Adjusting Lambda accordingly')}
           ValLambda <- as.numeric(ValLambda)
           tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
         }
@@ -459,7 +460,7 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @param Force4LowLAI boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI
 #' @param method character. which machine learning regression method should be used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
-#'
+#' @param verbose boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @export
@@ -471,7 +472,7 @@ train_prosail_inversion <- function(minval = NULL, maxval = NULL,
                                     Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
                                     Path_Results = './', FigPlot = FALSE, Force4LowLAI = TRUE,
-                                    method = 'liquidSVM'){
+                                    method = 'liquidSVM', verbose = FALSE){
 
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###           1- PRODUCE A LUT TO TRAIN THE HYBRID INVERSION          ###
@@ -581,7 +582,7 @@ train_prosail_inversion <- function(minval = NULL, maxval = NULL,
     InputVar <- InputPROSAIL[[ColParm]]
     modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
                                              FigPlot = FigPlot,nbEnsemble = nbModels,
-                                             WithReplacement = Replacement, method = method)
+                                             WithReplacement = Replacement, method = method, verbose = verbose)
   }
   return(modelSVR)
 }
