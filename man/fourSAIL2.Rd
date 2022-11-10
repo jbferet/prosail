@@ -23,9 +23,9 @@ fourSAIL2(
 )
 }
 \arguments{
-\item{leafgreen}{list. includes relfectance and transmittance for vegetation #1 (e.g. green vegetation)}
+\item{leafgreen}{list. includes reflectance and transmittance for vegetation #1 (e.g. green vegetation)}
 
-\item{leafbrown}{list. includes relfectance and transmittance for vegetation #2 (e.g. brown vegetation)}
+\item{leafbrown}{list. includes reflectance and transmittance for vegetation #2 (e.g. brown vegetation)}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
