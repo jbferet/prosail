@@ -1,3 +1,9 @@
+# prosail v1.2.2
+
+## Fix
+- corrected function to compute spectral indices: SpectralIndices instead of spectralindices
+- set default value for LMA to 0
+
 # prosail v1.2.1
 
 ## Changes

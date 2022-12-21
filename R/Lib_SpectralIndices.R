@@ -278,7 +278,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL',
   }
   if ("CCCI" %in% Sel_Indices) {
     CCCI <- ((Refl[["B8"]] - Refl[["B5"]]) / (Refl[["B8"]] + Refl[["B5"]])) / ((Refl[["B8"]] - Refl[["B4"]]) / (Refl[["B8"]] + Refl[["B4"]]))
-    spectralindices$CCCI <- CCCI
+    SpectralIndices$CCCI <- CCCI
   }
   if ('CHL_RE'%in%Sel_Indices){
     CHL_RE <- Refl[["B5"]]/Refl[["B8"]]
@@ -354,7 +354,7 @@ ComputeSpectralIndices_Raster <- function(Refl, SensorBands, Sel_Indices='ALL',
   }
   if ("NDSI" %in% Sel_Indices) {
     ndsi <- (Refl[["B3"]] - Refl[["B11"]]) / (Refl[["B3"]] + Refl[["B11"]])
-    spectralindices$NDSI <- ndsi
+    SpectralIndices$NDSI <- ndsi
   }
   if ('NDVI'%in%Sel_Indices){
     NDVI <- (Refl[["B8"]]-Refl[["B4"]])/(Refl[["B8"]]+Refl[["B4"]])
@@ -491,7 +491,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   }
   if ("CCCI" %in% Sel_Indices) {
     CCCI <- ((Refl[,Sen2S2[["B8"]]] - Refl[,Sen2S2[["B5"]]]) / (Refl[,Sen2S2[["B8"]]] + Refl[,Sen2S2[["B5"]]])) / ((Refl[,Sen2S2[["B8"]]] - Refl[,Sen2S2[["B4"]]]) / (Refl[,Sen2S2[["B8"]]] + Refl[,Sen2S2[["B4"]]]))
-    spectralindices$CCCI <- CCCI
+    SpectralIndices$CCCI <- CCCI
   }
   if ('CHL_RE'%in%Sel_Indices){
     CHL_RE <- Refl[,Sen2S2[["B5"]]]/Refl[,Sen2S2[["B8"]]]
@@ -568,7 +568,7 @@ ComputeSpectralIndices_HS <- function(Refl,SensorBands,Sel_Indices='ALL'){
   }
   if ("NDSI" %in% Sel_Indices) {
     ndsi <- (Refl[,Sen2S2[["B3"]]] - Refl[,Sen2S2[["B11"]]]) / (Refl[,Sen2S2[["B3"]]] + Refl[,Sen2S2[["B11"]]])
-    spectralindices$NDSI <- ndsi
+    SpectralIndices$NDSI <- ndsi
   }
   if ('NDVI'%in%Sel_Indices){
     NDVI <- (Refl[,Sen2S2[["B8"]]]-Refl[,Sen2S2[["B4"]]])/(Refl[,Sen2S2[["B8"]]]+Refl[,Sen2S2[["B4"]]])
