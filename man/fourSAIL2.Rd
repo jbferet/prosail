@@ -31,7 +31,7 @@ fourSAIL2(
 
 \item{LIDFa}{numeric.
 if TypeLidf ==1, controls the average leaf slope
-if TypeLidf ==2, corresponds to average leaf angle}
+if TypeLidf ==2, controls the average leaf angle}
 
 \item{LIDFb}{numeric.
 if TypeLidf ==1, unused

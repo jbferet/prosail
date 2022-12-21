@@ -58,10 +58,10 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' if TypeLidf ==1, controls the distribution's bimodality
+#' if TypeLidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -88,7 +88,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @export
 PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
                      CAR = 8.0,ANT = 0.0,BROWN = 0.0,EWT = 0.01,
-                     LMA = 0.008,PROT = 0.0,CBC = 0.0,alpha = 40.0,
+                     LMA = 0.000,PROT = 0.0,CBC = 0.0,alpha = 40.0,
                      TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,lai = NULL,
                      q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
                      fraction_brown = 0.0, diss = 0.0, Cv = 1,Zeta = 1,
@@ -200,10 +200,10 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' if TypeLidf ==1, controls the distribution's bimodality
+#' if TypeLidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -271,7 +271,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     frho <- resVolscatt$frho
     ftau <- resVolscatt$ftau
 
-    #********************************************************************************
+    # ********************************************************************************
     #*                   SUITS SYSTEM COEFFICIENTS
     #*
     #*	ks  : Extinction coefficient for direct solar flux
@@ -284,7 +284,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     #*	vf   : Scattering coefficient of upward diffuse flux in the observed direction
     #*	vb   : Scattering coefficient of downward diffuse flux in the observed direction
     #*	w   : Bidirectional scattering coefficient
-    #********************************************************************************
+    # *********************************************************************************
 
     #	Extinction coefficients
     ksli <- chi_s/cts
@@ -454,7 +454,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
 #' if TypeLidf ==1, unused
 #' if TypeLidf ==2, controls the distribution's bimodality
@@ -1130,12 +1130,12 @@ Jfunc4 <- function(m,t){
 #' @return res list. includes chi_s, chi_o, frho, ftau
 #' @export
 volscatt  <- function(tts,tto,psi,ttl){
-  #********************************************************************************
+  # ********************************************************************************
   #*	chi_s	= interception functions
   #*	chi_o	= interception functions
   #*	frho	= function to be multiplied by leaf reflectance rho
   #*	ftau	= functions to be multiplied by leaf transmittance tau
-  #********************************************************************************
+  # ********************************************************************************
   #	Wout Verhoef, april 2001, for CROMA
 
   rd <- pi/180
