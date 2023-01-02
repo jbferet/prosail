@@ -136,7 +136,7 @@ preprocS2::save_reflectance_s2(S2_stars = S2obj$S2_Stack,
 
 # Computation of spectral indices
 
-Once reflectance data is written as a raster file, `prosail` includes a set of functions for the computation of various spectral indices. 
+Once reflectance data is written as a raster file, the [`spinR`](https://gitlab.com/jbferet/spinr) package includes a set of functions for the computation of various spectral indices. 
 
 Here we will compute NDVI in order to update the vegetation mask and discard non-vegetated pixels. About 30-40 spectral indices are available. 
 
@@ -145,6 +145,7 @@ Here we will compute NDVI in order to update the vegetation mask and discard non
 ##                      COMPUTE SPECTRAL INDEX                        ##
 ########################################################################
 library(prosail)
+library(spinR)
 library(raster)
 library(stars)
 # Read raster
@@ -155,9 +156,9 @@ SensorBands <- HDR_Refl$wavelength
 # compute a set of spectral indices defined by IndexList from S2 data
 IndexList <- c('NDVI')
 # ReflFactor = 10000 when reflectance is coded as INT16
-Indices <- prosail::ComputeSpectralIndices_Raster(Refl = Refl, SensorBands = SensorBands,
-                                                  Sel_Indices = IndexList,
-                                                  ReflFactor = 10000, StackOut=F)
+Indices <- spinR::ComputeSpectralIndices_Raster(Refl = Refl, SensorBands = SensorBands,
+                                                Sel_Indices = IndexList,
+                                                ReflFactor = 10000, StackOut=F)
 
 # create directory for Spectral indices
 SI_path <- file.path(results_site_path,'SpectralIndices')

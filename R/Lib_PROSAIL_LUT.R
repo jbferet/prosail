@@ -347,7 +347,7 @@ Apply_Noise_LUT <- function(LUT,NoiseLevel,NoiseType = 'relative'){
   nbSamples <- ncol(LUT)
   if (NoiseType == 'relative'){
     LUT_Noise <- LUT + LUT*matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
-  } else if (NoiseType == 'relative'){
+  } else if (NoiseType == 'absolute'){
     LUT_Noise <- LUT + matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
   }
   return(LUT_Noise)

@@ -186,13 +186,14 @@ get_HDR_name <- function(ImPath) {
 #' @importFrom stats predict
 #' @importFrom matrixStats rowSds
 #' @importFrom progress progress_bar
+#' @importFrom methods is
 #' @export
 
 PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
   # make sure Refl is right dimensions
   Refl <- t(Refl)
-  if (class(RegressionModels[[1]])=='liquidSVM'){
+  if (is(RegressionModels[[1]])[1]=='liquidSVM'){
     nbFeatures <- RegressionModels[[1]]$dim
   } else {
     nbFeatures <- ncol(RegressionModels[[1]]$trainingData) - 1
