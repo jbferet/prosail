@@ -167,6 +167,9 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
 applySensorCharacteristics <- function(wvl,InRefl,SRF){
 
   nbBands_Origin <- length(wvl)
+  if (dim(SRF$Spectral_Response)[1]==nbBands_Origin){
+    SRF$Spectral_Response <- t(SRF$Spectral_Response)
+  }
   nbBands_Sensor <- dim(SRF$Spectral_Response)[1]
   # if (!length(InRefl)==nbBands_Origin){
   #   message('_ Dimensions of input data and spectral sampling do not match _')

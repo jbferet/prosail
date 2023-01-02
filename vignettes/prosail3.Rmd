@@ -46,9 +46,9 @@ SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
 # convert 1nm reflectance into Sentinel-2 reflectance
 # adjust optical constants
 SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-SpecPROSPECT_Sensor <- SpecSensor[[1]]$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- SpecSensor[[1]]$SpecSOIL_Sensor
-SpecATM_Sensor <- SpecSensor[[1]]$SpecATM_Sensor
+SpecPROSPECT_Sensor <- SpecSensor$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- SpecSensor$SpecSOIL_Sensor
+SpecATM_Sensor <- SpecSensor$SpecATM_Sensor
 ```
 
 
@@ -84,15 +84,71 @@ InputPROSAIL <- get_distribution_input_prosail(minval = minval, maxval = maxval,
 ```
 
 
-# Simulation of BRF following user defined distribution
+# Simulation of BRF following user-defined distribution
+
+The simulation of sensor reflectance is usually performed in two steps: 
+- simulation of reflectance with 1 nm spectral sampling
+- conversion from 1 nm sampling to sensor spectral sampling using the proper spectral response function
 
 ```{r simulate_LUT}
-# produce BRF LUT based on InputPROSAIL
-BRF_LUT <- Generate_LUT_BRF(InputPROSAIL = InputPROSAIL,SpecPROSPECT = SpecPROSPECT_Sensor,
-                            BandNames = SpecSensor$BandNames, SpecSOIL = SpecSOIL_Sensor,
-                            SpecATM = SpecATM_Sensor, SAILversion = '4SAIL')
+# produce 1 nm BRF LUT based on InputPROSAIL
+BRF_LUT_1nm <- Generate_LUT_BRF(InputPROSAIL = InputPROSAIL, SpecPROSPECT = SpecPROSPECT,
+                                BandNames = SpecPROSPECT$lambda, SpecSOIL = SpecSOIL,
+                                SpecATM = SpecATM, SAILversion = '4SAIL')
+
+# convert to sensor spectral characteristics
+wvl <- SpecPROSPECT$lambda
+BRF_LUT <- applySensorCharacteristics(wvl = wvl,
+                                      SRF = SRF,
+                                      InRefl = BRF_LUT_1nm)
 ```
 
+# Simulation of BRF using sensor spectral response function
+
+The `prosail` package does not include an exhaustive soil database. 
+Therefore, it may be possible that soil optical properties corresponding to a scene in an optical image do not correspond to the default dry and wet soil reflectance defined as default soil properties.
+In such case, users can define soil properties based on pixels corresponding bare soil and picked in the image, assuming that these exist.
+The soil optical properties will then already have sensor spectral response. 
+In this case, if users want to define custom soil properties, they need to apply sensor response function to all optical constants used in PROSAIL.
+
+```{r simulate_LUT_Alternative}
+# apply sensor characteristics to PROSPECT optical constants
+wvl <- SpecPROSPECT$lambda
+Spec_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
+Spec_Sensor <- split(Spec_Sensor, rep(1:ncol(Spec_Sensor), each = nrow(Spec_Sensor))) # split matrix into list
+names(Spec_Sensor) <- names(SpecPROSPECT) # keep names for elements of list
+# apply sensor characteristics to atmospheric properties
+SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
+SpecATM_Sensor <- split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor))) # split matrix into list
+names(SpecATM_Sensor) <- names(SpecATM) # keep names for elements of list
+# apply sensor characteristics to soil properties
+SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
+SpecSOIL_Sensor <- split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nrow(SpecSOIL_Sensor))) # split matrix into list
+names(SpecSOIL_Sensor) <- names(SpecSOIL) # keep names for elements of list
+```
+
+This conversion can also be done using a unique function `PrepareSensorSimulation`: 
+
+```{r conversion_SRF_OptCst}
+# apply sensor characteristics to PROSPECT optical constants
+PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+Spec_Sensor <- PropSensor[[1]]$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- PropSensor[[1]]$SpecSOIL_Sensor
+SpecATM_Sensor <- PropSensor[[1]]$SpecATM_Sensor
+```
+
+... Then BRF can be computed based on these values:
+
+```{r Apply_SRF_Reflectance}
+# WL is a vector giving central wavelength for each band in nanometer
+# FWHM is a vector giving FWHM for each band in nanometer
+rsoil <- SpecSOIL_Sensor$Dry_Soil
+Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
+                       TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,
+                       lai = lai,q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
+# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+BRF_Sensor <- Compute_BRF(Ref_Sensor$rdot,Ref_Sensor$rsot,tts,SpecATM_Sensor)
+```
 
 # Biophysical variables of interest 
 Definition of the biophysical variables of interest using hybrid inversion.
@@ -116,8 +172,8 @@ Bands2Select$lai <- c(2,3,4,5,6,7,8,9,10)
 # Define gaussian noise to be applied on reflectance
 NoiseLevel <- list()
 NoiseLevel$CHL <- 0.01
-NoiseLevel$EWT <- 0.02
-NoiseLevel$LMA <- 0.05
+NoiseLevel$EWT <- 0.01
+NoiseLevel$LMA <- 0.01
 NoiseLevel$lai <- 0.05
 
 # Apply gaussian noise to be applied on reflectance

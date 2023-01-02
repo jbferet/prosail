@@ -33,11 +33,11 @@ The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expe
 
 * `SAILversion`: the version of SAIL to be used. The default version is __4SAIL__. __4SAIL2__ can also be called from the same function with additional parameters. Both versions include the following input parameters:
 
-* `Spec_Sensor`: dataframe including the refractive index and specific absorption ceofficients, defined for a given spectral range (max range: 400 nm - 2500 nm). Simulation and inversion on different spectral domains can be peformed by adapting the information in `SpecPROSPECT`, which is loaded by default when calling the package `prospect`.
+* `Spec_Sensor`: dataframe including the refractive index and specific absorption coefficients, defined for a given spectral range (max range: 400 nm - 2500 nm). Simulation and inversion on different spectral domains can be performed by adapting the information in `SpecPROSPECT`, which is loaded by default when calling the package `prospect`.
 
 * The biochemical and biophysical input variables of PROSPECT, including `N`, `CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. If no value, their default value is set.
 
-    * Note that a unique value (or no value) is expected for each of the leaf consituents when running __4SAIL__. __4SAIL2__ allows introduction of two distinct sets of leaf optical properties. In the original version, one type is dedicated to 'Green leaves', and the other type is dedicated to 'Brown leaves'. User can decide either to simulate both types of leaf optical properties using PROSPECT, or to directly define these leaf optical properties with the `BrownVegetation` input parameter, defined as follows
+    * Note that a unique value (or no value) is expected for each of the leaf constituents when running __4SAIL__. __4SAIL2__ allows introduction of two distinct sets of leaf optical properties. In the original version, one type is dedicated to 'Green leaves', and the other type is dedicated to 'Brown leaves'. User can decide either to simulate both types of leaf optical properties using PROSPECT, or to directly define these leaf optical properties with the `BrownVegetation` input parameter, defined as follows
 
     * `BrownVegetation` is a parameter specific to  __4SAIL2__. It should be a list including `Reflectance` and `Transmittance`, with the spectral sampling corresponding to the sampling defined in `Spec_Sensor`
     
@@ -45,16 +45,16 @@ The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expe
 
     * Define `TypeLidf=1` if you want to use the original LIDF introduced by [Verhoef (1998)](https://edepot.wur.nl/210943).
         * if `TypeLidf=1` then `LIDFa` controls the average leaf slope and `LIDFb` controls the distribution's bimodality
-    * Define `TypeLidf=2` if you want to use the [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) characterised by the average leaf inclination angle in degree
+    * Define `TypeLidf=2` if you want to use the [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) characterized by the average leaf inclination angle in degree
         * if `TypeLidf=2` then `LIDFa` controls the average leaf angle
 
 * `lai`: leaf area angle
 
 * `q`: hot spot parameter
 
-* `tts`: sun zenith angle (0 degres = sun at the vertical of surface)
+* `tts`: sun zenith angle (0 degrees = sun at the vertical of surface)
 
-* `tto`: observer zenith angle (0 degres = nadir observation)
+* `tto`: observer zenith angle (0 degrees = nadir observation)
 
 * `psi`: azimuth between sun and observer (in degrees)
 
@@ -172,44 +172,16 @@ SRF can also be directly computed for any sensor under the hypothesis of Gaussia
 SRF <- Compute_SRF(WL,FWHM)
 ```
 
-Then, optical values used to compute reflectance (specific absorption constituents, soil properties, direct/diffuse radiation) can be converted from 1 nm spectral sampling (default sampling) to sensor sampling before simulation of reflectance:
+Then, reflectance can be converted from 1 nm spectral sampling (default sampling) to sensor sampling :
 
 ```{r Conversion}
-# apply sensor characteristics to PROSPECT optical constants
+# apply sensor characteristics to simulated reflectance
 wvl <- SpecPROSPECT$lambda
-Spec_Sensor = applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-Spec_Sensor = split(Spec_Sensor, rep(1:ncol(Spec_Sensor), each = nrow(Spec_Sensor))) # split matrix into list
-names(Spec_Sensor)=names(SpecPROSPECT) # keep names for elements of list
-# apply sensor characteristics to atmospheric properties
-SpecATM_Sensor = applySensorCharacteristics(wvl,SpecATM,SRF)
-SpecATM_Sensor = split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor))) # split matrix into list
-names(SpecATM_Sensor)=names(SpecATM) # keep names for elements of list
-# apply sensor characteristics to soil properties
-SpecSOIL_Sensor = applySensorCharacteristics(wvl,SpecSOIL,SRF)
-SpecSOIL_Sensor = split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nrow(SpecSOIL_Sensor))) # split matrix into list
-names(SpecSOIL_Sensor)=names(SpecSOIL) # keep names for elements of list
+BRF_4SAIL_S2 <- applySensorCharacteristics(wvl = wvl,
+                                           SRF = SRF,
+                                           InRefl = BRF_4SAIL)
+
+BRF_4SAIL2_S2 <- applySensorCharacteristics(wvl = wvl,
+                                           SRF = SRF,
+                                           InRefl = BRF_4SAIL2)
 ```
-
-This conversion can also be done using a unique function `PrepareSensorSimulation`:
-
-```{r Conversion_all}
-# apply sensor characteristics to PROSPECT optical constants
-PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-Spec_Sensor <- PropSensor[[1]]$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- PropSensor[[1]]$SpecSOIL_Sensor
-SpecATM_Sensor <- PropSensor[[1]]$SpecATM_Sensor
-```
-
-... Then BRF can be computed based on these values:
-
-```{r BRF new res}
-# WL is a vector giving central wavelength for each band in nanometer
-# FWHM is a vector giving FWHM for each band in nanometer
-rsoil <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-                       TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,
-                       lai = lai,q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
-# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-BRF_Sensor <-Compute_BRF(Ref_Sensor$rdot,Ref_Sensor$rsot,tts,SpecATM_Sensor)
-```
-

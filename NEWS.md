@@ -1,3 +1,12 @@
+# prosail v1.2.3
+
+## Changes
+- added function OptimalSI to compute the correlation between a set of vegetation properties and all combinations of spectral bands corresponding to a given type of spectral index
+
+## Fix
+- transpose sensor spectral response function in applySensorCharacteristics if not properly oriented
+- Apply_Noise_LUT: add possibility to add absolute noise
+
 # prosail v1.2.2
 
 ## Fix
