@@ -334,7 +334,7 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
 #' This function applied noise on a matrix
 #'
 #' @param LUT numeric. Matrix including data to add noise to
-#' @param NoiseLevel numeric. value of teh normal noise proportional to LUT to apply on LUT
+#' @param NoiseLevel numeric. value of the normal noise proportional to LUT to apply on LUT
 #' @param NoiseType character.
 #' - relative: noise proportional to actual value to add noise to
 #' - absolute: noise not proportional to actual value to add noise to
