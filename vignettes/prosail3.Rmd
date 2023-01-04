@@ -132,9 +132,9 @@ This conversion can also be done using a unique function `PrepareSensorSimulatio
 ```{r conversion_SRF_OptCst}
 # apply sensor characteristics to PROSPECT optical constants
 PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-Spec_Sensor <- PropSensor[[1]]$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- PropSensor[[1]]$SpecSOIL_Sensor
-SpecATM_Sensor <- PropSensor[[1]]$SpecATM_Sensor
+Spec_Sensor <- PropSensor$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- PropSensor$SpecSOIL_Sensor
+SpecATM_Sensor <- PropSensor$SpecATM_Sensor
 ```
 
 ... Then BRF can be computed based on these values:
