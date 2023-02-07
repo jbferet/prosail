@@ -22,23 +22,23 @@ RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown
 Imports: 
-    pracma,
-    utils,
-    raster,
-    methods,
+    caret,
     dplyr,
-    liquidSVM,
-    progress,
-    matrixStats,
-    ggplot2,
-    prospect,
     expandFunctions,
-    stringr,
-    XML,
+    ggplot2,
+    liquidSVM,
+    matrixStats,
+    methods,
+    pracma,
+    raster,
     rgdal,
-    stars,
     simsalapar,
-    caret
+    stars,
+    stringr,
+    utils,
+    progress,
+    prospect,
+    XML
 Remotes: gitlab::jbferet/prospect
 VignetteBuilder: knitr
 URL: https://gitlab.com/jbferet/prosail

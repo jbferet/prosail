@@ -156,9 +156,9 @@ SensorBands <- HDR_Refl$wavelength
 # compute a set of spectral indices defined by IndexList from S2 data
 IndexList <- c('NDVI')
 # ReflFactor = 10000 when reflectance is coded as INT16
-Indices <- spinR::ComputeSpectralIndices_Raster(Refl = Refl, SensorBands = SensorBands,
-                                                Sel_Indices = IndexList,
-                                                ReflFactor = 10000, StackOut=F)
+Indices <- spinR::compute_S2SI_Raster(Refl = Refl, SensorBands = SensorBands,
+                                      Sel_Indices = IndexList,
+                                      ReflFactor = 10000, StackOut=F)
 
 # create directory for Spectral indices
 SI_path <- file.path(results_site_path,'SpectralIndices')
@@ -215,7 +215,7 @@ SpecATM_Sensor <- SpecSensor$SpecATM_Sensor
 
 # define spectral bands required to train SVR model for each variable
 S2BandSelect <- list()
-S2BandSelect$CHL <- S2BandSelect$lai <- S2BandSelect$EWT <- S2BandSelect$LMA <- c('B3','B4','B5','B6','B7','B8','B11','B12')
+S2BandSelect$CHL <- S2BandSelect$lai <- S2BandSelect$EWT <- S2BandSelect$LMA <- c('B03','B04','B05','B06','B07','B08','B11','B12')
 ImgBandNames <- strsplit(HDR_Refl$`band names`,split = ',')[[1]]
 # get variable ID for train_prosail_inversion
 Bands2Select <- list()
