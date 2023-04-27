@@ -30,14 +30,14 @@ Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R libr
 You need to install the package `prospect` with the following command line in R session:
 
 ```
-devtools::install_gitlab('jbferet/prospect')
+devtools::install_github('jbferet/prospect')
 ```
 
 # 2 Install `prosail`
 
 The package `prosail` can then be installed with the following command line in R session:
 ```
-devtools::install_gitlab('jbferet/prosail')
+devtools::install_github('jbferet/prosail')
 ```
 
 # 3 Tutorial
@@ -71,7 +71,7 @@ Féret J-B, Gitelson AA, Noble SD & Jacquemoud S, 2017. PROSPECT-D: Towards mode
 Féret J-B, Berger K, de Boissieu F & Malenovský Z, 2020. Estimation of leaf protein and carbon-based constituent content from optical properties with the PROSPECT-PRO model. ArXiv200311961 Q-Bio.
 
 ## 4SAIL & 4SAIL2
-Verhoef W & Bach H, 2007. Coupled soil–leaf-canopy and atmosphere radiative transfer modeling to simulate hyperspectral multi-angular surface reflectance and TOA radiance data. Remote Sensing of Environment, 109:166-182. doi:10.1016/j.rse.2006.12.013
+Verhoef W & Bach H, 2007. Coupled soil–leaf-canopy and atmosphere radiative transfer modeling to simulate hyperspectral multi-angular surface reflectance and TOA radiance data. Remote Sensing of Environment, 109:166-182. https://doi.org/10.1016/j.rse.2006.12.013
 
 Verhoef W, Jia L, Xiao Q & Su Z, 2007. Unified optical-thermal four-stream radiative transfer theory for homogeneous vegetation canopies. IEEE Transactions in Geosciences and Remote Sensing, 45:1808–1822. https://doi.org/10.1109/TGRS.2007.895844
 
