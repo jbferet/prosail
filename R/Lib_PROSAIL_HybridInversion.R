@@ -32,7 +32,6 @@
 #' @importFrom stars read_stars
 #' @importFrom raster raster brick blockSize readStart readStop getValues writeStart writeStop writeValues
 #' @importFrom matrixStats rowSds
-#' @import rgdal
 #' @export
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname,
@@ -44,14 +43,14 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
   print('The following biophysical variables will be computed')
   print(BPvar)
 
-  # get image dimensions
-  if (attr(rgdal::GDALinfo(raster_path,returnStats = FALSE), 'driver')=='ENVI'){
-    hdr <- read_ENVI_header(get_HDR_name(raster_path))
-    dimsraster <- list('rows'=hdr$lines,'cols'=hdr$samples,'bands'=hdr$bands)
-  } else {
-    dimsraster <- dim(read_stars(raster_path))
-    dimsraster <- list('rows'=as.numeric(dimsraster[2]),'cols'=as.numeric(dimsraster[1]),'bands'=as.numeric(dimsraster[3]))
-  }
+  # # get image dimensions
+  # if (attr(rgdal::GDALinfo(raster_path,returnStats = FALSE), 'driver')=='ENVI'){
+  #   hdr <- read_ENVI_header(get_HDR_name(raster_path))
+  #   dimsraster <- list('rows'=hdr$lines,'cols'=hdr$samples,'bands'=hdr$bands)
+  # } else {
+  #   dimsraster <- dim(read_stars(raster_path))
+  #   dimsraster <- list('rows'=as.numeric(dimsraster[2]),'cols'=as.numeric(dimsraster[1]),'bands'=as.numeric(dimsraster[3]))
+  # }
 
   # Produce a map for each biophysical property
   for (parm in BPvar){

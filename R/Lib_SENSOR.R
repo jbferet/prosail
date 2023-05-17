@@ -29,17 +29,17 @@ GetRadiometry <- function(SensorName = 'MyCustomSensor',
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
   # == == == == == == == == == == == == == == == == == == == == == == == == =
-  if (SensorName=='Sentinel_2'){                                  # if sensor is SENTINEL-2
+  if (SensorName=='Sentinel_2' | SensorName=='S2'){                                  # if sensor is SENTINEL-2
     Spectral_Response <- prosail::Sentinel_2$Spectral_Response
     Spectral_Bands <- prosail::Sentinel_2$Spectral_Bands
     OriginalBands <- prosail::Sentinel_2$OriginalBands
     SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
-  } else if (SensorName=='Sentinel_2A'){                          # if sensor is SENTINEL-2A
+  } else if (SensorName=='Sentinel_2A' | SensorName=='S2A'){                          # if sensor is SENTINEL-2A
     Spectral_Response <- prosail::Sentinel_2A$Spectral_Response
     Spectral_Bands <- prosail::Sentinel_2A$Spectral_Bands
     OriginalBands <- prosail::Sentinel_2A$OriginalBands
     SRF <- list("Spectral_Response"=Spectral_Response, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
-  } else if (SensorName=='Sentinel_2B'){                          # if sensor is SENTINEL-2B
+  } else if (SensorName=='Sentinel_2B' | SensorName=='S2B'){                          # if sensor is SENTINEL-2B
     Spectral_Response <- prosail::Sentinel_2B$Spectral_Response
     Spectral_Bands <- prosail::Sentinel_2B$Spectral_Bands
     OriginalBands <- prosail::Sentinel_2B$OriginalBands
