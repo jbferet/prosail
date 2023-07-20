@@ -6,19 +6,24 @@
 values for default parameters}
 \usage{
 train_prosail_inversion(
+  InputPROSAIL = NULL,
+  atbd = NULL,
+  GeomAcq = NULL,
+  Codist_LAI = TRUE,
   minval = NULL,
   maxval = NULL,
   TypeDistrib = NULL,
   GaussianDistrib = NULL,
   ParmSet = NULL,
+  SAILversion = "4SAIL",
   nbSamples = 2000,
   nbSamplesPerRun = 100,
   nbModels = 20,
   Replacement = TRUE,
-  SAILversion = "4SAIL",
   Parms2Estimate = "lai",
   Bands2Select = NULL,
   NoiseLevel = NULL,
+  SRF = NULL,
   SpecPROSPECT = NULL,
   SpecSOIL = NULL,
   SpecATM = NULL,
@@ -30,6 +35,14 @@ train_prosail_inversion(
 )
 }
 \arguments{
+\item{InputPROSAIL}{list. user-defined list of input parameters to be used to produce a training LUT}
+
+\item{atbd}{boolean. should input parameter distribution from ATBD be applied ?}
+
+\item{GeomAcq}{list. geometry of acquisiton. list should contain min and max values for tts, tto and psi}
+
+\item{Codist_LAI}{boolean. set TYRUE if codistribution with LAI accounted for}
+
 \item{minval}{list. minimum value for input parameters sampled to produce a training LUT}
 
 \item{maxval}{list. maximum value for input parameters sampled to produce a training LUT}
@@ -40,6 +53,8 @@ train_prosail_inversion(
 
 \item{ParmSet}{list. list of input parameters set to a specific value}
 
+\item{SAILversion}{character. Either 4SAIL or 4SAIL2}
+
 \item{nbSamples}{numeric. number of samples in training LUT}
 
 \item{nbSamplesPerRun}{numeric. number of training sample per individual regression model}
@@ -48,13 +63,13 @@ train_prosail_inversion(
 
 \item{Replacement}{bolean. is there replacement in subsampling?}
 
-\item{SAILversion}{character. Either 4SAIL or 4SAIL2}
-
 \item{Parms2Estimate}{list. list of input parameters to be estimated}
 
 \item{Bands2Select}{list. list of bands used for regression for each input parameter}
 
 \item{NoiseLevel}{list. list of noise value added to reflectance (defined per input parm)}
+
+\item{SRF}{list. Spectral response function}
 
 \item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
 

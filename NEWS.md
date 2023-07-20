@@ -1,3 +1,8 @@
+# prosail v1.2.4
+
+## Changes
+- added raster file path as output of function Apply_prosail_inversion. corresponds to maps of biophysical properties of interest (mean value and corresponding standard deviation)
+
 # prosail v1.2.3
 
 ## Changes

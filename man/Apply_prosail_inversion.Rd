@@ -37,7 +37,7 @@ each element of the list corresponds to a set of hybrid models for a vegetation 
 default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
 }
 \value{
-None
+res character. path for output files corresponding to biophysical properties
 }
 \description{
 This function applies SVR model on raster data in order to estimate

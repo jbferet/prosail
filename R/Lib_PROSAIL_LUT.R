@@ -10,6 +10,133 @@
 # This Library includes functions dedicated to generating PROSAIL LUTs
 # ============================================================================= =
 
+#' This function provides a LUT corresponding to PROSAIL input parameters to
+#' reproduce the distribution of parameters used in the ATBD
+#'
+#' @param nbSamples numeric. number of samples to generate
+#' @param GeomAcq list. min and max values for tts, tto and psi
+#' @param Codist_LAI boolean. set TYRUE if codistribution with LAI accounted for
+#'
+#' @return InputPROSAIL list. list of PROSAIL input parameters
+#' @importFrom truncnorm rtruncnorm
+#' @export
+
+get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TRUE){
+
+  # define paremertization for truncated gaussians
+  TgaussParms <- list()
+  TgaussParms$min <- data.frame('lai' = 0, 'LIDFa' = 30, 'q' = 0.1, 'N' = 1.2, 'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6, 'BROWN' = 0.0, 'psoil' = 0)
+  TgaussParms$max <- data.frame('lai' = 15, 'LIDFa' = 80, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85, 'BROWN' = 2.0, 'psoil' = 1)
+  TgaussParms$mean <- data.frame('lai' = 2, 'LIDFa' = 60, 'q' = 0.2, 'N' = 1.5, 'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.75, 'BROWN' = 0.0, 'psoil' = 0.25)
+  TgaussParms$sd <- data.frame('lai' = 3, 'LIDFa' = 30, 'q' = 0.5, 'N' = 0.3, 'CHL' = 30, 'LMA' = 0.005, 'Cw_rel' = 0.08, 'BROWN' = 0.30, 'psoil' = 0.6)
+
+  # get distribution corresponding to gaussians
+  InputPROSAIL <- list()
+  for (parm in names(TgaussParms$min)){
+    set.seed(42)
+    InputPROSAIL[[parm]] <- truncnorm::rtruncnorm(n = nbSamples,
+                                                  a = TgaussParms$min[[parm]], b = TgaussParms$max[[parm]],
+                                                  mean = TgaussParms$mean[[parm]], sd = TgaussParms$sd[[parm]])
+  }
+  InputPROSAIL <- data.frame(InputPROSAIL)
+
+  # define co-distribution with LAI
+  if (Codist_LAI==TRUE){
+    Codist_LAI <- list()
+    Codist_LAI$Vmin0 <- data.frame('LIDFa' = 30, 'q' = 0.1, 'N' = 1.2, 'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6, 'BROWN' = 0.0, 'psoil' = 0)
+    Codist_LAI$Vmax0 <- data.frame('LIDFa' = 80, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85, 'BROWN' = 2.0, 'psoil' = 1)
+    Codist_LAI$VminLAImax <- data.frame('LIDFa' = 55, 'q' = 0.1, 'N' = 1.3, 'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.70, 'BROWN' = 0.0, 'psoil' = 0)
+    Codist_LAI$VmaxLAImax <- data.frame('LIDFa' = 65, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.80, 'BROWN' = 0.2, 'psoil' = 0.4)
+    for (parm in names(Codist_LAI$Vmin0)){
+      Vstar <- get_codistributions(V = InputPROSAIL[[parm]],
+                                   LAI = InputPROSAIL$lai, MaxLAI = TgaussParms$max$lai,
+                                   Vmin0 = Codist_LAI$Vmin0[[parm]],
+                                   Vmax0 = Codist_LAI$Vmax0[[parm]],
+                                   VminLAImax = Codist_LAI$VminLAImax[[parm]],
+                                   VmaxLAImax = Codist_LAI$VmaxLAImax[[parm]])
+      InputPROSAIL[[parm]] <- Vstar
+    }
+  }
+
+  # convert CW_rel into EWT
+  InputPROSAIL$EWT <- ((InputPROSAIL$LMA)/(1-InputPROSAIL$Cw_rel))-InputPROSAIL$LMA
+  # set ANT, PROT and CBC to 0
+  InputPROSAIL$ANT <- InputPROSAIL$PROT <- InputPROSAIL$CBC <- 0
+  # set CAR to 0.25*CHL
+  InputPROSAIL$CAR <- 0.25*InputPROSAIL$CHL
+  # set geometry of acquisition
+  if (is.null(GeomAcq)){
+    GeomAcq <- list()
+    GeomAcq$min <- GeomAcq$max <- list()
+    GeomAcq$min$tto <- 0
+    GeomAcq$max$tto <- 10
+    GeomAcq$min$tts <- 20
+    GeomAcq$max$tts <- 30
+    GeomAcq$min$psi <- 0
+    GeomAcq$max$psi <- 360
+
+  }
+  InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq$min$tts,max=GeomAcq$max$tts)
+  InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq$min$tto,max=GeomAcq$max$tto)
+  InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq$min$psi,max=GeomAcq$max$psi)
+  return(InputPROSAIL)
+}
+
+#' This function adjusts variable values based on co-distribution rules as defined in ATBD
+#' co-distributions are all related to LAI
+#'
+#' @param V numeric.
+#' @param LAI numeric.
+#' @param MaxLAI numeric.
+#' @param Vmin0 numeric.
+#' @param Vmax0 numeric.
+#' @param VminLAImax numeric.
+#' @param VmaxLAImax numeric.
+#'
+#' @return Vstar numeric.
+#' @export
+
+get_codistributions <- function(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLAImax){
+
+  VminLAI <- Vmin0 + (LAI*(VminLAImax-Vmin0)/MaxLAI)
+  VmaxLAI <- Vmax0 + (LAI*(VmaxLAImax-Vmax0)/MaxLAI)
+  Vstar <- VminLAI+((V-Vmin0)*(VmaxLAI-VminLAI)/(Vmax0-Vmin0))
+  return(Vstar)
+}
+
+
+#' This function sets default values for PROSAIL LUT simulation when not defined by user
+#'
+#' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
+#' @param GaussianDistrib  list. Mean value and STD corresponding to the parameters sampled with gaussian distribution
+#' @param minval list. Defines the minimum value to be set for a list of parameters randomly produced
+#' @param maxval list. Defines the maximum value to be set for a list of parameters randomly produced
+#'
+#' @return res list. list of default values corresponding to NULL input parameters
+#' @export
+
+get_default_LUT_input <- function(TypeDistrib = NULL,
+                                  GaussianDistrib = NULL,
+                                  minval = NULL,
+                                  maxval = NULL){
+  # define uniform / gaussian distribution
+  if (is.null(TypeDistrib)) TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform', 'BROWN'='Uniform',
+                                                      'EWT' = 'Uniform', 'LMA' = 'Uniform', 'N' = 'Uniform',
+                                                      'psoil' = 'Uniform', 'LIDFa' = 'Uniform', 'lai' = 'Uniform', 'q'='Uniform',
+                                                      'tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
+  # define mean / sd for gaussian
+  if (is.null(GaussianDistrib)) GaussianDistrib <- list('Mean'=NULL,'Std'=NULL)
+  # define min and max values
+  if (is.null(minval)) minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.01,'ANT' = 0,'LMA' = 0.005,'N' = 1.0,'psoil' = 0.0, 'BROWN'=0.0,
+                                            'LIDFa' = 20, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = 20, 'psi' = 80)
+  if (is.null(maxval)) maxval <- data.frame('CHL'=75,'CAR'=15,'EWT' = 0.03,'ANT' = 2,'LMA' = 0.03,'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
+                                            'LIDFa' = 70, 'lai' = 7,'q'=0.2,'tto' = 5,'tts' = 30, 'psi' = 110)
+  res <- list('TypeDistrib' = TypeDistrib,
+              'GaussianDistrib' = GaussianDistrib,
+              'minval' = minval, 'maxval' = maxval)
+  return(res)
+}
+
 #' This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL
 #'
 #' @param minval list. Defines the minimum value to be set for a list of parameters randomly produced
@@ -43,7 +170,7 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
                                                                     'tts' = 'Uniform',
                                                                     'psi' = 'Uniform',
                                                                     'alpha' = 'Uniform'),
-                                           Mean = NULL,Std = NULL,Force4LowLAI=TRUE){
+                                           Mean = NULL, Std = NULL, Force4LowLAI=TRUE){
 
   # define all input parameters from PROSAIL
   InVar <- c('CHL','CAR','ANT','BROWN','EWT','LMA',
