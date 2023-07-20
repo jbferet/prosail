@@ -8,14 +8,18 @@ print(SensorName)
 SRFraw <- read.csv(Path_SRF,header = TRUE,sep = '\t')
 
 # 3- identify initial spectral sampling
-OriginalBands <- SRFraw[,1]
+Original_Bands <- SRFraw[,1]
 # 4- identify name of spectral bands for sensor
 Spectral_Bands <- colnames(SRFraw)
 Spectral_Bands <- Spectral_Bands[-1]
 # 5- check if conversion of spctral bands into numeric values
 SensorRadiometry <-SRFraw[,-1]
 SensorRadiometry <- t(SensorRadiometry)
-Sentinel_2 <- list("Spectral_Response"=SensorRadiometry, "Spectral_Bands"=Spectral_Bands,'OriginalBands'=OriginalBands)
+Central_WL <- c(492.4, 559.8, 664.6, 704.1, 740.5, 782.8, 832.8, 864.7, 1613.7, 2202.4)
+Sentinel_2 <- list('Spectral_Response' = SensorRadiometry,
+                   'Spectral_Bands' = Spectral_Bands,
+                   'Original_Bands' = Original_Bands,
+                   'Central_WL' = Central_WL)
 
 ## code to prepare `Sentinel_2_Spectral_Response` dataset goes here
 usethis::use_data(Sentinel_2,compress = 'xz',overwrite = TRUE)

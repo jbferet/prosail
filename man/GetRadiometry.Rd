@@ -6,7 +6,7 @@
 spectral response from Sentinel-2 is already defined}
 \usage{
 GetRadiometry(
-  SensorName = "MyCustomSensor",
+  SensorName = "Custom",
   SpectralProps = NULL,
   Path_SensorResponse = NULL,
   SaveSRF = TRUE
