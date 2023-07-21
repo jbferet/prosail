@@ -494,11 +494,12 @@ train_prosail_inversion <- function(InputPROSAIL = NULL,
                                     atbd = NULL, GeomAcq = NULL, Codist_LAI = TRUE,
                                     minval = NULL, maxval = NULL,
                                     TypeDistrib = NULL, GaussianDistrib = NULL,
-                                    ParmSet = NULL, SAILversion='4SAIL',
+                                    ParmSet = NULL, SAILversion = '4SAIL',
                                     nbSamples = 2000, nbSamplesPerRun = 100, nbModels = 20,
-                                    Replacement=TRUE,
+                                    Replacement = TRUE,
                                     Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
-                                    SRF = NULL, SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
+                                    SRF = NULL,
+                                    SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
                                     Path_Results = './', FigPlot = FALSE, Force4LowLAI = TRUE,
                                     method = 'liquidSVM', verbose = FALSE){
 
@@ -614,9 +615,11 @@ train_prosail_inversion <- function(InputPROSAIL = NULL,
   # apply sensor spectral response function if provided
   wvl <- SpecPROSPECT$lambda
   if (!is.null(SRF)) {
-    BRF_LUT <- applySensorCharacteristics(wvl = wvl, SRF = SRF, InRefl = BRF_LUT)
-    SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-    rownames(BRF_LUT) <- SpecSensor$BandNames
+    if (!length(SRF$Spectral_Bands)==nrow(BRF_LUT)){
+      BRF_LUT <- applySensorCharacteristics(wvl = wvl, SRF = SRF, InRefl = BRF_LUT)
+      SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+    }
+    rownames(BRF_LUT) <- SRF$Spectral_Bands
   }
 
   # write parameters LUT
