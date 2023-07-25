@@ -491,7 +491,7 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @export
 
 train_prosail_inversion <- function(InputPROSAIL = NULL,
-                                    atbd = NULL, GeomAcq = NULL, Codist_LAI = TRUE,
+                                    atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
                                     minval = NULL, maxval = NULL,
                                     TypeDistrib = NULL, GaussianDistrib = NULL,
                                     ParmSet = NULL, SAILversion = '4SAIL',
@@ -518,7 +518,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL,
   ##############################################################################
   if (!is.null(InputPROSAIL)){
     InputPROSAIL <- data.frame(InputPROSAIL)
-    if (!is.null(atbd) | !is.null(minval) | !is.null(maxval)){
+    if (atbd == FALSE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('parameters to generate BRF LUT provided by user in "InputPROSAIL"')
         message('following input variables will be ignored: "atbd" "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
