@@ -7,7 +7,7 @@ values for default parameters}
 \usage{
 train_prosail_inversion(
   InputPROSAIL = NULL,
-  atbd = NULL,
+  atbd = FALSE,
   GeomAcq = NULL,
   Codist_LAI = TRUE,
   minval = NULL,
