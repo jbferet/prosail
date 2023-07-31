@@ -42,7 +42,7 @@ However, for the sake of straightforwardness, the parameterization defined in th
 The general workflow is described in Figure 1, and will be described in details in the following tutorials.
 
 <p float="center">
-  <img src="../man/figures/Hybrid_Inversion/FlowChart_HybridInversion.tif" width="80%" />
+  <img src="../man/figures/Hybrid_Inversion/FlowChart_HybridInversion.png" width="80%" />
 </p>
 <center>
   Fig. 1. Workflow of PROSAIL hybrid inversion implemented in the package `prosail`.
