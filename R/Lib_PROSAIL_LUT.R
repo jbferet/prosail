@@ -22,7 +22,6 @@
 #' @export
 
 get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TRUE){
-
   # define paremertization for truncated gaussians
   TgaussParms <- list()
   TgaussParms$min <- data.frame('lai' = 0, 'LIDFa' = 30, 'q' = 0.1, 'N' = 1.2, 'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6, 'BROWN' = 0.0, 'psoil' = 0)
@@ -74,11 +73,13 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
     GeomAcq$max$tts <- 30
     GeomAcq$min$psi <- 0
     GeomAcq$max$psi <- 360
-
   }
   InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq$min$tts,max=GeomAcq$max$tts)
   InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq$min$tto,max=GeomAcq$max$tto)
   InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq$min$psi,max=GeomAcq$max$psi)
+  # default values
+  InputPROSAIL$TypeLidf <- 2
+  InputPROSAIL$alpha <- 40
   return(InputPROSAIL)
 }
 
@@ -119,13 +120,40 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
                                   GaussianDistrib = NULL,
                                   minval = NULL,
                                   maxval = NULL){
+
+  # define mean / sd for gaussian
+  if (is.null(GaussianDistrib)) GaussianDistrib <- list('Mean'=NULL,'Std'=NULL)
+  # check consistency between TypeDistrib and GaussianDistrib
+  if (!is.null(TypeDistrib)){
+    namesDist <- names(TypeDistrib)
+    whichGauss <- which(TypeDistrib=='Gaussian')
+    if (length(whichGauss)>0){
+      namesGauss <- names(GaussianDistrib$Mean)
+      selGauss <- namesDist[whichGauss]
+      matchGauss <- match(selGauss, namesGauss)
+      WhichMissed <- selGauss[which(is.na(matchGauss))]
+      if (length(WhichMissed)>0){
+        message(paste('missing Mean and Std for GaussianDistrib of parameter', WhichMissed))
+        stop(message('abort process'))
+      }
+    }
+  }
+
+  namesParms <- names(TypeDistrib)
+  namesMin <- names(minval)
+  namesMax <- names(maxval)
+  MatchingVars <- c(match(namesParms, namesMin), match(namesMin, namesParms),
+                    match(namesParms, namesMax), match(namesMax, namesParms),
+                    match(namesMin, namesMax), match(namesMax, namesMin))
+  if (length(which(is.na(MatchingVars)))>0){
+    message('Make sure TypeDistrib, minval and maxval share the same parameters')
+    stop(message('abort process'))
+  }
   # define uniform / gaussian distribution
   if (is.null(TypeDistrib)) TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform', 'BROWN'='Uniform',
                                                       'EWT' = 'Uniform', 'LMA' = 'Uniform', 'N' = 'Uniform',
                                                       'psoil' = 'Uniform', 'LIDFa' = 'Uniform', 'lai' = 'Uniform', 'q'='Uniform',
                                                       'tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
-  # define mean / sd for gaussian
-  if (is.null(GaussianDistrib)) GaussianDistrib <- list('Mean'=NULL,'Std'=NULL)
   # define min and max values
   if (is.null(minval)) minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.01,'ANT' = 0,'LMA' = 0.005,'N' = 1.0,'psoil' = 0.0, 'BROWN'=0.0,
                                             'LIDFa' = 20, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = 20, 'psi' = 80)
@@ -146,32 +174,27 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
 #' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
 #' @param Mean list. mean value for parameters with Gaussian distribution
 #' @param Std list. standard deviation for parameters with Gaussian distribution
-#' @param Force4LowLAI boolean. set to TRUE if needed to force distribution of leaf chemistry to low values for low LAI
 #'
 #' @return InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
 #' @importFrom stats runif rnorm sd
+#' @importFrom truncnorm rtruncnorm
 #' @export
-get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
-                                           TypeDistrib = data.frame('CHL'='Uniform',
-                                                                    'CAR'='Uniform',
-                                                                    'EWT' = 'Uniform',
-                                                                    'ANT' = 'Uniform',
-                                                                    'LMA' = 'Uniform',
-                                                                    'PROT' = 'Uniform',
-                                                                    'CBC' = 'Uniform',
-                                                                    'N' = 'Uniform',
-                                                                    'BROWN'='Uniform',
-                                                                    'psoil' = 'Uniform',
-                                                                    'LIDFa' = 'Uniform',
-                                                                    'LIDFb' = 'Uniform',
-                                                                    'lai' = 'Uniform',
-                                                                    'q'='Uniform',
-                                                                    'tto' = 'Uniform',
-                                                                    'tts' = 'Uniform',
-                                                                    'psi' = 'Uniform',
-                                                                    'alpha' = 'Uniform'),
-                                           Mean = NULL, Std = NULL, Force4LowLAI=TRUE){
+#'
 
+get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet = NULL,
+                                           nbSamples = 2000,
+                                           TypeDistrib = NULL,
+                                           Mean = NULL, Std = NULL){
+
+  if (is.null(TypeDistrib)){
+    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform',
+                              'EWT' = 'Uniform', 'LMA' = 'Uniform', 'BROWN'='Uniform',
+                              'PROT' = 'Uniform', 'CBC' = 'Uniform', 'N' = 'Uniform',
+                              'psoil' = 'Uniform', 'LIDFa' = 'Uniform',
+                              'lai' = 'Uniform', 'q'='Uniform',
+                              'tto' = 'Uniform', 'tts' = 'Uniform', 'psi' = 'Uniform')
+
+  }
   # define all input parameters from PROSAIL
   InVar <- c('CHL','CAR','ANT','BROWN','EWT','LMA',
              'PROT','CBC','N','alpha','LIDFa','LIDFb',
@@ -233,33 +256,38 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
       InputPROSAIL[[Sel]] <- array(runif(nbSamples,min = minval[1,i],max=maxval[1,i]),dim = c(nbSamples,1))
     # if Gaussian distribution
     } else if (TypeDistrib[[Sel]] == 'Gaussian'){
-      InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
-      Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
-      if (length(Elim)>0){
-        InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
-      }
-      if (length(InputPROSAIL[[Sel]])>=nbSamples){
-        InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
-      } else {
-        # repeat to get correct number of samples
-        repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
-        InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
-      }
+      set.seed(42)
+      InputPROSAIL[[Sel]] <- truncnorm::rtruncnorm(n = nbSamples,
+                                                   a = minval[[Sel]], b = maxval[[Sel]],
+                                                   mean = Mean[[Sel]], sd = Std[[Sel]])
+      # InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
+      # Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
+      # if (length(Elim)>0){
+      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
+      # }
+      # if (length(InputPROSAIL[[Sel]])>=nbSamples){
+      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
+      # } else {
+      #   # repeat to get correct number of samples
+      #   repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
+      #   InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
+      # }
       InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
-  if (Force4LowLAI==T){
-    MaxLAI <- 2
-    LowLAI <- which(InputPROSAIL$lai<MaxLAI)
-    if (length(LowLAI)>0){
-      for (BP in AllParm){
-        if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
-          InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.25*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-                                                      + InputPROSAIL$lai[LowLAI]*(0.75/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-        }
-      }
-    }
-  }
+  # # should be removed at some point
+  # if (Force4LowLAI==T){
+  #   MaxLAI <- 2
+  #   LowLAI <- which(InputPROSAIL$lai<MaxLAI)
+  #   if (length(LowLAI)>0){
+  #     for (BP in AllParm){
+  #       if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
+  #         InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.25*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+  #                                                     + InputPROSAIL$lai[LowLAI]*(0.75/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+  #       }
+  #     }
+  #   }
+  # }
   return(InputPROSAIL)
 }
 
@@ -272,36 +300,25 @@ get_distribution_input_prosail <- function(minval,maxval,ParmSet,nbSamples,
 #' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
 #' @param Mean list. mean value for parameters with Gaussian distribution
 #' @param Std list. standard deviation for parameters with Gaussian distribution
-#' @param Force4LowLAI boolean. set to TRUE if needed to force distribution of leaf chemistry to low values for low LAI
 #'
 #' @return InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
 #' @importFrom stats runif rnorm sd
+#' @importFrom truncnorm rtruncnorm
 #' @export
 get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
-                                            TypeDistrib = data.frame('CHL'='Uniform',
-                                                                     'CAR'='Uniform',
-                                                                     'EWT' = 'Uniform',
-                                                                     'ANT' = 'Uniform',
-                                                                     'LMA' = 'Uniform',
-                                                                     'PROT' = 'Uniform',
-                                                                     'CBC' = 'Uniform',
-                                                                     'N' = 'Uniform',
-                                                                     'BROWN'='Uniform',
-                                                                     'psoil' = 'Uniform',
-                                                                     'LIDFa' = 'Uniform',
-                                                                     'LIDFb' = 'Uniform',
-                                                                     'lai' = 'Uniform',
-                                                                     'q'='Uniform',
-                                                                     'tto' = 'Uniform',
-                                                                     'tts' = 'Uniform',
-                                                                     'psi' = 'Uniform',
-                                                                     'alpha' = 'Uniform',
-                                                                     'fraction_brown' = 'Uniform',
-                                                                     'diss' = 'Uniform',
-                                                                     'Cv' = 'Uniform',
-                                                                     'Zeta' = 'Uniform'),
-                                            Mean = NULL,Std = NULL,Force4LowLAI=TRUE){
+                                            TypeDistrib = NULL,
+                                            Mean = NULL,Std = NULL){
 
+  if (is.null(TypeDistrib)){
+    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform',
+                              'EWT' = 'Uniform', 'LMA' = 'Uniform', 'BROWN'='Uniform',
+                              'PROT' = 'Uniform', 'CBC' = 'Uniform', 'N' = 'Uniform',
+                              'psoil' = 'Uniform', 'LIDFa' = 'Uniform',
+                              'lai' = 'Uniform', 'q'='Uniform',
+                              'tto' = 'Uniform', 'tts' = 'Uniform', 'psi' = 'Uniform',
+                              'fraction_brown' = 'Uniform', 'diss' = 'Uniform',
+                              'Cv' = 'Uniform', 'Zeta' = 'Uniform')
+  }
   # define all input parameters from PROSAIL
   InVar <- c('CHL','CAR','ANT','BROWN','EWT','LMA',
              'PROT','CBC','N','alpha','LIDFa','LIDFb',
@@ -346,7 +363,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   # define InputPROSAIL # 1 default value
   if (length(Set2Default)>0){
     for (i in Set2Default){
-      InputPROSAIL[[i]] = array(Default[i],dim = c(nbSamples,1))
+      InputPROSAIL[[i]] <- array(Default[i],dim = c(nbSamples,1))
     }
   }
 
@@ -354,7 +371,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   if (length(ParmSet)>0){
     for (i in 1:length(ParmSet)){
       Sel <- which(InVar==names(ParmSet)[i])
-      InputPROSAIL[[Sel]] = array(ParmSet[i],dim = c(nbSamples,1))
+      InputPROSAIL[[Sel]] <- array(ParmSet[i],dim = c(nbSamples,1))
     }
   }
 
@@ -366,36 +383,41 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
       InputPROSAIL[[Sel]] <- array(runif(nbSamples,min = minval[1,i],max=maxval[1,i]),dim = c(nbSamples,1))
       # if Gaussian distribution
     } else if (TypeDistrib[[Sel]] == 'Gaussian'){
-      InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
-      Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
-      if (length(Elim)>0){
-        InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
-      }
-      if (length(InputPROSAIL[[Sel]])>=nbSamples){
-        InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
-      } else {
-        # repeat to get correct number of samples
-        repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
-        InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
-      }
+      set.seed(42)
+      InputPROSAIL[[Sel]] <- truncnorm::rtruncnorm(n = nbSamples,
+                                                   a = minval[[Sel]], b = maxval[[Sel]],
+                                                   mean = Mean[[Sel]], sd = Std[[Sel]])
+      # InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
+      # Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
+      # if (length(Elim)>0){
+      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
+      # }
+      # if (length(InputPROSAIL[[Sel]])>=nbSamples){
+      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
+      # } else {
+      #   # repeat to get correct number of samples
+      #   repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
+      #   InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
+      # }
       InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
 
-  if (Force4LowLAI==T){
-    MaxLAI <- 2
-    LowLAI <- which(InputPROSAIL$lai<MaxLAI)
-    if (length(LowLAI)>0){
-      for (BP in InVar){
-        if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
-          if (length(unique(InputPROSAIL[[BP]]))>1){
-            InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.20*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]]) +
-                                                          InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-          }
-        }
-      }
-    }
-  }
+  # # should be removed
+  # if (Force4LowLAI==T){
+  #   MaxLAI <- 2
+  #   LowLAI <- which(InputPROSAIL$lai<MaxLAI)
+  #   if (length(LowLAI)>0){
+  #     for (BP in InVar){
+  #       if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
+  #         if (length(unique(InputPROSAIL[[BP]]))>1){
+  #           InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.20*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]]) +
+  #                                                         InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
   return(InputPROSAIL)
 }
 
@@ -451,7 +473,7 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
                           BrownVegetation = BrownVegetation)
     }
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-    BRF[[i]] <-Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
+    BRF[[i]] <- Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
   }
   BRF <- do.call(cbind,BRF)
   row.names(BRF) <- BandNames
@@ -479,6 +501,3 @@ Apply_Noise_LUT <- function(LUT,NoiseLevel,NoiseType = 'relative'){
   }
   return(LUT_Noise)
 }
-
-
-
