@@ -194,6 +194,87 @@ get_HDR_name <- function(ImPath) {
   return(ImPathHDR)
 }
 
+#' generate InputPROSAIL, following
+#' - either distribution defined in ATBD
+#' - or distribution defined in user
+#'
+#' @param atbd boolean. should input parameter distribution from ATBD be applied ?
+#' @param GeomAcq list. geometry of acquisiton. list should contain min and max values for tts, tto and psi
+#' @param Codist_LAI boolean. set TYRUE if codistribution with LAI accounted for
+#' @param minval list. minimum value for input parameters sampled to produce a training LUT
+#' @param maxval list. maximum value for input parameters sampled to produce a training LUT
+#' @param TypeDistrib  list. Type of distribution. Either 'Uniform' or 'Gaussian'
+#' @param GaussianDistrib  list. Mean value and STD corresponding to the parameters sampled with gaussian distribution
+#' @param ParmSet list. list of input parameters set to a specific value
+#' @param nbSamples numeric. number of samples in training LUT
+#' @param verbose boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training
+#'
+#' @return InputPROSAIL
+#' @export
+
+get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
+                             minval = NULL, maxval = NULL,
+                             TypeDistrib = NULL, GaussianDistrib = NULL,
+                             ParmSet = NULL, nbSamples = 2000, verbose = FALSE){
+
+  # default parameter values
+  ListParms <- c('CHL', 'CAR', 'ANT', 'EWT', 'LMA', 'BROWN', 'N', 'psoil',
+                 'LIDFa', 'lai', 'q', 'tto', 'tts', 'psi')
+  defaultVal <- data.frame('CHL'=40, 'CAR'=10, 'ANT' = 0, 'EWT' = 0.01,
+                           'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5, 'psoil' = 0.5,
+                           'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1,
+                           'tto' = 0, 'tts' = 30, 'psi' = 80)
+
+  if (atbd==TRUE){
+    ##############################################################################
+    #                         distribution defined in S2 ATBD                   ##
+    ##############################################################################
+    if (!is.null(minval) | !is.null(maxval)){
+      if (verbose==TRUE){
+        message('using PROSAIL parameter distribution defined in S2 ATBD')
+        message('http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf')
+      }
+    }
+    InputPROSAIL <- get_atbd_LUT_input(nbSamples = nbSamples,
+                                       GeomAcq = GeomAcq,
+                                       Codist_LAI = Codist_LAI)
+  } else {
+    ##############################################################################
+    #                     user defined range and distribution                   ##
+    ##############################################################################
+    # check consistency between user-defined variables, use default distribution if needed
+    res <- get_default_LUT_input(TypeDistrib = TypeDistrib,
+                                 GaussianDistrib = GaussianDistrib,
+                                 minval = minval, maxval = maxval)
+    TypeDistrib <- res$TypeDistrib
+    GaussianDistrib <- res$GaussianDistrib
+    minval <- res$minval
+    maxval <- res$maxval
+
+    # fixed parameters
+    if (is.na(match('TypeLidf', names(ParmSet)))){
+      if (is.null(ParmSet)){
+        ParmSet <- data.frame('TypeLidf' = 2)
+      } else {
+        ParmSet <- data.frame(ParmSet, 'TypeLidf' = 2)
+      }
+    }
+    if (is.na(match('alpha', names(ParmSet)))){
+      if (is.null(ParmSet)){
+        ParmSet <- data.frame('alpha' = 40)
+      } else {
+        ParmSet <- data.frame(ParmSet, 'alpha' = 40)
+      }
+    }
+    # produce input parameters distribution
+    InputPROSAIL <- get_distribution_input_prosail(minval, maxval, ParmSet, nbSamples,
+                                                   TypeDistrib = TypeDistrib,
+                                                   Mean = GaussianDistrib$Mean, Std = GaussianDistrib$Std)
+  }
+  InputPROSAIL <- data.frame(InputPROSAIL)
+  return(InputPROSAIL)
+}
+
 #' This function applies the regression models trained with PROSAIL_Hybrid_Train
 #'
 #' @param RegressionModels list. List of regression models produced by PROSAIL_Hybrid_Train
@@ -456,10 +537,11 @@ split_line <- function(x, separator, trim.blank = TRUE) {
   return(value)
 }
 
-#' This function performs full training for hybrid invrsion using SVR with
+#' This function performs full training for hybrid inversion using SVR with
 #' values for default parameters
 #'
 #' @param InputPROSAIL list. user-defined list of input parameters to be used to produce a training LUT
+#' @param BRF_LUT list. user-defined BRF LUT used to run the hybrid inversion
 #' @param atbd boolean. should input parameter distribution from ATBD be applied ?
 #' @param GeomAcq list. geometry of acquisiton. list should contain min and max values for tts, tto and psi
 #' @param Codist_LAI boolean. set TYRUE if codistribution with LAI accounted for
@@ -482,7 +564,6 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
 #' @param Path_Results character. path for results
 #' @param FigPlot boolean. Set TRUE to get scatterplot of estimated biophysical variable during training step
-#' @param Force4LowLAI boolean. Set TRUE to artificially reduce leaf chemical constituent content for low LAI
 #' @param method character. which machine learning regression method should be used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #' @param verbose boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training
@@ -490,7 +571,7 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @return modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
 #' @export
 
-train_prosail_inversion <- function(InputPROSAIL = NULL,
+train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                     atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
                                     minval = NULL, maxval = NULL,
                                     TypeDistrib = NULL, GaussianDistrib = NULL,
@@ -500,32 +581,30 @@ train_prosail_inversion <- function(InputPROSAIL = NULL,
                                     Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
                                     SRF = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
-                                    Path_Results = './', FigPlot = FALSE, Force4LowLAI = TRUE,
+                                    Path_Results = './', FigPlot = FALSE,
                                     method = 'liquidSVM', verbose = FALSE){
-
-  # default parameter values
-  defaultVal <- data.frame('CHL'=40, 'CAR'=10, 'ANT' = 0, 'EWT' = 0.01, 'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5,
-                           'psoil' = 0.5, 'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1,
-                           'tto' = 0, 'tts' = 30, 'psi' = 80)
-  # fixed parameters
-  if (is.null(ParmSet)) ParmSet <- data.frame('TypeLidf' = 2, 'alpha' = 40)
 
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###     1- DEFINE THE LUT USED TO TRAIN THE HYBRID INVERSION          ###
   ### == == == == == == == == == == == == == == == == == == == == == == ###
+  # default parameter values
+  defaultVal <- data.frame('CHL'=40, 'CAR'=10, 'ANT' = 0, 'EWT' = 0.01, 'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5,
+                           'psoil' = 0.5, 'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1,
+                           'tto' = 0, 'tts' = 30, 'psi' = 80, 'TypeLidf' = 2, 'alpha' = 40)
+  ListParms <- names(defaultVal)
+
   ##############################################################################
   #                     user-defined set of input parameters                  ##
   ##############################################################################
   if (!is.null(InputPROSAIL)){
     InputPROSAIL <- data.frame(InputPROSAIL)
-    if (atbd == FALSE | !is.null(minval) | !is.null(maxval)){
+    if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('parameters to generate BRF LUT provided by user in "InputPROSAIL"')
         message('following input variables will be ignored: "atbd" "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
       }
     }
     # check if all parameters defined & use default value for undefined parameters
-    ListParms <- c('CHL', 'CAR', 'ANT', 'EWT', 'LMA', 'BROWN', 'N', 'psoil', 'LIDFa', 'lai', 'q', 'tto', 'tts', 'psi')
     UndefinedParms <- ListParms[which(is.na(match(ListParms, names(InputPROSAIL))))]
     for (parm in UndefinedParms){
       InputPROSAIL[[parm]] <- defaultVal[[parm]]
@@ -536,134 +615,93 @@ train_prosail_inversion <- function(InputPROSAIL = NULL,
         if (is.null(InputPROSAIL[[parm]])) InputPROSAIL[[parm]] <- ParmSet[[parm]]
       }
     }
-
-  ##############################################################################
-  #                         distribution defined in S2 ATBD                   ##
-  ##############################################################################
-  } else if (atbd==TRUE){
-    if (!is.null(minval) | !is.null(maxval)){
-      if (verbose==TRUE){
-        message('using PROSAIL parameter distribution defined in S2 ATBD')
-        message('http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf')
-        message('following input variables will be ignored: "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
-      }
-    }
-    InputPROSAIL <- get_atbd_LUT_input(nbSamples = nbSamples,
-                                       GeomAcq = GeomAcq,
-                                       Codist_LAI = Codist_LAI)
-    # Set parameters
-    if (length(ParmSet)>0){
-      for (parm in names(ParmSet)){
-        if (is.null(InputPROSAIL[[parm]])) InputPROSAIL[[parm]] <- ParmSet[[parm]]
-      }
-    }
-  ##############################################################################
-  #                     user defined range and distribution                   ##
-  ##############################################################################
   } else {
-    # define distribution for parameters to be sampled
-    res <- get_default_LUT_input(TypeDistrib = TypeDistrib, GaussianDistrib = GaussianDistrib,
-                                 minval = minval, maxval = maxval)
-    TypeDistrib <- res$TypeDistrib
-    GaussianDistrib <- res$GaussianDistrib
-    minval <- res$minval
-    maxval <- res$maxval
-    # produce input parameters distribution
-    if (SAILversion=='4SAIL'){
-      InputPROSAIL <- get_distribution_input_prosail(minval, maxval, ParmSet, nbSamples,
-                                                     TypeDistrib = TypeDistrib,
-                                                     Mean = GaussianDistrib$Mean, Std = GaussianDistrib$Std,
-                                                     Force4LowLAI = Force4LowLAI)
-    } else if (SAILversion=='4SAIL2'){
-      InputPROSAIL <- get_distribution_input_prosail2(minval, maxval, ParmSet, nbSamples,
-                                                      TypeDistrib = TypeDistrib,
-                                                      Mean = GaussianDistrib$Mean, Std = GaussianDistrib$Std,
-                                                      Force4LowLAI = Force4LowLAI)
-    }
-    if (SAILversion=='4SAIL2'){
-      # Definition of Cv & update LAI
-      # vegetation covers 100% surface when > MaxLAI (Cv=1)
-      MaxLAI <- min(c(maxval$lai),4)
-      InputPROSAIL$Cv <- NA*InputPROSAIL$lai
-      InputPROSAIL$Cv[which(InputPROSAIL$lai>MaxLAI)] <- 1
-      # Cv proportional to LAI when LAI < MaxLAI
-      # needs to be refined as it is very ugly, undocumented and unclear
-      InputPROSAIL$Cv[which(InputPROSAIL$lai<=MaxLAI)] <- (1/MaxLAI)+InputPROSAIL$lai[which(InputPROSAIL$lai<=MaxLAI)]/(MaxLAI+1)
-      InputPROSAIL$Cv <- InputPROSAIL$Cv*matrix(rnorm(length(InputPROSAIL$Cv),mean = 1,sd = 0.1))
-      InputPROSAIL$Cv[which(InputPROSAIL$Cv<0)] <- 0
-      InputPROSAIL$Cv[which(InputPROSAIL$Cv>1)] <- 1
-      InputPROSAIL$Cv[which(InputPROSAIL$lai>MaxLAI)] <- 1
-      InputPROSAIL$lai <- InputPROSAIL$lai*InputPROSAIL$Cv
-      # fraction of brown vegetation is not included
-      InputPROSAIL$fraction_brown <- 0+0*InputPROSAIL$lai
-      # dissociation between main vegetation and brown vegetation = 0 as fraction_brown = 0
-      InputPROSAIL$diss <- 0+0*InputPROSAIL$lai
-      # Zeta = ratio of crown diameter to crown height
-      InputPROSAIL$Zeta <- 0.2+0*InputPROSAIL$lai
-    }
+    InputPROSAIL <- get_InputPROSAIL(atbd = atbd, GeomAcq = GeomAcq, Codist_LAI = Codist_LAI,
+                                     minval = minval, maxval = maxval,
+                                     TypeDistrib = TypeDistrib, GaussianDistrib = GaussianDistrib,
+                                     ParmSet = ParmSet, nbSamples = nbSamples, verbose = verbose)
   }
 
-  # define default SpecPROSPECT, SpecSOIL and SpecATM if undefined
-  if (is.null(SpecPROSPECT)) SpecPROSPECT <- prosail::SpecPROSPECT
-  if (is.null(SpecSOIL)) SpecSOIL <- prosail::SpecSOIL
-  if (is.null(SpecATM)) SpecATM <- prosail::SpecATM
-
-  # generate LUT of BRF corresponding to InputPROSAIL, for a sensor
-  BRF_LUT <- Generate_LUT_BRF(SAILversion = SAILversion, InputPROSAIL = InputPROSAIL,
-                              SpecPROSPECT = SpecPROSPECT, SpecSOIL = SpecSOIL, SpecATM = SpecATM)
-
-  # apply sensor spectral response function if provided
-  wvl <- SpecPROSPECT$lambda
-  if (!is.null(SRF)) {
-    if (!length(SRF$Spectral_Bands)==nrow(BRF_LUT)){
-      BRF_LUT <- applySensorCharacteristics(wvl = wvl, SRF = SRF, InRefl = BRF_LUT)
-      SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+  if (!is.null(BRF_LUT)){
+    for (parm in Parms2Estimate){
+      if (!is.null(BRF_LUT[[parm]])){
+        BRF_LUT_Noise[[parm]] <- BRF_LUT[[parm]]
+      } else {
+        message('Please make sure you provide BRF_LUT as a list with elements corresponding to Parms2Estimate')
+      }
     }
-    rownames(BRF_LUT) <- SRF$Spectral_Bands
-  }
+  } else {
+    ### == == == == == == == == == == == == == == == == == == == == == == == ###
+    ### 2- PRODUCE BRF from InputPROSAIL & ddefault spectral sampling = 1nm  ###
+    ### == == == == == == == == == == == == == == == == == == == == == == == ###
+    # define default SpecPROSPECT, SpecSOIL and SpecATM if undefined
+    if (is.null(SpecPROSPECT)) SpecPROSPECT <- prosail::SpecPROSPECT
+    if (is.null(SpecSOIL)) SpecSOIL <- prosail::SpecSOIL
+    if (is.null(SpecATM)) SpecATM <- prosail::SpecATM
+    # check if same spectral sampling for all key variables
+    check_SpectralSampling(SpecPROSPECT, SpecSOIL, SpecATM)
+    # generate LUT of BRF corresponding to InputPROSAIL, for a sensor
+    BRF_LUT <- Generate_LUT_BRF(SAILversion = SAILversion,
+                                InputPROSAIL = InputPROSAIL,
+                                SpecPROSPECT = SpecPROSPECT,
+                                SpecSOIL = SpecSOIL,
+                                SpecATM = SpecATM)
 
-  # write parameters LUT
-  output <- matrix(unlist(InputPROSAIL), ncol = length(InputPROSAIL), byrow = FALSE)
-  filename <- file.path(Path_Results,'PROSAIL_LUT_InputParms.txt')
-  write.table(x = format(output, digits=3),file = filename,append = F, quote = F,
-              col.names = names(InputPROSAIL), row.names = F,sep = '\t')
-  # Write BRF LUT corresponding to parameters LUT
-  filename <- file.path(Path_Results,'PROSAIL_LUT_Reflectance.txt')
-  write.table(x = format(t(BRF_LUT), digits=5),file = filename,append = F, quote = F,
-              col.names = SpecSensor$SpecPROSPECT_Sensor$lambda, row.names = F,sep = '\t')
+    ### == == == == == == == == == == == == == == == == == == == == == == ###
+    ###     3- APPLY SPECTRAL RESPONSE FUNCTION if not already applied    ###
+    ### == == == == == == == == == == == == == == == == == == == == == == ###
+    # apply sensor spectral response function if provided
+    wvl <- SpecPROSPECT$lambda
+    if (!is.null(SRF)) {
+      if (!length(SRF$Spectral_Bands)==nrow(BRF_LUT)){
+        BRF_LUT <- applySensorCharacteristics(wvl = wvl, SRF = SRF, InRefl = BRF_LUT)
+        SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+      }
+      rownames(BRF_LUT) <- SRF$Spectral_Bands
+    }
 
-  # bands used for inversion
-  for (parm in Parms2Estimate){
-    if (is.null(Bands2Select[[parm]])) Bands2Select[[parm]] <- seq(1,length(SpecSensor$BandNames))
-  }
+    # write parameters LUT
+    output <- matrix(unlist(InputPROSAIL), ncol = length(InputPROSAIL), byrow = FALSE)
+    filename <- file.path(Path_Results,'PROSAIL_LUT_InputParms.txt')
+    write.table(x = format(output, digits=3),file = filename,append = F, quote = F,
+                col.names = names(InputPROSAIL), row.names = F,sep = '\t')
+    # Write BRF LUT corresponding to parameters LUT
+    filename <- file.path(Path_Results,'PROSAIL_LUT_Reflectance.txt')
+    write.table(x = format(t(BRF_LUT), digits=5),file = filename,append = F, quote = F,
+                col.names = SpecSensor$SpecPROSPECT_Sensor$lambda, row.names = F,sep = '\t')
 
-  ### == == == == == == == == == == == == == == == == == == == == == == ###
-  ###                     add noise to reflectance data                 ###
-  ### == == == == == == == == == == == == == == == == == == == == == == ###
-  # if NoiseLevel == NULL then use the same strategy than ATBD
-  BRF_LUT_Noise <- list()
-  if (is.null(NoiseLevel)){
-    if (SRF$Sensor=='Sentinel_2' | SRF$Sensor=='Sentinel_2A' | SRF$Sensor=='Sentinel_2B'){
-      BRF_LUT_NoiseAll <- apply_noise_atbd(BRF_LUT)
-      for (parm in Parms2Estimate) BRF_LUT_Noise[[parm]] <- BRF_LUT_NoiseAll[Bands2Select[[parm]],]
+    # bands used for inversion
+    for (parm in Parms2Estimate){
+      if (is.null(Bands2Select[[parm]])) Bands2Select[[parm]] <- seq(1,length(SpecSensor$BandNames))
+    }
+
+    ### == == == == == == == == == == == == == == == == == == == == == == ###
+    ###     4- add noise to reflectance data                              ###
+    ### == == == == == == == == == == == == == == == == == == == == == == ###
+    # if NoiseLevel == NULL then use the same strategy than ATBD
+    BRF_LUT_Noise <- list()
+    if (is.null(NoiseLevel)){
+      if (SRF$Sensor=='Sentinel_2' | SRF$Sensor=='Sentinel_2A' | SRF$Sensor=='Sentinel_2B'){
+        BRF_LUT_NoiseAll <- apply_noise_atbd(BRF_LUT)
+        for (parm in Parms2Estimate) BRF_LUT_Noise[[parm]] <- BRF_LUT_NoiseAll[Bands2Select[[parm]],]
+      } else {
+        for (parm in Parms2Estimate) {
+          NoiseLevel[[parm]] <- 0.01
+          subsetRefl <- BRF_LUT[Bands2Select[[parm]],]
+          BRF_LUT_Noise[[parm]] <- subsetRefl + subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),0,NoiseLevel[[parm]]),
+                                                                  nrow = nrow(subsetRefl))
+        }
+      }
     } else {
-      for (parm in Parms2Estimate) {
-        NoiseLevel[[parm]] <- 0.01
+      # produce LUT with noise
+      for (parm in Parms2Estimate){
+        if (is.null(NoiseLevel[[parm]])) NoiseLevel[[parm]] <- 0.01
         subsetRefl <- BRF_LUT[Bands2Select[[parm]],]
         BRF_LUT_Noise[[parm]] <- subsetRefl + subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),0,NoiseLevel[[parm]]),
                                                                 nrow = nrow(subsetRefl))
       }
     }
-
-  } else {
-    # produce LUT with noise
-    for (parm in Parms2Estimate){
-      subsetRefl <- BRF_LUT[Bands2Select[[parm]],]
-      BRF_LUT_Noise[[parm]] <- subsetRefl + subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),0,NoiseLevel[[parm]]),
-                                                              nrow = nrow(subsetRefl))
-    }
   }
-
 
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###                     PERFORM HYBRID INVERSION                      ###

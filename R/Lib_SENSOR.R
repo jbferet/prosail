@@ -237,8 +237,11 @@ applySensorCharacteristics <- function(wvl,InRefl,SRF){
     }
   }
   OutRefl <-do.call('rbind',OutRefl)
+  OutRefl <- data.frame(OutRefl)
   if (!is.null(colnames(InRefl))){
-    colnames(OutRefl) <- colnames(InRefl)
+    names(OutRefl) <- colnames(InRefl)
+  } else {
+    names(OutRefl) <- paste('sample#',seq(1:ncol(InRefl)),sep = '')
   }
   return(OutRefl)
 }
@@ -258,16 +261,10 @@ PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
   wvl <- SpecPROSPECT$lambda
   # leaf properties
   SpecPROSPECT_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-  SpecPROSPECT_Sensor <- split(SpecPROSPECT_Sensor, rep(1:ncol(SpecPROSPECT_Sensor), each = nrow(SpecPROSPECT_Sensor)))
-  names(SpecPROSPECT_Sensor)=names(SpecPROSPECT)
   # atmospheric properties
   SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
-  SpecATM_Sensor <- split(SpecATM_Sensor, rep(1:ncol(SpecATM_Sensor), each = nrow(SpecATM_Sensor)))
-  names(SpecATM_Sensor)=names(SpecATM)
   # soil properties
   SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
-  SpecSOIL_Sensor <- split(SpecSOIL_Sensor, rep(1:ncol(SpecSOIL_Sensor), each = nrow(SpecSOIL_Sensor)))
-  names(SpecSOIL_Sensor)=names(SpecSOIL)
   SpecSensor <- list('SpecPROSPECT_Sensor' = SpecPROSPECT_Sensor,
                      'SpecATM_Sensor' = SpecATM_Sensor,
                      'SpecSOIL_Sensor' = SpecSOIL_Sensor,
