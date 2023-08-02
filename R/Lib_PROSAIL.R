@@ -11,6 +11,7 @@
 # SAIL versions available are 4SAIL and 4SAIL2
 # ============================================================================= =
 
+
 #' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
 #'
 #' The direct and diffuse light are taken into account as proposed by:
@@ -58,10 +59,10 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' if TypeLidf ==1, controls the distribution's bimodality
+#' if TypeLidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -88,7 +89,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @export
 PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
                      CAR = 8.0,ANT = 0.0,BROWN = 0.0,EWT = 0.01,
-                     LMA = 0.008,PROT = 0.0,CBC = 0.0,alpha = 40.0,
+                     LMA = 0.000,PROT = 0.0,CBC = 0.0,alpha = 40.0,
                      TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,lai = NULL,
                      q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
                      fraction_brown = 0.0, diss = 0.0, Cv = 1,Zeta = 1,
@@ -200,10 +201,10 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' if TypeLidf ==1, controls the distribution's bimodality
+#' if TypeLidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -271,7 +272,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     frho <- resVolscatt$frho
     ftau <- resVolscatt$ftau
 
-    #********************************************************************************
+    # ********************************************************************************
     #*                   SUITS SYSTEM COEFFICIENTS
     #*
     #*	ks  : Extinction coefficient for direct solar flux
@@ -284,7 +285,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     #*	vf   : Scattering coefficient of upward diffuse flux in the observed direction
     #*	vb   : Scattering coefficient of downward diffuse flux in the observed direction
     #*	w   : Bidirectional scattering coefficient
-    #********************************************************************************
+    # *********************************************************************************
 
     #	Extinction coefficients
     ksli <- chi_s/cts
@@ -454,10 +455,10 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, corresponds to average leaf angle
+#' if TypeLidf ==2, controls the average leaf angle
 #' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' if TypeLidf ==1, controls the distribution's bimodality
+#' if TypeLidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param hot numeric. Hot Spot parameter = ratio of the correlation length of leaf projections in the horizontal plane and the canopy height (doi:10.1016/j.rse.2006.12.013)
 #' @param tts numeric. Sun zeith angle
@@ -1130,12 +1131,12 @@ Jfunc4 <- function(m,t){
 #' @return res list. includes chi_s, chi_o, frho, ftau
 #' @export
 volscatt  <- function(tts,tto,psi,ttl){
-  #********************************************************************************
+  # ********************************************************************************
   #*	chi_s	= interception functions
   #*	chi_o	= interception functions
   #*	frho	= function to be multiplied by leaf reflectance rho
   #*	ftau	= functions to be multiplied by leaf transmittance tau
-  #********************************************************************************
+  # ********************************************************************************
   #	Wout Verhoef, april 2001, for CROMA
 
   rd <- pi/180
@@ -1230,4 +1231,32 @@ volscatt  <- function(tts,tto,psi,ttl){
   }
   res <- list("chi_s" = chi_s,"chi_o" =chi_o,"frho" =frho,"ftau" =ftau)
   return(res)
+}
+
+
+#' check if spectral sampling is identical between SpecPROSPECT, SpecSOIL, SpecATM
+#'
+#' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
+#' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
+#' @param SpecATM list. direct and diffuse radiation for clear conditions
+#'
+#' @return invisible
+#' @export
+
+check_SpectralSampling <- function(SpecPROSPECT, SpecSOIL, SpecATM){
+  l1 <- SpecPROSPECT$lambda
+  l2 <- SpecSOIL$lambda
+  l3 <- SpecATM$lambda
+
+  if (!length(l1)==length(l2) | !length(l1)==length(l3) | !length(l3)==length(l2)){
+    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    stop()
+  } else if (length(unique(l1-l2))>1 | length(unique(l1-l3))>1 | length(unique(l3-l2))>1) {
+    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    stop()
+  } else if (!unique(l1-l2)==0 | !unique(l1-l3)==0 | !unique(l3-l2)==0){
+    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    stop()
+  }
+  return(invisible())
 }

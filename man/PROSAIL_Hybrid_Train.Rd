@@ -10,7 +10,8 @@ PROSAIL_Hybrid_Train(
   FigPlot = FALSE,
   nbEnsemble = 20,
   WithReplacement = FALSE,
-  method = "liquidSVM"
+  method = "svmRadial",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -25,7 +26,9 @@ PROSAIL_Hybrid_Train(
 \item{WithReplacement}{Boolean. should subsets be generated with or without replacement?}
 
 \item{method}{character. which machine learning regression method should be used?
-default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
+default = svmRadial, and svmLinear also available from caret package also implemented. More to come}
+
+\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT

@@ -1,6 +1,6 @@
 Package: prosail
 Title: PROSAIL leaf and canopy radiative transfer model and inversion routines
-Version: 1.2.1
+Version: 2.0.0
 Authors@R: c(person(given = "Jean-Baptiste", 
 					    family = "Feret", 
 					    email = "jb.feret@teledetection.fr", 
@@ -18,17 +18,15 @@ Depends: R (>= 3.5.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown
 Imports: 
-    expint,
     pracma,
     utils,
     raster,
     methods,
     dplyr,
-    liquidSVM,
     progress,
     matrixStats,
     ggplot2,
@@ -36,10 +34,10 @@ Imports:
     expandFunctions,
     stringr,
     XML,
-    rgdal,
     stars,
     simsalapar,
-    caret
+    caret,
+    truncnorm
 Remotes: gitlab::jbferet/prospect
 VignetteBuilder: knitr
 URL: https://gitlab.com/jbferet/prosail

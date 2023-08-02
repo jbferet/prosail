@@ -9,7 +9,7 @@ Apply_Noise_LUT(LUT, NoiseLevel, NoiseType = "relative")
 \arguments{
 \item{LUT}{numeric. Matrix including data to add noise to}
 
-\item{NoiseLevel}{numeric. value of teh normal noise proportional to LUT to apply on LUT}
+\item{NoiseLevel}{numeric. value of the normal noise proportional to LUT to apply on LUT}
 
 \item{NoiseType}{character.
 \itemize{

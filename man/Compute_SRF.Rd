@@ -4,12 +4,14 @@
 \alias{Compute_SRF}
 \title{Computes spectral response function based on wavelength and FWHM characteristics}
 \usage{
-Compute_SRF(wvl, FWHM)
+Compute_SRF(wvl, FWHM, SensorName = "Custom")
 }
 \arguments{
 \item{wvl}{numeric. spectral sampling of the sensor}
 
 \item{FWHM}{numeric. Full Width Half Maximum for each spectral band}
+
+\item{SensorName}{character. sensor name}
 }
 \value{
 SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined

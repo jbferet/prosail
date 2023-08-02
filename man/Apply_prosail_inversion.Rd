@@ -13,7 +13,7 @@ Apply_prosail_inversion(
   bandname,
   MaskRaster = FALSE,
   MultiplyingFactor = 10000,
-  method = "liquidSVM"
+  method = "svmRadial"
 )
 }
 \arguments{
@@ -34,10 +34,10 @@ each element of the list corresponds to a set of hybrid models for a vegetation 
 --> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range}
 
 \item{method}{character. which machine learning regression method should be used?
-default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
+default = svmRadial, and svmLinear also available from caret package also implemented. More to come}
 }
 \value{
-None
+res character. path for output files corresponding to biophysical properties
 }
 \description{
 This function applies SVR model on raster data in order to estimate
