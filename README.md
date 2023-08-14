@@ -35,7 +35,9 @@ When installing the master branch, please follow installation instructions provi
 ### !!! WINDOWS USERS !!!
 
 Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R library. 
-This `i386` directory should be downloaded [`here`](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) and copied into the local 'Path_For_My_R_distribution/library/liquidSVM/libs/' directory on your computer.
+This `i386` directory should be downloaded [here](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) and copied into the local directory on your computer, where the binary codes of liquidSVM are installed: 
+
+`Path_For_My_R_distribution/library/liquidSVM/libs/`.
 
 ### If liquidSVM installation fails
 Please refer to the next section and install the branch `dev_noliquidSVM`
