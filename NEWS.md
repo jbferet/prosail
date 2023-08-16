@@ -1,3 +1,42 @@
+# prosail v2.0.1
+
+## Changes
+- eliminate LMA when generating PROSAIL-PRO parameter distribution with get_distribution_input_prosail in order to avoid warnings when producing reflectance
+- function PROSAIL() : sets LMA to 0 when LMA = NULL
+
+# prosail v2.0.0
+
+## Changes
+- added possibility to use input PROSAIL distribution and noise model from ATBD when performing hybrid inversion
+- added possibility to use user defined Input PROSAIL and user defined BRF LUT
+- updated vignettes
+- removed 4SAIL2 from option for hybrid inversion, unless users provide their own input parameter distribution and BRF LUT
+
+# prosail v1.3.2
+
+## Fix
+- fixed bug occuring when atbd == NULL
+
+
+# prosail v1.3.1:
+
+## Fix
+- fixed train_prosail_inversion : systematically add name for spectral bands in BRF_LUT according to SRF when providing
+
+
+# prosail v1.3.0
+
+## Changes
+- implemented configuration described in S2 toolbox ATBD for biophysical processor (http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf)
+ - truncated gaussian distribution
+ - co-distribution with LAI
+ - additive and multiplicative noise
+- added possibility to directly provide user-defined InputPROSAIL data.frame to complement ATBD and initial minmax range and distributions
+- added spectral response for Landsat-9 & Pleiades, added central wavelength and sensor name in SRF variable
+- returning path for biophysical map products in Apply_prosail_inversion
+- removed dependency to rgdal
+- function added: apply_noise_atbd, get_atbd_LUT_input, get_codistributions, get_default_LUT_input
+
 # prosail v1.2.4
 
 ## Changes
