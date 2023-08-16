@@ -210,27 +210,33 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
                         'tts'=0,'tto'=0,'psi'=0,'psoil'=1,'TypeLidf'=2)
 
   # which input parameters should be randomly sampled?
-  ParmRand <- which(is.element(InVar,names(minval))==TRUE)
+  ParmRand <- InVar[which(is.element(InVar,names(minval))==TRUE)]
   # which input parameters should be set to a constant value?
-  ParmCte <- which(is.element(InVar,names(ParmSet))==TRUE)
+  ParmCte <- InVar[which(is.element(InVar,names(ParmSet))==TRUE)]
   # if some parameters are defined to be sampled randomly and set to constant value
   if (length(intersect(ParmRand,ParmCte))>0){
     message('WARNING: some elements are defined as parameters to sample')
     message('and parameters to set: ')
-    print(InVar[intersect(ParmRand,ParmCte)])
+    print(intersect(ParmRand,ParmCte))
     message('will be randomly sampled based on the min and max values defined by minval and maxval')
   }
   # if some parameters are neither defined as set value nor random value
   AllParm <- c(ParmRand,ParmCte)
-  FullList <- seq(1,length(InVar),by=1)
   Set2Default <- c()
-  if (length(setdiff(FullList,AllParm))>0){
+  if (length(setdiff(InVar,AllParm))>0){
+    # eliminate LMA when using PROSPECT-PRO in order to avoid warnings when generating reflectance
+    if (!is.na(match('LMA', setdiff(InVar,AllParm)))){
+      if (!is.na(match('PROT', AllParm)) | !is.na(match('CBC', AllParm))) {
+        InVar <- InVar[-which(InVar=='LMA')]
+        InputPROSAIL$LMA <- NULL
+      }
+    }
     message('WARNING: some elements are neither defined as parameters to sample')
     message('nor parameters to set: ')
-    print(InVar[setdiff(FullList,AllParm)])
+    print(setdiff(InVar,AllParm))
     message('These parameters will be set to their default value')
-    print(Default[setdiff(FullList,AllParm)])
-    Set2Default <- setdiff(FullList,AllParm)
+    print(Default[setdiff(InVar,AllParm)])
+    Set2Default <- setdiff(InVar,AllParm)
   }
 
   # define InputPROSAIL # 1 default value

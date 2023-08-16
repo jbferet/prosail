@@ -99,6 +99,7 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
   #	LEAF OPTICAL PROPERTIES	##
   ############################ #
   if (is.null(Input_PROSPECT)){
+    if (is.null(LMA)) LMA <- 0
     Input_PROSPECT = data.frame('CHL'= CHL, 'CAR'= CAR, 'ANT'=ANT, 'BROWN'= BROWN, 'EWT'=EWT,
                                 'LMA'=LMA, 'PROT'= PROT, 'CBC'= CBC, 'N'=N, 'alpha'= alpha)
   }
