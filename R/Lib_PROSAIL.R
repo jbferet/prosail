@@ -42,6 +42,76 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
   return(BRF)
 }
 
+
+#' Computes fraction of absorbed photosyntehtically active radiation fAPAR
+#'
+#' The direct and diffuse light are taken into account as proposed by:
+#' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
+#' measurements into total shortwave broadband albedo using a canopy
+#' radiative transfer model, Agronomie
+#' Es = direct
+#' Ed = diffuse
+#'
+#' @param abs_dir numeric. fraction of direct light absorbed
+#' @param abs_hem numeric. fraction of diffuse light absorbed
+#' @param tts numeric. Solar zenith angle
+#' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
+#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for computation of fAPAR
+#'
+#' @return fAPAR numeric. fAPAR
+#' @export
+Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor, PAR_range = c(400, 700)){
+
+  ############################## #
+  ##	direct / diffuse light	##
+  ############################## #
+  Es <- SpecATM_Sensor$Direct_Light
+  Ed <- SpecATM_Sensor$Diffuse_Light
+  rd <- pi/180
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  PARdiro <- (1-skyl)*Es
+  PARdifo <- skyl*Ed
+  top <- (abs_dir*PARdiro+abs_hem*PARdifo)
+  PARdomain <- which(SpecATM_Sensor$lambda >= PAR_range[1] & SpecATM_Sensor$lambda <= PAR_range[2])
+  fAPAR <- sum(top[PARdomain])/sum(PARdiro[PARdomain]+PARdifo[PARdomain])
+  return(fAPAR)
+}
+
+#' Computes albedo
+#' borrowed from python package PROSAIL developed by Jose Gomez Dans
+#'
+#' The direct and diffuse light are taken into account as proposed by:
+#' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
+#' measurements into total shortwave broadband albedo using a canopy
+#' radiative transfer model, Agronomie
+#' Es = direct
+#' Ed = diffuse
+#'
+#' @param rsdstar numeric. reflectance from direct light
+#' @param rddstar numeric. reflectance from diffuse light
+#' @param tts numeric. Solar zenith angle
+#' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
+#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for computation of albedo
+#'
+#' @return albedo numeric. albedo
+#' @export
+Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor, PAR_range = c(400, 2400)){
+
+  ############################## #
+  ##	direct / diffuse light	##
+  ############################## #
+  Es <- SpecATM_Sensor$Direct_Light
+  Ed <- SpecATM_Sensor$Diffuse_Light
+  rd <- pi/180
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  PARdiro <- (1-skyl)*Es
+  PARdifo <- skyl*Ed
+  top <- (rsdstar*PARdiro+rddstar*PARdifo)
+  albedo_domain <- which(SpecATM_Sensor$lambda >= PAR_range[1] & SpecATM_Sensor$lambda <= PAR_range[2])
+  albedo <- sum(top[albedo_domain])/sum(PARdiro[albedo_domain]+PARdifo[albedo_domain])
+  return(albedo)
+}
+
 #' Performs PROSAIL simulation based on a set of combinations of input parameters
 #' @param Spec_Sensor list. Includes optical constants required for PROSPECT
 #' refractive index, specific absorption coefficients and corresponding spectral bands
@@ -328,25 +398,25 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
   #	Here the LAI comes in
   #   Outputs for the case LAI = 0
   if (lai<0){
-    tss <- 1
-    too <- 1
-    tsstoo <- 1
-    rdd <- 0
-    tdd <- 1
-    rsd <- 0
-    tsd <- 0
-    rdo <- 0
-    tdo <- 0
-    rso <- 0
-    rsos <- 0
-    rsod <- 0
+    tss <- 1                # beam transmittance in the sun-target path.
+    too <- 1                # beam transmittance in the target-view path.
+    tsstoo <- 1             # beam transmittance in the sun-target-view path.
+    rdd <- 0                # canopy bihemispherical reflectance factor.
+    tdd <- 1                # canopy bihemispherical transmittance factor.
+    rsd <- 0                # canopy directional-hemispherical reflectance factor.
+    tsd <- 0                # canopy directional-hemispherical transmittance factor.
+    rdo <- 0                # canopy hemispherical-directional reflectance factor.
+    tdo <- 0                # canopy hemispherical-directional transmittance factor.
+    rso <- 0                # canopy bidirectional reflectance factor.
+    rsos <- 0               # single scattering contribution to rso.
+    rsod <- 0               # multiple scattering contribution to rso.
 
-    rddt <- rsoil
-    rsdt <- rsoil
-    rdot <- rsoil
-    rsodt <- 0*rsoil
-    rsost <- rsoil
-    rsot <- rsoil
+    rddt <- rsoil           # surface bihemispherical reflectance factor.
+    rsdt <- rsoil           # surface directional-hemispherical reflectance factor.
+    rdot <- rsoil           # surface hemispherical-directional reflectance factor.
+    rsodt <- 0*rsoil        # reflectance factor.
+    rsost <- rsoil          # reflectance factor.
+    rsot <- rsoil           # surface bidirectional reflectance factor.
   } else {
     #	Other cases (LAI > 0)
     e1 <- exp(-m*lai)
@@ -391,13 +461,9 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     #	Treatment of the hotspot-effect
     alf <- 1e6
     #	Apply correction 2/(K+k) suggested by F.-M. Breon
-    if (q>0){
-      alf <- (dso/q)*2./(ks+ko)
-    }
-    if (alf>200){
-      # inserted H. Bach 1/3/04
-      alf <- 200
-    }
+    if (q>0) alf <- (dso/q)*2./(ks+ko)
+    # inserted H. Bach 1/3/04
+    if (alf>200) alf <- 200
     if (alf==0){
       #	The pure hotspot - no shadow
       tsstoo <- tss
@@ -408,11 +474,9 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
       #	Integrate by exponential Simpson method in 20 steps
       #	the steps are arranged according to equal partitioning
       #	of the slope of the joint probability function
-      x1 <- 0
-      y1 <- 0
+      x1 <- y1 <- sumint <- 0
       f1 <- 1
       fint <- (1.-exp(-alf))*0.05
-      sumint <- 0
       for (i in 1:20){
         if (i<20){
           x2 <- -log(1.-i*fint)/alf
@@ -445,8 +509,24 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     rsodt <- rsod+((tss+tsd)*tdo+(tsd+tss*rsoil*rdd)*too)*rsoil/dn
     rsost <- rsos+tsstoo*rsoil
     rsot <- rsost+rsodt
+
+    # compute directional and hemispherical absorbances
+    abs_dir <- 1 - rsdt - ((1-rsoil)*tss) - (1-rsoil)*((tss*rsoil*rdd)+tsd)/dn
+    abs_hem <- 1 - rddt - ((1-rsoil)*tdd) - (1-rsoil)*(tdd*rdd*rsoil)/dn
+
+    # # compute absorbances of the isolated canopy (from J. Gomez Dans)
+    # alfas <- 1.0 - tss - tsd - rsd  # direct flux
+    # alfad <- 1.0 - tdd - rdd  # diffuse
+    # alfasx <- alfas + (rsoil * (tss + tsd) / dn) * alfad
+    # alfadx <- alfad + ((tdd * rsoil) / dn) * alfas
+
+    # compute Albedo (from J. Gomez Dans)
+    rsdstar <- rsd + (tss + tsd) * rsoil * tdd / dn
+    rddstar <- rdd + (tdd * tdd * rsoil) / dn
   }
-  my_list <- list("rdot" = rdot,"rsot" =rsot,"rddt" =rddt,"rsdt" =rsdt)
+  my_list <- list('rdot' = rdot, 'rsot' = rsot, 'rddt' = rddt, 'rsdt' = rsdt,
+                  'fCover' = 1 - too, 'abs_dir' = abs_dir, 'abs_hem' = abs_hem,
+                  'rsdstar' = rsdstar, 'rddstar' = rddstar)
   return(my_list)
 }
 
@@ -804,9 +884,11 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     # New weight function Fcdc for crown contribution (W. Verhoef, 22-05-08)
     rsoc <- Fcdc*rsot
     tssooc <- Fcd*tsstoo+Fcs*toot+Fod*tsst+Fos
+
     # Canopy absorptance for black background (W. Verhoef, 02-03-04)
     alfas <- 1.-tssc-tsdc-rsdc
     alfad <- 1.-tddc-rddct
+
     # Add the soil background
     rn <- 1-rddcb*rddsoil
     tup <- (tssc*rsdsoil+tsdc*rddsoil)/rn
@@ -820,13 +902,28 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     # Effect of soil background on canopy absorptances (W. Verhoef, 02-03-04)
     alfast <- alfas+tup*alfad
     alfadt <- alfad*(1.+tddc*rddsoil/rn)
+
+    # # compute directional and hemispherical absorbances
+    # abs_dir <- 1 - rsdt - ((1-rsoil)*tss) - (1-rsoil)*((tss*rsoil*rdd)+tsd)/dn
+    # abs_hem <- 1 - rddt - ((1-rsoil)*tdd) - (1-rsoil)*(tdd*rdd*rsoil)/dn
+
+    # # compute absorbances of the isolated canopy (from J. Gomez Dans)
+    # alfas <- 1.0 - tss - tsd - rsd  # direct flux
+    # alfad <- 1.0 - tdd - rdd  # diffuse
+    # alfasx <- alfas + (rsoil * (tss + tsd) / dn) * alfad
+    # alfadx <- alfad + ((tdd * rsoil) / dn) * alfas
+
+    # compute Albedo (from J. Gomez Dans)
+    rsdstar <- rsd + (tss + tsd) * rsoil * tdd / rn
+    rddstar <- rdd + (tdd * tdd * rsoil) / rn
+
+
   }
-  my_list <- list("rdot" = rdot,"rsot" =rsot,"rddt" =rddt,"rsdt" =rsdt,
-                  "alfast" = alfast, "alfadt" = alfadt)
+  my_list <- list('rdot' = rdot, 'rsot' = rsot, 'rddt' = rddt, 'rsdt' =rsdt,
+                  'fCover' = 1 - too, 'abs_dir' = alfast, 'abs_hem' = alfadt,
+                  'rsdstar' = rsdstar, 'rddstar' = rddstar)
   return(my_list)
 }
-
-
 
 #' computes non conservative scattering conditions
 #' @param m numeric.
