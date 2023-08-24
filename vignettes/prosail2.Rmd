@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Running `prosail` in direct mode
+## Run `prosail` in direct mode
 
 ### Input variables
 The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and expects the following input variables.
@@ -73,18 +73,17 @@ Additionally, __4SAIL2__ also includes the following parameters
 * `BrownVegetation`: optional input parameter. If user defined brown vegetation such as experimental measurements is available. If PROSPECT is used to define both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
 
 ### Output variables
-`PRO4SAIL` returns a list containing four reflectance factors 
+`PRO4SAIL` returns a list containing : 
 
 * `rddt`: bi-hemispherical reflectance factor
 * `rsdt`: directional-hemispherical reflectance factor for solar incident flux
 *	`rdot`: hemispherical-directional reflectance factor in viewing direction
 * `rsot`: bi-directional reflectance factor
-
-Additionally, __4SAIL2__ returns the two following parameters: 
-
-* `alfast`: canopy absorptance for direct solar incident flux
-* `alfadt`: canopy absorptance for hemispherical diffuse incident flux
-
+* `fcover`: Fraction of green Vegetation Cover (= 1 - beam transmittance in the target-view path)
+* `abs_dir`: canopy absorptance for direct solar incident flux
+* `abs_hem`: canopy absorptance for hemispherical diffuse incident flux
+* `rsdstar`: contribution of direct solar incident flux to albedo
+* `rddstar`: contribution of hemispherical diffuse incident flux to albedo
 
 ```{r prosail direct mode}
 library(prosail)
@@ -126,17 +125,62 @@ Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',Spec_Sensor = SpecPROSPECT,
 ```
 
 
-## Computing a simplified bidirectional reflectance factor under the assumption of clear conditions conditions
+## Compute simplified bidirectional reflectance factor (BRF) under the assumption of clear conditions conditions
 
 The function `Compute_BRF` computes the bi-directional reflectance factor in the direction of the observer, by combining both hemispherical-directional and bi-directional reflectance factors.
 The direct and diffuse light are taken into account as proposed by [Francois et al. (2002)](https://doi.org/10.1051/agro:2002033), by computing the share of diffuse flux in global radiation `skyl` based on the equation proposed by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
 
 ```{r compute BRF}
-# Ref is the variable obtained when running PRO4SAIL as in the previous illustration
+# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous illustration
 # SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF_4SAIL <-Compute_BRF(Ref_4SAIL$rdot,Ref_4SAIL$rsot,tts,SpecATM)
-BRF_4SAIL2 <-Compute_BRF(Ref_4SAIL2$rdot,Ref_4SAIL2$rsot,tts,SpecATM)
+BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot,
+                         rsot = Ref_4SAIL$rsot,
+                         tts = tts,
+                         SpecATM_Sensor = SpecATM)
+BRF_4SAIL2 <- Compute_BRF(rdot = Ref_4SAIL2$rdot,
+                          rsot = Ref_4SAIL2$rsot,
+                          tts = tts,
+                          SpecATM_Sensor = SpecATM)
 
+```
+
+## Compute fraction of absorbed photosyntehtically active radiation (fAPAR)
+
+The function `Compute_fAPAR` computes the fAPAR in the direction of the observer, by combining both canopy absorptance for direct solar incident flux and canopy absorptance for hemispherical diffuse incident flux. 
+The direct and diffuse light are taken into account as proposed by [Francois et al. (2002)](https://doi.org/10.1051/agro:2002033), by computing the share of diffuse flux in global radiation `skyl` based on the equation proposed by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
+
+```{r compute fAPAR}
+# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous illustration
+# SpecATM corresponds to the direct and diffuse radiation solar spectra
+fAPAR_4SAIL <- Compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
+                             abs_hem = Ref_4SAIL$abs_hem,
+                             tts = tts,
+                             SpecATM_Sensor = SpecATM)
+
+fAPAR_4SAIL2 <- Compute_fAPAR(abs_dir = Ref_4SAIL2$abs_dir,
+                              abs_hem = Ref_4SAIL2$abs_hem,
+                              tts = tts,
+                              SpecATM_Sensor = SpecATM)
+
+```
+
+## Compute albedo
+
+The function `Compute_albedo` computes the albedo by combining the contribution of direct solar incident flux (rsdstar) and the contribution of hemispherical diffuse incident flux (rddstar). 
+The direct and diffuse light are taken into account as proposed by [Francois et al. (2002)](https://doi.org/10.1051/agro:2002033), by computing the share of diffuse flux in global radiation `skyl` based on the equation proposed by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
+
+```{r compute albedo}
+# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous illustration
+# SpecATM corresponds to the direct and diffuse radiation solar spectra
+albedo_4SAIL <- Compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
+                               rddstar = Ref_4SAIL$rddstar,
+                               tts = tts,
+                               SpecATM_Sensor = SpecATM)
+
+albedo_4SAIL2 <- Compute_albedo(rsdstar = Ref_4SAIL2$rsdstar,
+                                rddstar = Ref_4SAIL2$rddstar,
+                                tts = tts,
+                                SpecATM_Sensor = SpecATM)
 ```
 
 ## Simulating sensor BRF

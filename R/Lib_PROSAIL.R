@@ -288,6 +288,11 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
 #' rsot: bi-directional reflectance factor
 #' rsdt: directional-hemispherical reflectance factor for solar incident flux
 #' rddt: bi-hemispherical reflectance factor
+#' fcover: Fraction of green Vegetation Cover (= 1 - beam transmittance in the target-view path)
+#' abs_dir: canopy absorptance for direct solar incident flux
+#' abs_hem: canopy absorptance for hemispherical diffuse incident flux
+#' rsdstar: contribution of direct solar incident flux to albedo
+#' rddstar: contribution of hemispherical diffuse incident flux to albedo
 #' @export
 
 fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai = NULL,
@@ -558,8 +563,12 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' rsot: bi-directional reflectance factor
 #' rsdt: directional-hemispherical reflectance factor for solar incident flux
 #' rddt: bi-hemispherical reflectance factor
-#' alfast: canopy absorptance for direct solar incident flux
-#' alfadt: canopy absorptance for hemispherical diffuse incident flux
+#' fcover: Fraction of green Vegetation Cover (= 1 - beam transmittance in the target-view path)
+#' abs_dir: canopy absorptance for direct solar incident flux
+#' abs_hem: canopy absorptance for hemispherical diffuse incident flux
+#' rsdstar: contribution of direct solar incident flux to albedo
+#' rddstar: contribution of hemispherical diffuse incident flux to albedo
+
 #' @export
 
 fourSAIL2  <- function(leafgreen, leafbrown,

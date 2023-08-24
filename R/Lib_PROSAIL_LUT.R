@@ -454,7 +454,7 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
     total = 10, clear = FALSE, width= 100)
   for (i in 1:nbSamples){
     if (i%%Split==0 & nbSamples>100){
-        pb$tick()
+      pb$tick()
     }
     rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
     # if 4SAIL
@@ -484,6 +484,81 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
   BRF <- do.call(cbind,BRF)
   row.names(BRF) <- BandNames
   return(BRF)
+}
+
+
+#' This function generates a LUT of PROSAIL outputs, including BRF, fAPAR,
+#' fCover and albedo, based on a table of input variables for PRO4SAIL model
+#'
+#' @param InputPROSAIL list. PROSAIL input variables
+#' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
+#' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
+#' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
+#' @param BandNames character. Name of the spectral bands of the sensor
+#' @param SAILversion character. choose between 4SAIL and 4SAIL2
+#' @param BrownVegetation list. Defines optical properties for brown vegetation, if not NULL
+#' - WVL, Reflectance, Transmittance
+#' - Set to NULL if use PROSPECT to generate it
+#'
+#' @return LUT numeric. list of BRF, fCover, fAPAR and albedo corresponding to InputPROSAIL
+#' @importFrom progress progress_bar
+#' @export
+
+Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
+                             SAILversion='4SAIL', BrownVegetation = NULL){
+
+  nbSamples <- length(InputPROSAIL[[1]])
+  BRF <- list()
+  fCover <- fAPAR <- albedo <- c()
+  Split <- round(nbSamples/10)
+  pb <- progress_bar$new(
+    format = "Generate LUT [:bar] :percent in :elapsed",
+    total = 10, clear = FALSE, width= 100)
+  for (i in 1:nbSamples){
+    if (i%%Split==0 & nbSamples>100){
+      pb$tick()
+    }
+    rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
+    # if 4SAIL
+    if (SAILversion=='4SAIL'){
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
+                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
+                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
+                          N = InputPROSAIL$N[[i]],
+                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
+                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
+                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil)
+    } else if (SAILversion=='4SAIL2'){
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
+                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
+                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
+                          N = InputPROSAIL$N[[i]],
+                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
+                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
+                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil,
+                          SAILversion='4SAIL2',
+                          fraction_brown = InputPROSAIL$fraction_brown[[i]], diss = InputPROSAIL$diss[[i]], Cv = InputPROSAIL$Cv[[i]],Zeta = InputPROSAIL$Zeta[[i]],
+                          BrownVegetation = BrownVegetation)
+    }
+    # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+    BRF[[i]] <- Compute_BRF(rdot = RefSAIL$rdot,
+                            rsot = RefSAIL$rsot,
+                            tts = InputPROSAIL$tts[[i]],
+                            SpecATM_Sensor = SpecATM)
+    fCover[i] <- RefSAIL$fCover
+    fAPAR[i] <- Compute_fAPAR(abs_dir = RefSAIL$abs_dir,
+                                abs_hem = RefSAIL$abs_hem,
+                                tts = InputPROSAIL$tts[[i]],
+                                SpecATM_Sensor = SpecATM)
+    albedo[i] <- Compute_albedo(rsdstar = RefSAIL$rsdstar,
+                                  rddstar = RefSAIL$rddstar,
+                                  tts = InputPROSAIL$tts[[i]],
+                                  SpecATM_Sensor = SpecATM)
+  }
+  BRF <- do.call(cbind,BRF)
+  row.names(BRF) <- BandNames
+  res <- list('BRF' = BRF, 'fCover' = fCover, 'fAPAR' = fAPAR, 'albedo' = albedo)
+  return(res)
 }
 
 #' This function applied noise on a matrix

@@ -677,11 +677,23 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
     # check if same spectral sampling for all key variables
     check_SpectralSampling(SpecPROSPECT, SpecSOIL, SpecATM)
     # generate LUT of BRF corresponding to InputPROSAIL, for a sensor
-    BRF_LUT <- Generate_LUT_BRF(SAILversion = SAILversion,
-                                InputPROSAIL = InputPROSAIL,
-                                SpecPROSPECT = SpecPROSPECT,
-                                SpecSOIL = SpecSOIL,
-                                SpecATM = SpecATM)
+    if (length(which(!is.na(match(c('fCover', 'albedo', 'fAPAR'), Parms2Estimate))))==0){
+      BRF_LUT <- Generate_LUT_BRF(SAILversion = SAILversion,
+                                  InputPROSAIL = InputPROSAIL,
+                                  SpecPROSPECT = SpecPROSPECT,
+                                  SpecSOIL = SpecSOIL,
+                                  SpecATM = SpecATM)
+    } else if (length(which(!is.na(match(c('fCover', 'albedo', 'fAPAR'), Parms2Estimate))))>0){
+      res <- Generate_LUT_PROSAIL(SAILversion = SAILversion,
+                                  InputPROSAIL = InputPROSAIL,
+                                  SpecPROSPECT = SpecPROSPECT,
+                                  SpecSOIL = SpecSOIL,
+                                  SpecATM = SpecATM)
+      BRF_LUT <- res$BRF
+      InputPROSAIL$fCover <- res$fCover
+      InputPROSAIL$fAPAR <- res$fAPAR
+      InputPROSAIL$albedo <- res$albedo
+    }
 
     ### == == == == == == == == == == == == == == == == == == == == == == ###
     ###     3- APPLY SPECTRAL RESPONSE FUNCTION if not already applied    ###

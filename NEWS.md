@@ -1,3 +1,8 @@
+# prosail v2.2.0
+
+## Changes
+- add fAPAR, albedo and fCover as possible variables to estimate from train_prosail_inversion
+
 # prosail v2.1.0
 
 ## Changes
