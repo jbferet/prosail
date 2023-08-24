@@ -49,6 +49,11 @@ rdot: hemispherical-directional reflectance factor in viewing direction
 rsot: bi-directional reflectance factor
 rsdt: directional-hemispherical reflectance factor for solar incident flux
 rddt: bi-hemispherical reflectance factor
+fcover: Fraction of green Vegetation Cover (= 1 - beam transmittance in the target-view path)
+abs_dir: canopy absorptance for direct solar incident flux
+abs_hem: canopy absorptance for hemispherical diffuse incident flux
+rsdstar: contribution of direct solar incident flux to albedo
+rddstar: contribution of hemispherical diffuse incident flux to albedo
 }
 \description{
 Performs PROSAIL simulation based on a set of combinations of input parameters

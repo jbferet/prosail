@@ -1,8 +1,23 @@
-# prosail v2.0.1
+# prosail v2.2.0
+
+## Changes
+- add fAPAR, albedo and fCover as possible variables to estimate from train_prosail_inversion
+
+# prosail v2.1.0
+
+## Changes
+- add function Compute_fAPAR and Compute_albedo to compute fAPAR and albedo
+
+# prosail v2.0.2
 
 ## Changes
 - eliminate LMA when generating PROSAIL-PRO parameter distribution with get_distribution_input_prosail in order to avoid warnings when producing reflectance
 - function PROSAIL() : sets LMA to 0 when LMA = NULL
+
+# prosail v2.0.1
+
+## Changes
+- add function apply_noise_AddMult to apply additive and multiplicative noise to reflectance LUT
 
 # prosail v2.0.0
 

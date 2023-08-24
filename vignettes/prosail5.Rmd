@@ -1,0 +1,95 @@
+---
+title: "5. Miscellaneous"
+author: "Jean-Baptiste Féret, Florian de Boissieu"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    number_sections: true
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+vignette: >
+  \usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{5. Miscellaneous}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval=FALSE
+)
+```
+
+# Additional tips when running PROSAIL
+
+### Adjust soil properties based on external source (e.g. image to process)
+
+The `prosail` package does not include an exhaustive soil database. 
+Therefore, it may be possible that soil optical properties corresponding to a scene in an optical image do not correspond to the default dry and wet soil reflectance defined as default soil properties.
+In such case, users can define soil properties based on pixels corresponding bare soil and picked in the image, assuming that these exist.
+The soil optical properties will then already have sensor spectral response. 
+In this case, if users want to define custom soil properties, they need to apply sensor response function to all optical constants used in PROSAIL.
+
+```{r simulate_LUT_Alternative}
+# apply sensor characteristics to PROSPECT optical constants
+wvl <- SpecPROSPECT$lambda
+Spec_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
+# apply sensor characteristics to atmospheric properties
+SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
+# apply sensor characteristics to soil properties
+SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
+```
+
+This conversion can also be done using a unique function `PrepareSensorSimulation`: 
+
+```{r conversion_SRF_OptCst}
+# apply sensor characteristics to PROSPECT optical constants
+PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+Spec_Sensor <- PropSensor$SpecPROSPECT_Sensor
+SpecSOIL_Sensor <- PropSensor$SpecSOIL_Sensor
+SpecATM_Sensor <- PropSensor$SpecATM_Sensor
+```
+
+... Then BRF, fAPAR and albedo can be computed based on these values:
+
+```{r Apply_SRF_Reflectance}
+# WL is a vector giving central wavelength for each band in nanometer
+# FWHM is a vector giving FWHM for each band in nanometer
+rsoil <- SpecSOIL_Sensor$Dry_Soil
+Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,
+                       CHL = 40, CAR = 10, EWT = 0.01, ANT = 0, LMA = 0.01, N = 1.5,
+                       TypeLidf = 2, LIDFa = 50, lai = 4, q = 0.1, 
+                       tts = 27, tto = 0, psi = 100, rsoil = SpecSOIL_Sensor$Dry_Soil)
+
+# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+BRF_Sensor <- Compute_BRF(rdot = Ref_Sensor$rdot, 
+                          rsot = Ref_Sensor$rsot, 
+                          tts = tts,
+                          SpecATM_Sensor = SpecATM_Sensor)
+
+# Computes fAPAR based on outputs from PROSAIL and sun position
+fAPAR_Sensor <- Compute_fAPAR(abs_dir = Ref_Sensor$abs_dir, 
+                              abs_hem = Ref_Sensor$abs_hem, 
+                              tts = tts, 
+                              SpecATM_Sensor = SpecATM_Sensor)
+
+# Computes albedo based on outputs from PROSAIL and sun position
+albedo_Sensor <- Compute_albedo(rsdstar = Ref_Sensor$rsdstar, 
+                                rddstar = Ref_Sensor$rddstar, 
+                                tts = tts,
+                                SpecATM_Sensor = SpecATM_Sensor)
+```
+
+### Use alternative implementation of machine learning algorithm for hybrid inversion
+
+The default machine learning algorithm is support vector regression from the package `liquidSVM`. However, multiple users experienced difficulties installing this package. Therefore, an alternative SVR implementation based on the package `caret` is also implemented.
+
+Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling `train_prosail_inversion` to choose between the alternative implementations. 
+
+Additional methods may be implemented with the support of users. 

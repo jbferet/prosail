@@ -121,7 +121,7 @@ SensorName <- 'Sentinel_2'
 SRF <- GetRadiometry(SensorName)
 
 # define parameters to estimate
-Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA')
+Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
 Bands2Select <- list()
@@ -162,11 +162,15 @@ InputPROSAIL <- get_InputPROSAIL(atbd = TRUE,
 
 - produce BRF LUT
 ```{r Generate_BRF_LUT_atbd}
-BRF_LUT_1nm <- Generate_LUT_BRF(SAILversion = '4SAIL',
-                                InputPROSAIL = InputPROSAIL,
-                                SpecPROSPECT = SpecPROSPECT,
-                                SpecSOIL = SpecSOIL,
-                                SpecATM = SpecATM)
+res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL',
+                            InputPROSAIL = InputPROSAIL,
+                            SpecPROSPECT = SpecPROSPECT,
+                            SpecSOIL = SpecSOIL,
+                            SpecATM = SpecATM)
+BRF_LUT_1nm <- res$BRF
+InputPROSAIL$fCover <- res$fCover
+InputPROSAIL$fAPAR <- res$fAPAR
+InputPROSAIL$albedo <- res$albedo
 ```
 
 
@@ -238,6 +242,10 @@ xylim$lai <- c(0.0,12)
 xylim$CHL <- c(20,90)
 xylim$EWT <- c(0.0,0.04)
 xylim$LMA <- c(0.003,0.011)
+xylim$fCover <- c(0,1)
+xylim$fAPAR <- c(0,1)
+xylim$albedo <- c(0,0.4)
+
 
 for (parm in Parms2Estimate){
   # create dataframe and plot results
@@ -273,8 +281,15 @@ The resulting estimated values are displayed:
   <img src="../man/figures/Hybrid_Inversion/EWT_atbd.png" width="50%" />
   <img src="../man/figures/Hybrid_Inversion/LMA_atbd.png" width="50%" />
 </p>
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/fCover_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/fAPAR_atbd.png" width="50%" />
+</p>
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/albedo_atbd.png" width="50%" />
+</p>
 <center>
-  Fig. 2. Estimation of `CHL`, `LAI`, `EWT` and `LMA` from a simulated dataset corresponding to Sentinel-2 BRF using PROSAIL-D Hybrid inversion based on bagged SVR.
+  Fig. 2. Estimation of `CHL`, `LAI`, `EWT`, `LMA`, `fCover`, `fAPAR` and `albedo` from a simulated dataset corresponding to Sentinel-2 BRF using PROSAIL-D Hybrid inversion based on bagged SVR.
 </center> 
 <p>&nbsp;</p>
 
@@ -319,7 +334,8 @@ A multiplicative noise can also be defined and applied to simulated BRF.
 ```{r user_defined_noise}
 # define noise level for each variable
 NoiseLevel <- list()
-NoiseLevel$EWT <- NoiseLevel$CHL <- NoiseLevel$LMA <- NoiseLevel$lai <- 0.02
+NoiseLevel$EWT <- NoiseLevel$CHL <- NoiseLevel$LMA <- NoiseLevel$lai <- 
+  NoiseLevel$fCover <- NoiseLevel$fAPAR <- NoiseLevel$albedo <- 0.02
 ```
 
 
@@ -348,11 +364,15 @@ InputPROSAIL <- get_InputPROSAIL(minval = minval, maxval = maxval,
 
 - produce BRF LUT
 ```{r Generate_BRF_LUT_user}
-BRF_LUT_1nm <- Generate_LUT_BRF(SAILversion = '4SAIL',
-                                InputPROSAIL = InputPROSAIL,
-                                SpecPROSPECT = SpecPROSPECT,
-                                SpecSOIL = SpecSOIL,
-                                SpecATM = SpecATM)
+res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL',
+                            InputPROSAIL = InputPROSAIL,
+                            SpecPROSPECT = SpecPROSPECT,
+                            SpecSOIL = SpecSOIL,
+                            SpecATM = SpecATM)
+BRF_LUT_1nm <- res$BRF
+InputPROSAIL$fCover <- res$fCover
+InputPROSAIL$fAPAR <- res$fAPAR
+InputPROSAIL$albedo <- res$albedo
 ```
 
 - Apply sensor SRF
@@ -418,7 +438,9 @@ xylim$lai <- c(minval$lai, maxval$lai)
 xylim$CHL <- c(minval$CHL, maxval$CHL)
 xylim$EWT <- c(minval$EWT, maxval$EWT)
 xylim$LMA <- c(minval$LMA, maxval$LMA)
-
+xylim$fCover <- c(0,1)
+xylim$fAPAR <- c(0,1)
+xylim$albedo <- c(0,0.4)
 
 for (parm in Parms2Estimate){
   # create dataframe and plot results
@@ -454,8 +476,15 @@ The resulting estimated values are displayed:
   <img src="../man/figures/Hybrid_Inversion/EWT_user.png" width="50%" />
   <img src="../man/figures/Hybrid_Inversion/LMA_user.png" width="50%" />
 </p>
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/fCover_user.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/fAPAR_user.png" width="50%" />
+</p>
+<p float="left">
+  <img src="../man/figures/Hybrid_Inversion/albedo_user.png" width="50%" />
+</p>
 <center>
-  Fig. 3. Estimation of `CHL`, `LAI`, `EWT` and `LMA` from a simulated dataset corresponding to Sentinel-2 BRF using PROSAIL-D Hybrid inversion based on bagged SVR and user defined distribution of training data.
+  Fig. 3. Estimation of `CHL`, `LAI`, `EWT`, `LMA`, `fCover`, `fAPAR` and `albedo` from a simulated dataset corresponding to Sentinel-2 BRF using PROSAIL-D Hybrid inversion based on bagged SVR and user defined distribution of training data.
 </center> 
 <p>&nbsp;</p>
 
@@ -464,51 +493,3 @@ The resulting estimated values are displayed:
 
 While __4SAIL2__ is implemented in the `prosail` package, the hybrid inversion cannot be applied directly using this version of the model. 
 It is still possible to run a hybrid inversion, if users provide their own input PROSAIL (`InputPROSAIL`) parameters and corresponding BRF LUT (`BRF_LUT`) as input variables for `train_prosail_inversion`. 
-
-
-# Additional tips
-
-The `prosail` package does not include an exhaustive soil database. 
-Therefore, it may be possible that soil optical properties corresponding to a scene in an optical image do not correspond to the default dry and wet soil reflectance defined as default soil properties.
-In such case, users can define soil properties based on pixels corresponding bare soil and picked in the image, assuming that these exist.
-The soil optical properties will then already have sensor spectral response. 
-In this case, if users want to define custom soil properties, they need to apply sensor response function to all optical constants used in PROSAIL.
-
-```{r simulate_LUT_Alternative}
-# apply sensor characteristics to PROSPECT optical constants
-wvl <- SpecPROSPECT$lambda
-Spec_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-# apply sensor characteristics to atmospheric properties
-SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
-# apply sensor characteristics to soil properties
-SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
-```
-
-This conversion can also be done using a unique function `PrepareSensorSimulation`: 
-
-```{r conversion_SRF_OptCst}
-# apply sensor characteristics to PROSPECT optical constants
-PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-Spec_Sensor <- PropSensor$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- PropSensor$SpecSOIL_Sensor
-SpecATM_Sensor <- PropSensor$SpecATM_Sensor
-```
-
-... Then BRF can be computed based on these values:
-
-```{r Apply_SRF_Reflectance}
-# WL is a vector giving central wavelength for each band in nanometer
-# FWHM is a vector giving FWHM for each band in nanometer
-rsoil <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,CHL = CHL, CAR = CAR, ANT = ANT, EWT = EWT, LMA = LMA, N = N,
-                       TypeLidf = TypeLidf,LIDFa = LIDFa,LIDFb = LIDFb,
-                       lai = lai,q = q,tts = tts,tto = tto,psi = psi,rsoil = rsoil)
-# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-BRF_Sensor <- Compute_BRF(Ref_Sensor$rdot,Ref_Sensor$rsot,tts,SpecATM_Sensor)
-```
-
-
-The default machine learning algorithm is support vector regression from the package `liquidSVM`. However, multiple users experienced difficulties installing this package. Therefore, an alternative SVR implementation based on the package `caret` is also implemented.
-
-Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling `train_prosail_inversion` to choose between the alternative implementations. 
-
