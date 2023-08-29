@@ -40,6 +40,5 @@ The SAIL model is an example of four-stream representations of the radiative tra
   <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">
 </center> 
 <center>
-  Fig. 1. Four-stream RT modeling concept as applied in SAIL model
+  Fig. 1. Four-stream RT modeling concept as applied in SAIL model ([Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844)).
 </center> 
-
