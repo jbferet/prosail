@@ -1,3 +1,8 @@
+# prosail v2.2.1
+
+## Fix
+- correct Apply_prosail_inversion so that inversion can be performed on images with file extension
+
 # prosail v2.2.0
 
 ## Changes

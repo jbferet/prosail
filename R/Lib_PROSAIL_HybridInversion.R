@@ -98,6 +98,7 @@ apply_noise_AddMult <- function(BRF_LUT,
 #' @importFrom stars read_stars
 #' @importFrom raster raster brick blockSize readStart readStop getValues writeStart writeStop writeValues
 #' @importFrom matrixStats rowSds
+#' @importFrom tools file_path_sans_ext
 #' @export
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname,
@@ -135,8 +136,8 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       total = pgbarlength, clear = FALSE, width= 100)
 
     # output files
-    BPvarpath[[parm]] <- file.path(PathOut,paste(basename(raster_path),parm,sep = '_'))
-    BPvarSDpath[[parm]] <- file.path(PathOut,paste(basename(raster_path),parm,'STD',sep = '_'))
+    BPvarpath[[parm]] <- file.path(PathOut,paste(file_path_sans_ext(basename(raster_path)),parm,sep = '_'))
+    BPvarSDpath[[parm]] <- file.path(PathOut,paste(file_path_sans_ext(basename(raster_path)),parm,'STD',sep = '_'))
     r_outMean <- writeStart(raster(raster_path), filename = BPvarpath[[parm]],format = "ENVI", overwrite = TRUE)
     r_outSD <- writeStart(raster(raster_path), filename = BPvarSDpath[[parm]],format = "ENVI", overwrite = TRUE)
     Selbands <- match(SelectedBands[[parm]],bandname)
