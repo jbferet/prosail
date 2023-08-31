@@ -39,7 +39,7 @@ Imports:
     prospect,
     XML,
     truncnorm
-Remotes: gitlab::jbferet/prospect
+Remotes: github::jbferet/prospect
 VignetteBuilder: knitr
 URL: https://gitlab.com/jbferet/prosail
 BugReports: https://gitlab.com/jbferet/prosail/issues
