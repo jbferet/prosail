@@ -65,18 +65,28 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
   InputPROSAIL$CAR <- 0.25*InputPROSAIL$CHL
   # set geometry of acquisition
   if (is.null(GeomAcq)){
-    GeomAcq <- list()
-    GeomAcq$min <- GeomAcq$max <- list()
-    GeomAcq$min$tto <- 0
-    GeomAcq$max$tto <- 10
-    GeomAcq$min$tts <- 20
-    GeomAcq$max$tts <- 30
-    GeomAcq$min$psi <- 0
-    GeomAcq$max$psi <- 360
+    GeomAcq <- data.frame('min' = c('tto' = 0, 'tts' = 20, 'psi' = 0),
+                          'max' = c('tto' = 10, 'tts' = 30, 'psi' = 360))
+    # GeomAcq <- list()
+    # GeomAcq$min <- GeomAcq$max <- list()
+    # GeomAcq$min$tto <- 0
+    # GeomAcq$max$tto <- 10
+    # GeomAcq$min$tts <- 20
+    # GeomAcq$max$tts <- 30
+    # GeomAcq$min$psi <- 0
+    # GeomAcq$max$psi <- 360
   }
-  InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq$min$tts,max=GeomAcq$max$tts)
-  InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq$min$tto,max=GeomAcq$max$tto)
-  InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq$min$psi,max=GeomAcq$max$psi)
+  if (inherits(GeomAcq, "list")){
+    GeomAcq <- data.frame('min' = c('tto' = GeomAcq$min$tto,
+                                    'tts' = GeomAcq$min$tts,
+                                    'psi' = GeomAcq$min$psi),
+                          'max' = c('tto' = GeomAcq$max$tto,
+                                    'tts' = GeomAcq$max$tts,
+                                    'psi' = GeomAcq$max$psi))
+  }
+  InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq['tts', 'min'], max = GeomAcq['tts', 'max'])
+  InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq['tto', 'min'], max = GeomAcq['tto', 'max'])
+  InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq['psi', 'min'], max = GeomAcq['psi', 'max'])
   # default values
   InputPROSAIL$TypeLidf <- 2
   InputPROSAIL$alpha <- 40

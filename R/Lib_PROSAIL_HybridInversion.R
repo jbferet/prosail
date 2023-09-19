@@ -263,9 +263,9 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
                            'tto' = 0, 'tts' = 30, 'psi' = 80)
 
   if (atbd==TRUE){
-    ##############################################################################
-    #                         distribution defined in S2 ATBD                   ##
-    ##############################################################################
+    #__________________________________________________________________________#
+    #                         distribution defined in S2 ATBD                 ##
+    #__________________________________________________________________________#
     if (!is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('using PROSAIL parameter distribution defined in S2 ATBD')
@@ -276,9 +276,9 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
                                        GeomAcq = GeomAcq,
                                        Codist_LAI = Codist_LAI)
   } else {
-    ##############################################################################
-    #                     user defined range and distribution                   ##
-    ##############################################################################
+    #__________________________________________________________________________#
+    #                     user defined range and distribution                 ##
+    #__________________________________________________________________________#
     # check consistency between user-defined variables, use default distribution if needed
     res <- get_default_LUT_input(TypeDistrib = TypeDistrib,
                                  GaussianDistrib = GaussianDistrib,
