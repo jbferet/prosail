@@ -1,3 +1,8 @@
+# prosail v2.2.2
+
+## Changes
+- change format of GeomAcq in get_atbd_LUT_input: using data.frame instead of list
+
 # prosail v2.2.1
 
 ## Fix
