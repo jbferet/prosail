@@ -11,7 +11,7 @@ fourSAIL2(
   LIDFa = NULL,
   LIDFb = NULL,
   lai = NULL,
-  hot = NULL,
+  q = NULL,
   tts = NULL,
   tto = NULL,
   psi = NULL,
@@ -23,9 +23,9 @@ fourSAIL2(
 )
 }
 \arguments{
-\item{leafgreen}{list. includes relfectance and transmittance for vegetation #1 (e.g. green vegetation)}
+\item{leafgreen}{dataframe. leaf optical properties #1 (e.g. green vegetation)}
 
-\item{leafbrown}{list. includes relfectance and transmittance for vegetation #2 (e.g. brown vegetation)}
+\item{leafbrown}{dataframe. leaf optical properties #2 (e.g. brown vegetation)}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
@@ -39,7 +39,9 @@ if TypeLidf ==2, controls the distribution's bimodality}
 
 \item{lai}{numeric. Leaf Area Index}
 
-\item{hot}{numeric. Hot Spot parameter = ratio of the correlation length of leaf projections in the horizontal plane and the canopy height (doi:10.1016/j.rse.2006.12.013)}
+\item{q}{numeric. Hot Spot parameter = ratio of the correlation length of
+leaf projections in the horizontal plane and the canopy height
+(doi:10.1016/j.rse.2006.12.013)}
 
 \item{tts}{numeric. Sun zeith angle}
 

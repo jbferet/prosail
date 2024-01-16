@@ -24,10 +24,18 @@
 get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TRUE){
   # define paremertization for truncated gaussians
   TgaussParms <- list()
-  TgaussParms$min <- data.frame('lai' = 0, 'LIDFa' = 30, 'q' = 0.1, 'N' = 1.2, 'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6, 'BROWN' = 0.0, 'psoil' = 0)
-  TgaussParms$max <- data.frame('lai' = 15, 'LIDFa' = 80, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85, 'BROWN' = 2.0, 'psoil' = 1)
-  TgaussParms$mean <- data.frame('lai' = 2, 'LIDFa' = 60, 'q' = 0.2, 'N' = 1.5, 'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.75, 'BROWN' = 0.0, 'psoil' = 0.25)
-  TgaussParms$sd <- data.frame('lai' = 3, 'LIDFa' = 30, 'q' = 0.5, 'N' = 0.3, 'CHL' = 30, 'LMA' = 0.005, 'Cw_rel' = 0.08, 'BROWN' = 0.30, 'psoil' = 0.6)
+  TgaussParms$min <- data.frame('lai' = 0, 'LIDFa' = 30, 'q' = 0.1, 'N' = 1.2,
+                                'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6,
+                                'BROWN' = 0.0, 'psoil' = 0)
+  TgaussParms$max <- data.frame('lai' = 15, 'LIDFa' = 80, 'q' = 0.5, 'N' = 1.8,
+                                'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85,
+                                'BROWN' = 2.0, 'psoil' = 1)
+  TgaussParms$mean <- data.frame('lai' = 2, 'LIDFa' = 60, 'q' = 0.2, 'N' = 1.5,
+                                 'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.75,
+                                 'BROWN' = 0.0, 'psoil' = 0.25)
+  TgaussParms$sd <- data.frame('lai' = 3, 'LIDFa' = 30, 'q' = 0.5, 'N' = 0.3,
+                               'CHL' = 30, 'LMA' = 0.005, 'Cw_rel' = 0.08,
+                               'BROWN' = 0.30, 'psoil' = 0.6)
 
   # get distribution corresponding to gaussians
   InputPROSAIL <- list()
@@ -42,13 +50,22 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
   # define co-distribution with LAI
   if (Codist_LAI==TRUE){
     Codist_LAI <- list()
-    Codist_LAI$Vmin0 <- data.frame('LIDFa' = 30, 'q' = 0.1, 'N' = 1.2, 'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6, 'BROWN' = 0.0, 'psoil' = 0)
-    Codist_LAI$Vmax0 <- data.frame('LIDFa' = 80, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85, 'BROWN' = 2.0, 'psoil' = 1)
-    Codist_LAI$VminLAImax <- data.frame('LIDFa' = 55, 'q' = 0.1, 'N' = 1.3, 'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.70, 'BROWN' = 0.0, 'psoil' = 0)
-    Codist_LAI$VmaxLAImax <- data.frame('LIDFa' = 65, 'q' = 0.5, 'N' = 1.8, 'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.80, 'BROWN' = 0.2, 'psoil' = 0.4)
+    Codist_LAI$Vmin0 <- data.frame('LIDFa' = 30, 'q' = 0.1, 'N' = 1.2,
+                                   'CHL' = 20, 'LMA' = 0.003, 'Cw_rel' = 0.6,
+                                   'BROWN' = 0.0, 'psoil' = 0)
+    Codist_LAI$Vmax0 <- data.frame('LIDFa' = 80, 'q' = 0.5, 'N' = 1.8,
+                                   'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85,
+                                   'BROWN' = 2.0, 'psoil' = 1)
+    Codist_LAI$VminLAImax <- data.frame('LIDFa' = 55, 'q' = 0.1, 'N' = 1.3,
+                                        'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.70,
+                                        'BROWN' = 0.0, 'psoil' = 0)
+    Codist_LAI$VmaxLAImax <- data.frame('LIDFa' = 65, 'q' = 0.5, 'N' = 1.8,
+                                        'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.80,
+                                        'BROWN' = 0.2, 'psoil' = 0.4)
     for (parm in names(Codist_LAI$Vmin0)){
       Vstar <- get_codistributions(V = InputPROSAIL[[parm]],
-                                   LAI = InputPROSAIL$lai, MaxLAI = TgaussParms$max$lai,
+                                   LAI = InputPROSAIL$lai,
+                                   MaxLAI = TgaussParms$max$lai,
                                    Vmin0 = Codist_LAI$Vmin0[[parm]],
                                    Vmax0 = Codist_LAI$Vmax0[[parm]],
                                    VminLAImax = Codist_LAI$VminLAImax[[parm]],
@@ -84,17 +101,20 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
                                     'tts' = GeomAcq$max$tts,
                                     'psi' = GeomAcq$max$psi))
   }
-  InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq['tts', 'min'], max = GeomAcq['tts', 'max'])
-  InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq['tto', 'min'], max = GeomAcq['tto', 'max'])
-  InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq['psi', 'min'], max = GeomAcq['psi', 'max'])
+  InputPROSAIL$tts <- runif(n = nbSamples, min = GeomAcq['tts', 'min'],
+                            max = GeomAcq['tts', 'max'])
+  InputPROSAIL$tto <- runif(n = nbSamples, min = GeomAcq['tto', 'min'],
+                            max = GeomAcq['tto', 'max'])
+  InputPROSAIL$psi <- runif(n = nbSamples, min = GeomAcq['psi', 'min'],
+                            max = GeomAcq['psi', 'max'])
   # default values
   InputPROSAIL$TypeLidf <- 2
   InputPROSAIL$alpha <- 40
   return(InputPROSAIL)
 }
 
-#' This function adjusts variable values based on co-distribution rules as defined in ATBD
-#' co-distributions are all related to LAI
+#' This function adjusts variable values based on co-distribution rules as
+#' defined in ATBD co-distributions are all related to LAI
 #'
 #' @param V numeric.
 #' @param LAI numeric.
@@ -160,15 +180,25 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
     stop(message('abort process'))
   }
   # define uniform / gaussian distribution
-  if (is.null(TypeDistrib)) TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform', 'BROWN'='Uniform',
-                                                      'EWT' = 'Uniform', 'LMA' = 'Uniform', 'N' = 'Uniform',
-                                                      'psoil' = 'Uniform', 'LIDFa' = 'Uniform', 'lai' = 'Uniform', 'q'='Uniform',
-                                                      'tto' = 'Uniform','tts' = 'Uniform', 'psi' = 'Uniform')
+  if (is.null(TypeDistrib))
+    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform',
+                              'BROWN'='Uniform', 'EWT' = 'Uniform',
+                              'LMA' = 'Uniform', 'N' = 'Uniform',
+                              'psoil' = 'Uniform', 'LIDFa' = 'Uniform',
+                              'lai' = 'Uniform', 'q'='Uniform',
+                              'tto' = 'Uniform','tts' = 'Uniform',
+                              'psi' = 'Uniform')
   # define min and max values
-  if (is.null(minval)) minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.01,'ANT' = 0,'LMA' = 0.005,'N' = 1.0,'psoil' = 0.0, 'BROWN'=0.0,
-                                            'LIDFa' = 20, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = 20, 'psi' = 80)
-  if (is.null(maxval)) maxval <- data.frame('CHL'=75,'CAR'=15,'EWT' = 0.03,'ANT' = 2,'LMA' = 0.03,'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
-                                            'LIDFa' = 70, 'lai' = 7,'q'=0.2,'tto' = 5,'tts' = 30, 'psi' = 110)
+  if (is.null(minval))
+    minval <- data.frame('CHL' = 10, 'CAR' = 0, 'EWT' = 0.01, 'ANT' = 0,
+                         'LMA' = 0.005, 'N' = 1.0, 'psoil' = 0.0, 'BROWN'=0.0,
+                         'LIDFa' = 20, 'lai' = 0.5, 'q'=0.1, 'tto' = 0,
+                         'tts' = 20, 'psi' = 80)
+  if (is.null(maxval))
+    maxval <- data.frame('CHL' = 75, 'CAR' = 15, 'EWT' = 0.03, 'ANT' = 2,
+                         'LMA' = 0.03, 'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
+                         'LIDFa' = 70, 'lai' = 7, 'q'=0.2, 'tto' = 5,
+                         'tts' = 30, 'psi' = 110)
   res <- list('TypeDistrib' = TypeDistrib,
               'GaussianDistrib' = GaussianDistrib,
               'minval' = minval, 'maxval' = maxval)
@@ -210,14 +240,19 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
              'PROT','CBC','N','alpha','LIDFa','LIDFb',
              'lai','q','tts','tto','psi','psoil','TypeLidf')
 
-  InputPROSAIL <- list('CHL'=c(),'CAR'=c(),'ANT'=c(),'BROWN'=c(),'EWT'=c(),
-                       'LMA'=c(),'PROT'=c(),'CBC'=c(),'N'=c(),'alpha'=c(),
-                       'LIDFa'=c(),'LIDFb'=c(),'lai'=c(),'q'=c(),
-                       'tts'=c(),'tto'=c(),'psi'=c(),'psoil'=c(),'TypeLidf'=c())
-  Default <- data.frame('CHL'=0,'CAR'=0,'ANT'=0,'BROWN'=0,'EWT'=0,
-                        'LMA'=0,'PROT'=0,'CBC'=0,'N'=1.5,'alpha'=40,
-                        'LIDFa'=0,'LIDFb'=0,'lai'=2,'q'=0,
-                        'tts'=0,'tto'=0,'psi'=0,'psoil'=1,'TypeLidf'=2)
+  fillNA <- NA*vector(length = nbSamples)
+  InputPROSAIL <- data.frame('CHL' = fillNA, 'CAR' = fillNA, 'ANT' = fillNA,
+                             'BROWN' = fillNA, 'EWT' = fillNA, 'LMA' = fillNA,
+                             'PROT' = fillNA, 'CBC' = fillNA, 'N' = fillNA,
+                             'alpha' = fillNA, 'LIDFa' = fillNA,
+                             'LIDFb' = fillNA, 'lai' = fillNA, 'q' = fillNA,
+                             'tts' = fillNA, 'tto' = fillNA, 'psi' = fillNA,
+                             'psoil' = fillNA, 'TypeLidf' = fillNA)
+  Default <- data.frame('CHL' = 0, 'CAR' = 0, 'ANT' = 0, 'BROWN' = 0, 'EWT' = 0,
+                        'LMA' = 0, 'PROT' = 0, 'CBC' = 0, 'N' = 1.5,
+                        'alpha' = 40, 'LIDFa' = 0, 'LIDFb' = 0, 'lai' = 2,
+                        'q' = 0, 'tts' = 0, 'tto' = 0, 'psi' = 0, 'psoil' = 1,
+                        'TypeLidf' = 2)
 
   # which input parameters should be randomly sampled?
   ParmRand <- InVar[which(is.element(InVar,names(minval))==TRUE)]
@@ -252,7 +287,7 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
   # define InputPROSAIL # 1 default value
   if (length(Set2Default)>0){
     for (i in Set2Default){
-      InputPROSAIL[[i]] = array(Default[i],dim = c(nbSamples,1))
+      InputPROSAIL[[i]] = Default[,i]
     }
   }
 
@@ -260,7 +295,7 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
   if (length(ParmSet)>0){
     for (i in 1:length(ParmSet)){
       Sel <- which(InVar==names(ParmSet)[i])
-      InputPROSAIL[[Sel]] = array(ParmSet[i],dim = c(nbSamples,1))
+      InputPROSAIL[[Sel]] = ParmSet[,i]
     }
   }
 
@@ -269,7 +304,7 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
     Sel <- names(minval)[i]
     # if uniform distribution
     if (TypeDistrib[[Sel]] == 'Uniform'){
-      InputPROSAIL[[Sel]] <- array(runif(nbSamples,min = minval[1,i],max=maxval[1,i]),dim = c(nbSamples,1))
+      InputPROSAIL[[Sel]] <- runif(nbSamples, min = minval[1,i], max=maxval[1,i])
     # if Gaussian distribution
     } else if (TypeDistrib[[Sel]] == 'Gaussian'){
       set.seed(42)
@@ -288,7 +323,7 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
       #   repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
       #   InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
       # }
-      InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
+      # InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
   # # should be removed at some point
@@ -379,7 +414,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   # define InputPROSAIL # 1 default value
   if (length(Set2Default)>0){
     for (i in Set2Default){
-      InputPROSAIL[[i]] <- array(Default[i],dim = c(nbSamples,1))
+      InputPROSAIL[[i]] <- Default[,i]
     }
   }
 
@@ -387,7 +422,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   if (length(ParmSet)>0){
     for (i in 1:length(ParmSet)){
       Sel <- which(InVar==names(ParmSet)[i])
-      InputPROSAIL[[Sel]] <- array(ParmSet[i],dim = c(nbSamples,1))
+      InputPROSAIL[[Sel]] <- ParmSet[,i]
     }
   }
 
@@ -437,6 +472,75 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   return(InputPROSAIL)
 }
 
+#' This function generates a LUT of 4SAIL outputs based on a table of input variables for PRO4SAIL model
+#'
+#' @param InputPROSAIL list. PROSAIL input variables
+#' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
+#' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
+#' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
+#' @param BandNames character. Name of the spectral bands of the sensor
+#' @param SAILversion character. choose between 4SAIL and 4SAIL2
+#' @param BrownLOP list. Defines optical properties for brown vegetation, if not NULL
+#' - WVL, Reflectance, Transmittance
+#' - Set to NULL if use PROSPECT to generate it
+#'
+#' @return 4SAIL_LUT numeric. matrix of 4SAIL outputs (rdot, rsot, rsdt, rddt)
+#' corresponding to InputPROSAIL
+#'
+#' @importFrom progress progress_bar
+#' @export
+
+Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
+                               SAILversion='4SAIL', BrownLOP = NULL){
+
+  nbSamples <- length(InputPROSAIL[[1]])
+  rdot <- rsot <- rsdt <- rddt <-  BRF <- list()
+  Split <- round(nbSamples/10)
+  pb <- progress_bar$new(
+    format = "Generate LUT [:bar] :percent in :elapsed",
+    total = 10, clear = FALSE, width= 100)
+  for (i in 1:nbSamples){
+    if (i%%Split==0 & nbSamples>100){
+      pb$tick()
+    }
+    rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
+    # if 4SAIL
+    if (SAILversion=='4SAIL'){
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL[i,]$TypeLidf,
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
+    } else if (SAILversion=='4SAIL2'){
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL[i,]$TypeLidf,
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
+                          SAILversion = '4SAIL2',
+                          fraction_brown = InputPROSAIL[i,]$fraction_brown,
+                          diss = InputPROSAIL[i,]$diss, Cv = InputPROSAIL[i,]$Cv,
+                          Zeta = InputPROSAIL[i,]$Zeta, BrownLOP = BrownLOP)
+    }
+    rdot[[i]] <- RefSAIL$rdot
+    rsot[[i]] <- RefSAIL$rsot
+    rsdt[[i]] <- RefSAIL$rsdt
+    rddt[[i]] <- RefSAIL$rddt
+    # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+    BRF[[i]] <- Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
+  }
+  BRF <- do.call(cbind,BRF)
+  rdot <- do.call(cbind,rdot)
+  rsot <- do.call(cbind,rsot)
+  rsdt <- do.call(cbind,rsdt)
+  rddt <- do.call(cbind,rddt)
+  row.names(BRF) <- row.names(rdot) <- row.names(rsot) <- row.names(rsdt) <- row.names(rddt) <- BandNames
+  return(list('BRF' = BRF, 'rdot' = rdot, 'rsot' = rsot, 'rsdt' = rsdt, 'rddt' = rddt))
+}
+
+
 #' This function generates a LUT of BRF based on a table of input variables for PRO4SAIL model
 #'
 #' @param InputPROSAIL list. PROSAIL input variables
@@ -445,7 +549,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
 #' @param BandNames character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
-#' @param BrownVegetation list. Defines optical properties for brown vegetation, if not NULL
+#' @param BrownLOP list. Defines optical properties for brown vegetation, if not NULL
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
@@ -454,7 +558,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 #' @export
 
 Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
-                             SAILversion='4SAIL', BrownVegetation = NULL){
+                             SAILversion='4SAIL', BrownLOP = NULL){
 
   nbSamples <- length(InputPROSAIL[[1]])
   BRF <- list()
@@ -466,27 +570,26 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
     if (i%%Split==0 & nbSamples>100){
       pb$tick()
     }
-    rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
+    rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
-                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
-                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
-                          N = InputPROSAIL$N[[i]],
-                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
-                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
-                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil)
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL[i,]$TypeLidf,
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
-                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
-                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
-                          N = InputPROSAIL$N[[i]],
-                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
-                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
-                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil,
-                          SAILversion='4SAIL2',
-                          fraction_brown = InputPROSAIL$fraction_brown[[i]], diss = InputPROSAIL$diss[[i]], Cv = InputPROSAIL$Cv[[i]],Zeta = InputPROSAIL$Zeta[[i]],
-                          BrownVegetation = BrownVegetation)
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL[i,]$TypeLidf,
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
+                          SAILversion = '4SAIL2',
+                          fraction_brown = InputPROSAIL[i,]$fraction_brown,
+                          diss = InputPROSAIL[i,]$diss, Cv = InputPROSAIL[i,]$Cv,
+                          Zeta = InputPROSAIL[i,]$Zeta, BrownLOP = BrownLOP)
     }
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
     BRF[[i]] <- Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
@@ -506,7 +609,7 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
 #' @param SpecATM list. Includes direct and diffuse radiation for clear conditions
 #' @param BandNames character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
-#' @param BrownVegetation list. Defines optical properties for brown vegetation, if not NULL
+#' @param BrownLOP list. Defines optical properties for brown vegetation, if not NULL
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
@@ -514,8 +617,9 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
 #' @importFrom progress progress_bar
 #' @export
 
-Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
-                             SAILversion='4SAIL', BrownVegetation = NULL){
+Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT,
+                                 SpecSOIL, SpecATM, BandNames = NULL,
+                                 SAILversion='4SAIL', BrownLOP = NULL){
 
   nbSamples <- length(InputPROSAIL[[1]])
   BRF <- list()
@@ -528,27 +632,26 @@ Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, 
     if (i%%Split==0 & nbSamples>100){
       pb$tick()
     }
-    rsoil <- InputPROSAIL$psoil[[i]]*SpecSOIL$Dry_Soil+(1-InputPROSAIL$psoil[[i]])*SpecSOIL$Wet_Soil
+    rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
-                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
-                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
-                          N = InputPROSAIL$N[[i]],
-                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
-                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
-                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil)
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL$TypeLidf[i],
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,CHL = InputPROSAIL$CHL[[i]], CAR = InputPROSAIL$CAR[[i]],
-                          ANT = InputPROSAIL$ANT[[i]], EWT = InputPROSAIL$EWT[[i]], LMA = InputPROSAIL$LMA[[i]],
-                          PROT = InputPROSAIL$PROT[[i]], CBC = InputPROSAIL$CBC[[i]], BROWN = InputPROSAIL$BROWN[[i]],
-                          N = InputPROSAIL$N[[i]],
-                          TypeLidf = InputPROSAIL$TypeLidf[[i]],LIDFa = InputPROSAIL$LIDFa[[i]],LIDFb = InputPROSAIL$LIDFb[[i]],
-                          lai = InputPROSAIL$lai[[i]],q = InputPROSAIL$q[[i]],
-                          tts = InputPROSAIL$tts[[i]],tto = InputPROSAIL$tto[[i]],psi = InputPROSAIL$psi[[i]],rsoil = rsoil,
-                          SAILversion='4SAIL2',
-                          fraction_brown = InputPROSAIL$fraction_brown[[i]], diss = InputPROSAIL$diss[[i]], Cv = InputPROSAIL$Cv[[i]],Zeta = InputPROSAIL$Zeta[[i]],
-                          BrownVegetation = BrownVegetation)
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+                          TypeLidf = InputPROSAIL[i,]$TypeLidf,
+                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
+                          tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
+                          psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
+                          SAILversion = '4SAIL2',
+                          fraction_brown = InputPROSAIL[i,]$fraction_brown,
+                          diss = InputPROSAIL[i,]$diss, Cv = InputPROSAIL[i,]$Cv,
+                          Zeta = InputPROSAIL[i,]$Zeta, BrownLOP = BrownLOP)
     }
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
     BRF[[i]] <- Compute_BRF(rdot = RefSAIL$rdot,

@@ -27,14 +27,26 @@ knitr::opts_chunk$set(
 ```
 
 
-This tutorial briefly describes the different functionalities of the R package `prosail`, based on the canopy reflectance model __4SAIL__ coupled with the leaf model __PROSPECT__.
-The package `prosail` includes the package `prospect`, so please check the brief tutorial from [this package](https://jbferet.gitlab.io/prospect/) if you need specific information on __PROSPECT__.
+This tutorial briefly describes the different functionalities of the R package 
+`prosail`, based on the canopy reflectance model __4SAIL__ coupled with the leaf 
+model __PROSPECT__.
+The package `prosail` includes the package `prospect`, so please check the brief 
+tutorial from [this package](https://jbferet.gitlab.io/prospect/) if you need 
+specific information on __PROSPECT__.
 
 The current version of the model PROSPECT implemented in `prosail` is __PROSPECT-PRO__.
 
-There are currently two versions of the model SAIL implemented in `prosail`:  __4SAIL__ and __4SAIL2__. 
+There are currently two versions of the model SAIL implemented in `prosail`: 
+__4SAIL__ and __4SAIL2__. 
 
-The SAIL model is an example of four-stream representations of the radiative transfer equation, in which case one distinguishes two direct fluxes (incident solar flux and radiance in the viewing direction) and two diffuse fluxes (upward and downward hemispherical flux). Detailed description of the functioning of the different SAIL versions can be found in [Verhoef & Bach, 2007](https://doi.org/10.1016/j.rse.2006.12.013) and [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which th figure below is taken.
+The SAIL model is an example of four-stream representations of the radiative 
+transfer equation, in which case one distinguishes two direct fluxes (incident 
+solar flux and radiance in the viewing direction) and two diffuse fluxes 
+(upward and downward hemispherical flux). 
+Detailed description of the functioning of the different SAIL versions can be 
+found in [Verhoef & Bach, 2007](https://doi.org/10.1016/j.rse.2006.12.013) and 
+[Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which the
+figure below is borrowed.
 
 <center>
   <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">

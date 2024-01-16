@@ -26,52 +26,80 @@ knitr::opts_chunk$set(
 )
 ```
 
-This tutorial is based on the estimation of vegetation properties from Sentinel-2 data and `prosail` hybrid inversion. It provides the full framework step by step, from Sentinel-2 data download to image preprocessing and masking, to the training of a hybrid model to the application of the model on an image. 
+This tutorial is based on the estimation of vegetation properties from 
+Sentinel-2 data and `prosail` hybrid inversion. 
+It provides the full framework step by step, including Sentinel-2 data download, 
+image preprocessing and masking, hybrid model training, and the application of 
+the model on an image. 
 
 
 # Identifying and downloading Sentinel-2 images
 
-In the present situation, we are interested in downloading a unique Sentinel-2 image with no cloud cover for an illustration of the package. 
-We selected the Barrax area in Spain, as it is a well-known study area for application using remote sensing for crop monitoring. 
+The Sentinel-2 acquisition corresponds to the Barrax area in Spain. 
+Barrax is a well-studied area for remote sensing applications on crop monitoring. 
+A polygon corresponding to the study area can be downloaded from a repository. 
 
-First, we used [Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) in order to identify an acquisition corresponding to our requirement. 
+```{r identify_S2_product}
+# library
+library(zip)
+# define data directory
+Path_Data <- '01_DATA'
+dir.create(Path_Data,showWarnings = F, recursive = T)
+# name zip file including plots located on the tile
+destzip <- file.path(Path_Data,'Study_area_Barrax.zip')
+# url for the zip file
+url <- 'https://gitlab.com/jbferet/myshareddata/-/raw/master/preprocS2_Example/Study_area_Barrax.zip'
+download.file(url = url, destfile = destzip)
+destunz <- file.path(Path_Data,'Study_area_Barrax')
+unzip(zipfile = destzip,exdir = destunz)
+```
 
-Once the S2 tile and the date of acquisition were identified, we could proceed to the image download. 
-We first defined a polygon corresponding to our study area, named 'Study_area_Barrax.shp' and saved on our computer. 
+[Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) 
+is then used in order to identify an acquisition with minimum cloud cover.
 
-We then used the R package [`sen2r`](https://sen2r.ranghetti.info/) in order to identify S2 product available for a specific date of acquisition, and download the corresponding Sentinel-2 SAFE archive. Here, level-2A images (atmospherically corrected with Sen2Cor) can be downloaded directly from [SciHub](https://scihub.copernicus.eu) with sen2r.
+Once a date of acquisition is identified, the S2 product is then downloaded. 
+The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used 
+in order to identify the S2 product available for the date of acquisition over 
+the study area, and to download the corresponding Sentinel-2 SAFE archive from 
+the google Cloud Sentinel-2 bucket.
+`preprocS2` is based on the R package [`sen2r`](https://sen2r.ranghetti.info/). 
+
+__WARNING#1: [sen2r](https://github.com/ranghetti/sen2r/issues/464) is no longer maintained.__
+__WARNING#2: Users are required to download S2 images from the Google Cloud Sentinel-2 bucket.__ 
 
 
-```{r download_S2_image}
-library(sen2r)
+```{r download_S2_product}
+library(preprocS2)
 # define date of S2 acquisition
-dateAcq <- '2021-05-13'
-time_window <- as.Date(c(dateAcq, dateAcq))
+dateAcq <- '2022-05-28'
 # define path for study area
-path_vector <- '../DATA/Study_area_Barrax.shp'
-# get product name corresponding to Barrax 
-list_safe <- s2_list(spatial_extent = sf::st_read(dsn = path_vector), time_interval = time_window)
+path_vector <- '01_DATA/Study_area_Barrax/Study_area_Barrax.shp'
 # define output directory where SAFE zipfile is stored
-DirWrite <- '../DATA/S2_Images'
-s2_download(list_safe, outdir=DirWrite)
-
+DirWrite <- '01_DATA/S2_Images'
+dir.create(DirWrite,showWarnings = F, recursive = T)
+# download Sentinel-2 image corresponding to study area and date of acquisition 
+Path_S2 <- get_S2_L2A_Image(l2a_path = DirWrite, 
+                            spatial_extent = path_vector, 
+                            dateAcq = dateAcq)
 ```
 
 # Preprocess S2 image
 
-Once the SAFE S2 image is downloaded, the R package [`preprocS2`](https://jbferet.gitlab.io/preprocS2/index.html) is used to stack individual bands, crop to required extent defined by the vector file, produce a binary cloud mask and save in the desired raster format.
+Once the SAFE S2 image is downloaded, the R package 
+[`preprocS2`](https://jbferet.gitlab.io/preprocS2/index.html) is used to stack 
+individual bands, crop to required extent defined by the vector file, produce a 
+binary cloud mask and save in the desired raster format.
 
-The function `extract_from_S2_L2A` performs cropping and resampling to 10m if needed, and provides a stars object as output, along with location for metadata and image full name.
+The function `extract_from_S2_L2A` performs cropping and resampling to 10m if 
+needed, and provides a stars object as output, along with location for metadata 
+and image full name.
 
 ```{r preprocess_S2}
-library(preprocS2)
 ##____________________________________________________________________##
 ##        Define where data is stored and where to write results      ##
 ##--------------------------------------------------------------------##
-# define raster path
-Path_S2 <- file.path(DirWrite,list.files(DirWrite,pattern = '.SAFE'))
 # Result directory
-result_path <- '../RESULTS'
+result_path <- '03_RESULTS'
 dir.create(path = result_path,showWarnings = FALSE,recursive = TRUE)
 
 ##____________________________________________________________________##
@@ -85,16 +113,15 @@ S2obj <- preprocS2::extract_from_S2_L2A(Path_dir_S2 = Path_S2,
                                         path_vector = path_vector,
                                         S2source = S2source,
                                         resolution = resolution)
-
 # update shapefile if needed (reprojection)
 path_vector <- S2obj$path_vector
-
 ```
 
 
 # Write reflectance, cloud mask and metadata
 
-Once the image is read, it can be written as stacked raster file, and stored with the binary cloud mask and the metadata file. 
+Once the image is read, it can be written as stacked raster file, and stored 
+with the binary cloud mask and the metadata file. 
 
 ```{r write_raster}
 # create specific result directory corresponding to granule name
@@ -109,6 +136,7 @@ dir.create(path = Cloud_path,showWarnings = FALSE,recursive = TRUE)
 # Filename for cloud mask
 cloudmasks <- preprocS2::save_cloud_s2(S2_stars = S2obj$S2_Stack,
                                        Cloud_path = Cloud_path,
+                                       footprint = path_vector,
                                        S2source = S2source, SaveRaw = T)
 ##____________________________________________________________________##
 ##                        Write REFLECTANCE                           ##
@@ -134,17 +162,18 @@ preprocS2::save_reflectance_s2(S2_stars = S2obj$S2_Stack,
 ```
 
 
-# Computation of spectral indices
+# masking non vegetated pixels with NDVI thresholding
 
-Once reflectance data is written as a raster file, the [`spinR`](https://gitlab.com/jbferet/spinr) package includes a set of functions for the computation of various spectral indices. 
+The [`spinR`](https://gitlab.com/jbferet/spinr) package includes a set of 
+functions for the computation of spectral indices.
+We will compute NDVI in order to update the vegetation mask and discard
+non-vegetated pixels. 
 
-Here we will compute NDVI in order to update the vegetation mask and discard non-vegetated pixels. About 30-40 spectral indices are available. 
 
 ```{r Spectral_indices}
 ########################################################################
 ##                      COMPUTE SPECTRAL INDEX                        ##
 ########################################################################
-library(prosail)
 library(spinR)
 library(raster)
 library(stars)
@@ -182,70 +211,62 @@ CloudInit$CloudMask_Binary[Elim] <- 0
 # save updated cloud mask
 Cloud_File <- file.path(Cloud_path,'CloudMask_Binary_Update')
 stars::write_stars(CloudInit, dsn=Cloud_File,driver = "ENVI",type='Byte')
-
 ```
 
 # Training and application of hybrid inversion model 
 
 ```{r Hybrid_Inversion}
+library(prosail)
+# get sensor response for Sentinel-2
+SensorName <- 'Sentinel_2'
+SRF <- GetRadiometry(SensorName)
 
-########################################################################
-##      COMPUTE BIOPHYSICAL VARIABLES BASED ON PROSAIL INVERSION      ##
-########################################################################
-# get S2 geometry
-# read metadata file from S2 image
+# define parameters to estimate
+Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
+
+# define spectral bands required to train SVR model for each variable
+S2BandSelect <- Bands2Select <- list()
+for (parm in Parms2Estimate){
+  S2BandSelect[[parm]] <- c('B3','B4','B5','B6','B7','B8','B11','B12')
+  Bands2Select[[parm]] <- match(S2BandSelect[[parm]],SRF$Spectral_Bands)
+}
+# ImgBandNames <- strsplit(HDR_Refl$`band names`,split = ',')[[1]]
+ImgBandNames <- c('B2','B3','B4','B5','B6','B7','B8','B11','B12')
+
+# define output directory where LUTs will be saved
+PROSAIL_ResPath <- file.path(results_site_path,'HybridInversion')
+dir.create(path = PROSAIL_ResPath, showWarnings = FALSE,recursive = TRUE)
+
+# get S2 geometry: read metadata file from S2 image
 xmlfile <- file.path(dirname(Refl_path),'MTD_TL.xml')
 S2Geom <- get_S2geometry(MTD_TL_xml = xmlfile)
 
-# Train PROSAIL inversion
-minval <- data.frame('CHL'=10,'CAR'=0,'EWT' = 0.005,'ANT' = 0,'LMA' = 0.005,'N' = 1.5,'psoil' = 0.0, 'BROWN'=0.0,
-                     'LIDFa' = 50, 'lai' = 0.5,'q'=0.1,'tto' = 0,'tts' = min(S2Geom$SZA), 'psi' = 5)
-maxval <- data.frame('CHL'=90,'CAR'=20,'EWT' = 0.03,'ANT' = 3,'LMA' = 0.03,'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
-                     'LIDFa' = 70, 'lai' = 7,'q'=0.2,'tto' = 7,'tts' = max(S2Geom$SZA), 'psi' = 355)
+# define ranges for zenith angles of acquisition
+GeomAcq <- list()
+GeomAcq$min <- data.frame('tto' = min(S2Geom$VZA), 'tts' = min(S2Geom$SZA), 
+                          'psi' = 0)
+GeomAcq$max <- data.frame('tto' = max(S2Geom$VZA), 'tts' = max(S2Geom$SZA), 
+                          'psi' = 360)
 
-# get sensor response for Sentinel-2
-SensorName <- HDR_Refl$`sensor type`
-SRF <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
-# adjust optical constants from 1nm sampling into spectral S2 spectral sampling
-wvl <- SpecPROSPECT$lambda
-SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-SpecPROSPECT_Sensor <- SpecSensor$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- SpecSensor$SpecSOIL_Sensor
-SpecATM_Sensor <- SpecSensor$SpecATM_Sensor
+# train regression model
+modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
+                                    atbd = TRUE, GeomAcq = GeomAcq, 
+                                    SRF = SRF, 
+                                    Bands2Select = Bands2Select, 
+                                    Path_Results = PROSAIL_ResPath)
 
-# define spectral bands required to train SVR model for each variable
-S2BandSelect <- list()
-S2BandSelect$CHL <- S2BandSelect$lai <- S2BandSelect$EWT <- S2BandSelect$LMA <- c('B03','B04','B05','B06','B07','B08','B11','B12')
-ImgBandNames <- strsplit(HDR_Refl$`band names`,split = ',')[[1]]
-# get variable ID for train_prosail_inversion
-Bands2Select <- list()
-for (bpvar in names(S2BandSelect)){
-  Bands2Select[[bpvar]] <- match(S2BandSelect[[bpvar]],ImgBandNames)
-}
-
-# define noise level for each variable
-NoiseLevel <- list()
-NoiseLevel$EWT <- 0.025
-NoiseLevel$CHL <- 0.01
-NoiseLevel$LMA <- NoiseLevel$lai <- 0.05
-
-# where results will be stored
-PROSAIL_ResPath <- file.path(results_site_path,'PRO4SAIL_INVERSION')
-dir.create(path = PROSAIL_ResPath,showWarnings = FALSE,recursive = TRUE)
-
-method <- 'liquidSVM' # use 'svmRadial' or 'svmLinear' if you have difficulties with installing liquidSVM
-Parms2Estimate <- c('CHL','EWT','LMA','lai')
-modelSVR <- train_prosail_inversion(minval = minval, maxval = maxval, Parms2Estimate = Parms2Estimate,
-                                    Bands2Select = Bands2Select, NoiseLevel = NoiseLevel, SAILversion = '4SAIL',
-                                    SpecPROSPECT = SpecPROSPECT_Sensor, SpecSOIL = SpecSOIL_Sensor, SpecATM = SpecATM_Sensor,
-                                    Path_Results = PROSAIL_ResPath, nbModels = 10, nbSamples = 1000,
-                                    FigPlot = FALSE, method = method)
-
-# Apply SVR model on Sentinel-2 data
-Apply_prosail_inversion(raster_path = Refl_path, HybridModel = modelSVR, PathOut = PROSAIL_ResPath,
-                        SelectedBands = S2BandSelect, bandname = ImgBandNames, MaskRaster = Cloud_File, 
-                        MultiplyingFactor = 10000, method = method)
+# apply regression model on Sentinel-2 raster data
+Apply_prosail_inversion(raster_path = Refl_path, 
+                        HybridModel = modelSVR, 
+                        PathOut = PROSAIL_ResPath,
+                        SelectedBands = S2BandSelect, 
+                        bandname = ImgBandNames, 
+                        MaskRaster = Cloud_File, 
+                        MultiplyingFactor = 10000)
 ```
 
 
-The function `Apply_prosail_inversion` then writes output files corresponding to individual biophysical variables, including mean value and standard deviation.
+Assessed biophysical properties computed with `Apply_prosail_inversion` are then 
+saved as individual raster files. 
+For each biophysical variable, the mean value and standard deviation defined by 
+the input variable `nbModels` from `modelSVR` (default = 20 models) is saved.

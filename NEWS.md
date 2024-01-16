@@ -1,3 +1,14 @@
+# prosail v2.3.0
+
+## Changes
+- update to fix bugs induced by upgrade of package prospect (>=1.6.0)
+- rewrite PRO4SAIL function to simplify it
+
+# prosail v2.2.3
+
+## Changes
+- added function Generate_LUT_4SAIL to produce LUT corresponding to all 4SAIL outputs (rdot, rsot, rsdt, rddt) in addition to BRF
+
 # prosail v2.2.2
 
 ## Changes

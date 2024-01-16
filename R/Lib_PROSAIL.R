@@ -35,11 +35,12 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
   Es <- SpecATM_Sensor$Direct_Light
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  # diffuse radiation (Francois et al., 2002)
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   BRF <- (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
-  return(BRF)
+  return(data.frame('BRF' = BRF))
 }
 
 
@@ -56,11 +57,13 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #' @param abs_hem numeric. fraction of diffuse light absorbed
 #' @param tts numeric. Solar zenith angle
 #' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
-#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for computation of fAPAR
+#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for
+#' computation of fAPAR
 #'
 #' @return fAPAR numeric. fAPAR
 #' @export
-Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor, PAR_range = c(400, 700)){
+Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor,
+                           PAR_range = c(400, 700)){
 
   ############################## #
   ##	direct / diffuse light	##
@@ -68,7 +71,8 @@ Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor, PAR_range = c(400
   Es <- SpecATM_Sensor$Direct_Light
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  # diffuse radiation (Francois et al., 2002)
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   top <- (abs_dir*PARdiro+abs_hem*PARdifo)
@@ -95,7 +99,8 @@ Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor, PAR_range = c(400
 #'
 #' @return albedo numeric. albedo
 #' @export
-Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor, PAR_range = c(400, 2400)){
+Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor,
+                            PAR_range = c(400, 2400)){
 
   ############################## #
   ##	direct / diffuse light	##
@@ -103,7 +108,8 @@ Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor, PAR_range = c(40
   Es <- SpecATM_Sensor$Direct_Light
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) # diffuse radiation (Francois et al., 2002)
+  # diffuse radiation (Francois et al., 2002)
+  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   top <- (rsdstar*PARdiro+rddstar*PARdifo)
@@ -146,7 +152,7 @@ Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor, PAR_range = c(40
 #' @param Zeta numeric. Tree shape factor
 #' = ratio of crown diameter to crown height
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
-#' @param BrownVegetation list. Defines optical properties for brown vegetation, if not NULL
+#' @param BrownLOP dataframe. Defines optical properties for brown vegetation, if not NULL
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
@@ -157,112 +163,158 @@ Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor, PAR_range = c(40
 #' rddt: bi-hemispherical reflectance factor
 #' @import prospect
 #' @export
-PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
-                     CAR = 8.0,ANT = 0.0,BROWN = 0.0,EWT = 0.01,
-                     LMA = 0.000,PROT = 0.0,CBC = 0.0,alpha = 40.0,
-                     TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,lai = NULL,
-                     q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
-                     fraction_brown = 0.0, diss = 0.0, Cv = 1,Zeta = 1,
-                     SAILversion = '4SAIL',BrownVegetation = NULL){
+PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL,
+                     N = 1.5, CHL = 40.0, CAR = 8.0, ANT = 0.0,
+                     BROWN = 0.0, EWT = 0.01, LMA = NULL,
+                     PROT = 0.0, CBC = 0.0, alpha = 40.0,
+                     TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai = NULL,
+                     q = NULL, tts = NULL, tto = NULL, psi = NULL, rsoil = NULL,
+                     fraction_brown = 0.0, diss = 0.0, Cv = 1, Zeta = 1,
+                     SAILversion = '4SAIL', BrownLOP = NULL){
 
-  ############################ #
-  #	LEAF OPTICAL PROPERTIES	##
-  ############################ #
-  if (is.null(Input_PROSPECT)){
-    if (is.null(LMA)) LMA <- 0
-    Input_PROSPECT = data.frame('CHL'= CHL, 'CAR'= CAR, 'ANT'=ANT, 'BROWN'= BROWN, 'EWT'=EWT,
-                                'LMA'=LMA, 'PROT'= PROT, 'CBC'= CBC, 'N'=N, 'alpha'= alpha)
-  }
-  GreenVegetation <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
-                                        N = Input_PROSPECT$N[1],
-                                        CHL = Input_PROSPECT$CHL[1],
-                                        CAR = Input_PROSPECT$CAR[1],
-                                        ANT = Input_PROSPECT$ANT[1],
-                                        BROWN = Input_PROSPECT$BROWN[1],
-                                        EWT = Input_PROSPECT$EWT[1],
-                                        LMA = Input_PROSPECT$LMA[1],
-                                        PROT = Input_PROSPECT$PROT[1],
-                                        CBC = Input_PROSPECT$CBC[1],
-                                        alpha = Input_PROSPECT$alpha[1])
-
-  if (SAILversion == '4SAIL2'){
-    # 4SAIL2 requires one of the following combination of input parameters
-    # Case #1: valid optical properties for brown vegetation
-    if (!is.null(BrownVegetation)){
-      # need to define Reflectance and Transmittance for BrownVegetation
-      if (length(grep('Reflectance',names(BrownVegetation)))==0 | length(grep('Transmittance',names(BrownVegetation)))==0){
-        message('Please define BrownVegetation as a list including "Reflectance" and "Transmittance"')
-        stop()
-      }
-      # check if spectral domain for optical properties of brown vegetation match
-      # with spectral domain for optical properties of green vegetation
-      if (length(setdiff(Spec_Sensor$lambda,BrownVegetation$wvl))>0){
-        message('Please define same spectral domain for BrownVegetation and SpecPROSPECT')
-        stop()
-      }
-      if (length(unique(lengths(Input_PROSPECT)))==1){
-        if (!unique(lengths(Input_PROSPECT))==1){
-          message('BrownVegetation defined along with multiple leaf chemical properties')
-          message('Only first set of leaf chemical properties will be used to simulate green vegetation')
-        }
-      }
-    # if no leaf optical properties brown vegetation defined
-    } else if (is.null(BrownVegetation)){
-      # if all PROSPECT input parameters have the same length
-      if (length(unique(lengths(Input_PROSPECT)))==1){
-        # if all PROSPECT input parameters are unique (no possibility to simulate 2 types of leaf optics)
-        if (unique(lengths(Input_PROSPECT))==1){
-          # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
-          if (fraction_brown==0){
-            BrownVegetation <- GreenVegetation
-          # else run 4SAIL
-          } else {
-            message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-            message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
-            SAILversion <- '4SAIL'
-          }
-        # if all PROSPECT parameters have at least 2 elements
-        } else if (unique(lengths(Input_PROSPECT))>=2){
-          # compute leaf optical properties
-          BrownVegetation <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
-                                                N = Input_PROSPECT$N[2],
-                                                CHL = Input_PROSPECT$CHL[2],
-                                                CAR = Input_PROSPECT$CAR[2],
-                                                ANT = Input_PROSPECT$ANT[2],
-                                                BROWN = Input_PROSPECT$BROWN[2],
-                                                EWT = Input_PROSPECT$EWT[2],
-                                                LMA = Input_PROSPECT$LMA[2],
-                                                PROT = Input_PROSPECT$PROT[2],
-                                                CBC = Input_PROSPECT$CBC[2],
-                                                alpha = Input_PROSPECT$alpha[2])
-          if (unique(lengths(Input_PROSPECT))>2){
-            message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-            message('Currently more than 2 sets are defined. will only use the first 2')
-          }
-        }
-      }
-    }
-  }
+  if (is.null(Spec_Sensor)) Spec_Sensor <- prospect::SpecPROSPECT_FullRange
+  #	PROSPECT: LEAF OPTICAL PROPERTIES
+  LOP <- adjust_PROSPECT_2_SAIL(SAILversion = SAILversion,
+                                Spec_Sensor = Spec_Sensor,
+                                Input_PROSPECT = Input_PROSPECT,
+                                CHL = CHL, CAR = CAR, ANT = ANT, BROWN = BROWN,
+                                EWT = EWT, LMA = LMA, PROT = PROT, CBC = CBC,
+                                N = N, alpha = alpha, BrownLOP = BrownLOP,
+                                fraction_brown = fraction_brown)
+  #	SAIL: CANOPY REFLECTANCE
   if (SAILversion == '4SAIL'){
-    if (length(unique(lengths(Input_PROSPECT)))==1){
-      if (unique(lengths(Input_PROSPECT))>1){
-        message('4SAIL needs only one set of optical properties')
-        message('Currently more than one set of leaf chemical constituents is defined.')
-        message('Will run 4SAIL with the first set of leaf chemical constituents')
-      }
-    }
-  }
-
-  if (SAILversion == '4SAIL'){
-    # run 4SAIL
-    Ref <- fourSAIL(LeafOptics = GreenVegetation,
-                    TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil)
+    Ref <- fourSAIL(LeafOptics = LOP$GreenLOP,
+                    TypeLidf = TypeLidf, LIDFa = LIDFa, LIDFb = LIDFb,
+                    lai = lai, q = q, tts = tts, tto = tto, psi = psi,
+                    rsoil = rsoil)
   } else if (SAILversion == '4SAIL2'){
-    # run 4SAIL2
-    Ref <- fourSAIL2(leafgreen = GreenVegetation, leafbrown = BrownVegetation,
-                     TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil,
-                     fraction_brown, diss, Cv, Zeta)
+    Ref <- fourSAIL2(leafgreen = LOP$GreenLOP, leafbrown = LOP$BrownLOP,
+                     TypeLidf = TypeLidf, LIDFa = LIDFa, LIDFb = LIDFb,
+                     lai = lai, q = q, tts = tts, tto = tto, psi = psi,
+                     rsoil = rsoil, fraction_brown = fraction_brown,
+                     diss = diss, Cv = Cv, Zeta = Zeta)
   }
+
+  # ############################ #
+  # #	LEAF OPTICAL PROPERTIES	##
+  # ############################ #
+  # if (SAILversion =='4SAIL'){
+  #   default_PROSPECT <- data.frame('CHL' = 40.0, 'CAR' = 8.0, 'ANT' = 0.0,
+  #                                  'BROWN' = 0.0, 'EWT' = 0.01, 'LMA' = 0.0,
+  #                                  'PROT'= 0.0, 'CBC' = 0.0, 'N' = 1.5,
+  #                                  'alpha' = 40.0)
+  #
+  #   if (is.null(Input_PROSPECT)){
+  #     dm_val <- prospect::check_version_prospect(LMA, PROT, CBC)
+  #     Input_PROSPECT <- data.frame('CHL' = CHL, 'CAR' = CAR, 'ANT' = ANT,
+  #                                  'BROWN' = BROWN, 'EWT' = EWT, 'LMA' = dm_val$LMA,
+  #                                  'PROT'= dm_val$PROT, 'CBC' = dm_val$CBC,
+  #                                  'N' = N, 'alpha' = alpha)
+  #   } else if (!is.null(Input_PROSPECT)){
+  #     missing <- which(!names(default_PROSPECT)%in%names(Input_PROSPECT))
+  #     if (length(missing)>0) Input_PROSPECT <- cbind(Input_PROSPECT, default_PROSPECT[missing])
+  #     dm_val <- prospect::check_version_prospect(Input_PROSPECT$LMA,
+  #                                                Input_PROSPECT$PROT,
+  #                                                Input_PROSPECT$CBC)
+  #     Input_PROSPECT <- data.frame('CHL' = CHL, 'CAR' = CAR, 'ANT' = ANT,
+  #                                  'BROWN' = BROWN, 'EWT' = EWT, 'LMA' = dm_val$LMA,
+  #                                  'PROT'= dm_val$PROT, 'CBC' = dm_val$CBC,
+  #                                  'N' = N, 'alpha' = alpha)
+  #   }
+  # }
+  # GreenVegetation <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
+  #                                       N = Input_PROSPECT$N[1],
+  #                                       CHL = Input_PROSPECT$CHL[1],
+  #                                       CAR = Input_PROSPECT$CAR[1],
+  #                                       ANT = Input_PROSPECT$ANT[1],
+  #                                       BROWN = Input_PROSPECT$BROWN[1],
+  #                                       EWT = Input_PROSPECT$EWT[1],
+  #                                       LMA = Input_PROSPECT$LMA[1],
+  #                                       PROT = Input_PROSPECT$PROT[1],
+  #                                       CBC = Input_PROSPECT$CBC[1],
+  #                                       alpha = Input_PROSPECT$alpha[1])
+  #
+  # if (SAILversion == '4SAIL2'){
+  #   # 4SAIL2 requires one of the following combination of input parameters
+  #   # Case #1: valid optical properties for brown vegetation
+  #   if (!is.null(BrownLOP)){
+  #     # need to define Reflectance and Transmittance for BrownLOP
+  #     if (length(grep('Reflectance',names(BrownLOP)))==0 |
+  #         length(grep('Transmittance',names(BrownLOP)))==0){
+  #       message('Please define BrownLOP as a list including "Reflectance" and "Transmittance"')
+  #       stop()
+  #     }
+  #     # check if spectral domain for optical properties of brown vegetation match
+  #     # with spectral domain for optical properties of green vegetation
+  #     if (length(setdiff(Spec_Sensor$lambda, BrownLOP$wvl))>0){
+  #       message('Please define same spectral domain for BrownLOP and SpecPROSPECT')
+  #       stop()
+  #     }
+  #     if (length(unique(lengths(Input_PROSPECT)))==1){
+  #       if (!unique(lengths(Input_PROSPECT))==1){
+  #         message('BrownLOP defined along with multiple leaf chemical properties')
+  #         message('Only first set of leaf chemical properties will be used to simulate green vegetation')
+  #       }
+  #     }
+  #   # if no leaf optical properties brown vegetation defined
+  #   } else if (is.null(BrownLOP)){
+  #     # if all PROSPECT input parameters have the same length
+  #     if (length(unique(lengths(Input_PROSPECT)))==1){
+  #       # if all PROSPECT input parameters are unique (no possibility to simulate 2 types of leaf optics)
+  #       if (unique(lengths(Input_PROSPECT))==1){
+  #         # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
+  #         if (fraction_brown==0){
+  #           BrownLOP <- GreenVegetation
+  #         # else run 4SAIL
+  #         } else {
+  #           message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
+  #           message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
+  #           SAILversion <- '4SAIL'
+  #         }
+  #       # if all PROSPECT parameters have at least 2 elements
+  #       } else if (unique(lengths(Input_PROSPECT))>=2){
+  #         # compute leaf optical properties
+  #         BrownLOP <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
+  #                                               N = Input_PROSPECT$N[2],
+  #                                               CHL = Input_PROSPECT$CHL[2],
+  #                                               CAR = Input_PROSPECT$CAR[2],
+  #                                               ANT = Input_PROSPECT$ANT[2],
+  #                                               BROWN = Input_PROSPECT$BROWN[2],
+  #                                               EWT = Input_PROSPECT$EWT[2],
+  #                                               LMA = Input_PROSPECT$LMA[2],
+  #                                               PROT = Input_PROSPECT$PROT[2],
+  #                                               CBC = Input_PROSPECT$CBC[2],
+  #                                               alpha = Input_PROSPECT$alpha[2])
+  #         if (unique(lengths(Input_PROSPECT))>2){
+  #           message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
+  #           message('Currently more than 2 sets are defined. will only use the first 2')
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
+  #
+  #
+  # if (SAILversion == '4SAIL'){
+  #   if (length(unique(lengths(Input_PROSPECT)))==1){
+  #     if (unique(lengths(Input_PROSPECT))>1){
+  #       message('4SAIL needs only one set of optical properties')
+  #       message('Currently more than one set of leaf chemical constituents is defined.')
+  #       message('Will run 4SAIL with the first set of leaf chemical constituents')
+  #     }
+  #   }
+  # }
+  #
+  # if (SAILversion == '4SAIL'){
+  #   # run 4SAIL
+  #   Ref <- fourSAIL(LeafOptics = GreenVegetation,
+  #                   TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil)
+  # } else if (SAILversion == '4SAIL2'){
+  #   # run 4SAIL2
+  #   Ref <- fourSAIL2(leafgreen = GreenVegetation, leafbrown = BrownLOP,
+  #                    TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil,
+  #                    fraction_brown, diss, Cv, Zeta)
+  # }
   return(Ref)
 }
 
@@ -295,8 +347,9 @@ PRO4SAIL  <- function(Spec_Sensor,Input_PROSPECT=NULL,N = 1.5,CHL = 40.0,
 #' rddstar: contribution of hemispherical diffuse incident flux to albedo
 #' @export
 
-fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai = NULL,
-                      q = NULL, tts = NULL, tto = NULL, psi = NULL, rsoil = NULL){
+fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL,
+                      lai = NULL, q = NULL, tts = NULL, tto = NULL, psi = NULL,
+                      rsoil = NULL){
 
   ############################ #
   #	LEAF OPTICAL PROPERTIES	##
@@ -314,7 +367,8 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
   cospsi <- cos(rd*psi)
   dso <- sqrt(tants*tants+tanto*tanto-2.*tants*tanto*cospsi)
 
-  #	Generate leaf angle distribution from average leaf angle (ellipsoidal) or (a,b) parameters
+  #	Generate leaf angle distribution from average leaf angle (ellipsoidal)
+  # or (a,b) parameters
   if (TypeLidf==1){
     foliar_distrib <- dladgen(LIDFa,LIDFb)
     lidf <- foliar_distrib$lidf
@@ -340,8 +394,8 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
   for (i in 1:na){
     ttl <- litab[i]	    # leaf inclination discrete values
     ctl <- cos(rd*ttl)
-    #	SAIL volume scattering phase function gives interception and portions to be
-    #	multiplied by rho and tau
+    #	SAIL volume scattering phase function gives interception and portions to
+    #	be multiplied by rho and tau
     resVolscatt <- volscatt(tts,tto,psi,ttl)
     chi_s <- resVolscatt$chi_s
     chi_o <- resVolscatt$chi_o
@@ -351,16 +405,16 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
     # ********************************************************************************
     #*                   SUITS SYSTEM COEFFICIENTS
     #*
-    #*	ks  : Extinction coefficient for direct solar flux
-    #*	ko  : Extinction coefficient for direct observed flux
-    #*	att : Attenuation coefficient for diffuse flux
-    #*	sigb : Backscattering coefficient of the diffuse downward flux
-    #*	sigf : Forwardscattering coefficient of the diffuse upward flux
-    #*	sf  : Scattering coefficient of the direct solar flux for downward diffuse flux
-    #*	sb  : Scattering coefficient of the direct solar flux for upward diffuse flux
-    #*	vf   : Scattering coefficient of upward diffuse flux in the observed direction
-    #*	vb   : Scattering coefficient of downward diffuse flux in the observed direction
-    #*	w   : Bidirectional scattering coefficient
+    #* ks : Extinction coefficient for direct solar flux
+    #* ko : Extinction coefficient for direct observed flux
+    #* att : Attenuation coefficient for diffuse flux
+    #* sigb : Backscattering coefficient of the diffuse downward flux
+    #* sigf : Forwardscattering coefficient of the diffuse upward flux
+    #* sf : Scattering coefficient of the direct solar flux for downward diffuse flux
+    #* sb : Scattering coefficient of the direct solar flux for upward diffuse flux
+    #* vf : Scattering coefficient of upward diffuse flux in the observed direction
+    #* vb : Scattering coefficient of downward diffuse flux in the observed direction
+    #* w : Bidirectional scattering coefficient
     # *********************************************************************************
 
     #	Extinction coefficients
@@ -403,25 +457,25 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
   #	Here the LAI comes in
   #   Outputs for the case LAI = 0
   if (lai<0){
-    tss <- 1                # beam transmittance in the sun-target path.
-    too <- 1                # beam transmittance in the target-view path.
-    tsstoo <- 1             # beam transmittance in the sun-target-view path.
-    rdd <- 0                # canopy bihemispherical reflectance factor.
-    tdd <- 1                # canopy bihemispherical transmittance factor.
-    rsd <- 0                # canopy directional-hemispherical reflectance factor.
-    tsd <- 0                # canopy directional-hemispherical transmittance factor.
-    rdo <- 0                # canopy hemispherical-directional reflectance factor.
-    tdo <- 0                # canopy hemispherical-directional transmittance factor.
-    rso <- 0                # canopy bidirectional reflectance factor.
-    rsos <- 0               # single scattering contribution to rso.
-    rsod <- 0               # multiple scattering contribution to rso.
+    tss <- 1          # beam transmittance in the sun-target path.
+    too <- 1          # beam transmittance in the target-view path.
+    tsstoo <- 1       # beam transmittance in the sun-target-view path.
+    rdd <- 0          # canopy bihemispherical reflectance factor.
+    tdd <- 1          # canopy bihemispherical transmittance factor.
+    rsd <- 0          # canopy directional-hemispherical reflectance factor.
+    tsd <- 0          # canopy directional-hemispherical transmittance factor.
+    rdo <- 0          # canopy hemispherical-directional reflectance factor.
+    tdo <- 0          # canopy hemispherical-directional transmittance factor.
+    rso <- 0          # canopy bidirectional reflectance factor.
+    rsos <- 0         # single scattering contribution to rso.
+    rsod <- 0         # multiple scattering contribution to rso.
 
-    rddt <- rsoil           # surface bihemispherical reflectance factor.
-    rsdt <- rsoil           # surface directional-hemispherical reflectance factor.
-    rdot <- rsoil           # surface hemispherical-directional reflectance factor.
-    rsodt <- 0*rsoil        # reflectance factor.
-    rsost <- rsoil          # reflectance factor.
-    rsot <- rsoil           # surface bidirectional reflectance factor.
+    rddt <- rsoil     # surface bihemispherical reflectance factor.
+    rsdt <- rsoil     # surface directional-hemispherical reflectance factor.
+    rdot <- rsoil     # surface hemispherical-directional reflectance factor.
+    rsodt <- 0*rsoil  # reflectance factor.
+    rsost <- rsoil    # reflectance factor.
+    rsot <- rsoil     # surface bidirectional reflectance factor.
   } else {
     #	Other cases (LAI > 0)
     e1 <- exp(-m*lai)
@@ -536,8 +590,8 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 }
 
 #' Performs PRO4SAIL2 simulation based on a set of combinations of input parameters
-#' @param leafgreen list. includes relfectance and transmittance for vegetation #1 (e.g. green vegetation)
-#' @param leafbrown list. includes relfectance and transmittance for vegetation #2 (e.g. brown vegetation)
+#' @param leafgreen dataframe. leaf optical properties #1 (e.g. green vegetation)
+#' @param leafbrown dataframe. leaf optical properties #2 (e.g. brown vegetation)
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
@@ -546,7 +600,9 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' if TypeLidf ==1, unused
 #' if TypeLidf ==2, controls the distribution's bimodality
 #' @param lai numeric. Leaf Area Index
-#' @param hot numeric. Hot Spot parameter = ratio of the correlation length of leaf projections in the horizontal plane and the canopy height (doi:10.1016/j.rse.2006.12.013)
+#' @param q numeric. Hot Spot parameter = ratio of the correlation length of
+#' leaf projections in the horizontal plane and the canopy height
+#' (doi:10.1016/j.rse.2006.12.013)
 #' @param tts numeric. Sun zeith angle
 #' @param tto numeric. Observer zeith angle
 #' @param psi numeric. Azimuth Sun / Observer
@@ -572,8 +628,8 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai 
 #' @export
 
 fourSAIL2  <- function(leafgreen, leafbrown,
-                       TypeLidf = 2,LIDFa = NULL,LIDFb = NULL,
-                       lai = NULL, hot = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
+                       TypeLidf = 2, LIDFa = NULL,LIDFb = NULL,
+                       lai = NULL, q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
                        fraction_brown = 0.5, diss = 0.5, Cv = 1,Zeta = 1){
 
   #	This version does not include non-Lambertian soil properties.
@@ -631,8 +687,10 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     Fcdc <- 1.0-(1.0-Fcd)^(0.5/cts+0.5/cto)
 
     #	Part depending on diss, fraction_brown, and leaf optical properties
-    #	First save the input fraction_brown as the old fraction_brown, as the following change is only artificial
-    # Better define an fraction_brown that is actually used: fb, so that the input is not modified!
+    #	First save the input fraction_brown as the old fraction_brown, as the
+    # following change is only artificial
+    # Better define an fraction_brown that is actually used: fb, so that the
+    # input is not modified!
 
     fb <- fraction_brown
     # if only green leaves
@@ -700,9 +758,7 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     tss <- exp(-ks*lai)
     ck <- exp(-ks*lai1)
     alf <- 1e6
-    if (hot>0.0){
-      alf <- (dso/hot)*2.0/(ks+ko)
-    }
+    if (q > 0) alf <- (dso/q)*2./(ks+ko)
     if (alf>200.0){
       alf<- 200.0     # inserted H. Bach 1/3/04
     }
@@ -777,8 +833,10 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     tdd <- rdd <- tsd <- rsd <- tdo <- rdo <- 0*m
     rsod <- 0*m
     if (length(Which_NCS)>0){
-      resNCS <- NonConservativeScattering(m[Which_NCS],lai2,att[Which_NCS],sigb[Which_NCS],
-                                          ks,ko,sf[Which_NCS],sb[Which_NCS],vf[Which_NCS],vb[Which_NCS],tss,too)
+      resNCS <- NonConservativeScattering(m[Which_NCS], lai2, att[Which_NCS],
+                                          sigb[Which_NCS], ks, ko, sf[Which_NCS],
+                                          sb[Which_NCS], vf[Which_NCS],
+                                          vb[Which_NCS], tss, too)
       tdd[Which_NCS] <- resNCS$tdd
       rdd[Which_NCS] <- resNCS$rdd
       tsd[Which_NCS] <- resNCS$tsd
@@ -788,8 +846,10 @@ fourSAIL2  <- function(leafgreen, leafbrown,
       rsod[Which_NCS] <- resNCS$rsod
     }
     if (length(Which_CS)>0){
-      resCS <- ConservativeScattering(m[Which_CS],lai2,att[Which_CS],sigb[Which_CS],
-                                      ks,ko,sf[Which_CS],sb[Which_CS],vf[Which_CS],vb[Which_CS],tss,too)
+      resCS <- ConservativeScattering(m[Which_CS], lai2, att[Which_CS],
+                                      sigb[Which_CS], ks, ko, sf[Which_CS],
+                                      sb[Which_CS], vf[Which_CS], vb[Which_CS],
+                                      tss, too)
       tdd[Which_CS] <- resCS$tdd
       rdd[Which_CS] <- resCS$rdd
       tsd[Which_CS] <- resCS$tsd
@@ -834,8 +894,10 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     tdd <- rdd <- tsd <- rsd <- tdo <- rdo <- 0*m
     rsod <- 0*m
     if (length(Which_NCS)>0){
-      resNCS <- NonConservativeScattering(m[Which_NCS],lai1,att[Which_NCS],sigb[Which_NCS],
-                                          ks,ko,sf[Which_NCS],sb[Which_NCS],vf[Which_NCS],vb[Which_NCS],tss,too)
+      resNCS <- NonConservativeScattering(m[Which_NCS], lai1, att[Which_NCS],
+                                          sigb[Which_NCS], ks, ko, sf[Which_NCS],
+                                          sb[Which_NCS], vf[Which_NCS],
+                                          vb[Which_NCS], tss, too)
       tdd[Which_NCS] <- resNCS$tdd
       rdd[Which_NCS] <- resNCS$rdd
       tsd[Which_NCS] <- resNCS$tsd
@@ -845,8 +907,10 @@ fourSAIL2  <- function(leafgreen, leafbrown,
       rsod[Which_NCS] <- resNCS$rsod
     }
     if (length(Which_CS)>0){
-      resCS <- ConservativeScattering(m[Which_CS],lai1,att[Which_CS],sigb[Which_CS],
-                                      ks,ko,sf[Which_CS],sb[Which_CS],vf[Which_CS],vb[Which_CS],tss,too)
+      resCS <- ConservativeScattering(m[Which_CS], lai1, att[Which_CS],
+                                      sigb[Which_CS], ks, ko, sf[Which_CS],
+                                      sb[Which_CS], vf[Which_CS], vb[Which_CS],
+                                      tss, too)
       tdd[Which_CS] <- resCS$tdd
       rdd[Which_CS] <- resCS$rdd
       tsd[Which_CS] <- resCS$tsd
@@ -925,8 +989,6 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     # compute Albedo (from J. Gomez Dans)
     rsdstar <- rsd + (tss + tsd) * rsoil * tdd / rn
     rddstar <- rdd + (tdd * tdd * rsoil) / rn
-
-
   }
   my_list <- list('rdot' = rdot, 'rsot' = rsot, 'rddt' = rddt, 'rsdt' =rsdt,
                   'fCover' = 1 - too, 'abs_dir' = alfast, 'abs_hem' = alfadt,
@@ -1044,10 +1106,6 @@ ConservativeScattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
                   "rsod" = rsod)
   return(my_list)
 }
-
-
-
-
 
 
 #' Computes the leaf angle distribution function value (freq)
@@ -1181,7 +1239,7 @@ Jfunc1 <- function(k,l,t){
   # J1 function with avoidance of singularity problem
   del <- (k-l)*t
   Jout = 0*l
-  Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t)-exp(-k*t))/(k-l[which(abs(del)>1e-3)])
+  Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t) - exp(-k*t))/(k-l[which(abs(del)>1e-3)])
   Jout[which(abs(del)<=1e-3)] <- 0.5*t*(exp(-k*t)+exp(-l[which(abs(del)<=1e-3)]*t))*(1-del[which(abs(del)<=1e-3)]*del[which(abs(del)<=1e-3)]/12)
   return(Jout)
 }
@@ -1298,10 +1356,10 @@ volscatt  <- function(tts,tto,psi,ttl){
   }
   chi_o <- 2./pi*((bto-pi*.5)*co+sin(bto)*so)
 
-  #c ..............................................................................
+  #c ...........................................................................
   #c   Computation of auxiliary azimut angles bt1, bt2, bt3 used
   #c   for the computation of the bidirectional scattering coefficient w
-  #c .............................................................................
+  #c ...........................................................................
 
   btran1 <- abs(bts-bto)
   btran2 <- pi-abs(bts+bto-pi)
@@ -1366,4 +1424,97 @@ check_SpectralSampling <- function(SpecPROSPECT, SpecSOIL, SpecATM){
     stop()
   }
   return(invisible())
+}
+
+#' check if brown leaf optical properties are correctly defined
+#'
+#' @param BrownLOP dataframe. should include wvl, Reflectance & Transmittance
+#' @param lambda numeric. spectral bands corresponding to data to simulate
+#' @param Input_PROSPECT dataframe. includes all prospect input parameters
+#'
+#' @return invisible
+#' @export
+
+check_BrownLOP <- function(BrownLOP, lambda, Input_PROSPECT){
+  if  (!'Reflectance' %in%names(BrownLOP) |
+       !'Transmittance' %in%names(BrownLOP) |
+       !'wvl' %in%names(BrownLOP)){
+    message('BrownLOP must include "wvl", "Reflectance" and "Transmittance"')
+    stop()
+  }
+  # spectral domain for brown vegetation matching input optical domain
+  if (length(setdiff(lambda, BrownLOP$wvl))>0){
+    message('Same spectral domain expected for BrownLOP & SpecPROSPECT')
+    stop()
+  }
+  if (dim(Input_PROSPECT)[1]>1){
+    message('BrownLOP defined along with multiple leaf chemical properties')
+    message('Only first set of leaf chemical properties will be used to simulate green vegetation')
+  }
+}
+
+#' adjust prospect inputs and run prospect in preparation for 4SAIL or 4SAIL2
+#'
+#' @param SAILversion character. should be '4SAIL' or '4SAIL2'
+#' @param Spec_Sensor dataframe. spectral properties required to run PROSPECT
+#' @param Input_PROSPECT dataframe. includes all prospect input parameters
+#' @param CHL numeric. Chlorophyll content (microg.cm-2)
+#' @param CAR numeric. Carotenoid content (microg.cm-2)
+#' @param ANT numeric. Anthocyain content (microg.cm-2)
+#' @param BROWN numeric. Brown pigment content (Arbitrary units)
+#' @param EWT numeric. Equivalent Water Thickness (g.cm-2)
+#' @param LMA numeric. Leaf Mass per Area (g.cm-2)
+#' @param PROT numeric. protein content  (g.cm-2)
+#' @param CBC numeric. NonProtCarbon-based constituent content (g.cm-2)
+#' @param N numeric. Leaf structure parameter
+#' @param alpha numeric. Solid angle for incident light at surface of leaf
+#' @param fraction_brown numeric. fraction of brown vegetation (0-1)
+#' @param BrownLOP dataframe. brown leaf optical properties, when available
+#'
+#' (simulation of roughness)
+#'
+#' @return invisible
+#' @export
+
+adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor,
+                                   Input_PROSPECT,
+                                   CHL, CAR, ANT, BROWN, EWT, LMA,
+                                   PROT, CBC, N, alpha, fraction_brown,
+                                   BrownLOP = NULL){
+
+  # for all versions of 4SAIL: get green vegetation
+  inprospect_green <- prospect::define_Input_PROSPECT(Input_PROSPECT[1,],
+                                                      CHL[1], CAR[1], ANT[1],
+                                                      BROWN[1], EWT[1], LMA[1],
+                                                      PROT[1], CBC[1], N[1],
+                                                      alpha[1])
+  GreenLOP <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
+                                 Input_PROSPECT = inprospect_green)
+  if (SAILversion =='4SAIL2'){
+    # 4SAIL2 requires one of the following combination of input parameters
+    # Case #1: optical properties for brown vegetation provided
+    if (!is.null(BrownLOP)){
+      check_BrownLOP(BrownLOP = BrownLOP,
+                     lambda = Spec_Sensor$lambda,
+                     Input_PROSPECT = Input_PROSPECT)
+      # Case #2: two sets of input data for prospect
+    } else if (is.null(BrownLOP)){
+      # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
+      if (fraction_brown==0) {
+        BrownLOP <- GreenLOP
+      } else {
+        if (!dim(Input_PROSPECT)[1]==2){
+          message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
+          message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
+          SAILversion <- '4SAIL'
+        } else {
+          inprospect_brown <- prospect::define_Input_PROSPECT(Input_PROSPECT[2,])
+          BrownLOP <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
+                                         Input_PROSPECT = inprospect_brown)
+        }
+      }
+    }
+  }
+  return(list('GreenLOP' = GreenLOP,
+              'BrownLOP' = BrownLOP))
 }

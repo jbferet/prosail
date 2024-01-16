@@ -31,10 +31,14 @@ knitr::opts_chunk$set(
 ### Adjust soil properties based on external source (e.g. image to process)
 
 The `prosail` package does not include an exhaustive soil database. 
-Therefore, it may be possible that soil optical properties corresponding to a scene in an optical image do not correspond to the default dry and wet soil reflectance defined as default soil properties.
-In such case, users can define soil properties based on pixels corresponding bare soil and picked in the image, assuming that these exist.
+Therefore, it may be possible that soil optical properties corresponding to a 
+scene in an optical image do not correspond to the default dry and wet soil 
+reflectance defined as default soil properties.
+In such case, users can define soil properties based on pixels corresponding 
+bare soil and picked in the image, assuming that these exist.
 The soil optical properties will then already have sensor spectral response. 
-In this case, if users want to define custom soil properties, they need to apply sensor response function to all optical constants used in PROSAIL.
+In this case, if users want to define custom soil properties, they need to apply 
+sensor response function to all optical constants used in PROSAIL.
 
 ```{r simulate_LUT_Alternative}
 # apply sensor characteristics to PROSPECT optical constants
@@ -88,8 +92,13 @@ albedo_Sensor <- Compute_albedo(rsdstar = Ref_Sensor$rsdstar,
 
 ### Use alternative implementation of machine learning algorithm for hybrid inversion
 
-The default machine learning algorithm is support vector regression from the package `liquidSVM`. However, multiple users experienced difficulties installing this package. Therefore, an alternative SVR implementation based on the package `caret` is also implemented.
+The default machine learning algorithm is support vector regression from the 
+package `liquidSVM`. However, multiple users experienced difficulties installing 
+this package. 
+Therefore, an alternative SVR implementation based on the package `caret` is 
+also implemented.
 
-Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling `train_prosail_inversion` to choose between the alternative implementations. 
+Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling 
+`train_prosail_inversion` to choose between the alternative implementations. 
 
 Additional methods may be implemented with the support of users. 

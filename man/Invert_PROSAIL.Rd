@@ -35,7 +35,8 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 
 \item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
 
-\item{SpecSOIL_Sensor}{list. includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted}
+\item{SpecSOIL_Sensor}{list. includes either dry soil and wet soil,
+or a unique soil sample if the psoil parameter is not inverted}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
@@ -48,7 +49,8 @@ with given criterion to minimize (default = RMSE)}
 
 \item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
 
-\item{WeightPrior}{numeric. Weight to be applied on prior information to modulate its importance}
+\item{WeightPrior}{numeric. Weight to be applied on prior information to
+modulate its importance}
 }
 \value{
 OutPROSPECT estimated values corresponding to Parms2Estimate

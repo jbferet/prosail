@@ -12,7 +12,7 @@ Generate_LUT_PROSAIL(
   SpecATM,
   BandNames = NULL,
   SAILversion = "4SAIL",
-  BrownVegetation = NULL
+  BrownLOP = NULL
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ Generate_LUT_PROSAIL(
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownVegetation}{list. Defines optical properties for brown vegetation, if not NULL
+\item{BrownLOP}{list. Defines optical properties for brown vegetation, if not NULL
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it

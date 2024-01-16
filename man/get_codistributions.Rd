@@ -2,8 +2,8 @@
 % Please edit documentation in R/Lib_PROSAIL_LUT.R
 \name{get_codistributions}
 \alias{get_codistributions}
-\title{This function adjusts variable values based on co-distribution rules as defined in ATBD
-co-distributions are all related to LAI}
+\title{This function adjusts variable values based on co-distribution rules as
+defined in ATBD co-distributions are all related to LAI}
 \usage{
 get_codistributions(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLAImax)
 }
@@ -26,6 +26,6 @@ get_codistributions(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLAImax)
 Vstar numeric.
 }
 \description{
-This function adjusts variable values based on co-distribution rules as defined in ATBD
-co-distributions are all related to LAI
+This function adjusts variable values based on co-distribution rules as
+defined in ATBD co-distributions are all related to LAI
 }

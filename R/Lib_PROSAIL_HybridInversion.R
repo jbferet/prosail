@@ -304,9 +304,11 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
       }
     }
     # produce input parameters distribution
-    InputPROSAIL <- get_distribution_input_prosail(minval, maxval, ParmSet, nbSamples,
+    InputPROSAIL <- get_distribution_input_prosail(minval, maxval,
+                                                   ParmSet, nbSamples,
                                                    TypeDistrib = TypeDistrib,
-                                                   Mean = GaussianDistrib$Mean, Std = GaussianDistrib$Std)
+                                                   Mean = GaussianDistrib$Mean,
+                                                   Std = GaussianDistrib$Std)
   }
   InputPROSAIL <- data.frame(InputPROSAIL)
   return(InputPROSAIL)
@@ -672,7 +674,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
     ### 2- PRODUCE BRF from InputPROSAIL & ddefault spectral sampling = 1nm  ###
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default SpecPROSPECT, SpecSOIL and SpecATM if undefined
-    if (is.null(SpecPROSPECT)) SpecPROSPECT <- prosail::SpecPROSPECT
+    if (is.null(SpecPROSPECT)) SpecPROSPECT <- prospect::SpecPROSPECT_FullRange
     if (is.null(SpecSOIL)) SpecSOIL <- prosail::SpecSOIL
     if (is.null(SpecATM)) SpecATM <- prosail::SpecATM
     # check if same spectral sampling for all key variables
