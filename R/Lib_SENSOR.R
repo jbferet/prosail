@@ -284,7 +284,6 @@ Compute_SRF <- function(wvl,FWHM, SensorName = 'Custom'){
 
   # define full spectral domain in optical domain
   lambda <- seq(400,2500,by = 1)
-  VoidSpectrum <- matrix(0,nrow = length(lambda),ncol = 1)
   Spectral_Response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
   for (i in 1:length(wvl)){
     y <- dnorm(lambda,wvl[i],FWHM[i]/2.355)
