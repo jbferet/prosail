@@ -1,7 +1,103 @@
+# prosail v2.3.0
+
+## Changes
+- update to fix bugs induced by upgrade of package prospect (>=1.6.0)
+- rewrite PRO4SAIL function to simplify it
+
+# prosail v2.2.3
+
+## Changes
+- added function Generate_LUT_4SAIL to produce LUT corresponding to all 4SAIL outputs (rdot, rsot, rsdt, rddt) in addition to BRF
+
+# prosail v2.2.2
+
+## Changes
+- change format of GeomAcq in get_atbd_LUT_input: using data.frame instead of list
+
+# prosail v2.2.1
+
+## Fix
+- correct Apply_prosail_inversion so that inversion can be performed on images with file extension
+
+# prosail v2.2.0
+
+## Changes
+- add fAPAR, albedo and fCover as possible variables to estimate from train_prosail_inversion
+
+# prosail v2.1.0
+
+## Changes
+- add function Compute_fAPAR and Compute_albedo to compute fAPAR and albedo
+
+# prosail v2.0.2
+
+## Changes
+- eliminate LMA when generating PROSAIL-PRO parameter distribution with get_distribution_input_prosail in order to avoid warnings when producing reflectance
+- function PROSAIL() : sets LMA to 0 when LMA = NULL
+
+# prosail v2.0.1
+
+## Changes
+- add function apply_noise_AddMult to apply additive and multiplicative noise to reflectance LUT
+
+# prosail v2.0.0
+
+## Changes
+- added possibility to use input PROSAIL distribution and noise model from ATBD when performing hybrid inversion
+- added possibility to use user defined Input PROSAIL and user defined BRF LUT
+- updated vignettes
+- removed 4SAIL2 from option for hybrid inversion, unless users provide their own input parameter distribution and BRF LUT
+
+# prosail v1.3.2
+
+## Fix
+- fixed bug occuring when atbd == NULL
+
+
+# prosail v1.3.1:
+
+## Fix
+- fixed train_prosail_inversion : systematically add name for spectral bands in BRF_LUT according to SRF when providing
+
+
+# prosail v1.3.0
+
+## Changes
+- implemented configuration described in S2 toolbox ATBD for biophysical processor (http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf)
+ - truncated gaussian distribution
+ - co-distribution with LAI
+ - additive and multiplicative noise
+- added possibility to directly provide user-defined InputPROSAIL data.frame to complement ATBD and initial minmax range and distributions
+- added spectral response for Landsat-9 & Pleiades, added central wavelength and sensor name in SRF variable
+- returning path for biophysical map products in Apply_prosail_inversion
+- removed dependency to rgdal
+- function added: apply_noise_atbd, get_atbd_LUT_input, get_codistributions, get_default_LUT_input
+
+# prosail v1.2.4
+
+## Changes
+- added raster file path as output of function Apply_prosail_inversion. corresponds to maps of biophysical properties of interest (mean value and corresponding standard deviation)
+
+# prosail v1.2.3
+
+## Changes
+- added function OptimalSI to compute the correlation between a set of vegetation properties and all combinations of spectral bands corresponding to a given type of spectral index
+
+## Fix
+- transpose sensor spectral response function in applySensorCharacteristics if not properly oriented
+- Apply_Noise_LUT: add possibility to add absolute noise
+
+# prosail v1.2.2
+
+## Fix
+- corrected function to compute spectral indices: SpectralIndices instead of spectralindices
+- set default value for LMA to 0
+
 # prosail v1.2.1
 
 ## Changes
 - implemented caret for function Apply_prosail_inversion used for raster processing
+- added verbose parameter to control printed message when hyperparameter adjustment performed during training of liquidSVM
 
 # prosail v1.2.0
 

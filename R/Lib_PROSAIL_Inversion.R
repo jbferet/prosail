@@ -20,22 +20,26 @@
 #' @param SpecPROSPECT_Sensor  list. Includes optical constants
 #' refractive index, specific absorption coefficients and corresponding spectral bands
 #' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
-#' @param SpecSOIL_Sensor list. includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted
+#' @param SpecSOIL_Sensor list. includes either dry soil and wet soil,
+#' or a unique soil sample if the psoil parameter is not inverted
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param ParmSet  list. Parameters set to a fixed value by user
 #' @param MeritFunction  character. name of the function to be used as merit function
 #' with given criterion to minimize (default = RMSE)
 #' @param PriorInfoMean list. prior mean value of parameters defined as xprior
 #' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
-#' @param WeightPrior numeric. Weight to be applied on prior information to modulate its importance
+#' @param WeightPrior numeric. Weight to be applied on prior information to
+#' modulate its importance
 #'
 #' @return OutPROSPECT estimated values corresponding to Parms2Estimate
 #' @importFrom pracma fmincon
 #' @export
 
-Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
-                            SpecPROSPECT_Sensor,SpecATM_Sensor,SpecSOIL_Sensor,TypeLidf,
-                            ParmSet,MeritFunction = 'Merit_RMSE_PROSAIL',PriorInfoMean=NULL,PriorInfoSD=NULL,WeightPrior = 0.01){
+Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
+                            SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
+                            TypeLidf, ParmSet, MeritFunction = 'Merit_RMSE_PROSAIL',
+                            PriorInfoMean = NULL, PriorInfoSD = NULL,
+                            WeightPrior = 0.01){
 
   # define parameters included in inversion or set
   ParmInv <- WhichParameters2Invert(InitialGuess,LowerBound,UpperBound,ParmSet)
@@ -49,17 +53,21 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
   ParmInv$InVar[ParmInv$Parms2Set] <- ParmInv$ParmSet
 
   # update init value and lower/upper boundaries for inversion based on Vars2Estimate
-  xinit = as.vector(ParmInv$InitialGuess,mode='numeric')
-  lb    = as.vector(ParmInv$LowerBound,mode='numeric')
-  ub    = as.vector(ParmInv$UpperBound,mode='numeric')
-  resInv   = fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,brfMES = brfMES,
-                  SpecPROSPECT_Sensor=SpecPROSPECT_Sensor, SpecSOIL_Sensor=SpecSOIL_Sensor, SpecATM_Sensor=SpecATM_Sensor,
-                  Parms2Estimate=ParmInv$Parms2Estimate, Parm2Set=ParmInv$Parms2Set, ParmSet=ParmInv$ParmSet,
-                  InVar=ParmInv$InVar ,TypeLidf=TypeLidf,
-                  PriorInfoMean =PriorInfoMean,PriorInfoSD =PriorInfoSD,Parms2Prior=Parms2Prior,WeightPrior=WeightPrior,
-                  method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
-                  lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-08,
-                  maxfeval = 2000, maxiter = 2000)
+  xinit <- as.vector(ParmInv$InitialGuess,mode='numeric')
+  lb <- as.vector(ParmInv$LowerBound,mode='numeric')
+  ub <- as.vector(ParmInv$UpperBound,mode='numeric')
+  resInv <- fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,brfMES = brfMES,
+                    SpecPROSPECT_Sensor = SpecPROSPECT_Sensor,
+                    SpecSOIL_Sensor = SpecSOIL_Sensor,
+                    SpecATM_Sensor = SpecATM_Sensor,
+                    Parms2Estimate = ParmInv$Parms2Estimate,
+                    Parm2Set = ParmInv$Parms2Set, ParmSet = ParmInv$ParmSet,
+                    InVar = ParmInv$InVar ,TypeLidf = TypeLidf,
+                    PriorInfoMean = PriorInfoMean, PriorInfoSD = PriorInfoSD,
+                    Parms2Prior = Parms2Prior, WeightPrior = WeightPrior,
+                    method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
+                    lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-08,
+                    maxfeval = 2000, maxiter = 2000)
 
   ParmInv$InVar[ParmInv$Parms2Estimate] <- resInv$par
   return(ParmInv$InVar)
@@ -70,7 +78,8 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
 #' @param xinit numeric. Vector of input variables to estimate
 #' @param brfMES  numeric. measured BRF
 #' @param SpecPROSPECT_Sensor list. Includes optical constants for PROSPECT
-#' @param SpecSOIL_Sensor list. Includes soil reflectance (either 2 references for optimization of psoil, or a unique spectrun)
+#' @param SpecSOIL_Sensor list. Includes soil reflectance (either 2 references
+#' for optimization of psoil, or a unique spectrun)
 #' @param SpecATM_Sensor list. Includes diffuse and direct light
 #' refractive index, specific absorption coefficients and corresponding spectral bands
 #' @param Parms2Estimate  numeric. rank of variables to be inverted
@@ -86,23 +95,28 @@ Invert_PROSAIL  <- function(brfMES,InitialGuess,LowerBound,UpperBound,
 #'
 #' @return fc estimates of the parameters
 #' @export
-Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,SpecATM_Sensor,
-                               Parms2Estimate,Parm2Set,ParmSet,InVar,TypeLidf,
-                               PriorInfoMean=NULL,PriorInfoSD=NULL,Parms2Prior=NULL,WeightPrior=0.01){
+Merit_RMSE_PROSAIL <- function(xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
+                               SpecATM_Sensor, Parms2Estimate, Parm2Set,
+                               ParmSet, InVar, TypeLidf, PriorInfoMean = NULL,
+                               PriorInfoSD = NULL, Parms2Prior = NULL,
+                               WeightPrior = 0.01){
 
   xinit[xinit<0] = 0
   InVar[Parms2Estimate] <- xinit
   xprior <-InVar[Parms2Prior]
   rsoil <- InVar$psoil*SpecSOIL_Sensor$Dry_Soil+(1-InVar$psoil)*SpecSOIL_Sensor$Wet_Soil
   # call PROSAIL to get reflectance from 4 fluxes
-  Ref <- PRO4SAIL(SpecPROSPECT_Sensor,CHL = InVar$CHL, CAR = InVar$CAR, ANT = InVar$ANT,
-                  EWT = InVar$EWT, LMA = InVar$LMA, N = InVar$N,
-                  TypeLidf = TypeLidf,LIDFa = InVar$LIDFa,LIDFb = InVar$LIDFb,lai = InVar$lai,
-                  q = InVar$q,tts = InVar$tts,tto = InVar$tto,psi = InVar$psi,rsoil = rsoil)
+  Ref <- PRO4SAIL(Spec_Sensor = SpecPROSPECT_Sensor, Input_PROSPECT = InVar,
+                  TypeLidf = TypeLidf,LIDFa = InVar$LIDFa,LIDFb = InVar$LIDFb,
+                  lai = InVar$lai, q = InVar$q, tts = InVar$tts,
+                  tto = InVar$tto, psi = InVar$psi, rsoil = rsoil)
   # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
   brfMOD <- Compute_BRF(Ref$rdot,Ref$rsot,InVar$tts,SpecATM_Sensor)
   # compute cost
-  fc <- CostVal_RMSE_PROSAIL(brfMES,brfMOD,xprior,PriorInfoMean=PriorInfoMean,PriorInfoSD=PriorInfoSD,WeightPrior=WeightPrior)
+  fc <- CostVal_RMSE_PROSAIL(brfMES, brfMOD$BRF, xprior,
+                             PriorInfoMean = PriorInfoMean,
+                             PriorInfoSD = PriorInfoSD,
+                             WeightPrior = WeightPrior)
   return(fc)
 }
 
@@ -118,7 +132,8 @@ Merit_RMSE_PROSAIL <- function(xinit,brfMES,SpecPROSPECT_Sensor,SpecSOIL_Sensor,
 #' @return res list. Includes Parms2Estimate, Parms2Set,
 #' InitialGuess, LowerBound, UpperBound, ParmSet, InVar
 #' @export
-CostVal_RMSE_PROSAIL  <- function(brfMES,brfMOD,xprior,PriorInfoMean=NULL,PriorInfoSD=NULL,WeightPrior=0.01){
+CostVal_RMSE_PROSAIL  <- function(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
+                                  PriorInfoSD = NULL, WeightPrior = 0.01){
 
   fc = sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
   if (!is.null(PriorInfoMean)){
@@ -157,7 +172,8 @@ WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
 
   Parms2Estimate <- c()
   ParmSet_Final <- c()
-  InitialGuess_Update <- LowerBound_Update <- UpperBound_Update <- ParmSet_Update <- data.frame(row.names = c('Val'))
+  InitialGuess_Update <- LowerBound_Update <- UpperBound_Update <-
+    ParmSet_Update <- data.frame(row.names = c('Val'))
 
   # set parameters to user value defined in ParmSet
   if ('CHL'%in%names(InitialGuess) & !'CHL'%in%names(ParmSet)){
@@ -327,10 +343,13 @@ WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
                       'LIDFa'=0,'LIDFb'=0,'lai'=0,'q'=0,
                       'tts'=0,'tto'=0,'psi'=0,'psoil'=0)
 
-  res <- list('Parms2Estimate'=Parms2Estimate,'Parms2Set'=ParmSet_Final,
-             'InitialGuess'=InitialGuess_Update,'LowerBound'= LowerBound_Update,
-             'UpperBound'=UpperBound_Update,'ParmSet'= ParmSet_Update,'InVar'= InVar)
-  return(res)
+  return(list('Parms2Estimate' = Parms2Estimate,
+              'Parms2Set' = ParmSet_Final,
+              'InitialGuess' = InitialGuess_Update,
+              'LowerBound' = LowerBound_Update,
+              'UpperBound' = UpperBound_Update,
+              'ParmSet' = ParmSet_Update,
+              'InVar' = InVar))
 }
 
 #' function identifying for which parameters prior information is known
@@ -437,6 +456,8 @@ WhichParmPRior <- function(PriorInfoMean,PriorInfoSD) {
     PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psoil' = PriorInfoMean$psoil)
     PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psoil' = PriorInfoSD$psoil)
   }
-  res = list('Parms2Prior'=Parms2Prior,'PriorInfoMean'=PriorInfoMean_Update,'PriorInfoSD'=PriorInfoSD_Update)
+  res = list('Parms2Prior' = Parms2Prior,
+             'PriorInfoMean' = PriorInfoMean_Update,
+             'PriorInfoSD' = PriorInfoSD_Update)
   return(res)
 }

@@ -261,16 +261,10 @@ PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
   wvl <- SpecPROSPECT$lambda
   # leaf properties
   SpecPROSPECT_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
-																													   
-												
   # atmospheric properties
   SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
-																								   
-									  
   # soil properties
   SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
-																									   
-										
   SpecSensor <- list('SpecPROSPECT_Sensor' = SpecPROSPECT_Sensor,
                      'SpecATM_Sensor' = SpecATM_Sensor,
                      'SpecSOIL_Sensor' = SpecSOIL_Sensor,
@@ -290,7 +284,6 @@ Compute_SRF <- function(wvl,FWHM, SensorName = 'Custom'){
 
   # define full spectral domain in optical domain
   lambda <- seq(400,2500,by = 1)
-  VoidSpectrum <- matrix(0,nrow = length(lambda),ncol = 1)
   Spectral_Response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
   for (i in 1:length(wvl)){
     y <- dnorm(lambda,wvl[i],FWHM[i]/2.355)
