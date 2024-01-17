@@ -5,7 +5,7 @@
 \title{Performs PROSAIL simulation based on a set of combinations of input parameters}
 \usage{
 PRO4SAIL(
-  Spec_Sensor,
+  Spec_Sensor = NULL,
   Input_PROSPECT = NULL,
   N = 1.5,
   CHL = 40,
@@ -13,7 +13,7 @@ PRO4SAIL(
   ANT = 0,
   BROWN = 0,
   EWT = 0.01,
-  LMA = 0,
+  LMA = NULL,
   PROT = 0,
   CBC = 0,
   alpha = 40,
@@ -31,7 +31,7 @@ PRO4SAIL(
   Cv = 1,
   Zeta = 1,
   SAILversion = "4SAIL",
-  BrownVegetation = NULL
+  BrownLOP = NULL
 )
 }
 \arguments{
@@ -94,7 +94,7 @@ if TypeLidf ==2, unused}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownVegetation}{list. Defines optical properties for brown vegetation, if not NULL
+\item{BrownLOP}{dataframe. Defines optical properties for brown vegetation, if not NULL
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it

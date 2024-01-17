@@ -28,7 +28,8 @@ Merit_RMSE_PROSAIL(
 
 \item{SpecPROSPECT_Sensor}{list. Includes optical constants for PROSPECT}
 
-\item{SpecSOIL_Sensor}{list. Includes soil reflectance (either 2 references for optimization of psoil, or a unique spectrun)}
+\item{SpecSOIL_Sensor}{list. Includes soil reflectance (either 2 references
+for optimization of psoil, or a unique spectrun)}
 
 \item{SpecATM_Sensor}{list. Includes diffuse and direct light
 refractive index, specific absorption coefficients and corresponding spectral bands}

@@ -15,7 +15,8 @@ Compute_fAPAR(abs_dir, abs_hem, tts, SpecATM_Sensor, PAR_range = c(400, 700))
 
 \item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
 
-\item{PAR_range}{numeric. range (in nm) of spectral domain to integrate for computation of fAPAR}
+\item{PAR_range}{numeric. range (in nm) of spectral domain to integrate for
+computation of fAPAR}
 }
 \value{
 fAPAR numeric. fAPAR
