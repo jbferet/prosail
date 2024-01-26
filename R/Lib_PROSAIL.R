@@ -27,7 +27,7 @@
 #' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
 #' @return BRF numeric. Bidirectional reflectance factor
 #' @export
-Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
+Compute_BRF  <- function(rdot, rsot, tts, SpecATM_Sensor){
 
   ############################## #
   ##	direct / diffuse light	##
@@ -36,7 +36,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
+  skyl <- 0.847 - 1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   BRF <- (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
@@ -62,7 +62,7 @@ Compute_BRF  <- function(rdot,rsot,tts,SpecATM_Sensor){
 #'
 #' @return fAPAR numeric. fAPAR
 #' @export
-Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor,
+Compute_fAPAR  <- function(abs_dir, abs_hem, tts, SpecATM_Sensor,
                            PAR_range = c(400, 700)){
 
   ############################## #
@@ -72,11 +72,12 @@ Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor,
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
+  skyl <- 0.847 - 1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   top <- (abs_dir*PARdiro+abs_hem*PARdifo)
-  PARdomain <- which(SpecATM_Sensor$lambda >= PAR_range[1] & SpecATM_Sensor$lambda <= PAR_range[2])
+  PARdomain <- which(SpecATM_Sensor$lambda >= PAR_range[1] &
+                       SpecATM_Sensor$lambda <= PAR_range[2])
   fAPAR <- sum(top[PARdomain])/sum(PARdiro[PARdomain]+PARdifo[PARdomain])
   return(fAPAR)
 }
@@ -99,7 +100,7 @@ Compute_fAPAR  <- function(abs_dir,abs_hem,tts,SpecATM_Sensor,
 #'
 #' @return albedo numeric. albedo
 #' @export
-Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor,
+Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
                             PAR_range = c(400, 2400)){
 
   ############################## #
@@ -109,12 +110,13 @@ Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor,
   Ed <- SpecATM_Sensor$Diffuse_Light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
-  skyl <- 0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
+  skyl <- 0.847 - 1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
-  top <- (rsdstar*PARdiro+rddstar*PARdifo)
-  albedo_domain <- which(SpecATM_Sensor$lambda >= PAR_range[1] & SpecATM_Sensor$lambda <= PAR_range[2])
-  albedo <- sum(top[albedo_domain])/sum(PARdiro[albedo_domain]+PARdifo[albedo_domain])
+  top <- (rsdstar*PARdiro + rddstar*PARdifo)
+  albedo_domain <- which(SpecATM_Sensor$lambda >= PAR_range[1] &
+                           SpecATM_Sensor$lambda <= PAR_range[2])
+  albedo <- sum(top[albedo_domain])/sum(PARdiro[albedo_domain] + PARdifo[albedo_domain])
   return(albedo)
 }
 
@@ -163,16 +165,16 @@ Compute_albedo  <- function(rsdstar,rddstar,tts,SpecATM_Sensor,
 #' rddt: bi-hemispherical reflectance factor
 #' @import prospect
 #' @export
-PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL,
-                     N = 1.5, CHL = 40.0, CAR = 8.0, ANT = 0.0,
-                     BROWN = 0.0, EWT = 0.01, LMA = NULL,
-                     PROT = 0.0, CBC = 0.0, alpha = 40.0,
-                     TypeLidf = 2, LIDFa = NULL, LIDFb = NULL, lai = NULL,
-                     q = NULL, tts = NULL, tto = NULL, psi = NULL, rsoil = NULL,
+PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL, N = 1.5,
+                     CHL = 40.0, CAR = 8.0, ANT = 0.0, BROWN = 0.0, EWT = 0.01,
+                     LMA = NULL, PROT = 0.0, CBC = 0.0, alpha = 40.0,
+                     TypeLidf = 2, LIDFa = 60, LIDFb = NULL, lai = 3,
+                     q = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
                      fraction_brown = 0.0, diss = 0.0, Cv = 1, Zeta = 1,
                      SAILversion = '4SAIL', BrownLOP = NULL){
 
   if (is.null(Spec_Sensor)) Spec_Sensor <- prospect::SpecPROSPECT_FullRange
+  if (is.null(rsoil)) rsoil <- prosail::SpecSOIL$Dry_Soil
   #	PROSPECT: LEAF OPTICAL PROPERTIES
   LOP <- adjust_PROSPECT_2_SAIL(SAILversion = SAILversion,
                                 Spec_Sensor = Spec_Sensor,
@@ -347,8 +349,8 @@ PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL,
 #' rddstar: contribution of hemispherical diffuse incident flux to albedo
 #' @export
 
-fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL,
-                      lai = NULL, q = NULL, tts = NULL, tto = NULL, psi = NULL,
+fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
+                      lai = 3, q = 0.1, tts = 30, tto = 0, psi = 60,
                       rsoil = NULL){
 
   ############################ #
@@ -628,9 +630,9 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = NULL, LIDFb = NULL,
 #' @export
 
 fourSAIL2  <- function(leafgreen, leafbrown,
-                       TypeLidf = 2, LIDFa = NULL,LIDFb = NULL,
-                       lai = NULL, q = NULL,tts = NULL,tto = NULL,psi = NULL,rsoil = NULL,
-                       fraction_brown = 0.5, diss = 0.5, Cv = 1,Zeta = 1){
+                       TypeLidf = 2, LIDFa = 60, LIDFb = NULL, lai = 3,
+                       q = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
+                       fraction_brown = 0.5, diss = 0.5, Cv = 1, Zeta = 1){
 
   #	This version does not include non-Lambertian soil properties.
   #	original codes do, and only need to add the following variables as input
@@ -1239,7 +1241,8 @@ Jfunc1 <- function(k,l,t){
   # J1 function with avoidance of singularity problem
   del <- (k-l)*t
   Jout = 0*l
-  Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t) - exp(-k*t))/(k-l[which(abs(del)>1e-3)])
+  Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t) -
+                                   exp(-k*t))/(k-l[which(abs(del)>1e-3)])
   Jout[which(abs(del)<=1e-3)] <- 0.5*t*(exp(-k*t)+exp(-l[which(abs(del)<=1e-3)]*t))*(1-del[which(abs(del)<=1e-3)]*del[which(abs(del)<=1e-3)]/12)
   return(Jout)
 }
@@ -1394,7 +1397,7 @@ volscatt  <- function(tts,tto,psi,ttl){
   if (ftau<0){
     ftau <- 0
   }
-  res <- list("chi_s" = chi_s,"chi_o" =chi_o,"frho" =frho,"ftau" =ftau)
+  res <- list("chi_s" = chi_s,"chi_o" = chi_o,"frho" = frho,"ftau" = ftau)
   return(res)
 }
 
@@ -1476,8 +1479,7 @@ check_BrownLOP <- function(BrownLOP, lambda, Input_PROSPECT){
 #' @return invisible
 #' @export
 
-adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor,
-                                   Input_PROSPECT,
+adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor, Input_PROSPECT,
                                    CHL, CAR, ANT, BROWN, EWT, LMA,
                                    PROT, CBC, N, alpha, fraction_brown,
                                    BrownLOP = NULL){

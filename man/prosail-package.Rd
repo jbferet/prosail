@@ -23,7 +23,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Florian de Boissieu \email{florian.deboissieu@irstea.fr} (\href{https://orcid.org/0000-0002-2185-9952}{ORCID})
+  \item Florian de Boissieu \email{florian.deboissieu@inrae.fr} (\href{https://orcid.org/0000-0002-2185-9952}{ORCID})
 }
 
 }

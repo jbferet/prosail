@@ -54,8 +54,7 @@ apply_noise_atbd <- function(BRF_LUT){
 #' @return BRF_LUT_Noise numeric.
 #' @export
 
-apply_noise_AddMult <- function(BRF_LUT,
-                                AdditiveNoise = 0.01,
+apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
                                 MultiplicativeNoise = 0.02){
   nbWL <- nrow(BRF_LUT)
   nbSamples <- ncol(BRF_LUT)
@@ -65,13 +64,15 @@ apply_noise_AddMult <- function(BRF_LUT,
                       nrow = nbWL)
   } else if ((length(AdditiveNoise)==nbWL)){
     AddComp <- matrix(data = 0, nrow = nbWL, ncol = nbSamples)
-    for (i in 1:nbWL) AddComp[i,] <- matrix(data = rnorm(nbSamples,0,AdditiveNoise[i]), ncol = nbSamples)
+    for (i in seq_len(nbWL)) AddComp[i,] <- matrix(data = rnorm(nbSamples,0,AdditiveNoise[i]),
+                                            ncol = nbSamples)
   }
   if (length(MultiplicativeNoise)==1){
     MultComp <- matrix(rnorm(nbWL*nbSamples,0,MultiplicativeNoise), nrow = nbWL)
   } else if ((length(MultiplicativeNoise)==nbWL)){
     MultComp <- matrix(data = 0, nrow = nbWL, ncol = nbSamples)
-    for (i in 1:nbWL) MultComp[i,] <- matrix(data = rnorm(nbSamples,0,MultiplicativeNoise[i]),ncol = nbSamples)
+    for (i in 1:nbWL) MultComp[i,] <- matrix(data = rnorm(nbSamples,0,MultiplicativeNoise[i]),
+                                             ncol = nbSamples)
   }
   BRF_LUT_Noise <- BRF_LUT*(1+(MultComp)) + AddComp
   return(BRF_LUT_Noise)
@@ -101,8 +102,8 @@ apply_noise_AddMult <- function(BRF_LUT,
 #' @importFrom tools file_path_sans_ext
 #' @export
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
-                                    SelectedBands, bandname,
-                                    MaskRaster = FALSE,MultiplyingFactor=10000,
+                                    SelectedBands, bandname, MaskRaster = FALSE,
+                                    MultiplyingFactor = 10000,
                                     method = 'liquidSVM'){
 
   # explain which biophysical variables will be computed
@@ -136,11 +137,16 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       total = pgbarlength, clear = FALSE, width= 100)
 
     # output files
-    BPvarpath[[parm]] <- file.path(PathOut,paste(file_path_sans_ext(basename(raster_path)),parm,sep = '_'))
-    BPvarSDpath[[parm]] <- file.path(PathOut,paste(file_path_sans_ext(basename(raster_path)),parm,'STD',sep = '_'))
-    r_outMean <- writeStart(raster(raster_path), filename = BPvarpath[[parm]],format = "ENVI", overwrite = TRUE)
-    r_outSD <- writeStart(raster(raster_path), filename = BPvarSDpath[[parm]],format = "ENVI", overwrite = TRUE)
-    Selbands <- match(SelectedBands[[parm]],bandname)
+    raster_name <- tools::file_path_sans_ext(basename(raster_path))
+    BPvarpath[[parm]] <- file.path(PathOut, paste(raster_name, parm, sep = '_'))
+    BPvarSDpath[[parm]] <- file.path(PathOut,paste(raster_name, parm, 'STD', sep = '_'))
+    r_outMean <- writeStart(raster(raster_path),
+                            filename = BPvarpath[[parm]],
+                            format = "ENVI", overwrite = TRUE)
+    r_outSD <- writeStart(raster(raster_path),
+                          filename = BPvarSDpath[[parm]],
+                          format = "ENVI", overwrite = TRUE)
+    Selbands <- match(SelectedBands[[parm]], bandname)
 
     # loop over blocks
     for (i in seq_along(blk$row)) {
@@ -171,7 +177,8 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         modelSVR_Estimate <- list()
         for (modind in 1:length(HybridModel[[parm]])){
           pb$tick()
-          modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]], BlockVal)
+          modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]],
+                                                 BlockVal)
         }
         modelSVR_Estimate <- do.call(cbind,modelSVR_Estimate)
         # final estimated value = mean parm value for all models
@@ -185,14 +192,14 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
           pb$tick()
         }
       }
-      r_outMean <- writeValues(r_outMean, Mean_EstimateFull, blk$row[i],format = "ENVI", overwrite = TRUE)
-      r_outSD <- writeValues(r_outSD, STD_EstimateFull, blk$row[i],format = "ENVI", overwrite = TRUE)
+      r_outMean <- writeValues(r_outMean, Mean_EstimateFull, blk$row[i],
+                               format = "ENVI", overwrite = TRUE)
+      r_outSD <- writeValues(r_outSD, STD_EstimateFull, blk$row[i],
+                             format = "ENVI", overwrite = TRUE)
     }
     # close files
     r_in <- readStop(r_in)
-    if (typeof(r_inmask)=='S4'){
-      r_inmask <- readStop(r_inmask)
-    }
+    if (typeof(r_inmask)=='S4') r_inmask <- readStop(r_inmask)
     r_outMean <- writeStop(r_outMean)
     r_outSD <- writeStop(r_outSD)
     # write biophysical variable name in headers
@@ -201,8 +208,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
     write_ENVI_header(HDR, get_HDR_name(BPvarpath[[parm]]))
   }
   print('processing completed')
-  res <- list('mean' = BPvarpath, 'SD' = BPvarSDpath)
-  return(res)
+  return(list('mean' = BPvarpath, 'SD' = BPvarSDpath))
 }
 
 #' get hdr name from image file name, assuming it is BIL format
@@ -222,7 +228,6 @@ get_HDR_name <- function(ImPath) {
   } else {
     ImPathHDR <- paste(tools::file_path_sans_ext(ImPath), ".hdr", sep = "")
   }
-
   if (!file.exists(ImPathHDR)) {
     message("WARNING : COULD NOT FIND HDR FILE")
     print(ImPathHDR)
@@ -352,8 +357,8 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
   EstimatedVal <- do.call(cbind,EstimatedVal)
   MeanEstimate <- rowMeans(EstimatedVal)
   StdEstimate <- rowSds(EstimatedVal)
-  HybridRes <- list("MeanEstimate" = MeanEstimate,"StdEstimate" =StdEstimate)
-  return(HybridRes)
+  return(list("MeanEstimate" = MeanEstimate,
+              "StdEstimate" = StdEstimate))
 }
 
 #' This function trains a support vector regression for a set of variables based on spectral data
@@ -380,27 +385,25 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @import ggplot2
 #' @export
 
-PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble = 20,
-                                 WithReplacement = FALSE, method = 'liquidSVM', verbose = FALSE){
+PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE,
+                                 nbEnsemble = 20, WithReplacement = FALSE,
+                                 method = 'liquidSVM', verbose = FALSE){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # library(dplyr)
   # split the LUT into nbEnsemble subsets
   nbSamples <- length(InputVar)
-  if (dim(BRF_LUT)[2]==nbSamples){
-    BRF_LUT <- t(BRF_LUT)
-  }
-
+  if (dim(BRF_LUT)[2]==nbSamples) BRF_LUT <- t(BRF_LUT)
   # if subsets are generated from BRF_LUT with replacement
   if (WithReplacement==TRUE){
     Subsets <- list()
     samples_per_run <- round(nbSamples/nbEnsemble)
     for (run in (1:nbEnsemble)){
-      Subsets[[run]] <- sample(seq(1,nbSamples), samples_per_run, replace = TRUE)
+      Subsets[[run]] <- sample(seq_len(nbSamples), samples_per_run, replace = TRUE)
     }
   # if subsets are generated from BRF_LUT without replacement
   } else if (WithReplacement==FALSE){
-    Subsets <- split(sample(seq(1,nbSamples,by = 1)),seq(1,nbEnsemble,by = 1))
+    Subsets <- split(sample(seq_len(nbSamples)),seq_len(nbEnsemble))
   }
 
   # run training for each subset
@@ -414,7 +417,8 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
     if (method == 'liquidSVM'){
       # liquidSVM
-      r1 <- tryCatch.W.E(tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y))
+      r1 <- tryCatch.W.E(tunedModel <- liquidSVM::svmRegression(TrainingSet$X,
+                                                                TrainingSet$Y))
       # reset.warnings()
       # tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y)
       if (!is.null(r1$warning)){
@@ -424,12 +428,16 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
         if (!is.na(as.numeric(ValGamma))){
           if (verbose==T) { message('Adjusting Gamma accordingly')}
           ValGamma <- as.numeric(ValGamma)
-          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_gamma = ValGamma)
+          tunedModel <- liquidSVM::svmRegression(TrainingSet$X,
+                                                 TrainingSet$Y,
+                                                 min_gamma = ValGamma)
         }
         if (!is.na(as.numeric(ValLambda))){
           if (verbose==T) { message('Adjusting Lambda accordingly')}
           ValLambda <- as.numeric(ValLambda)
-          tunedModel <- liquidSVM::svmRegression(TrainingSet$X, TrainingSet$Y,min_lambda = ValLambda)
+          tunedModel <- liquidSVM::svmRegression(TrainingSet$X,
+                                                 TrainingSet$Y,
+                                                 min_lambda = ValLambda)
         }
       }
     } else {
@@ -438,7 +446,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
         number = 5,
       )
       if (is.null(colnames(TrainingSet$X))){
-        colnames(TrainingSet$X) <- paste('var',seq(1,ncol(TrainingSet$X)),sep = '_')
+        colnames(TrainingSet$X) <- paste('var',seq_len(ncol(TrainingSet$X)),sep = '_')
       }
       target <- matrix(TrainingSet$Y,ncol = 1)
       if (is.null(colnames(target))){
@@ -476,7 +484,8 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
       tunedModelYAll = cbind(tunedModelYAll,matrix(tunedModelY,ncol = 1))
     }
     # plot prediction
-    df <- data.frame(x = rep(1:nbSamples,nbEnsemble), y = as.numeric(matrix(tunedModelYAll,ncol = 1)))
+    df <- data.frame(x = rep(1:nbSamples,nbEnsemble),
+                     y = as.numeric(matrix(tunedModelYAll, ncol = 1)))
     df.summary <- df %>% dplyr::group_by(x) %>%
       summarize( ymin = min(y),ystdmin = mean(y)-sd(y),
                  ymax = max(y),ystdmax = mean(y)+sd(y),
@@ -485,7 +494,8 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE, nbEnsemble 
     p <- ggplot(df.summary, aes(x = InputVar, y = ymean)) +
       geom_point(size = 2) +
       geom_errorbar(aes(ymin = ystdmin, ymax = ystdmax))
-    MeanPredict <- rowMeans(matrix(as.numeric(tunedModelYAll),ncol = nbEnsemble))
+    MeanPredict <- rowMeans(matrix(as.numeric(tunedModelYAll),
+                                   ncol = nbEnsemble))
     print(p)
   }
   return(modelsSVR)
@@ -518,9 +528,7 @@ read_ENVI_header <- function(HDRpath) {
     stop("Error matching curly braces in header (differing numbers).")
   }
 
-  if (any(r <= l)) {
-    stop("Mismatch of curly braces in header.")
-  }
+  if (any(r <= l)) stop("Mismatch of curly braces in header.")
 
   HDR[l] <- sub("\\{", "", HDR[l])
   HDR[r] <- sub("\\}", "", HDR[r])
@@ -546,7 +554,6 @@ read_ENVI_header <- function(HDRpath) {
   HDR [tmp] <- lapply(HDR [tmp], function(x) {
     as.numeric(unlist(strsplit(x, ",")))
   })
-
   return(HDR)
 }
 
@@ -615,11 +622,12 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                     minval = NULL, maxval = NULL,
                                     TypeDistrib = NULL, GaussianDistrib = NULL,
                                     ParmSet = NULL, SAILversion = '4SAIL',
-                                    nbSamples = 2000, nbSamplesPerRun = 100, nbModels = 20,
-                                    Replacement = TRUE,
-                                    Parms2Estimate = 'lai', Bands2Select = NULL, NoiseLevel = NULL,
-                                    SRF = NULL,
-                                    SpecPROSPECT = NULL, SpecSOIL = NULL, SpecATM = NULL,
+                                    nbSamples = 2000, nbSamplesPerRun = 100,
+                                    nbModels = 20, Replacement = TRUE,
+                                    Parms2Estimate = 'lai', Bands2Select = NULL,
+                                    NoiseLevel = NULL, SRF = NULL,
+                                    SpecPROSPECT = NULL, SpecSOIL = NULL,
+                                    SpecATM = NULL,
                                     Path_Results = './', FigPlot = FALSE,
                                     method = 'liquidSVM', verbose = FALSE){
 
@@ -627,9 +635,10 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
   ###     1- DEFINE THE LUT USED TO TRAIN THE HYBRID INVERSION          ###
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   # default parameter values
-  defaultVal <- data.frame('CHL'=40, 'CAR'=10, 'ANT' = 0, 'EWT' = 0.01, 'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5,
-                           'psoil' = 0.5, 'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1,
-                           'tto' = 0, 'tts' = 30, 'psi' = 80, 'TypeLidf' = 2, 'alpha' = 40)
+  defaultVal <- data.frame('CHL'=40, 'CAR'=10, 'ANT' = 0, 'EWT' = 0.01,
+                           'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5, 'psoil' = 0.5,
+                           'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1, 'tto' = 0,
+                           'tts' = 30, 'psi' = 80, 'TypeLidf' = 2, 'alpha' = 40)
   ListParms <- names(defaultVal)
 
   ##############################################################################
@@ -645,9 +654,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
     }
     # check if all parameters defined & use default value for undefined parameters
     UndefinedParms <- ListParms[which(is.na(match(ListParms, names(InputPROSAIL))))]
-    for (parm in UndefinedParms){
-      InputPROSAIL[[parm]] <- defaultVal[[parm]]
-    }
+    for (parm in UndefinedParms) InputPROSAIL[[parm]] <- defaultVal[[parm]]
     # Set parameters
     if (length(ParmSet)>0){
       for (parm in names(ParmSet)){
@@ -655,10 +662,13 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
       }
     }
   } else {
-    InputPROSAIL <- get_InputPROSAIL(atbd = atbd, GeomAcq = GeomAcq, Codist_LAI = Codist_LAI,
+    InputPROSAIL <- get_InputPROSAIL(atbd = atbd, GeomAcq = GeomAcq,
+                                     Codist_LAI = Codist_LAI,
                                      minval = minval, maxval = maxval,
-                                     TypeDistrib = TypeDistrib, GaussianDistrib = GaussianDistrib,
-                                     ParmSet = ParmSet, nbSamples = nbSamples, verbose = verbose)
+                                     TypeDistrib = TypeDistrib,
+                                     GaussianDistrib = GaussianDistrib,
+                                     ParmSet = ParmSet, nbSamples = nbSamples,
+                                     verbose = verbose)
   }
 
   if (!is.null(BRF_LUT)){
@@ -706,7 +716,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
     if (!is.null(SRF)) {
       if (!length(SRF$Spectral_Bands)==nrow(BRF_LUT)){
         BRF_LUT <- applySensorCharacteristics(wvl = wvl, SRF = SRF, InRefl = BRF_LUT)
-        SpecSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+        SpecSensor <- PrepareSensorSimulation(SpecPROSPECT, SpecSOIL, SpecATM, SRF)
       }
       rownames(BRF_LUT) <- SRF$Spectral_Bands
     }
@@ -762,9 +772,12 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
   for (parm in Parms2Estimate){
     ColParm <- which(parm==names(InputPROSAIL))
     InputVar <- InputPROSAIL[[ColParm]]
-    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],InputVar = InputVar,
-                                             FigPlot = FigPlot,nbEnsemble = nbModels,
-                                             WithReplacement = Replacement, method = method, verbose = verbose)
+    modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],
+                                             InputVar = InputVar,
+                                             FigPlot = FigPlot,
+                                             nbEnsemble = nbModels,
+                                             WithReplacement = Replacement,
+                                             method = method, verbose = verbose)
   }
   return(modelSVR)
 }
