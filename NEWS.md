@@ -1,3 +1,12 @@
+# prosail v2.3.1
+
+## additions
+- added automated unit tests
+- include plain text versions for SpecPROSPECT, SpecATM and SpecSOIL 
+
+## changes
+- changed default values
+
 # prosail v2.3.0
 
 ## Changes

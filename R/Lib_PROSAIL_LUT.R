@@ -490,8 +490,9 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 #' @importFrom progress progress_bar
 #' @export
 
-Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
-                               SAILversion='4SAIL', BrownLOP = NULL){
+Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
+                               BandNames = NULL, SAILversion ='4SAIL',
+                               BrownLOP = NULL){
 
   nbSamples <- length(InputPROSAIL[[1]])
   rdot <- rsot <- rsdt <- rddt <-  BRF <- list()
@@ -506,16 +507,20 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Ba
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL[i,]$TypeLidf,
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL[i,]$TypeLidf,
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
@@ -529,7 +534,9 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Ba
     rsdt[[i]] <- RefSAIL$rsdt
     rddt[[i]] <- RefSAIL$rddt
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-    BRF[[i]] <- Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
+    BRF[[i]] <- Compute_BRF(rdot = RefSAIL$rdot, rsot = RefSAIL$rsot,
+                            tts = InputPROSAIL$tts[[i]],
+                            SpecATM_Sensor = SpecATM)
   }
   BRF <- do.call(cbind,BRF)
   rdot <- do.call(cbind,rdot)
@@ -537,7 +544,8 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Ba
   rsdt <- do.call(cbind,rsdt)
   rddt <- do.call(cbind,rddt)
   row.names(BRF) <- row.names(rdot) <- row.names(rsot) <- row.names(rsdt) <- row.names(rddt) <- BandNames
-  return(list('BRF' = BRF, 'rdot' = rdot, 'rsot' = rsot, 'rsdt' = rsdt, 'rddt' = rddt))
+  return(list('BRF' = BRF, 'rdot' = rdot, 'rsot' = rsot,
+              'rsdt' = rsdt, 'rddt' = rddt))
 }
 
 
@@ -557,8 +565,9 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Ba
 #' @importFrom progress progress_bar
 #' @export
 
-Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames = NULL,
-                             SAILversion='4SAIL', BrownLOP = NULL){
+Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
+                             BandNames = NULL, SAILversion='4SAIL',
+                             BrownLOP = NULL){
 
   nbSamples <- length(InputPROSAIL[[1]])
   BRF <- list()
@@ -570,19 +579,24 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
     if (i%%Split==0 & nbSamples>100){
       pb$tick()
     }
-    rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
+    rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil +
+      (1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL[i,]$TypeLidf,
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL[i,]$TypeLidf,
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
@@ -592,7 +606,10 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, Band
                           Zeta = InputPROSAIL[i,]$Zeta, BrownLOP = BrownLOP)
     }
     # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-    BRF[[i]] <- Compute_BRF(RefSAIL$rdot,RefSAIL$rsot,InputPROSAIL$tts[[i]],SpecATM)
+    BRF[[i]] <- Compute_BRF(rdot = RefSAIL$rdot,
+                            rsot = RefSAIL$rsot,
+                            tts = InputPROSAIL$tts[[i]],
+                            SpecATM_Sensor = SpecATM)
   }
   BRF <- do.call(cbind,BRF)
   row.names(BRF) <- BandNames
@@ -635,16 +652,20 @@ Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT,
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL$TypeLidf[i],
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT, Input_PROSPECT = InputPROSAIL[i,],
+      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
+                          Input_PROSPECT = InputPROSAIL[i,],
                           TypeLidf = InputPROSAIL[i,]$TypeLidf,
-                          LIDFa = InputPROSAIL[i,]$LIDFa, LIDFb = InputPROSAIL[i,]$LIDFb,
+                          LIDFa = InputPROSAIL[i,]$LIDFa,
+                          LIDFb = InputPROSAIL[i,]$LIDFb,
                           lai = InputPROSAIL[i,]$lai, q = InputPROSAIL[i,]$q,
                           tts = InputPROSAIL[i,]$tts, tto = InputPROSAIL[i,]$tto,
                           psi = InputPROSAIL[i,]$psi, rsoil = rsoil,
@@ -689,9 +710,11 @@ Apply_Noise_LUT <- function(LUT,NoiseLevel,NoiseType = 'relative'){
   nbFeatures <- nrow(LUT)
   nbSamples <- ncol(LUT)
   if (NoiseType == 'relative'){
-    LUT_Noise <- LUT + LUT*matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
+    LUT_Noise <- LUT + LUT*matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),
+                                  nrow = nbFeatures)
   } else if (NoiseType == 'absolute'){
-    LUT_Noise <- LUT + matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),nrow = nbFeatures)
+    LUT_Noise <- LUT + matrix(rnorm(nbFeatures*nbSamples,0,NoiseLevel),
+                              nrow = nbFeatures)
   }
   return(LUT_Noise)
 }

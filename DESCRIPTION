@@ -1,6 +1,6 @@
 Package: prosail
 Title: PROSAIL leaf and canopy radiative transfer model and inversion routines
-Version: 2.3.0
+Version: 2.3.1
 Authors@R: c(person(given = "Jean-Baptiste", 
 					    family = "Feret", 
 					    email = "jb.feret@teledetection.fr", 
@@ -8,7 +8,7 @@ Authors@R: c(person(given = "Jean-Baptiste",
 					    comment = c(ORCID = "0000-0002-0151-1334")),
 			    person(	given = "Florian", 
 					    family = "de Boissieu", 
-					    email = "florian.deboissieu@irstea.fr", 
+					    email = "florian.deboissieu@inrae.fr", 
 					    role = c("aut"), 
 					    comment = c(ORCID = "0000-0002-2185-9952")))
 Description: The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
@@ -19,8 +19,10 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.0
-Suggests: knitr,
-    rmarkdown
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 Imports: 
     caret,
     dplyr,
@@ -43,3 +45,4 @@ Remotes: github::jbferet/prospect
 VignetteBuilder: knitr
 URL: https://gitlab.com/jbferet/prosail
 BugReports: https://gitlab.com/jbferet/prosail/issues
+Config/testthat/edition: 3

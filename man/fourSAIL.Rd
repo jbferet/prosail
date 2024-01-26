@@ -7,13 +7,13 @@
 fourSAIL(
   LeafOptics,
   TypeLidf = 2,
-  LIDFa = NULL,
+  LIDFa = 60,
   LIDFb = NULL,
-  lai = NULL,
-  q = NULL,
-  tts = NULL,
-  tto = NULL,
-  psi = NULL,
+  lai = 3,
+  q = 0.1,
+  tts = 30,
+  tto = 0,
+  psi = 60,
   rsoil = NULL
 )
 }

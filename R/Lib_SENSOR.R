@@ -315,7 +315,7 @@ get_spec_sensor <- function(SensorName = 'MyCustomSensor',
     stop()
   }
   # adjust optical constants from 1nm sampling into spectral S2 spectral sampling
-  SpecSensor <- PrepareSensorSimulation(prosail::SpecPROSPECT,
+  SpecSensor <- PrepareSensorSimulation(prosail::SpecPROSPECT_FullRange,
                                         prosail::SpecSOIL,
                                         prosail::SpecATM,SRF)
   return(SpecSensor)

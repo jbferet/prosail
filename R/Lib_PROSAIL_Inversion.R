@@ -456,8 +456,7 @@ WhichParmPRior <- function(PriorInfoMean,PriorInfoSD) {
     PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psoil' = PriorInfoMean$psoil)
     PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psoil' = PriorInfoSD$psoil)
   }
-  res = list('Parms2Prior' = Parms2Prior,
-             'PriorInfoMean' = PriorInfoMean_Update,
-             'PriorInfoSD' = PriorInfoSD_Update)
-  return(res)
+  return(list('Parms2Prior' = Parms2Prior,
+              'PriorInfoMean' = PriorInfoMean_Update,
+              'PriorInfoSD' = PriorInfoSD_Update))
 }
