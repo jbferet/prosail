@@ -87,7 +87,7 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
 #' @param Parm2Set  numeric. rank of variables to be set out of inversion
 #' @param ParmSet  list. value of variables to be set out of inversion
 #' @param InVar dataframe. full set of PROSAIL input variables
-#' @param TypeLidf  numeric. tyoe of leaf inclination distribution function
+#' @param TypeLidf  numeric. type of leaf inclination distribution function
 #' @param PriorInfoMean list. prior mean value of parameters defined as xprior
 #' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
 #' @param Parms2Prior numeric. rank of the parameters which should be used with prior information
