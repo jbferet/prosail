@@ -35,17 +35,21 @@
 #' @importFrom pracma fmincon
 #' @export
 
-Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
+Invert_PROSAIL  <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
                             SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
                             TypeLidf, ParmSet, MeritFunction = 'Merit_RMSE_PROSAIL',
                             PriorInfoMean = NULL, PriorInfoSD = NULL,
                             WeightPrior = 0.01){
 
   # define parameters included in inversion or set
-  ParmInv <- WhichParameters2Invert(InitialGuess,LowerBound,UpperBound,ParmSet)
+  ParmInv <- WhichParameters2Invert(InitialGuess = InitialGuess,
+                                    LowerBound = LowerBound,
+                                    UpperBound = UpperBound,
+                                    ParmSet = ParmSet)
   Parms2Prior <- NULL
   if (!is.null(PriorInfoMean) & !is.null(PriorInfoSD)){
-    PriorInfo <- WhichParmPRior(PriorInfoMean,PriorInfoSD)
+    PriorInfo <- WhichParmPrior(PriorInfoMean = PriorInfoMean,
+                                PriorInfoSD = PriorInfoSD)
     PriorInfoMean <- PriorInfo$PriorInfoMean
     PriorInfoSD <- PriorInfo$PriorInfoSD
     Parms2Prior <- PriorInfo$Parms2Prior
@@ -53,22 +57,27 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
   ParmInv$InVar[ParmInv$Parms2Set] <- ParmInv$ParmSet
 
   # update init value and lower/upper boundaries for inversion based on Vars2Estimate
-  xinit <- as.vector(ParmInv$InitialGuess,mode='numeric')
-  lb <- as.vector(ParmInv$LowerBound,mode='numeric')
-  ub <- as.vector(ParmInv$UpperBound,mode='numeric')
-  resInv <- fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,brfMES = brfMES,
+  # xinit <- as.vector(ParmInv$InitialGuess,mode='numeric')
+  # lb <- as.vector(ParmInv$LowerBound,mode='numeric')
+  # ub <- as.vector(ParmInv$UpperBound,mode='numeric')
+  xinit <- as.numeric(ParmInv$InitialGuess)
+  lb <- as.numeric(ParmInv$LowerBound)
+  names(lb) <- names(ParmInv$LowerBound)
+  ub <- as.numeric(ParmInv$UpperBound)
+  names(ub) <- names(ParmInv$UpperBound)
+  resInv <- fmincon(x0 = xinit, fn = MeritFunction, gr = NULL,
+                    parms_xinit = names(ParmInv$InitialGuess), brfMES = brfMES,
                     SpecPROSPECT_Sensor = SpecPROSPECT_Sensor,
                     SpecSOIL_Sensor = SpecSOIL_Sensor,
                     SpecATM_Sensor = SpecATM_Sensor,
                     Parms2Estimate = ParmInv$Parms2Estimate,
                     Parm2Set = ParmInv$Parms2Set, ParmSet = ParmInv$ParmSet,
-                    InVar = ParmInv$InVar ,TypeLidf = TypeLidf,
+                    InVar = ParmInv$InVar, TypeLidf = TypeLidf,
                     PriorInfoMean = PriorInfoMean, PriorInfoSD = PriorInfoSD,
                     Parms2Prior = Parms2Prior, WeightPrior = WeightPrior,
                     method = "SQP",A = NULL, b = NULL, Aeq = NULL, beq = NULL,
-                    lb = lb, ub = ub, hin = NULL, heq = NULL,tol = 1e-08,
+                    lb = lb, ub = ub, hin = NULL, heq = NULL, tol = 1e-14,
                     maxfeval = 2000, maxiter = 2000)
-
   ParmInv$InVar[ParmInv$Parms2Estimate] <- resInv$par
   return(ParmInv$InVar)
 }
@@ -76,6 +85,7 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
 #' Merit function for PROSAIL inversion
 #'
 #' @param xinit numeric. Vector of input variables to estimate
+#' @param parms_xinit character. name of parameters corresponding to xinit
 #' @param brfMES  numeric. measured BRF
 #' @param SpecPROSPECT_Sensor list. Includes optical constants for PROSPECT
 #' @param SpecSOIL_Sensor list. Includes soil reflectance (either 2 references
@@ -95,25 +105,26 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess, LowerBound, UpperBound,
 #'
 #' @return fc estimates of the parameters
 #' @export
-Merit_RMSE_PROSAIL <- function(xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
+Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
                                SpecATM_Sensor, Parms2Estimate, Parm2Set,
                                ParmSet, InVar, TypeLidf, PriorInfoMean = NULL,
                                PriorInfoSD = NULL, Parms2Prior = NULL,
                                WeightPrior = 0.01){
 
   xinit[xinit<0] = 0
-  InVar[Parms2Estimate] <- xinit
-  xprior <-InVar[Parms2Prior]
+  InVar[Parms2Estimate] <- xinit[match(parms_xinit, Parms2Estimate)]
+  xprior <- InVar[Parms2Prior]
   rsoil <- InVar$psoil*SpecSOIL_Sensor$Dry_Soil+(1-InVar$psoil)*SpecSOIL_Sensor$Wet_Soil
   # call PROSAIL to get reflectance from 4 fluxes
   Ref <- PRO4SAIL(Spec_Sensor = SpecPROSPECT_Sensor, Input_PROSPECT = InVar,
-                  TypeLidf = TypeLidf,LIDFa = InVar$LIDFa,LIDFb = InVar$LIDFb,
+                  TypeLidf = TypeLidf, LIDFa = InVar$LIDFa, LIDFb = InVar$LIDFb,
                   lai = InVar$lai, q = InVar$q, tts = InVar$tts,
                   tto = InVar$tto, psi = InVar$psi, rsoil = rsoil)
   # Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-  brfMOD <- Compute_BRF(Ref$rdot,Ref$rsot,InVar$tts,SpecATM_Sensor)
+  brfMOD <- Compute_BRF(rdot = Ref$rdot, rsot = Ref$rsot,
+                        tts = InVar$tts, SpecATM_Sensor = SpecATM_Sensor)
   # compute cost
-  fc <- CostVal_RMSE_PROSAIL(brfMES, brfMOD$BRF, xprior,
+  fc <- CostVal_RMSE_PROSAIL(brfMES = brfMES, brfMOD$BRF, xprior,
                              PriorInfoMean = PriorInfoMean,
                              PriorInfoSD = PriorInfoSD,
                              WeightPrior = WeightPrior)
@@ -135,11 +146,11 @@ Merit_RMSE_PROSAIL <- function(xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sens
 CostVal_RMSE_PROSAIL  <- function(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
                                   PriorInfoSD = NULL, WeightPrior = 0.01){
 
-  fc = sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
+  fc <- sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
   if (!is.null(PriorInfoMean)){
     # message('fc')
     # print(fc)
-    fc = fc + WeightPrior*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2)
+    fc <- fc + WeightPrior*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2)
     # message('prior')
     # print(0.01*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2))
     # print(PriorInfoMean)
@@ -168,181 +179,35 @@ CostVal_RMSE_PROSAIL  <- function(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
 #' - InVar
 #' fc estimates of the parameters
 #' @export
-WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
+WhichParameters2Invert <- function(InitialGuess, LowerBound,
+                                   UpperBound, ParmSet) {
 
-  Parms2Estimate <- c()
-  ParmSet_Final <- c()
+  # define all parameters which can be assessed through iterativbe optimization
+  InVar <- data.frame('CHL' = 0,'CAR' = 0,'ANT' = 0,'BROWN' = 0,'EWT' = 0,
+                      'LMA' = 0,'PROT' = 0,'CBC' = 0,'N' = 0,'alpha' = 40,
+                      'LIDFa' = 0,'LIDFb' = 0,'lai' = 0,'q' = 0,
+                      'tts' = 0,'tto' = 0,'psi' = 0,'psoil' = 0)
+  AllParms <- names(InVar)
+  Parms2Estimate <- ParmSet_Final <- c()
   InitialGuess_Update <- LowerBound_Update <- UpperBound_Update <-
-    ParmSet_Update <- data.frame(row.names = c('Val'))
+    ParmSet_Update <- list()
 
   # set parameters to user value defined in ParmSet
-  if ('CHL'%in%names(InitialGuess) & !'CHL'%in%names(ParmSet)){
-    Parms2Estimate <- c(Parms2Estimate,1)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'CHL' = InitialGuess$CHL)
-    LowerBound_Update <- data.frame(LowerBound_Update,'CHL' = LowerBound$CHL)
-    UpperBound_Update <- data.frame(UpperBound_Update,'CHL' = UpperBound$CHL)
-  } else if (!'CHL'%in%names(InitialGuess) & 'CHL'%in%names(ParmSet)){
-    ParmSet_Final <- c(ParmSet_Final,1)
-    ParmSet_Update <- data.frame(ParmSet_Update,'CHL' = ParmSet$CHL)
+  for (parm in AllParms){
+    if (parm %in% names(InitialGuess) & !parm %in% names(ParmSet)){
+      Parms2Estimate <- c(Parms2Estimate,parm)
+      InitialGuess_Update[[parm]] <- InitialGuess[[parm]]
+      LowerBound_Update[[parm]] <- LowerBound[[parm]]
+      UpperBound_Update[[parm]] <- UpperBound[[parm]]
+    } else if (!parm %in% names(InitialGuess) & parm %in% names(ParmSet)){
+      ParmSet_Final <- c(ParmSet_Final,parm)
+      ParmSet_Update[[parm]] <- ParmSet[[parm]]
+    }
   }
-  if ('CAR'%in%names(InitialGuess) & !'CAR'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,2)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'CAR' = InitialGuess$CAR)
-    LowerBound_Update <- data.frame(LowerBound_Update,'CAR' = LowerBound$CAR)
-    UpperBound_Update <- data.frame(UpperBound_Update,'CAR' = UpperBound$CAR)
-  } else if (!'CAR'%in%names(InitialGuess) & 'CAR'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,2)
-    ParmSet_Update <- data.frame(ParmSet_Update,'CAR' = ParmSet$CAR)
-  }
-  if ('ANT'%in%names(InitialGuess) & !'ANT'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,3)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'ANT' = InitialGuess$ANT)
-    LowerBound_Update <- data.frame(LowerBound_Update,'ANT' = LowerBound$ANT)
-    UpperBound_Update <- data.frame(UpperBound_Update,'ANT' = UpperBound$ANT)
-  } else if (!'ANT'%in%names(InitialGuess) & 'ANT'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,3)
-    ParmSet_Update <- data.frame(ParmSet_Update,'ANT' = ParmSet$ANT)
-  }
-  if ('BROWN'%in%names(InitialGuess) & !'BROWN'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,4)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'BROWN' = InitialGuess$BROWN)
-    LowerBound_Update <- data.frame(LowerBound_Update,'BROWN' = LowerBound$BROWN)
-    UpperBound_Update <- data.frame(UpperBound_Update,'BROWN' = UpperBound$BROWN)
-  } else if (!'BROWN'%in%names(InitialGuess) & 'BROWN'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,4)
-    ParmSet_Update <- data.frame(ParmSet_Update,'BROWN' = ParmSet$BROWN)
-  }
-  if ('EWT'%in%names(InitialGuess) & !'EWT'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,5)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'EWT' = InitialGuess$EWT)
-    LowerBound_Update <- data.frame(LowerBound_Update,'EWT' = LowerBound$EWT)
-    UpperBound_Update <- data.frame(UpperBound_Update,'EWT' = UpperBound$EWT)
-  } else if (!'EWT'%in%names(InitialGuess) & 'EWT'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,5)
-    ParmSet_Update <- data.frame(ParmSet_Update,'EWT' = ParmSet$EWT)
-  }
-  if ('LMA'%in%names(InitialGuess) & !'LMA'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,6)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'LMA' = InitialGuess$LMA)
-    LowerBound_Update <- data.frame(LowerBound_Update,'LMA' = LowerBound$LMA)
-    UpperBound_Update <- data.frame(UpperBound_Update,'LMA' = UpperBound$LMA)
-  } else if (!'LMA'%in%names(InitialGuess) & 'LMA'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,6)
-    ParmSet_Update <- data.frame(ParmSet_Update,'LMA' = ParmSet$LMA)
-  }
-  if ('PROT'%in%names(InitialGuess) & !'PROT'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,7)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'PROT' = InitialGuess$PROT)
-    LowerBound_Update <- data.frame(LowerBound_Update,'PROT' = LowerBound$PROT)
-    UpperBound_Update <- data.frame(UpperBound_Update,'PROT' = UpperBound$PROT)
-  } else if (!'PROT'%in%names(InitialGuess) & 'PROT'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,7)
-    ParmSet_Update <- data.frame(ParmSet_Update,'PROT' = ParmSet$PROT)
-  }
-  if ('CBC'%in%names(InitialGuess) & !'CBC'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,8)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'CBC' = InitialGuess$CBC)
-    LowerBound_Update <- data.frame(LowerBound_Update,'CBC' = LowerBound$CBC)
-    UpperBound_Update <- data.frame(UpperBound_Update,'CBC' = UpperBound$CBC)
-  } else if (!'CBC'%in%names(InitialGuess) & 'CBC'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,8)
-    ParmSet_Update <- data.frame(ParmSet_Update,'CBC' = ParmSet$CBC)
-  }
-  if ('N'%in%names(InitialGuess) & !'N'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,9)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'N' = InitialGuess$N)
-    LowerBound_Update <- data.frame(LowerBound_Update,'N' = LowerBound$N)
-    UpperBound_Update <- data.frame(UpperBound_Update,'N' = UpperBound$N)
-  } else if (!'N'%in%names(InitialGuess) & 'N'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,9)
-    ParmSet_Update <- data.frame(ParmSet_Update,'N' = ParmSet$N)
-  }
-  if ('alpha'%in%names(InitialGuess) & !'alpha'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,10)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'alpha' = InitialGuess$alpha)
-    LowerBound_Update <- data.frame(LowerBound_Update,'alpha' = LowerBound$alpha)
-    UpperBound_Update <- data.frame(UpperBound_Update,'alpha' = UpperBound$alpha)
-  } else if (!'alpha'%in%names(InitialGuess) & 'alpha'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,10)
-    ParmSet_Update <- data.frame(ParmSet_Update,'alpha' = ParmSet$alpha)
-  }
-  if ('LIDFa'%in%names(InitialGuess) & !'LIDFa'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,11)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'LIDFa' = InitialGuess$LIDFa)
-    LowerBound_Update <- data.frame(LowerBound_Update,'LIDFa' = LowerBound$LIDFa)
-    UpperBound_Update <- data.frame(UpperBound_Update,'LIDFa' = UpperBound$LIDFa)
-  } else if (!'LIDFa'%in%names(InitialGuess) & 'LIDFa'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,11)
-    ParmSet_Update <- data.frame(ParmSet_Update,'LIDFa' = ParmSet$LIDFa)
-  }
-  if ('LIDFb'%in%names(InitialGuess) & !'LIDFb'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,12)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'LIDFb' = InitialGuess$LIDFb)
-    LowerBound_Update <- data.frame(LowerBound_Update,'LIDFb' = LowerBound$LIDFb)
-    UpperBound_Update <- data.frame(UpperBound_Update,'LIDFb' = UpperBound$LIDFb)
-  } else if (!'LIDFb'%in%names(InitialGuess) & 'LIDFb'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,12)
-    ParmSet_Update <- data.frame(ParmSet_Update,'LIDFb' = ParmSet$LIDFb)
-  }
-  if ('lai'%in%names(InitialGuess) & !'lai'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,13)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'lai' = InitialGuess$lai)
-    LowerBound_Update <- data.frame(LowerBound_Update,'lai' = LowerBound$lai)
-    UpperBound_Update <- data.frame(UpperBound_Update,'lai' = UpperBound$lai)
-  } else if (!'lai'%in%names(InitialGuess) & 'lai'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,13)
-    ParmSet_Update <- data.frame(ParmSet_Update,'lai' = ParmSet$lai)
-  }
-  if ('q'%in%names(InitialGuess) & !'q'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,14)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'q' = InitialGuess$q)
-    LowerBound_Update <- data.frame(LowerBound_Update,'q' = LowerBound$q)
-    UpperBound_Update <- data.frame(UpperBound_Update,'q' = UpperBound$q)
-  } else if (!'q'%in%names(InitialGuess) & 'q'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,14)
-    ParmSet_Update <- data.frame(ParmSet_Update,'q' = ParmSet$q)
-  }
-  if ('tts'%in%names(InitialGuess) & !'tts'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,15)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'tts' = InitialGuess$tts)
-    LowerBound_Update <- data.frame(LowerBound_Update,'tts' = LowerBound$tts)
-    UpperBound_Update <- data.frame(UpperBound_Update,'tts' = UpperBound$tts)
-  } else if (!'tts'%in%names(InitialGuess) & 'tts'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,15)
-    ParmSet_Update <- data.frame(ParmSet_Update,'tts' = ParmSet$tts)
-  }
-  if ('tto'%in%names(InitialGuess) & !'tto'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,16)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'tto' = InitialGuess$tto)
-    LowerBound_Update <- data.frame(LowerBound_Update,'tto' = LowerBound$tto)
-    UpperBound_Update <- data.frame(UpperBound_Update,'tto' = UpperBound$tto)
-  } else if (!'tto'%in%names(InitialGuess) & 'tto'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,16)
-    ParmSet_Update <- data.frame(ParmSet_Update,'tto' = ParmSet$tto)
-  }
-  if ('psi'%in%names(InitialGuess) & !'psi'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,17)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'psi' = InitialGuess$psi)
-    LowerBound_Update <- data.frame(LowerBound_Update,'psi' = LowerBound$psi)
-    UpperBound_Update <- data.frame(UpperBound_Update,'psi' = UpperBound$psi)
-  } else if (!'psi'%in%names(InitialGuess) & 'psi'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,17)
-    ParmSet_Update <- data.frame(ParmSet_Update,'psi' = ParmSet$psi)
-  }
-  if ('psoil'%in%names(InitialGuess) & !'psoil'%in%names(ParmSet)){
-    Parms2Estimate = c(Parms2Estimate,18)
-    InitialGuess_Update <- data.frame(InitialGuess_Update,'psoil' = InitialGuess$psoil)
-    LowerBound_Update <- data.frame(LowerBound_Update,'psoil' = LowerBound$psoil)
-    UpperBound_Update <- data.frame(UpperBound_Update,'psoil' = UpperBound$psoil)
-  } else if (!'psoil'%in%names(InitialGuess) & 'psoil'%in%names(ParmSet)){
-    ParmSet_Final = c(ParmSet_Final,18)
-    ParmSet_Update <- data.frame(ParmSet_Update,'psoil' = ParmSet$psoil)
-  }
-  InVar <- data.frame('CHL'=0,'CAR'=0,'ANT'=0,'BROWN'=0,'EWT'=0,
-                      'LMA'=0,'PROT'=0,'CBC'=0,'N'=0,'alpha'=0,
-                      'LIDFa'=0,'LIDFb'=0,'lai'=0,'q'=0,
-                      'tts'=0,'tto'=0,'psi'=0,'psoil'=0)
-
+  InitialGuess_Update <- data.frame(InitialGuess_Update)
+  LowerBound_Update <- data.frame(LowerBound_Update)
+  UpperBound_Update <- data.frame(UpperBound_Update)
+  ParmSet_Update <- data.frame(ParmSet_Update)
   return(list('Parms2Estimate' = Parms2Estimate,
               'Parms2Set' = ParmSet_Final,
               'InitialGuess' = InitialGuess_Update,
@@ -359,103 +224,22 @@ WhichParameters2Invert <- function(InitialGuess,LowerBound,UpperBound,ParmSet) {
 #'
 #' @return fc estimates of the parameters
 #' @export
-WhichParmPRior <- function(PriorInfoMean,PriorInfoSD) {
+WhichParmPrior <- function(PriorInfoMean, PriorInfoSD) {
 
   Parms2Prior <- c()
-  PriorInfoMean_Update <- data.frame(row.names = c('Val'))
-  PriorInfoSD_Update <- data.frame(row.names = c('Val'))
-
-  # set parameters to user value defined in ParmSet
-  if ('CHL'%in%names(PriorInfoMean) & 'CHL'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,1)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CHL' = PriorInfoMean$CHL)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CHL' = PriorInfoSD$CHL)
+  listParms <- c('CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'PROT', 'CBC', 'N',
+                 'alpha', 'LIDFa', 'LIDFb', 'lai', 'q', 'tts', 'tto', 'psi',
+                 'psoil')
+  PriorInfoMean_Update <- PriorInfoSD_Update <- list()
+  for (parm in listParms){
+    if (parm %in% names(PriorInfoMean) & parm %in% names(PriorInfoSD)){
+      Parms2Prior <- c(Parms2Prior,parm)
+      PriorInfoMean_Update[[parm]] <- PriorInfoMean[[parm]]
+      PriorInfoSD_Update[[parm]] <- PriorInfoSD[[parm]]
+    }
   }
-  if ('CAR'%in%names(PriorInfoMean) & 'CAR'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,2)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CAR' = PriorInfoMean$CAR)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CAR' = PriorInfoSD$CAR)
-  }
-  if ('ANT'%in%names(PriorInfoMean) & 'ANT'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,3)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'ANT' = PriorInfoMean$ANT)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'ANT' = PriorInfoSD$ANT)
-  }
-  if ('BROWN'%in%names(PriorInfoMean) & 'BROWN'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,4)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'BROWN' = PriorInfoMean$BROWN)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'BROWN' = PriorInfoSD$BROWN)
-  }
-  if ('EWT'%in%names(PriorInfoMean) & 'EWT'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,5)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'EWT' = PriorInfoMean$EWT)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'EWT' = PriorInfoSD$EWT)
-  }
-  if ('LMA'%in%names(PriorInfoMean) & 'LMA'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,6)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LMA' = PriorInfoMean$LMA)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LMA' = PriorInfoSD$LMA)
-  }
-  if ('PROT'%in%names(PriorInfoMean) & 'PROT'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,7)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'PROT' = PriorInfoMean$PROT)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'PROT' = PriorInfoSD$PROT)
-  }
-  if ('CBC'%in%names(PriorInfoMean) & 'CBC'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,8)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'CBC' = PriorInfoMean$CBC)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'CBC' = PriorInfoSD$CBC)
-  }
-  if ('N'%in%names(PriorInfoMean) & 'N'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,9)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'N' = PriorInfoMean$N)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'N' = PriorInfoSD$N)
-  }
-  if ('alpha'%in%names(PriorInfoMean) & 'alpha'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,10)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'alpha' = PriorInfoMean$alpha)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'alpha' = PriorInfoSD$alpha)
-  }
-  if ('LIDFa'%in%names(PriorInfoMean) & 'LIDFa'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,11)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LIDFa' = PriorInfoMean$LIDFa)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LIDFa' = PriorInfoSD$LIDFa)
-  }
-  if ('LIDFb'%in%names(PriorInfoMean) & 'LIDFb'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,12)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'LIDFb' = PriorInfoMean$LIDFb)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'LIDFb' = PriorInfoSD$LIDFb)
-  }
-  if ('lai'%in%names(PriorInfoMean) & 'lai'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,13)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'lai' = PriorInfoMean$lai)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'lai' = PriorInfoSD$lai)
-  }
-  if ('q'%in%names(PriorInfoMean) & 'q'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,14)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'q' = PriorInfoMean$q)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'q' = PriorInfoSD$q)
-  }
-  if ('tts'%in%names(PriorInfoMean) & 'tts'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,15)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'tts' = PriorInfoMean$tts)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'tts' = PriorInfoSD$tts)
-  }
-  if ('tto'%in%names(PriorInfoMean) & 'tto'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,16)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'tto' = PriorInfoMean$tto)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'tto' = PriorInfoSD$tto)
-  }
-  if ('psi'%in%names(PriorInfoMean) & 'psi'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,17)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psi' = PriorInfoMean$psi)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psi' = PriorInfoSD$psi)
-  }
-  if ('psoil'%in%names(PriorInfoMean) & 'psoil'%in%names(PriorInfoSD)){
-    Parms2Prior <- c(Parms2Prior,18)
-    PriorInfoMean_Update <- data.frame(PriorInfoMean_Update,'psoil' = PriorInfoMean$psoil)
-    PriorInfoSD_Update <- data.frame(PriorInfoSD_Update,'psoil' = PriorInfoSD$psoil)
-  }
+  PriorInfoMean_Update <- data.frame(PriorInfoMean_Update)
+  PriorInfoSD_Update <- data.frame(PriorInfoSD_Update)
   return(list('Parms2Prior' = Parms2Prior,
               'PriorInfoMean' = PriorInfoMean_Update,
               'PriorInfoSD' = PriorInfoSD_Update))

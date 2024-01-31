@@ -7,7 +7,7 @@ in order to define estimate a set of user defined parameters}
 \usage{
 Invert_PROSAIL(
   brfMES,
-  InitialGuess,
+  InitialGuess = NULL,
   LowerBound,
   UpperBound,
   SpecPROSPECT_Sensor,

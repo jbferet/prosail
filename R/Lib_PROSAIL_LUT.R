@@ -286,27 +286,24 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
 
   # define InputPROSAIL # 1 default value
   if (length(Set2Default)>0){
-    for (i in Set2Default){
-      InputPROSAIL[[i]] = Default[,i]
-    }
+    for (i in Set2Default) InputPROSAIL[[i]] <- Default[,i]
   }
-
   # define InputPROSAIL # 2 Set parameters
   if (length(ParmSet)>0){
     for (i in 1:length(ParmSet)){
       Sel <- which(InVar==names(ParmSet)[i])
-      InputPROSAIL[[Sel]] = ParmSet[,i]
+      InputPROSAIL[[Sel]] <- ParmSet[,i]
     }
   }
-
   # define InputPROSAIL # 3 random parameters
   for (i in 1:length(minval)){
     Sel <- names(minval)[i]
     # if uniform distribution
-    if (TypeDistrib[[Sel]] == 'Uniform'){
-      InputPROSAIL[[Sel]] <- runif(nbSamples, min = minval[1,i], max=maxval[1,i])
+    if (TypeDistrib[[Sel]] == 'Uniform') InputPROSAIL[[Sel]] <- runif(nbSamples,
+                                                                      min = minval[1,i],
+                                                                      max=maxval[1,i])
     # if Gaussian distribution
-    } else if (TypeDistrib[[Sel]] == 'Gaussian'){
+    if (TypeDistrib[[Sel]] == 'Gaussian'){
       set.seed(42)
       InputPROSAIL[[Sel]] <- truncnorm::rtruncnorm(n = nbSamples,
                                                    a = minval[[Sel]], b = maxval[[Sel]],
@@ -413,9 +410,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 
   # define InputPROSAIL # 1 default value
   if (length(Set2Default)>0){
-    for (i in Set2Default){
-      InputPROSAIL[[i]] <- Default[,i]
-    }
+    for (i in Set2Default) InputPROSAIL[[i]] <- Default[,i]
   }
 
   # define InputPROSAIL # 2 Set parameters

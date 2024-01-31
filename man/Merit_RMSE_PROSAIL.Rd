@@ -6,6 +6,7 @@
 \usage{
 Merit_RMSE_PROSAIL(
   xinit,
+  parms_xinit,
   brfMES,
   SpecPROSPECT_Sensor,
   SpecSOIL_Sensor,
@@ -23,6 +24,8 @@ Merit_RMSE_PROSAIL(
 }
 \arguments{
 \item{xinit}{numeric. Vector of input variables to estimate}
+
+\item{parms_xinit}{character. name of parameters corresponding to xinit}
 
 \item{brfMES}{numeric. measured BRF}
 

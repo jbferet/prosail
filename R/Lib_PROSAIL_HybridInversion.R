@@ -509,7 +509,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, FigPlot = FALSE,
 #' @export
 read_ENVI_header <- function(HDRpath) {
   # header <- paste(header, collapse = "\n")
-  if (!grepl(".hdr$", HDRpath)) {
+  if (!grepl(".hdr$", HDRpath) & !grepl(".HDR$", HDRpath)) {
     stop("File extension should be .hdr")
   }
   HDR <- readLines(HDRpath)
