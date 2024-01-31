@@ -1,3 +1,11 @@
+# prosail v2.3.2
+
+## fix
+- convert InRefl in dataframe to make sure applySensorCharacteristics works even if 1 sample provided.
+
+## changes
+- update read_ENVI_header to account for .hdr and .HDR
+
 # prosail v2.3.1
 
 ## additions

@@ -1129,8 +1129,8 @@ campbell  <- function(ala){
   excent <- exp(-1.6184e-5*ala**3+2.1145e-3*ala**2-1.2390e-1*ala+3.2491)
   sum0 <- 0
 
-  freq=c()
-  for (i in 1:n){
+  freq <- c()
+  for (i in seq_len(n)){
     x1 <- excent/(sqrt(1.+excent**2.*tan(tl1[i])**2))
     x2 <- excent/(sqrt(1.+excent**2.*tan(tl2[i])**2))
     if (excent==1){
@@ -1140,10 +1140,7 @@ campbell  <- function(ala){
       alpha2 <- alpha**2
       x12 <- x1**2
       x22 <- x2**2
-      alpx1   = 0*alpha2
-      alpx2   = 0*alpha2
-      almx1   = 0*alpha2
-      almx2   = 0*alpha2
+      alpx1 <- alpx2 <- almx1 <- almx2 <- 0*alpha2
       if (excent>1){
         alpx1 <- sqrt(alpha2[excent>1]+x12[excent>1])
         alpx2[excent>1] <- sqrt(alpha2[excent>1]+x22[excent>1])
@@ -1240,7 +1237,7 @@ dcum <- function(a,b,t){
 Jfunc1 <- function(k,l,t){
   # J1 function with avoidance of singularity problem
   del <- (k-l)*t
-  Jout = 0*l
+  Jout <- 0*l
   Jout[which(abs(del)>1e-3)] <- (exp(-l[which(abs(del)>1e-3)]*t) -
                                    exp(-k*t))/(k-l[which(abs(del)>1e-3)])
   Jout[which(abs(del)<=1e-3)] <- 0.5*t*(exp(-k*t)+exp(-l[which(abs(del)<=1e-3)]*t))*(1-del[which(abs(del)<=1e-3)]*del[which(abs(del)<=1e-3)]/12)
@@ -1298,7 +1295,7 @@ Jfunc4 <- function(m,t){
 #' @param ttl numeric. leaf inclination angle
 #' @return res list. includes chi_s, chi_o, frho, ftau
 #' @export
-volscatt  <- function(tts,tto,psi,ttl){
+volscatt <- function(tts,tto,psi,ttl){
   # ********************************************************************************
   #*	chi_s	= interception functions
   #*	chi_o	= interception functions
@@ -1383,22 +1380,15 @@ volscatt  <- function(tts,tto,psi,ttl){
   }
   t1 <- 2.*cs*co+ss*so*cospsi
   t2 <- 0
-  if (bt2>0) {
-    t2 <- sin(bt2)*(2.*ds*doo+ss*so*cos(bt1)*cos(bt3))
-  }
+  if (bt2>0) t2 <- sin(bt2)*(2.*ds*doo+ss*so*cos(bt1)*cos(bt3))
 
   denom <- 2.*pi*pi
   frho <- ((pi-bt2)*t1+t2)/denom
   ftau <- (-bt2*t1+t2)/denom
 
-  if (frho<0){
-    frho <- 0
-  }
-  if (ftau<0){
-    ftau <- 0
-  }
-  res <- list("chi_s" = chi_s,"chi_o" = chi_o,"frho" = frho,"ftau" = ftau)
-  return(res)
+  if (frho<0) frho <- 0
+  if (ftau<0) ftau <- 0
+  return(list('chi_s' = chi_s, 'chi_o' = chi_o, 'frho' = frho, 'ftau' = ftau))
 }
 
 

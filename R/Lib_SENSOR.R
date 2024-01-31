@@ -21,6 +21,7 @@
 # @import utils
 #' @importFrom utils read.csv write.table
 #' @export
+
 GetRadiometry <- function(SensorName = 'Custom',
                           SpectralProps = NULL,
                           Path_SensorResponse = NULL,
@@ -29,72 +30,39 @@ GetRadiometry <- function(SensorName = 'Custom',
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
   # == == == == == == == == == == == == == == == == == == == == == == == == =
-  if (SensorName=='Sentinel_2' | SensorName=='S2'){                             # if sensor is SENTINEL-2
-    SRF <- list('Spectral_Response' = prosail::Sentinel_2$Spectral_Response,
-                'Spectral_Bands' = prosail::Sentinel_2$Spectral_Bands,
-                'Original_Bands' = prosail::Sentinel_2$Original_Bands,
-                'Central_WL' = prosail::Sentinel_2$Central_WL,
-                'Sensor' = 'Sentinel_2')
-  } else if (SensorName=='Sentinel_2A' | SensorName=='S2A'){                    # if sensor is SENTINEL-2A
-    SRF <- list('Spectral_Response' = prosail::Sentinel_2A$Spectral_Response,
-                'Spectral_Bands' = prosail::Sentinel_2A$Spectral_Bands,
-                'Original_Bands' = prosail::Sentinel_2A$Original_Bands,
-                'Central_WL' = prosail::Sentinel_2A$Central_WL,
-                'Sensor' = 'Sentinel_2A')
-  } else if (SensorName=='Sentinel_2B' | SensorName=='S2B'){                    # if sensor is SENTINEL-2B
-    SRF <- list('Spectral_Response' = prosail::Sentinel_2B$Spectral_Response,
-                'Spectral_Bands' = prosail::Sentinel_2B$Spectral_Bands,
-                'Original_Bands' = prosail::Sentinel_2B$Original_Bands,
-                'Central_WL' = prosail::Sentinel_2B$Central_WL,
-                'Sensor' = 'Sentinel_2B')
-  } else if (SensorName=='Venus'){                                              # if sensor is Venus
-    SRF <- list('Spectral_Response' = prosail::Venus$Spectral_Response,
-                'Spectral_Bands' = prosail::Venus$Spectral_Bands,
-                'Original_Bands' = prosail::Venus$Original_Bands,
-                'Central_WL' = prosail::Venus$Central_WL,
-                'Sensor' = 'Venus')
-  } else if (SensorName=='Landsat_7' | SensorName=='L7'){                       # if sensor is Landsat-7
-    SRF <- list('Spectral_Response' = prosail::Landsat_7$Spectral_Response,
-                'Spectral_Bands' = prosail::Landsat_7$Spectral_Bands,
-                'Original_Bands' = prosail::Landsat_7$Original_Bands,
-                'Central_WL' = prosail::Landsat_7$Central_WL,
-                'Sensor' = 'Landsat_7')
-  } else if (SensorName=='Landsat_8' | SensorName=='L8'){                       # if sensor is Landsat-8
-    SRF <- list('Spectral_Response' = prosail::Landsat_8$Spectral_Response,
-                'Spectral_Bands' = prosail::Landsat_8$Spectral_Bands,
-                'Original_Bands' = prosail::Landsat_8$Original_Bands,
-                'Central_WL' = prosail::Landsat_8$Central_WL,
-                'Sensor' = 'Landsat_8')
-  } else if (SensorName=='Landsat_9' | SensorName=='L9'){                       # if sensor is Landsat-9
-    SRF <- list('Spectral_Response' = prosail::Landsat_9$Spectral_Response,
-                'Spectral_Bands' = prosail::Landsat_9$Spectral_Bands,
-                'Original_Bands' = prosail::Landsat_9$Original_Bands,
-                'Central_WL' = prosail::Landsat_9$Central_WL,
-                'Sensor' = 'Landsat_9')
-  } else if (SensorName=='MODIS'){                                              # if sensor is MODIS
-    SRF <- list('Spectral_Response' = prosail::MODIS$Spectral_Response,
-                'Spectral_Bands' = prosail::MODIS$Spectral_Bands,
-                'Original_Bands' = prosail::MODIS$Original_Bands,
-                'Central_WL' = prosail::MODIS$Central_WL,
-                'Sensor' = 'MODIS')
-  } else if (SensorName=='SPOT_6_7'|SensorName=='SPOT_6'|SensorName=='SPOT_7'){ # if sensor is SPOT_6_7
-    SRF <- list('Spectral_Response' = prosail::SPOT_6_7$Spectral_Response,
-                'Spectral_Bands' = prosail::SPOT_6_7$Spectral_Bands,
-                'Original_Bands' = prosail::SPOT_6_7$Original_Bands,
-                'Central_WL' = prosail::SPOT_6_7$Central_WL,
-                'Sensor' = 'SPOT_6_7')
-  } else if (SensorName=='Pleiades' | SensorName=='Pleiades_1A'){               # if sensor is Pleiades or Pleiades_1A
-    SRF <- list('Spectral_Response' = prosail::Pleiades_1A$Spectral_Response,
-                'Spectral_Bands' = prosail::Pleiades_1A$Spectral_Bands,
-                'Original_Bands' = prosail::Pleiades_1A$Original_Bands,
-                'Central_WL' = prosail::Pleiades_1A$Central_WL,
-                'Sensor' = 'Pleiades_1A')
-  } else if (SensorName=='Pleiades_1B'){                                        # if sensor is Pleiades_1B
-    SRF <- list('Spectral_Response' = prosail::Pleiades_1B$Spectral_Response,
-                'Spectral_Bands' = prosail::Pleiades_1B$Spectral_Bands,
-                'Original_Bands' = prosail::Pleiades_1B$Original_Bands,
-                'Central_WL' = prosail::Pleiades_1B$Central_WL,
-                'Sensor' = 'Pleiades_1B')
+  if (toupper(SensorName) %in% c('S2', 'SENTINEL2', 'SENTINEL-2', 'SENTINEL_2')){
+    SRF <- prosail::Sentinel_2
+    SRF$Sensor <- 'Sentinel_2'
+  } else if (toupper(SensorName) %in% c('S2A', 'SENTINEL2A', 'SENTINEL-2A', 'SENTINEL_2A')){
+    SRF <- prosail::Sentinel_2A
+    SRF$Sensor <- 'Sentinel_2A'
+  } else if (toupper(SensorName) %in% c('S2B', 'SENTINEL2B', 'SENTINEL-2B', 'SENTINEL_2B')){
+    SRF <- prosail::Sentinel_2B
+    SRF$Sensor <- 'Sentinel_2B'
+  } else if (toupper(SensorName) =='VENUS'){                                              # if sensor is Venus
+    SRF <- prosail::Venus
+    SRF$Sensor <- 'Venus'
+  } else if (toupper(SensorName) %in% c('L7', 'LANDSAT_7', 'LANDSAT-7')){                       # if sensor is Landsat-7
+    SRF <- prosail::Landsat_7
+    SRF$Sensor <- 'Landsat_7'
+  } else if (toupper(SensorName) %in% c('L8', 'LANDSAT_8', 'LANDSAT-8')){                       # if sensor is Landsat-8
+    SRF <- prosail::Landsat_8
+    SRF$Sensor <- 'Landsat_8'
+  } else if (toupper(SensorName) %in% c('L9', 'LANDSAT_9', 'LANDSAT-9')){                       # if sensor is Landsat-9
+    SRF <- prosail::Landsat_9
+    SRF$Sensor <- 'Landsat_9'
+  } else if (toupper(SensorName) == 'MODIS'){                                              # if sensor is MODIS
+    SRF <- prosail::MODIS
+    SRF$Sensor <- 'MODIS'
+  } else if (toupper(SensorName) %in% c('SPOT_6_7', 'SPOT_6', 'SPOT6', 'SPOT_7', 'SPOT7')){ # if sensor is SPOT_6_7
+    SRF <- prosail::SPOT_6_7
+    SRF$Sensor <- 'SPOT_6_7'
+  } else if (toupper(SensorName) %in% c('PLEIADES', 'PLEIADES_1A')){               # if sensor is Pleiades or Pleiades_1A
+    SRF <- prosail::Pleiades_1A
+    SRF$Sensor <- 'Pleiades_1A'
+  } else if (toupper(SensorName)=='PLEIADES_1B'){                                        # if sensor is Pleiades_1B
+    SRF <- prosail::Pleiades_1B
+    SRF$Sensor <- 'Pleiades_1B'
     # == == == == == == == == == == == == == == == == == == == == == == == == =
     ### if the spectral response function of the sensor is not defined      ###
     ###       but spectral characteristics (wl & FWHM) are provided         ###
@@ -195,8 +163,9 @@ GetRadiometry <- function(SensorName = 'Custom',
 #' @param SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
 #' @return OutRefl numeric. Output spectral data, sensor resolution
 #' @export
-applySensorCharacteristics <- function(wvl,InRefl,SRF){
+applySensorCharacteristics <- function(wvl, InRefl, SRF){
 
+  InRefl <- data.frame(InRefl)
   nbBands_Origin <- length(wvl)
   if (dim(SRF$Spectral_Response)[1]==nbBands_Origin){
     SRF$Spectral_Response <- t(SRF$Spectral_Response)
@@ -409,7 +378,7 @@ get_S2geometry_from_THEIA <- function(s2xml){
   VAA <- VAA[which(!is.na(VAA))]
 
   # return
-  return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
+  return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
 }
 
 #' This function returns geometry of acquisition for S2 image processed with Sen2Cor
@@ -421,6 +390,7 @@ get_S2geometry_from_THEIA <- function(s2xml){
 #'
 #' @return List of S2 angles (SZA, SAA, VZA, VAA)
 #' @export
+
 get_S2geometry_from_SAFE <- function(s2xml){
 
   Distrib_SunAngle <- list()
@@ -463,5 +433,16 @@ get_S2geometry_from_SAFE <- function(s2xml){
   VAA <- VAA[which(!is.na(VAA))]
 
   # return
-  return(list('SAA'=SAA,'SZA'=SZA,'VAA'=VAA,'VZA'=VZA))
+  return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
+}
+
+#' This function returns the list of al sensors for which SRF is available
+#'
+#' @return list of sensors
+#' @export
+
+SRF_Available <- function(){
+  return(c('SENTINEL-2', 'SENTINEL-2A', 'SENTINEL-2B', 'VENUS',
+           'LANDSAT-7', 'LANDSAT-8', 'LANDSAT-9', 'MODIS',
+           'SPOT-6', 'SPOT-7', 'PLEIADES', 'PLEIADES-1A', 'PLEIADES-1B'))
 }
