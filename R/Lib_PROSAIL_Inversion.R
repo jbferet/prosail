@@ -97,7 +97,7 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
 #' @param Parm2Set  numeric. rank of variables to be set out of inversion
 #' @param ParmSet  list. value of variables to be set out of inversion
 #' @param InVar dataframe. full set of PROSAIL input variables
-#' @param TypeLidf  numeric. tyoe of leaf inclination distribution function
+#' @param TypeLidf  numeric. type of leaf inclination distribution function
 #' @param PriorInfoMean list. prior mean value of parameters defined as xprior
 #' @param PriorInfoSD list. prior standard deviation of parameters defined as xprior
 #' @param Parms2Prior numeric. rank of the parameters which should be used with prior information
@@ -105,11 +105,11 @@ Invert_PROSAIL  <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
 #'
 #' @return fc estimates of the parameters
 #' @export
-Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor, SpecSOIL_Sensor,
-                               SpecATM_Sensor, Parms2Estimate, Parm2Set,
-                               ParmSet, InVar, TypeLidf, PriorInfoMean = NULL,
-                               PriorInfoSD = NULL, Parms2Prior = NULL,
-                               WeightPrior = 0.01){
+Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
+                               SpecSOIL_Sensor, SpecATM_Sensor, Parms2Estimate,
+                               Parm2Set, ParmSet, InVar, TypeLidf,
+                               PriorInfoMean = NULL, PriorInfoSD = NULL,
+                               Parms2Prior = NULL, WeightPrior = 0.01){
 
   xinit[xinit<0] = 0
   InVar[Parms2Estimate] <- xinit[match(parms_xinit, Parms2Estimate)]
@@ -148,16 +148,7 @@ CostVal_RMSE_PROSAIL  <- function(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
 
   fc <- sqrt(sum((brfMES-brfMOD)**2)/length(brfMES))
   if (!is.null(PriorInfoMean)){
-    # message('fc')
-    # print(fc)
     fc <- fc + WeightPrior*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2)
-    # message('prior')
-    # print(0.01*mean(as.numeric((xprior-PriorInfoMean)/PriorInfoSD)**2))
-    # print(PriorInfoMean)
-    # print(PriorInfoSD)
-    # print((((xprior-PriorInfoMean)/PriorInfoSD)**2))
-    # print(mean(((xprior-PriorInfoMean)/PriorInfoSD)**2))
-    # print(0.01*mean(((xprior-PriorInfoMean)/PriorInfoSD)**2))
   }
   return(fc)
 }

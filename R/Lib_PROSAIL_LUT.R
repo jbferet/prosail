@@ -42,8 +42,10 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
   for (parm in names(TgaussParms$min)){
     set.seed(42)
     InputPROSAIL[[parm]] <- truncnorm::rtruncnorm(n = nbSamples,
-                                                  a = TgaussParms$min[[parm]], b = TgaussParms$max[[parm]],
-                                                  mean = TgaussParms$mean[[parm]], sd = TgaussParms$sd[[parm]])
+                                                  a = TgaussParms$min[[parm]],
+                                                  b = TgaussParms$max[[parm]],
+                                                  mean = TgaussParms$mean[[parm]],
+                                                  sd = TgaussParms$sd[[parm]])
   }
   InputPROSAIL <- data.frame(InputPROSAIL)
 
@@ -301,41 +303,15 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
     # if uniform distribution
     if (TypeDistrib[[Sel]] == 'Uniform') InputPROSAIL[[Sel]] <- runif(nbSamples,
                                                                       min = minval[1,i],
-                                                                      max=maxval[1,i])
+                                                                      max = maxval[1,i])
     # if Gaussian distribution
     if (TypeDistrib[[Sel]] == 'Gaussian'){
       set.seed(42)
       InputPROSAIL[[Sel]] <- truncnorm::rtruncnorm(n = nbSamples,
                                                    a = minval[[Sel]], b = maxval[[Sel]],
                                                    mean = Mean[[Sel]], sd = Std[[Sel]])
-      # InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
-      # Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
-      # if (length(Elim)>0){
-      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
-      # }
-      # if (length(InputPROSAIL[[Sel]])>=nbSamples){
-      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
-      # } else {
-      #   # repeat to get correct number of samples
-      #   repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
-      #   InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
-      # }
-      # InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
-  # # should be removed at some point
-  # if (Force4LowLAI==T){
-  #   MaxLAI <- 2
-  #   LowLAI <- which(InputPROSAIL$lai<MaxLAI)
-  #   if (length(LowLAI)>0){
-  #     for (BP in AllParm){
-  #       if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
-  #         InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.25*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-  #                                                     + InputPROSAIL$lai[LowLAI]*(0.75/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-  #       }
-  #     }
-  #   }
-  # }
   return(InputPROSAIL)
 }
 
@@ -373,16 +349,16 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
              'lai','q','tts','tto','psi','psoil','TypeLidf',
              'fraction_brown','diss','Cv','Zeta')
 
-  InputPROSAIL <- list('CHL'=c(),'CAR'=c(),'ANT'=c(),'BROWN'=c(),'EWT'=c(),
-                       'LMA'=c(),'PROT'=c(),'CBC'=c(),'N'=c(),'alpha'=c(),
-                       'LIDFa'=c(),'LIDFb'=c(),'lai'=c(),'q'=c(),
-                       'tts'=c(),'tto'=c(),'psi'=c(),'psoil'=c(),'TypeLidf'=c(),
-                       'fraction_brown'=c(),'diss'=c(),'Cv'=c(),'Zeta'=c())
-  Default <- data.frame('CHL'=0,'CAR'=0,'ANT'=0,'BROWN'=0,'EWT'=0,
-                        'LMA'=0,'PROT'=0,'CBC'=0,'N'=1.5,'alpha'=40,
-                        'LIDFa'=0,'LIDFb'=0,'lai'=2,'q'=0,
-                        'tts'=0,'tto'=0,'psi'=0,'psoil'=1,'TypeLidf'=2,
-                        'fraction_brown'=0.5,'diss'=0.5,'Cv'=1,'Zeta'=1)
+  InputPROSAIL <- list('CHL' = c(), 'CAR' = c(), 'ANT' = c(), 'BROWN' = c(), 'EWT' = c(),
+                       'LMA' = c(), 'PROT' = c(), 'CBC' = c(), 'N' = c(), 'alpha' = c(),
+                       'LIDFa' = c(), 'LIDFb' = c(), 'lai' = c(), 'q' = c(),
+                       'tts' = c(), 'tto' = c(), 'psi' = c(), 'psoil' = c(), 'TypeLidf' = c(),
+                       'fraction_brown' = c(), 'diss' = c(), 'Cv' = c(), 'Zeta' = c())
+  Default <- data.frame('CHL' = 0, 'CAR' = 0, 'ANT'=0, 'BROWN' = 0, 'EWT' = 0,
+                        'LMA' = 0, 'PROT' = 0, 'CBC' = 0, 'N' = 1.5, 'alpha' = 40,
+                        'LIDFa' = 0, 'LIDFb' = 0, 'lai' = 2, 'q' = 0,
+                        'tts' = 0, 'tto' = 0,'psi'=0, 'psoil' = 1, 'TypeLidf' = 2,
+                        'fraction_brown' = 0.5, 'diss' = 0.5, 'Cv' = 1, 'Zeta' = 1)
 
   # which input parameters should be randomly sampled?
   ParmRand <- which(is.element(InVar,names(minval))==TRUE)
@@ -397,7 +373,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   }
   # if some parameters are neither defined as set value nor random value
   AllParm <- c(ParmRand,ParmCte)
-  FullList <- seq(1,length(InVar),by=1)
+  FullList <- seq_len(length(InVar))
   Set2Default <- c()
   if (length(setdiff(FullList,AllParm))>0){
     message('WARNING: some elements are neither defined as parameters to sample')
@@ -422,7 +398,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
   }
 
   # define InputPROSAIL # 3 random parameters
-  for (i in 1:length(minval)){
+  for (i in seq_len(length(minval))){
     Sel <- names(minval)[i]
     # if uniform distribution
     if (TypeDistrib[[Sel]] == 'Uniform'){
@@ -433,37 +409,9 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
       InputPROSAIL[[Sel]] <- truncnorm::rtruncnorm(n = nbSamples,
                                                    a = minval[[Sel]], b = maxval[[Sel]],
                                                    mean = Mean[[Sel]], sd = Std[[Sel]])
-      # InputPROSAIL[[Sel]] <- array(rnorm(2*nbSamples,mean = Mean[[Sel]],sd = Std[[Sel]]))
-      # Elim <- which(InputPROSAIL[[Sel]]<minval[[Sel]] | InputPROSAIL[[Sel]]>maxval[[Sel]])
-      # if (length(Elim)>0){
-      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][-Elim]
-      # }
-      # if (length(InputPROSAIL[[Sel]])>=nbSamples){
-      #   InputPROSAIL[[Sel]] <- InputPROSAIL[[Sel]][1:nbSamples]
-      # } else {
-      #   # repeat to get correct number of samples
-      #   repnb <- ceiling(nbSamples/length(InputPROSAIL[[Sel]]))
-      #   InputPROSAIL[[Sel]] <- rep(InputPROSAIL[[Sel]],repnb)[1:nbSamples]
-      # }
       InputPROSAIL[[Sel]] <- array(InputPROSAIL[[Sel]],dim = c(nbSamples,1))
     }
   }
-
-  # # should be removed
-  # if (Force4LowLAI==T){
-  #   MaxLAI <- 2
-  #   LowLAI <- which(InputPROSAIL$lai<MaxLAI)
-  #   if (length(LowLAI)>0){
-  #     for (BP in InVar){
-  #       if (!is.na(match(BP,c('CHL','CAR','EWT','LMA','ANT','PROT','CBC','N','BROWN')))){
-  #         if (length(unique(InputPROSAIL[[BP]]))>1){
-  #           InputPROSAIL[[BP]][LowLAI] <- minval[[BP]]  + 0.20*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]]) +
-  #                                                         InputPROSAIL$lai[LowLAI]*(0.80/MaxLAI)*(InputPROSAIL[[BP]][LowLAI]-minval[[BP]])
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
   return(InputPROSAIL)
 }
 
@@ -640,10 +588,8 @@ Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT,
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
     total = 10, clear = FALSE, width= 100)
-  for (i in 1:nbSamples){
-    if (i%%Split==0 & nbSamples>100){
-      pb$tick()
-    }
+  for (i in seq_len(nbSamples)){
+    if (i %% Split == 0 & nbSamples>100) pb$tick()
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
