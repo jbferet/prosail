@@ -24,19 +24,22 @@
 
 GetRadiometry <- function(SensorName = 'Custom',
                           SpectralProps = NULL,
-                          Path_SensorResponse = NULL,
+                          Path_SensorResponse = './',
                           SaveSRF = TRUE){
 
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
   # == == == == == == == == == == == == == == == == == == == == == == == == =
-  if (toupper(SensorName) %in% c('S2', 'SENTINEL2', 'SENTINEL-2', 'SENTINEL_2')){
+  if (toupper(SensorName) %in% c('S2', 'SENTINEL2',
+                                 'SENTINEL-2', 'SENTINEL_2')){
     SRF <- prosail::Sentinel_2
     SRF$Sensor <- 'Sentinel_2'
-  } else if (toupper(SensorName) %in% c('S2A', 'SENTINEL2A', 'SENTINEL-2A', 'SENTINEL_2A')){
+  } else if (toupper(SensorName) %in% c('S2A', 'SENTINEL2A',
+                                        'SENTINEL-2A', 'SENTINEL_2A')){
     SRF <- prosail::Sentinel_2A
     SRF$Sensor <- 'Sentinel_2A'
-  } else if (toupper(SensorName) %in% c('S2B', 'SENTINEL2B', 'SENTINEL-2B', 'SENTINEL_2B')){
+  } else if (toupper(SensorName) %in% c('S2B', 'SENTINEL2B',
+                                        'SENTINEL-2B', 'SENTINEL_2B')){
     SRF <- prosail::Sentinel_2B
     SRF$Sensor <- 'Sentinel_2B'
   } else if (toupper(SensorName) =='VENUS'){                                              # if sensor is Venus
@@ -54,7 +57,8 @@ GetRadiometry <- function(SensorName = 'Custom',
   } else if (toupper(SensorName) == 'MODIS'){                                              # if sensor is MODIS
     SRF <- prosail::MODIS
     SRF$Sensor <- 'MODIS'
-  } else if (toupper(SensorName) %in% c('SPOT_6_7', 'SPOT_6', 'SPOT6', 'SPOT_7', 'SPOT7')){ # if sensor is SPOT_6_7
+  } else if (toupper(SensorName) %in% c('SPOT_6_7', 'SPOT_6', 'SPOT6', 'SPOT-6',
+                                        'SPOT_7', 'SPOT7', 'SPOT-7')){ # if sensor is SPOT_6_7
     SRF <- prosail::SPOT_6_7
     SRF$Sensor <- 'SPOT_6_7'
   } else if (toupper(SensorName) %in% c('PLEIADES', 'PLEIADES_1A')){               # if sensor is Pleiades or Pleiades_1A
@@ -70,13 +74,13 @@ GetRadiometry <- function(SensorName = 'Custom',
   }  else {                                                       # if sensor is none of the above
     # check if spectral properties are provided in order to compute spectral response based on gaussian assumption
     if (!is.null(SpectralProps)){
-      if (is.na(match('wl',names(SpectralProps))) | is.na(match('fwhm',names(SpectralProps))>0 )){
+      if (!'wl' %in% names(SpectralProps) | ! 'fwhm' %in% names(SpectralProps)){
         message('Input variable "SpectralProps" expected to include fields')
         message('- wl (central wavelengths of bands in nm) ')
         message('- fwhl (FWHM of spectral bands in nm)')
         message('Please correct this input variable & provide proper info ')
         stop()
-      } else if (match('wl',names(SpectralProps))>0 & match('fwhm',names(SpectralProps))>0 ){
+      } else if ('wl' %in% names(SpectralProps) & 'fwhm' %in% names(SpectralProps)){
         # check if proper spectral range
         if (max(SpectralProps$wl)<400 | min(SpectralProps$wl)>2500){
           message('Spectral bands in "SpectralProps" should be defined in nm')
@@ -88,18 +92,13 @@ GetRadiometry <- function(SensorName = 'Custom',
                            FWHM = SpectralProps$fwhm,
                            SensorName = SensorName)
         # save SRF as csv
-        SRFsave <- cbind(SRF$Original_Bands,format(SRF$Spectral_Response, digits = 4, scientific = FALSE))
+        SRFsave <- cbind(SRF$Original_Bands,format(SRF$Spectral_Response,
+                                                   digits = 4, scientific = FALSE))
         colnames(SRFsave) <- c('SR_WL',SRF$Spectral_Bands)
-        if (!SaveSRF==F){
-          if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
-            Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
-            message('Saving spectral response function of sensor ')
-            message('in following directory defined by "Path_SensorResponse" : ')
-          } else {                                                      # if no path is provided to find the sensor, assuming it is in the WD
-            Path_SRF <- file.path(paste(SensorName,'_Spectral_Response.csv',sep=''))
-            message('Saving spectral response function of sensor ')
-            message('in current working directory as file : ')
-          }
+        if (SaveSRF==TRUE){
+          Path_SRF <- file.path(Path_SensorResponse,
+                                paste0(SensorName,'_Spectral_Response.csv'))
+          message('Saving sensor spectral response function here:')
           print(Path_SRF)
           write.table(x = SRFsave,file = Path_SRF,
                       quote = FALSE,sep = '\t',col.names = TRUE,row.names = FALSE)
@@ -113,11 +112,8 @@ GetRadiometry <- function(SensorName = 'Custom',
       ###   but a file corresponding to sensor characteristics is found       ###
       ### == == == == == == == == == == == == == == == == == == == == == == ==###
     } else {
-      if (!is.null(Path_SensorResponse)){                           # if a path is provided to find the sensor
-        Path_SRF <- file.path(Path_SensorResponse,paste(SensorName,'_Spectral_Response.csv',sep=''))
-      } else {                                                      # if no path is provided to find the sensor, assuming it is in the WD
-        Path_SRF <- file.path(paste(SensorName,'_Spectral_Response.csv',sep=''))
-      }
+      Path_SRF <- file.path(Path_SensorResponse,
+                            paste0(SensorName,'_Spectral_Response.csv'))
       if (file.exists(Path_SRF)){
         # read file containing spectral response
         message('_____ reading spectral response corresponding to ______')
@@ -126,12 +122,10 @@ GetRadiometry <- function(SensorName = 'Custom',
         Original_Bands <- SRFraw[,1]
         Spectral_Bands <- colnames(SRFraw)
         Spectral_Bands <- Spectral_Bands[-1]
-        # check if conversion of spctral bands into numeric values
-        Spectral_Bands_tmp = as.numeric(gsub(pattern = 'X',replacement = '',x = Spectral_Bands))
-        if (length(which(is.na(Spectral_Bands_tmp)))==0){
-          Spectral_Bands = Spectral_Bands_tmp
-        }
-        Spectral_Response <-SRFraw[,-1]
+        # check if conversion of spectral bands into numeric values
+        Spectral_Bands_tmp <- as.numeric(gsub(pattern = 'X',replacement = '',x = Spectral_Bands))
+        if (length(which(is.na(Spectral_Bands_tmp)))==0) Spectral_Bands <- Spectral_Bands_tmp
+        Spectral_Response <- SRFraw[,-1]
         Spectral_Response <- t(Spectral_Response)
         SRF <- list('Spectral_Response' = Spectral_Response,
                     'Spectral_Bands' = Spectral_Bands,
@@ -163,6 +157,7 @@ GetRadiometry <- function(SensorName = 'Custom',
 #' @param SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
 #' @return OutRefl numeric. Output spectral data, sensor resolution
 #' @export
+
 applySensorCharacteristics <- function(wvl, InRefl, SRF){
 
   InRefl <- data.frame(InRefl)
@@ -171,15 +166,9 @@ applySensorCharacteristics <- function(wvl, InRefl, SRF){
     SRF$Spectral_Response <- t(SRF$Spectral_Response)
   }
   nbBands_Sensor <- dim(SRF$Spectral_Response)[1]
-  # if (!length(InRefl)==nbBands_Origin){
-  #   message('_ Dimensions of input data and spectral sampling do not match _')
-  #   message('___________________ Please adjust input data___________________')
-  #   message('_____ Input spectral data should be an individual sample ______')
-  #   stop()
-  # }
   array_input <- cbind(matrix(wvl,ncol = 1),InRefl)
   OutRefl <- list()
-  for (i in 1:nbBands_Sensor){
+  for (i in seq_len(nbBands_Sensor)){
     # identify on which spectral bands spectral response >0
     indexIN <- which(SRF$Spectral_Response[i,]>0)
     usfl_wvl <- SRF$Original_Bands[indexIN]
@@ -188,30 +177,24 @@ applySensorCharacteristics <- function(wvl, InRefl, SRF){
     # for the given band defined in indexIN
     band_values <-SRF$Spectral_Response[i,indexIN]
     # simulated reflectance based on weighting
-    if (length(indexIN)==length(indexOUT)){
-      pond <-matrix(band_values,nrow = 1)%*%as.matrix(InRefl[indexOUT,])
-      IntegrateChannel <-sum(band_values)
-      Refl_Channel <-pond/IntegrateChannel
-      OutRefl[[i]] <-matrix(Refl_Channel,nrow =1)
+    if (length(indexIN) == length(indexOUT)){
+      pond <- matrix(band_values,nrow = 1)%*%as.matrix(InRefl[indexOUT,])
+      IntegrateChannel <- sum(band_values)
+      Refl_Channel <- pond/IntegrateChannel
+      OutRefl[[i]] <- matrix(Refl_Channel,nrow =1)
     } else {
       message('Please make sure that the spectral resolution for sensor response function ')
       message('__ is compatible ewith model (1 nm spectral sampling from 400 to 2500 m) __')
       message('______________________ This is currently not the case _____________________')
-
       message('_____ The follwing spectral band is not within accepted spectral range ____')
       print(SRF$Spectral_Bands[i])
       message('_________________________ Values will be set to 0  ________________________')
-      OutRefl[[i]] <-matrix(0,ncol = ncol(InRefl),nrow =1)
-
+      OutRefl[[i]] <- matrix(0, ncol = ncol(InRefl), nrow =1)
     }
   }
-  OutRefl <-do.call('rbind',OutRefl)
-  OutRefl <- data.frame(OutRefl)
-  if (!is.null(colnames(InRefl))){
-    names(OutRefl) <- colnames(InRefl)
-  } else {
-    names(OutRefl) <- paste('sample#',seq(1:ncol(InRefl)),sep = '')
-  }
+  OutRefl <-data.frame(do.call('rbind',OutRefl))
+  if (is.null(colnames(InRefl))) colnames(InRefl) <- paste0('sample#',seq_len(ncol(InRefl)))
+  names(OutRefl) <- colnames(InRefl)
   return(OutRefl)
 }
 
@@ -224,6 +207,7 @@ applySensorCharacteristics <- function(wvl, InRefl, SRF){
 #'
 #' @return SpecSensor list. list of input specs with sensor resolution
 #' @export
+
 PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
 
   # adjust optical constants
@@ -249,16 +233,17 @@ PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
 #' @return SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
 #' @importFrom stats dnorm
 #' @export
+
 Compute_SRF <- function(wvl,FWHM, SensorName = 'Custom'){
 
   # define full spectral domain in optical domain
   lambda <- seq(400,2500,by = 1)
   Spectral_Response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
-  for (i in 1:length(wvl)){
+  for (i in seq_len(length(wvl))){
     y <- dnorm(lambda,wvl[i],FWHM[i]/2.355)
     Spectral_Response[,i] <- y/max(y)
   }
-  Spectral_Response[which(Spectral_Response<0.001)] <- 0
+  Spectral_Response[which(Spectral_Response < 0.001)] <- 0
   SRF <- list('Spectral_Response' = Spectral_Response,
               'Spectral_Bands' = wvl,
               'Original_Bands' = lambda,
@@ -275,14 +260,13 @@ Compute_SRF <- function(wvl,FWHM, SensorName = 'Custom'){
 #'
 #' @return SRF list. Spectral response function, corresponding spectral bands, and Original Bands
 #' @export
+
 get_spec_sensor <- function(SensorName = 'MyCustomSensor',
                             SpectralProps = NULL,
                             Path_SensorResponse = NULL){
   SRF <- GetRadiometry(SensorName,SpectralProps = SpectralProps,
                        Path_SensorResponse = Path_SensorResponse)
-  if (is.null(SRF)){
-    stop()
-  }
+  if (is.null(SRF)) stop()
   # adjust optical constants from 1nm sampling into spectral S2 spectral sampling
   SpecSensor <- PrepareSensorSimulation(prosail::SpecPROSPECT_FullRange,
                                         prosail::SpecSOIL,
@@ -301,12 +285,12 @@ get_spec_sensor <- function(SensorName = 'MyCustomSensor',
 #' @return List of S2 angles (SZA, SAA, VZA, VAA)
 #' @importFrom XML xml xmlToList
 #' @export
+
 get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
 
   # read XML file containing info about geometry of acquisition
   s2xml <- XML::xml(MTD_TL_xml)
   s2xml <- XML::xmlToList(s2xml)
-
   if (is.null(s2xml$Dataset_Identification$AUTHORITY)){
     GeomS2 <- get_S2geometry_from_SAFE(s2xml)
   } else if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
@@ -318,7 +302,8 @@ get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
   } else {
     GeomS2 <- get_S2geometry_from_SAFE(s2xml)
   }
-  return(list('SAA'=GeomS2$SAA,'SZA'=GeomS2$SZA,'VAA'=GeomS2$VAA,'VZA'=GeomS2$VZA))
+  return(list('SAA' = GeomS2$SAA, 'SZA' = GeomS2$SZA,
+              'VAA' = GeomS2$VAA, 'VZA' = GeomS2$VZA))
 }
 
 #' This function returns geometry of acquisition for S2 image processed with MAJA
@@ -330,14 +315,15 @@ get_S2geometry <- function(MTD_TL_xml,verbose=FALSE){
 #'
 #' @return List of S2 angles (SZA, SAA, VZA, VAA)
 #' @export
+
 get_S2geometry_from_THEIA <- function(s2xml){
 
   Distrib_SunAngle <- list()
   # SZA
   Distrib_SunAngle$Zenith <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Zenith$Values_List
   SZA <- c()
-  for (i in 1:length(Distrib_SunAngle$Zenith)){
-    SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
+  for (i in seq_len(length(Distrib_SunAngle$Zenith))){
+    SZA <- c(SZA, as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,split = ' ')[[1]]))
   }
   SZA <- SZA[which(!is.na(SZA))]
 

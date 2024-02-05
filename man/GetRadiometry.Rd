@@ -8,7 +8,7 @@ spectral response from Sentinel-2 is already defined}
 GetRadiometry(
   SensorName = "Custom",
   SpectralProps = NULL,
-  Path_SensorResponse = NULL,
+  Path_SensorResponse = "./",
   SaveSRF = TRUE
 )
 }

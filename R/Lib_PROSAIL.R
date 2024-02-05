@@ -196,127 +196,6 @@ PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL, N = 1.5,
                      rsoil = rsoil, fraction_brown = fraction_brown,
                      diss = diss, Cv = Cv, Zeta = Zeta)
   }
-
-  # ############################ #
-  # #	LEAF OPTICAL PROPERTIES	##
-  # ############################ #
-  # if (SAILversion =='4SAIL'){
-  #   default_PROSPECT <- data.frame('CHL' = 40.0, 'CAR' = 8.0, 'ANT' = 0.0,
-  #                                  'BROWN' = 0.0, 'EWT' = 0.01, 'LMA' = 0.0,
-  #                                  'PROT'= 0.0, 'CBC' = 0.0, 'N' = 1.5,
-  #                                  'alpha' = 40.0)
-  #
-  #   if (is.null(Input_PROSPECT)){
-  #     dm_val <- prospect::check_version_prospect(LMA, PROT, CBC)
-  #     Input_PROSPECT <- data.frame('CHL' = CHL, 'CAR' = CAR, 'ANT' = ANT,
-  #                                  'BROWN' = BROWN, 'EWT' = EWT, 'LMA' = dm_val$LMA,
-  #                                  'PROT'= dm_val$PROT, 'CBC' = dm_val$CBC,
-  #                                  'N' = N, 'alpha' = alpha)
-  #   } else if (!is.null(Input_PROSPECT)){
-  #     missing <- which(!names(default_PROSPECT)%in%names(Input_PROSPECT))
-  #     if (length(missing)>0) Input_PROSPECT <- cbind(Input_PROSPECT, default_PROSPECT[missing])
-  #     dm_val <- prospect::check_version_prospect(Input_PROSPECT$LMA,
-  #                                                Input_PROSPECT$PROT,
-  #                                                Input_PROSPECT$CBC)
-  #     Input_PROSPECT <- data.frame('CHL' = CHL, 'CAR' = CAR, 'ANT' = ANT,
-  #                                  'BROWN' = BROWN, 'EWT' = EWT, 'LMA' = dm_val$LMA,
-  #                                  'PROT'= dm_val$PROT, 'CBC' = dm_val$CBC,
-  #                                  'N' = N, 'alpha' = alpha)
-  #   }
-  # }
-  # GreenVegetation <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
-  #                                       N = Input_PROSPECT$N[1],
-  #                                       CHL = Input_PROSPECT$CHL[1],
-  #                                       CAR = Input_PROSPECT$CAR[1],
-  #                                       ANT = Input_PROSPECT$ANT[1],
-  #                                       BROWN = Input_PROSPECT$BROWN[1],
-  #                                       EWT = Input_PROSPECT$EWT[1],
-  #                                       LMA = Input_PROSPECT$LMA[1],
-  #                                       PROT = Input_PROSPECT$PROT[1],
-  #                                       CBC = Input_PROSPECT$CBC[1],
-  #                                       alpha = Input_PROSPECT$alpha[1])
-  #
-  # if (SAILversion == '4SAIL2'){
-  #   # 4SAIL2 requires one of the following combination of input parameters
-  #   # Case #1: valid optical properties for brown vegetation
-  #   if (!is.null(BrownLOP)){
-  #     # need to define Reflectance and Transmittance for BrownLOP
-  #     if (length(grep('Reflectance',names(BrownLOP)))==0 |
-  #         length(grep('Transmittance',names(BrownLOP)))==0){
-  #       message('Please define BrownLOP as a list including "Reflectance" and "Transmittance"')
-  #       stop()
-  #     }
-  #     # check if spectral domain for optical properties of brown vegetation match
-  #     # with spectral domain for optical properties of green vegetation
-  #     if (length(setdiff(Spec_Sensor$lambda, BrownLOP$wvl))>0){
-  #       message('Please define same spectral domain for BrownLOP and SpecPROSPECT')
-  #       stop()
-  #     }
-  #     if (length(unique(lengths(Input_PROSPECT)))==1){
-  #       if (!unique(lengths(Input_PROSPECT))==1){
-  #         message('BrownLOP defined along with multiple leaf chemical properties')
-  #         message('Only first set of leaf chemical properties will be used to simulate green vegetation')
-  #       }
-  #     }
-  #   # if no leaf optical properties brown vegetation defined
-  #   } else if (is.null(BrownLOP)){
-  #     # if all PROSPECT input parameters have the same length
-  #     if (length(unique(lengths(Input_PROSPECT)))==1){
-  #       # if all PROSPECT input parameters are unique (no possibility to simulate 2 types of leaf optics)
-  #       if (unique(lengths(Input_PROSPECT))==1){
-  #         # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
-  #         if (fraction_brown==0){
-  #           BrownLOP <- GreenVegetation
-  #         # else run 4SAIL
-  #         } else {
-  #           message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-  #           message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
-  #           SAILversion <- '4SAIL'
-  #         }
-  #       # if all PROSPECT parameters have at least 2 elements
-  #       } else if (unique(lengths(Input_PROSPECT))>=2){
-  #         # compute leaf optical properties
-  #         BrownLOP <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
-  #                                               N = Input_PROSPECT$N[2],
-  #                                               CHL = Input_PROSPECT$CHL[2],
-  #                                               CAR = Input_PROSPECT$CAR[2],
-  #                                               ANT = Input_PROSPECT$ANT[2],
-  #                                               BROWN = Input_PROSPECT$BROWN[2],
-  #                                               EWT = Input_PROSPECT$EWT[2],
-  #                                               LMA = Input_PROSPECT$LMA[2],
-  #                                               PROT = Input_PROSPECT$PROT[2],
-  #                                               CBC = Input_PROSPECT$CBC[2],
-  #                                               alpha = Input_PROSPECT$alpha[2])
-  #         if (unique(lengths(Input_PROSPECT))>2){
-  #           message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-  #           message('Currently more than 2 sets are defined. will only use the first 2')
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
-  #
-  #
-  # if (SAILversion == '4SAIL'){
-  #   if (length(unique(lengths(Input_PROSPECT)))==1){
-  #     if (unique(lengths(Input_PROSPECT))>1){
-  #       message('4SAIL needs only one set of optical properties')
-  #       message('Currently more than one set of leaf chemical constituents is defined.')
-  #       message('Will run 4SAIL with the first set of leaf chemical constituents')
-  #     }
-  #   }
-  # }
-  #
-  # if (SAILversion == '4SAIL'){
-  #   # run 4SAIL
-  #   Ref <- fourSAIL(LeafOptics = GreenVegetation,
-  #                   TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil)
-  # } else if (SAILversion == '4SAIL2'){
-  #   # run 4SAIL2
-  #   Ref <- fourSAIL2(leafgreen = GreenVegetation, leafbrown = BrownLOP,
-  #                    TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil,
-  #                    fraction_brown, diss, Cv, Zeta)
-  # }
   return(Ref)
 }
 
@@ -1328,14 +1207,9 @@ volscatt <- function(tts,tto,psi,ttl){
   #c ..............................................................................
 
   cosbts <- 5
-  if (abs(ss)>1e-6){
-    cosbts <- -cs/ss
-  }
+  if (abs(ss)>1e-6) cosbts <- -cs/ss
   cosbto <- 5
-  if (abs(so)>1e-6){
-    cosbto <- -co/so
-  }
-
+  if (abs(so)>1e-6) cosbto <- -co/so
   if (abs(cosbts)<1){
     bts <- acos(cosbts)
     ds <- ss

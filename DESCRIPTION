@@ -1,6 +1,6 @@
 Package: prosail
 Title: PROSAIL leaf and canopy radiative transfer model and inversion routines
-Version: 2.3.2
+Version: 2.3.3
 Authors@R: c(person(given = "Jean-Baptiste", 
 					    family = "Feret", 
 					    email = "jb.feret@teledetection.fr", 
@@ -20,22 +20,17 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.0
 Suggests: 
+    liquidSVM,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Imports: 
     caret,
-    dplyr,
-    expandFunctions,
-    ggplot2,
-    liquidSVM,
     matrixStats,
     methods,
     pracma,
     raster,
     simsalapar,
-    stars,
-    stringr,
     utils,
     progress,
     prospect,

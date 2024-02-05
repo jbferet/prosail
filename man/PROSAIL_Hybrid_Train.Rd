@@ -7,7 +7,6 @@
 PROSAIL_Hybrid_Train(
   BRF_LUT,
   InputVar,
-  FigPlot = FALSE,
   nbEnsemble = 20,
   WithReplacement = FALSE,
   method = "liquidSVM",
@@ -18,8 +17,6 @@ PROSAIL_Hybrid_Train(
 \item{BRF_LUT}{numeric. LUT of bidirectional reflectances factors used for training}
 
 \item{InputVar}{numeric. biophysical parameter corresponding to the reflectance}
-
-\item{FigPlot}{Boolean. Set to TRUE if you want a scatterplot}
 
 \item{nbEnsemble}{numeric. Number of individual subsets should be generated from BRF_LUT}
 

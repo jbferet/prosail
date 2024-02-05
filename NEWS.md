@@ -1,3 +1,10 @@
+# prosail v2.3.3
+
+## change
+- move liquidSVM from Imports to Suggests
+- remove unnecessary packages from Imports
+- remove figure option for hybrid inversion training
+
 # prosail v2.3.2
 
 ## fix

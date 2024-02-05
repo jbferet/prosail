@@ -46,7 +46,7 @@ to be estimated through inversion}
 
 \item{InVar}{dataframe. full set of PROSAIL input variables}
 
-\item{TypeLidf}{numeric. tyoe of leaf inclination distribution function}
+\item{TypeLidf}{numeric. type of leaf inclination distribution function}
 
 \item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
 
