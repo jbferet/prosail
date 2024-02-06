@@ -7,17 +7,14 @@
 
 # 1 Requirements
 
-## Install `devtools` and `git2r`
+## Install `devtools`
 
-First, install the package `devtools` following the [instructions](https://www.r-project.org/nosvn/pandoc/devtools.html) depending on your operating system. 
+Install the package `devtools` following the [instructions](https://www.r-project.org/nosvn/pandoc/devtools.html) depending on your operating system. 
 
-Then install `git2r`:
-```
-install.packages("git2r")
-```
 
 ## Install `prospect`
-Then install the package `prospect` with the following command line in R session:
+
+Install the package `prospect` with the following command line in R session:
 ```
 devtools::install_github('jbferet/prospect')
 ```
@@ -26,40 +23,45 @@ devtools::install_github('jbferet/prospect')
 
 `prosail` uses Support Vector Regression (SVR) for hybrid inversion. 
 
-The master branch is currently based on the package [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+The default SVM implementation is currently based on the package 
+[`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
+A SVM implementation based on the R package [`caret`](https://topepo.github.io/caret/) 
+is also available.
 
-[liquidSVM](https://arxiv.org/pdf/1702.06899v1.pdf) provides very efficient and fully-integrated hyper-parameter selection, multithreading and GPU support. However, this package is not maintained anymore and may cause difficulties during the installation. 
+[`liquidSVM`](https://arxiv.org/pdf/1702.06899v1.pdf) provides very efficient and 
+fully-integrated hyper-parameter selection, multithreading and GPU support. 
+However, this package is not maintained anymore and may cause difficulties during 
+the installation. 
 
-When installing the master branch, please follow installation instructions provided in the [documentation webpage](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html). 
+To install `liquidSVM`, please follow installation instructions provided in the 
+[documentation webpage](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html). 
 
 ### !!! WINDOWS USERS !!!
 
 Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R library. 
-This `i386` directory should be downloaded [here](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) and copied into the local directory on your computer, where the binary codes of liquidSVM are installed: 
+This `i386` directory should be downloaded [here](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) 
+and copied into the local directory on your computer, where the binary codes of liquidSVM are installed:
 
 `Path_For_My_R_distribution/library/liquidSVM/libs/`.
 
 ### If liquidSVM installation fails
-Please refer to the next section and install the branch `dev_noliquidSVM`
+
+`liquidSVM` is a suggested package, so the installation of `prosail` should succeed 
+even without `liquidSVM`. 
+Two main functions using `liquidSVM` as default may be impacted: `train_prosail_inversion` 
+and `PROSAIL_Hybrid_Train`. 
+
+If the installation of `liquidSVM` does not succeed, please define `method = 'svmRadial'` 
+or `method = 'svmLinear'` as optional input variable. 
+This will use the caret implementation, but it will require longer training stage.
+
 
 # 2 Install `prosail`
-
-### If installation of liquidSVM succeeds
 
 The package `prosail` can then be installed with the following command line in R session:
 ```
 devtools::install_github('jbferet/prosail')
 ```
-
-### If installation of liquidSVM fails
-
-An alternative branch of `prosail` based on the SVR implementation of the package `caret` is available. 
-
-This branch `prosail` can then be installed with the following command line in R session:
-```
-devtools::install_github('jbferet/prosail@dev_noliquidSVM') 
-```
-
 
 # 3 Tutorial
 
@@ -89,6 +91,9 @@ We thank [Ingo Steinwart](ingo.steinwart@mathematik.uni-stuttgart.de) and [Phili
 If you use **prosail**, please consider citing the following references when appropriate :
 
 ### PROSPECT
+
+Féret, J.-B. & de Boissieu, F. (2024). `prospect`: an R package to link leaf optical properties with their chemical and structural properties with the leaf model PROSPECT. Journal of Open Source Software, 9(94), 6027, https://doi.org/10.21105/joss.06027
+
 Féret J-B, Gitelson AA, Noble SD & Jacquemoud S, 2017. PROSPECT-D: Towards modeling leaf optical properties through a complete lifecycle. Remote Sensing of Environment, 193, 204–215. https://doi.org/10.1016/j.rse.2017.03.004
 
 Féret J-B, Berger K, de Boissieu F & Malenovský Z, 2021. PROSPECT-PRO for estimating content of nitrogen-containing leaf proteins and other carbon-based constituents. Remote Sensing of Environment, 252, 112173. https://doi.org/10.1016/j.rse.2020.112173

@@ -95,8 +95,6 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 #' @param MaskRaster character. path for binary mask defining ON (1) and OFF (0) pixels in the raster
 #' @param MultiplyingFactor numeric. multiplying factor used to write reflectance in the raster
 #' --> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range
-#' @param method character. which machine learning regression method should be used?
-#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #'
 #' @return res character. path for output files corresponding to biophysical properties
 #' @importFrom progress progress_bar
@@ -107,8 +105,7 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname, MaskRaster = FALSE,
-                                    MultiplyingFactor = 10000,
-                                    method = 'liquidSVM'){
+                                    MultiplyingFactor = 10000){
 
   # explain which biophysical variables will be computed
   BPvar <- names(HybridModel)
@@ -170,7 +167,8 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         BlockVal <- BlockVal[SelectPixels,Selbands]
       }
       # add name for variables
-      if (!method =='liquidSVM'){
+
+      if (!inherits(HybridModel[[parm]][[1]], what = 'liquidSVM')){
         colnames(BlockVal) <- colnames(HybridModel[[parm]][[1]]$trainingData)[-1]
       }
 
@@ -179,7 +177,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       if (length(SelectPixels)>0){
         BlockVal <- BlockVal/MultiplyingFactor
         modelSVR_Estimate <- list()
-        for (modind in 1:length(HybridModel[[parm]])){
+        for (modind in seq_len(length(HybridModel[[parm]]))){
           pb$tick()
           modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]],
                                                  BlockVal)
@@ -192,9 +190,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         Mean_EstimateFull[SelectPixels] <- Mean_Estimate
         STD_EstimateFull[SelectPixels] <- STD_Estimate
       } else {
-        for (modind in 1:length(HybridModel[[parm]])){
-          pb$tick()
-        }
+        for (modind in seq_len(length(HybridModel[[parm]]))) pb$tick()
       }
       r_outMean <- writeValues(r_outMean, Mean_EstimateFull, blk$row[i],
                                format = "ENVI", overwrite = TRUE)
@@ -342,7 +338,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
   # make sure Refl is right dimensions
   Refl <- t(Refl)
-  if (is(RegressionModels[[1]])[1]=='liquidSVM'){
+  if (inherits(RegressionModels[[1]], what = 'liquidSVM')){
     nbFeatures <- RegressionModels[[1]]$dim
   } else {
     nbFeatures <- ncol(RegressionModels[[1]]$trainingData) - 1
@@ -395,7 +391,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
   if (WithReplacement==TRUE){
     Subsets <- list()
     samples_per_run <- round(nbSamples/nbEnsemble)
-    for (run in (1:nbEnsemble)){
+    for (run in seq_len(nbEnsemble)){
       Subsets[[run]] <- sample(seq_len(nbSamples), samples_per_run, replace = TRUE)
     }
   # if subsets are generated from BRF_LUT without replacement
@@ -408,7 +404,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
   pb <- progress_bar$new(
     format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
     total = nbEnsemble, clear = FALSE, width= 100)
-  for (i in 1:nbEnsemble){
+  for (i in seq_len(nbEnsemble)){
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
@@ -437,27 +433,17 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
         }
       }
     } else {
-      ctrl <- caret::trainControl(
-        method = "cv",
-        number = 5,
-      )
-      if (is.null(colnames(TrainingSet$X))){
-        colnames(TrainingSet$X) <- paste('var',seq_len(ncol(TrainingSet$X)),sep = '_')
-      }
+      ctrl <- caret::trainControl(method = "cv",
+                                  number = 5)
+      if (is.null(colnames(TrainingSet$X))) colnames(TrainingSet$X) <- paste('var',seq_len(ncol(TrainingSet$X)),sep = '_')
       target <- matrix(TrainingSet$Y,ncol = 1)
-      if (is.null(colnames(target))){
-        colnames(target) <- 'target'
-      }
+      if (is.null(colnames(target))) colnames(target) <- 'target'
       TrainingData <- cbind(target,TrainingSet$X)
       if (method =='svmRadial'){
-        tuneGrid <- expand.grid(
-          C = exp(seq(-10,0,by=1)),
-          sigma = exp(seq(-10,0,by=1))
-        )
+        tuneGrid <- expand.grid(C = exp(seq(-10, 0)),
+                                sigma = exp(seq(-10, 0)))
       } else if (method =='svmLinear'){
-        tuneGrid <- expand.grid(
-          C = exp(seq(-10,0,by=1))
-        )
+        tuneGrid <- expand.grid(C = exp(seq(-10, 0)))
       }
       tunedModel <- caret::train(target ~ .,
                                  data = TrainingData,
@@ -469,31 +455,6 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
     modelsSVR[[i]] <- tunedModel
     pb$tick()
   }
-  # # if scatterplots needed
-  # if (FigPlot==TRUE){
-  #   # predict for full BRF_LUT
-  #   if (is.null(colnames(BRF_LUT))){
-  #     colnames(BRF_LUT) <- paste('var',seq(1,ncol(BRF_LUT)),sep = '_')
-  #   }
-  #   for (i in 1:nbEnsemble){
-  #     tunedModelY <- stats::predict(modelsSVR[[i]], BRF_LUT)
-  #     tunedModelYAll <- cbind(tunedModelYAll,matrix(tunedModelY,ncol = 1))
-  #   }
-  #   # plot prediction
-  #   df <- data.frame(x = rep(1:nbSamples,nbEnsemble),
-  #                    y = as.numeric(matrix(tunedModelYAll, ncol = 1)))
-  #   df.summary <- df %>% dplyr::group_by(x) %>%
-  #     summarize( ymin = min(y),ystdmin = mean(y)-sd(y),
-  #                ymax = max(y),ystdmax = mean(y)+sd(y),
-  #                ymean = mean(y))
-  #   par(mar=rep(.1, 4))
-  #   p <- ggplot2::ggplot(df.summary, aes(x = InputVar, y = ymean)) +
-  #     geom_point(size = 2) +
-  #     geom_errorbar(aes(ymin = ystdmin, ymax = ystdmax))
-  #   MeanPredict <- rowMeans(matrix(as.numeric(tunedModelYAll),
-  #                                  ncol = nbEnsemble))
-  #   print(p)
-  # }
   return(modelsSVR)
 }
 
