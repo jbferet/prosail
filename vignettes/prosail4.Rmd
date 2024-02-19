@@ -249,7 +249,7 @@ for (parm in Parms2Estimate){
   Bands2Select[[parm]] <- match(S2BandSelect[[parm]],SRF$Spectral_Bands)
 }
 # ImgBandNames <- strsplit(HDR_Refl$`band names`,split = ',')[[1]]
-ImgBandNames <- c('B2','B3','B4','B5','B6','B7','B8','B11','B12')
+ImgBandNames <- c('B2','B3','B4','B5','B6','B7','B8','B8A','B11','B12')
 
 # define output directory where LUTs will be saved
 PROSAIL_ResPath <- file.path(results_site_path,'HybridInversion')
@@ -261,17 +261,22 @@ S2Geom <- get_S2geometry(MTD_TL_xml = xmlfile)
 
 # define ranges for zenith angles of acquisition
 GeomAcq <- list()
-GeomAcq$min <- data.frame('tto' = min(S2Geom$VZA), 'tts' = min(S2Geom$SZA), 
+GeomAcq$min <- data.frame('tto' = min(S2Geom$VZA), 
+                          'tts' = min(S2Geom$SZA), 
                           'psi' = 0)
-GeomAcq$max <- data.frame('tto' = max(S2Geom$VZA), 'tts' = max(S2Geom$SZA), 
+GeomAcq$max <- data.frame('tto' = max(S2Geom$VZA), 
+                          'tts' = max(S2Geom$SZA), 
                           'psi' = 360)
 
 # train regression model
+# set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in the 
+# R package caret instead of liquidSVM
 modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     atbd = TRUE, GeomAcq = GeomAcq, 
                                     SRF = SRF, 
                                     Bands2Select = Bands2Select, 
-                                    Path_Results = PROSAIL_ResPath)
+                                    Path_Results = PROSAIL_ResPath, 
+                                    method = 'liquidSVM')
 
 # apply regression model on Sentinel-2 raster data
 Apply_prosail_inversion(raster_path = Refl_path, 
