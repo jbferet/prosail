@@ -1,3 +1,8 @@
+# prosail v2.4.0
+
+## fix
+- fixed the tutorial related to hybrid inversion applied on Sentinel-2 image: B8A was not listed in spectral bands for the raster
+
 # prosail v2.3.3
 
 ## change
