@@ -1,3 +1,8 @@
+# prosail v2.4.1
+
+## fix
+- fixed a bug occurring when running 4SAIL2 with brown vegetation and Input_PROSPECT undefined
+
 # prosail v2.4.0
 
 ## fix

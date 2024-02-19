@@ -1357,13 +1357,19 @@ adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor, Input_PROSPECT,
   GreenLOP <- prospect::PROSPECT(SpecPROSPECT = Spec_Sensor,
                                  Input_PROSPECT = inprospect_green)
   if (SAILversion =='4SAIL2'){
+    if (is.null(Input_PROSPECT)){
+      Input_PROSPECT <- data.frame('CHL' = CHL, 'CAR' = CAR, 'ANT' = ANT,
+                                   'BROWN' = BROWN, 'EWT' = EWT, 'LMA' = LMA,
+                                   'PROT' = PROT, 'CBC' = CBC, 'N' = N,
+                                   'alpha' = alpha)
+    }
     # 4SAIL2 requires one of the following combination of input parameters
     # Case #1: optical properties for brown vegetation provided
     if (!is.null(BrownLOP)){
       check_BrownLOP(BrownLOP = BrownLOP,
                      lambda = Spec_Sensor$lambda,
                      Input_PROSPECT = Input_PROSPECT)
-      # Case #2: two sets of input data for prospect
+    # Case #2: two sets of input data for prospect
     } else if (is.null(BrownLOP)){
       # if fraction_brown set to 0, then assign green vegetation optics to brown vegetation optics
       if (fraction_brown==0) {
