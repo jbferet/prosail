@@ -15,14 +15,17 @@ GetRadiometry(
 \arguments{
 \item{SensorName}{character. name of the sensor}
 
-\item{SpectralProps}{list. list of spectral properties including wl = central wavelength and fwhm = corresponding FWHM}
+\item{SpectralProps}{list. list of spectral properties including
+wl = central wavelength and fwhm = corresponding FWHM}
 
-\item{Path_SensorResponse}{character. path for the file where SRF should be saved as CSV}
+\item{Path_SensorResponse}{character. path for the file where SRF should be
+saved as CSV}
 
 \item{SaveSRF}{boolean. Should SRF be saved in file?}
 }
 \value{
-SRF list. Spectral response function, corresponding spectral bands, and Original Bands
+SRF list. Spectral response function, corresponding spectral bands,
+and Original Bands
 }
 \description{
 reads spectral response from known sensor

@@ -12,7 +12,8 @@ applySensorCharacteristics(wvl, InRefl, SRF)
 
 \item{InRefl}{numeric. input spectral data (unique sample)}
 
-\item{SRF}{list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined}
+\item{SRF}{list. Spectral response & Spectral Bands of the sensor & Original
+Bands for which SRF is defined}
 }
 \value{
 OutRefl numeric. Output spectral data, sensor resolution

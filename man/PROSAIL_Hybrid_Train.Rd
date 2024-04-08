@@ -28,7 +28,8 @@ default = SVM with liquidSVM. svmRadial and svmLinear from caret package also im
 \item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
 }
 \value{
-modelsSVR list. regression models trained for the retrieval of InputVar based on BRF_LUT
+modelsMLR list. ML regression models trained for the retrieval of
+InputVar based on BRF_LUT
 }
 \description{
 This function trains a support vector regression for a set of variables based on spectral data

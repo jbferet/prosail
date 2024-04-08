@@ -1,7 +1,7 @@
 ## code to prepare `Venus` spectral response
 # 1- define sensor name
 SensorName <-'Venus'
-Path_SRF <- file.path('data-raw',paste(SensorName,'_Spectral_Response.csv',sep=''))
+Path_SRF <- file.path('data-raw',paste0(SensorName,'_Spectral_Response.csv'))
 # 2- read file containing spectral response
 message('_____ reading spectral response corresponding to ______')
 print(SensorName)
@@ -23,7 +23,7 @@ Venus <- list('Spectral_Response' = SensorRadiometry,
 
 ## code to prepare `Venus_Spectral_Response` dataset goes here
 usethis::use_data(Venus,compress = 'xz',overwrite = TRUE)
-save(Venus,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
+save(Venus,file =  file.path('data',paste0(SensorName,'.RData')))
 
 
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{PRO4SAIL}
 \alias{PRO4SAIL}
-\title{Performs PROSAIL simulation based on a set of combinations of input parameters}
+\title{PROSAIL simulation based on a set of combinations of input parameters}
 \usage{
 PRO4SAIL(
   Spec_Sensor = NULL,
@@ -36,7 +36,7 @@ PRO4SAIL(
 }
 \arguments{
 \item{Spec_Sensor}{list. Includes optical constants required for PROSPECT
-refractive index, specific absorption coefficients and corresponding spectral bands}
+refractive index, specific absorption coefficients and spectral bands}
 
 \item{Input_PROSPECT}{list. PROSPECT input variables}
 
@@ -58,7 +58,7 @@ refractive index, specific absorption coefficients and corresponding spectral ba
 
 \item{CBC}{numeric. NonProtCarbon-based constituent content (g.cm-2)}
 
-\item{alpha}{numeric. Solid angle for incident light at surface of leaf (simulation of roughness)}
+\item{alpha}{numeric. Solid angle for incident light at surface of leaf}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
@@ -94,7 +94,7 @@ if TypeLidf ==2, unused}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownLOP}{dataframe. Defines optical properties for brown vegetation, if not NULL
+\item{BrownLOP}{dataframe. optical properties for brown vegetation
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it
@@ -108,5 +108,5 @@ rsdt: directional-hemispherical reflectance factor for solar incident flux
 rddt: bi-hemispherical reflectance factor
 }
 \description{
-Performs PROSAIL simulation based on a set of combinations of input parameters
+PROSAIL simulation based on a set of combinations of input parameters
 }

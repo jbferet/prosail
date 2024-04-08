@@ -2,7 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL_LUT.R
 \name{get_default_LUT_input}
 \alias{get_default_LUT_input}
-\title{This function sets default values for PROSAIL LUT simulation when not defined by user}
+\title{Sets default values for PROSAIL LUT simulation when not defined by user}
 \usage{
 get_default_LUT_input(
   TypeDistrib = NULL,
@@ -12,17 +12,17 @@ get_default_LUT_input(
 )
 }
 \arguments{
-\item{TypeDistrib}{list. specify if uniform or Gaussian distribution to be applied. default = Uniform}
+\item{TypeDistrib}{list. uniform/Gaussian distribution to apply.}
 
-\item{GaussianDistrib}{list. Mean value and STD corresponding to the parameters sampled with gaussian distribution}
+\item{GaussianDistrib}{list. Mean & STD for parms with gaussian distribution}
 
-\item{minval}{list. Defines the minimum value to be set for a list of parameters randomly produced}
+\item{minval}{list. minimum value for a list of parameters randomly produced}
 
-\item{maxval}{list. Defines the maximum value to be set for a list of parameters randomly produced}
+\item{maxval}{list. maximum value for a list of parameters randomly produced}
 }
 \value{
-res list. list of default values corresponding to NULL input parameters
+res list. default values corresponding to NULL input parameters
 }
 \description{
-This function sets default values for PROSAIL LUT simulation when not defined by user
+Sets default values for PROSAIL LUT simulation when not defined by user
 }

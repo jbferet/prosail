@@ -21,7 +21,8 @@
 #' @importFrom truncnorm rtruncnorm
 #' @export
 
-get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TRUE){
+get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL,
+                               Codist_LAI = TRUE){
   # define paremertization for truncated gaussians
   TgaussParms <- list()
   TgaussParms$min <- data.frame('lai' = 0, 'LIDFa' = 30, 'q' = 0.1, 'N' = 1.2,
@@ -59,11 +60,13 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
                                    'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.85,
                                    'BROWN' = 2.0, 'psoil' = 1)
     Codist_LAI$VminLAImax <- data.frame('LIDFa' = 55, 'q' = 0.1, 'N' = 1.3,
-                                        'CHL' = 45, 'LMA' = 0.005, 'Cw_rel' = 0.70,
-                                        'BROWN' = 0.0, 'psoil' = 0)
+                                        'CHL' = 45, 'LMA' = 0.005,
+                                        'Cw_rel' = 0.70,'BROWN' = 0.0,
+                                        'psoil' = 0)
     Codist_LAI$VmaxLAImax <- data.frame('LIDFa' = 65, 'q' = 0.5, 'N' = 1.8,
-                                        'CHL' = 90, 'LMA' = 0.011, 'Cw_rel' = 0.80,
-                                        'BROWN' = 0.2, 'psoil' = 0.4)
+                                        'CHL' = 90, 'LMA' = 0.011,
+                                        'Cw_rel' = 0.80, 'BROWN' = 0.2,
+                                        'psoil' = 0.4)
     for (parm in names(Codist_LAI$Vmin0)){
       Vstar <- get_codistributions(V = InputPROSAIL[[parm]],
                                    LAI = InputPROSAIL$lai,
@@ -129,7 +132,8 @@ get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TR
 #' @return Vstar numeric.
 #' @export
 
-get_codistributions <- function(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLAImax){
+get_codistributions <- function(V, LAI, MaxLAI, Vmin0, Vmax0,
+                                VminLAImax, VmaxLAImax){
 
   VminLAI <- Vmin0 + (LAI*(VminLAImax-Vmin0)/MaxLAI)
   VmaxLAI <- Vmax0 + (LAI*(VmaxLAImax-Vmax0)/MaxLAI)
@@ -138,14 +142,14 @@ get_codistributions <- function(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLA
 }
 
 
-#' This function sets default values for PROSAIL LUT simulation when not defined by user
+#' Sets default values for PROSAIL LUT simulation when not defined by user
 #'
-#' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
-#' @param GaussianDistrib  list. Mean value and STD corresponding to the parameters sampled with gaussian distribution
-#' @param minval list. Defines the minimum value to be set for a list of parameters randomly produced
-#' @param maxval list. Defines the maximum value to be set for a list of parameters randomly produced
+#' @param TypeDistrib list. uniform/Gaussian distribution to apply.
+#' @param GaussianDistrib  list. Mean & STD for parms with gaussian distribution
+#' @param minval list. minimum value for a list of parameters randomly produced
+#' @param maxval list. maximum value for a list of parameters randomly produced
 #'
-#' @return res list. list of default values corresponding to NULL input parameters
+#' @return res list. default values corresponding to NULL input parameters
 #' @export
 
 get_default_LUT_input <- function(TypeDistrib = NULL,
@@ -183,7 +187,7 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
   }
   # define uniform / gaussian distribution
   if (is.null(TypeDistrib))
-    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT' = 'Uniform',
+    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT'='Uniform',
                               'BROWN'='Uniform', 'EWT' = 'Uniform',
                               'LMA' = 'Uniform', 'N' = 'Uniform',
                               'psoil' = 'Uniform', 'LIDFa' = 'Uniform',
@@ -209,11 +213,11 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
 
 #' This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL
 #'
-#' @param minval list. Defines the minimum value to be set for a list of parameters randomly produced
-#' @param maxval list. Defines the maximum value to be set for a list of parameters randomly produced
-#' @param ParmSet list.Defines the parameters to be set to a given value
+#' @param minval list. minimum value for a list of parameters randomly produced
+#' @param maxval list. maximum value for a list of parameters randomly produced
+#' @param ParmSet list. parameters to be set to a given value
 #' @param nbSamples numeric. Number of samples to be generated
-#' @param TypeDistrib list. specify if uniform or Gaussian distribution to be applied. default = Uniform
+#' @param TypeDistrib list. uniform/Gaussian distribution to be applied.
 #' @param Mean list. mean value for parameters with Gaussian distribution
 #' @param Std list. standard deviation for parameters with Gaussian distribution
 #'
@@ -221,7 +225,6 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
 #' @importFrom stats runif rnorm sd
 #' @importFrom truncnorm rtruncnorm
 #' @export
-#'
 
 get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet = NULL,
                                            nbSamples = 2000,
@@ -292,13 +295,13 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL, ParmSet
   }
   # define InputPROSAIL # 2 Set parameters
   if (length(ParmSet)>0){
-    for (i in 1:length(ParmSet)){
+    for (i in seq_len(length(ParmSet))){
       Sel <- which(InVar==names(ParmSet)[i])
       InputPROSAIL[[Sel]] <- ParmSet[,i]
     }
   }
   # define InputPROSAIL # 3 random parameters
-  for (i in 1:length(minval)){
+  for (i in seq_len(length(minval))){
     Sel <- names(minval)[i]
     # if uniform distribution
     if (TypeDistrib[[Sel]] == 'Uniform') InputPROSAIL[[Sel]] <- runif(nbSamples,
@@ -391,7 +394,7 @@ get_distribution_input_prosail2 <- function(minval,maxval,ParmSet,nbSamples,
 
   # define InputPROSAIL # 2 Set parameters
   if (length(ParmSet)>0){
-    for (i in 1:length(ParmSet)){
+    for (i in seq_len(length(ParmSet))){
       Sel <- which(InVar==names(ParmSet)[i])
       InputPROSAIL[[Sel]] <- ParmSet[,i]
     }
@@ -443,10 +446,8 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
     total = 10, clear = FALSE, width= 100)
-  for (i in 1:nbSamples){
-    if (i%%Split==0 & nbSamples>100){
-      pb$tick()
-    }
+  for (i in seq_len(nbSamples)){
+    if (i%%Split==0 & nbSamples>100) pb$tick()
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
@@ -486,7 +487,8 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
   rsot <- do.call(cbind,rsot)
   rsdt <- do.call(cbind,rsdt)
   rddt <- do.call(cbind,rddt)
-  row.names(BRF) <- row.names(rdot) <- row.names(rsot) <- row.names(rsdt) <- row.names(rddt) <- BandNames
+  row.names(BRF) <- row.names(rdot) <- row.names(rsot) <- BandNames
+  row.names(rsdt) <- row.names(rddt) <- BandNames
   return(list('BRF' = BRF, 'rdot' = rdot, 'rsot' = rsot,
               'rsdt' = rsdt, 'rddt' = rddt))
 }
@@ -518,10 +520,8 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
     total = 10, clear = FALSE, width= 100)
-  for (i in 1:nbSamples){
-    if (i%%Split==0 & nbSamples>100){
-      pb$tick()
-    }
+  for (i in seq_len(nbSamples)){
+    if (i%%Split==0 & nbSamples>100) pb$tick()
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil +
       (1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
@@ -632,8 +632,10 @@ Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT,
   }
   BRF <- do.call(cbind,BRF)
   row.names(BRF) <- BandNames
-  res <- list('BRF' = BRF, 'fCover' = fCover, 'fAPAR' = fAPAR, 'albedo' = albedo)
-  return(res)
+  return(list('BRF' = BRF,
+              'fCover' = fCover,
+              'fAPAR' = fAPAR,
+              'albedo' = albedo))
 }
 
 #' This function applied noise on a matrix

@@ -1,7 +1,7 @@
 ## code to prepare `Pleiades_1A` spectral response
 # 1- define sensor name
 SensorName <-'Pleiades_1A'
-Path_SRF <- file.path('data-raw',paste(SensorName,'_Spectral_Response.csv',sep=''))
+Path_SRF <- file.path('data-raw',paste0(SensorName,'_Spectral_Response.csv'))
 # 2- read file containing spectral response
 message('_____ reading spectral response corresponding to ______')
 print(SensorName)
@@ -23,4 +23,4 @@ Pleiades_1A <- list('Spectral_Response' = SensorRadiometry,
 
 ## code to prepare `Pleiades_1A_Spectral_Response` dataset goes here
 usethis::use_data(Pleiades_1A,compress = 'xz',overwrite = TRUE)
-save(Pleiades_1A,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
+save(Pleiades_1A,file =  file.path('data',paste0(SensorName,'.RData')))

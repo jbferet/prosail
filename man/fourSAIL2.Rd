@@ -2,7 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{fourSAIL2}
 \alias{fourSAIL2}
-\title{Performs PRO4SAIL2 simulation based on a set of combinations of input parameters}
+\title{PRO4SAIL2 simulation based on a set of combinations of input parameters}
 \usage{
 fourSAIL2(
   leafgreen,
@@ -23,9 +23,9 @@ fourSAIL2(
 )
 }
 \arguments{
-\item{leafgreen}{dataframe. leaf optical properties #1 (e.g. green vegetation)}
+\item{leafgreen}{dataframe. leaf optical properties #1 (e.g. green veg)}
 
-\item{leafbrown}{dataframe. leaf optical properties #2 (e.g. brown vegetation)}
+\item{leafbrown}{dataframe. leaf optical properties #2 (e.g. brown veg)}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
@@ -74,5 +74,5 @@ rsdstar: contribution of direct solar incident flux to albedo
 rddstar: contribution of hemispherical diffuse incident flux to albedo
 }
 \description{
-Performs PRO4SAIL2 simulation based on a set of combinations of input parameters
+PRO4SAIL2 simulation based on a set of combinations of input parameters
 }

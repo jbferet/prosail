@@ -14,7 +14,8 @@ Compute_SRF(wvl, FWHM, SensorName = "Custom")
 \item{SensorName}{character. sensor name}
 }
 \value{
-SRF list. Information about spectral response Spectral Bands of the sensor and Original Bands for which SRF is defined
+SRF list. spectral response, sensor Spectral Bands & Original Bands
+for which SRF is defined
 }
 \description{
 Computes spectral response function based on wavelength and FWHM characteristics

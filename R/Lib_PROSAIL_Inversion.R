@@ -111,7 +111,7 @@ Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
                                PriorInfoMean = NULL, PriorInfoSD = NULL,
                                Parms2Prior = NULL, WeightPrior = 0.01){
 
-  xinit[xinit<0] = 0
+  xinit[xinit<0] <- 0
   InVar[Parms2Estimate] <- xinit[match(parms_xinit, Parms2Estimate)]
   xprior <- InVar[Parms2Prior]
   rsoil <- InVar$psoil*SpecSOIL_Sensor$Dry_Soil+(1-InVar$psoil)*SpecSOIL_Sensor$Wet_Soil

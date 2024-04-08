@@ -1,7 +1,7 @@
 ## code to prepare `SPOT_6_7` spectral response
 # 1- define sensor name
 SensorName <-'SPOT_6_7'
-Path_SRF <- file.path('data-raw',paste(SensorName,'_Spectral_Response.csv',sep=''))
+Path_SRF <- file.path('data-raw',paste0(SensorName,'_Spectral_Response.csv'))
 # 2- read file containing spectral response
 message('_____ reading spectral response corresponding to ______')
 print(SensorName)
@@ -23,4 +23,4 @@ SPOT_6_7 <- list('Spectral_Response' = SensorRadiometry,
 
 ## code to prepare `SPOT_6_7_Spectral_Response` dataset goes here
 usethis::use_data(SPOT_6_7,compress = 'xz',overwrite = TRUE)
-save(SPOT_6_7,file =  file.path('data',paste(SensorName,'.RData',sep = '')))
+save(SPOT_6_7,file =  file.path('data',paste0(SensorName, '.RData')))

@@ -12,14 +12,17 @@ get_spec_sensor(
 )
 }
 \arguments{
-\item{SensorName}{character. name of the sensor. Either already defined, or to be defined based on other inputs}
+\item{SensorName}{character. name of the sensor. Either already defined, or
+to be defined based on other inputs}
 
-\item{SpectralProps}{list. Sensor spectral characteristics including wl = central wavelength and fwhm = corresponding FWHM}
+\item{SpectralProps}{list. Sensor spectral characteristics including
+wl = central wavelength and fwhm = corresponding FWHM}
 
-\item{Path_SensorResponse}{character. Path where to get or save spectral response function}
+\item{Path_SensorResponse}{character. Path where to get or save SRF}
 }
 \value{
-SRF list. Spectral response function, corresponding spectral bands, and Original Bands
+SRF list. Spectral response function, corresponding spectral bands,
+and Original Bands
 }
 \description{
 Computes spectral sensor characteristics for optical constants required for PROSPECT
