@@ -73,7 +73,7 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
     MultComp <- matrix(rnorm(nbWL*nbSamples,0,MultiplicativeNoise), nrow = nbWL)
   } else if ((length(MultiplicativeNoise)==nbWL)){
     MultComp <- matrix(data = 0, nrow = nbWL, ncol = nbSamples)
-    for (i in 1:nbWL) MultComp[i,] <- matrix(data = rnorm(nbSamples,
+    for (i in seq_len(nbWL)) MultComp[i,] <- matrix(data = rnorm(nbSamples,
                                                           mean = 0,
                                                           sd = MultiplicativeNoise[i]),
                                              ncol = nbSamples)
@@ -104,6 +104,7 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 #' @param bigRaster boolean. should R package bigRaster be used to apply prosail
 #' inversion on raster data? check https://gitlab.com/jbferet/bigRaster for
 #' additional support
+#' @param progressBar boolean. should progressbar be displayed?
 #'
 #'
 #' @return res character. path for output files corresponding to biophysical properties
@@ -116,7 +117,7 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname, MaskRaster = NULL,
                                     MultiplyingFactor = 10000, maxRows = 100,
-                                    bigRaster = FALSE){
+                                    bigRaster = FALSE, progressBar = TRUE){
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute
@@ -204,12 +205,13 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
           SelectPixels <- 'ALL'
         }
       }
-      # initiate progress bar
-      pgbarlength <- length(HybridModel[[parm]])*blk$n
-      pb <- progress_bar$new(
-        format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull , estimated time remaining :eta",
-        total = pgbarlength, clear = FALSE, width= 100)
-
+      if (progressBar == TRUE){
+        # initiate progress bar
+        pgbarlength <- length(HybridModel[[parm]])*blk$n
+        pb <- progress_bar$new(
+          format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull , estimated time remaining :eta",
+          total = pgbarlength, clear = FALSE, width= 100)
+      }
       # output files
       BPvarpath[[parm]] <- file.path(PathOut, paste(raster_name, parm, sep = '_'))
       BPvarSDpath[[parm]] <- file.path(PathOut,paste(raster_name, parm, 'STD', sep = '_'))
@@ -250,7 +252,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
           BlockVal <- BlockVal/MultiplyingFactor
           modelSVR_Estimate <- list()
           for (modind in seq_len(length(HybridModel[[parm]]))){
-            pb$tick()
+            if (progressBar == TRUE) pb$tick()
             modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]],
                                                    BlockVal)
           }
@@ -545,6 +547,7 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
 #'
 #' @param RegressionModels list. List of regression models produced by PROSAIL_Hybrid_Train
 #' @param Refl numeric. LUT of bidirectional reflectances factors used for training
+#' @param progressBar boolean. should progressbar be displayed?
 #'
 #' @return HybridRes list. Estimated values corresponding to Refl. Includes
 #' - MeanEstimate = mean value for the ensemble regression model
@@ -555,7 +558,7 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
 #' @importFrom methods is
 #' @export
 
-PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
+PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
 
   # make sure Refl is right dimensions
   Refl <- t(Refl)
@@ -569,12 +572,14 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
   }
   nbEnsemble <- length( RegressionModels)
   EstimatedVal <- list()
-  pb <- progress_bar$new(
-    format = "Applying SVR models [:bar] :percent in :elapsed",
-    total = nbEnsemble, clear = FALSE, width= 100)
-  for (i in 1:nbEnsemble){
-    pb$tick()
+  if (progressBar == TRUE){
+    pb <- progress_bar$new(
+      format = "Applying SVR models [:bar] :percent in :elapsed",
+      total = nbEnsemble, clear = FALSE, width= 100)
+  }
+  for (i in seq_len(length(nbEnsemble))){
     EstimatedVal[[i]] <- predict(RegressionModels[[i]], Refl)
+    if (progressBar == TRUE) pb$tick()
   }
   EstimatedVal <- do.call(cbind,EstimatedVal)
   MeanEstimate <- rowMeans(EstimatedVal)
@@ -592,6 +597,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 #' @param method character. which machine learning regression method should be used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come
 #' @param verbose boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training
+#' @param progressBar boolean. should progressbar be displayed?
 #'
 #' @return modelsMLR list. ML regression models trained for the retrieval of
 #' InputVar based on BRF_LUT
@@ -603,7 +609,8 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl){
 
 PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
                                  WithReplacement = FALSE,
-                                 method = 'liquidSVM', verbose = FALSE){
+                                 method = 'liquidSVM',
+                                 verbose = FALSE, progressBar = FALSE){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # split the LUT into nbEnsemble subsets
@@ -623,9 +630,12 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
 
   # run training for each subset
   modelsMLR <- predictedYAll <- tunedModelYAll <- list()
-  pb <- progress_bar$new(
-    format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
-    total = nbEnsemble, clear = FALSE, width= 100)
+
+  if (progressBar == TRUE){
+    pb <- progress_bar$new(
+      format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
+      total = nbEnsemble, clear = FALSE, width= 100)
+  }
   for (i in seq_len(nbEnsemble)){
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
@@ -724,7 +734,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
     #                       trControl = control)
     }
     modelsMLR[[i]] <- tunedModel
-    pb$tick()
+    if (progressBar == TRUE) pb$tick()
   }
   return(modelsMLR)
 }

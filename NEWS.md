@@ -1,3 +1,8 @@
+# prosail v2.5.1
+
+## addition
+- added option for progressbar
+
 # prosail v2.5.0
 
 ## addition

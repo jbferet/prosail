@@ -10,7 +10,8 @@ PROSAIL_Hybrid_Train(
   nbEnsemble = 20,
   WithReplacement = FALSE,
   method = "liquidSVM",
-  verbose = FALSE
+  verbose = FALSE,
+  progressBar = FALSE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ PROSAIL_Hybrid_Train(
 default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
 
 \item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
+
+\item{progressBar}{boolean. should progressbar be displayed?}
 }
 \value{
 modelsMLR list. ML regression models trained for the retrieval of

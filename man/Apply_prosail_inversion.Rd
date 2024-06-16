@@ -14,7 +14,8 @@ Apply_prosail_inversion(
   MaskRaster = NULL,
   MultiplyingFactor = 10000,
   maxRows = 100,
-  bigRaster = FALSE
+  bigRaster = FALSE,
+  progressBar = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ in the same range}
 \item{bigRaster}{boolean. should R package bigRaster be used to apply prosail
 inversion on raster data? check https://gitlab.com/jbferet/bigRaster for
 additional support}
+
+\item{progressBar}{boolean. should progressbar be displayed?}
 }
 \value{
 res character. path for output files corresponding to biophysical properties
