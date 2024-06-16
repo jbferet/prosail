@@ -2,22 +2,26 @@
 % Please edit documentation in R/Lib_SENSOR.R
 \name{PrepareSensorSimulation}
 \alias{PrepareSensorSimulation}
-\title{This function converts high resolution spectral info into broader spectral characteristics}
+\title{This function converts high resolution spectral info into broader
+spectral characteristics}
 \usage{
 PrepareSensorSimulation(SpecPROSPECT, SpecSOIL, SpecATM, SRF)
 }
 \arguments{
-\item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
+\item{SpecPROSPECT}{list. optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted}
+\item{SpecSOIL}{list. dry soil and wet soil, or a unique soil sample if
+psoil parameter is not inverted}
 
-\item{SpecATM}{list. Includes direct and diffuse radiation for clear conditions}
+\item{SpecATM}{list. direct and diffuse radiation for clear conditions}
 
-\item{SRF}{list. Spectral response function, corresponding spectral bands, and Original Bands}
+\item{SRF}{list. Spectral response function, corresponding spectral bands,
+and Original Bands}
 }
 \value{
 SpecSensor list. list of input specs with sensor resolution
 }
 \description{
-This function converts high resolution spectral info into broader spectral characteristics
+This function converts high resolution spectral info into broader
+spectral characteristics
 }

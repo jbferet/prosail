@@ -2,7 +2,7 @@
 % Please edit documentation in R/Lib_PROSAIL.R
 \name{Compute_BRF}
 \alias{Compute_BRF}
-\title{Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position}
+\title{Computes bidirectional reflectance factor based on outputs from PROSAIL & SZA}
 \usage{
 Compute_BRF(rdot, rsot, tts, SpecATM_Sensor)
 }

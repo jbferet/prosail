@@ -11,26 +11,42 @@ Apply_prosail_inversion(
   PathOut,
   SelectedBands,
   bandname,
-  MaskRaster = FALSE,
-  MultiplyingFactor = 10000
+  MaskRaster = NULL,
+  MultiplyingFactor = 10000,
+  maxRows = 100,
+  bigRaster = FALSE,
+  progressBar = TRUE
 )
 }
 \arguments{
 \item{raster_path}{character. path for a raster file}
 
 \item{HybridModel}{list. hybrid models produced from train_prosail_inversion
-each element of the list corresponds to a set of hybrid models for a vegetation parameter}
+each element of the list corresponds to a set of hybrid models for a
+vegetation parameter}
 
 \item{PathOut}{character. path for directory where results are written}
 
-\item{SelectedBands}{list. list of spectral bands to be selected from raster (identified by name of vegetation parameter)}
+\item{SelectedBands}{list. list of spectral bands to be selected from raster
+(identified by name of vegetation parameter)}
 
 \item{bandname}{character. spectral bands corresponding to the raster}
 
-\item{MaskRaster}{character. path for binary mask defining ON (1) and OFF (0) pixels in the raster}
+\item{MaskRaster}{character. path for binary mask defining ON (1) and OFF (0)
+pixels in the raster}
 
-\item{MultiplyingFactor}{numeric. multiplying factor used to write reflectance in the raster
---> PROSAIL simulates reflectance between 0 and 1, and raster data expected in the same range}
+\item{MultiplyingFactor}{numeric. multiplying factor used to write reflectance
+in the raster
+--> PROSAIL simulates reflectance between 0 and 1, and raster data expected
+in the same range}
+
+\item{maxRows}{numeric. number of rows to process from raster each time}
+
+\item{bigRaster}{boolean. should R package bigRaster be used to apply prosail
+inversion on raster data? check https://gitlab.com/jbferet/bigRaster for
+additional support}
+
+\item{progressBar}{boolean. should progressbar be displayed?}
 }
 \value{
 res character. path for output files corresponding to biophysical properties

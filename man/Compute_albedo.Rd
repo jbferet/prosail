@@ -16,7 +16,8 @@ Compute_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range = c(400, 2400))
 
 \item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
 
-\item{PAR_range}{numeric. range (in nm) of spectral domain to integrate for computation of albedo}
+\item{PAR_range}{numeric. range (in nm) of spectral domain to integrate for
+computation of albedo}
 }
 \value{
 albedo numeric. albedo

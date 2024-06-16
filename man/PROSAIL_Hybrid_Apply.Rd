@@ -4,12 +4,14 @@
 \alias{PROSAIL_Hybrid_Apply}
 \title{This function applies the regression models trained with PROSAIL_Hybrid_Train}
 \usage{
-PROSAIL_Hybrid_Apply(RegressionModels, Refl)
+PROSAIL_Hybrid_Apply(RegressionModels, Refl, progressBar = FALSE)
 }
 \arguments{
 \item{RegressionModels}{list. List of regression models produced by PROSAIL_Hybrid_Train}
 
 \item{Refl}{numeric. LUT of bidirectional reflectances factors used for training}
+
+\item{progressBar}{boolean. should progressbar be displayed?}
 }
 \value{
 HybridRes list. Estimated values corresponding to Refl. Includes

@@ -1,3 +1,14 @@
+# prosail v2.5.1
+
+## addition
+- added option for progressbar
+
+# prosail v2.5.0
+
+## addition
+- supports bigRaster for the application of PROSAIL hybrid inversion on raster data
+- implement additional ML algorithms for inversion. Currently suboptimal
+
 # prosail v2.4.1
 
 ## fix

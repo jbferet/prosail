@@ -12,7 +12,7 @@
 # ============================================================================= =
 
 
-#' Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
+#' Computes bidirectional reflectance factor based on outputs from PROSAIL & SZA
 #'
 #' The direct and diffuse light are taken into account as proposed by:
 #' Francois et al. (2002) Conversion of 400-1100 nm vegetation albedo
@@ -96,7 +96,8 @@ Compute_fAPAR  <- function(abs_dir, abs_hem, tts, SpecATM_Sensor,
 #' @param rddstar numeric. reflectance from diffuse light
 #' @param tts numeric. Solar zenith angle
 #' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
-#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for computation of albedo
+#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for
+#' computation of albedo
 #'
 #' @return albedo numeric. albedo
 #' @export
@@ -120,9 +121,9 @@ Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
   return(albedo)
 }
 
-#' Performs PROSAIL simulation based on a set of combinations of input parameters
+#' PROSAIL simulation based on a set of combinations of input parameters
 #' @param Spec_Sensor list. Includes optical constants required for PROSPECT
-#' refractive index, specific absorption coefficients and corresponding spectral bands
+#' refractive index, specific absorption coefficients and spectral bands
 #' @param Input_PROSPECT  list. PROSPECT input variables
 #' @param N numeric. Leaf structure parameter
 #' @param CHL numeric. Chlorophyll content (microg.cm-2)
@@ -133,7 +134,7 @@ Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
 #' @param LMA numeric. Leaf Mass per Area (g.cm-2)
 #' @param PROT numeric. protein content  (g.cm-2)
 #' @param CBC numeric. NonProtCarbon-based constituent content (g.cm-2)
-#' @param alpha numeric. Solid angle for incident light at surface of leaf (simulation of roughness)
+#' @param alpha numeric. Solid angle for incident light at surface of leaf
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
@@ -154,7 +155,7 @@ Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
 #' @param Zeta numeric. Tree shape factor
 #' = ratio of crown diameter to crown height
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
-#' @param BrownLOP dataframe. Defines optical properties for brown vegetation, if not NULL
+#' @param BrownLOP dataframe. optical properties for brown vegetation
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
@@ -326,7 +327,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
   sigf <- ddf*rho+ddb*tau
   att <- 1-sigf
   m2 <- (att+sigb)*(att-sigb)
-  m2[which(m2<=0)]=0
+  m2[which(m2<=0)] <- 0
   m <- sqrt(m2)
 
   sb <- sdb*rho+sdf*tau
@@ -430,7 +431,7 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
         y1 <- y2
         f1 <- f2
       }
-      tsstoo=f1
+      tsstoo <- f1
     }
     #	Bidirectional reflectance
     #	Single scattering contribution
@@ -470,9 +471,9 @@ fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
   return(my_list)
 }
 
-#' Performs PRO4SAIL2 simulation based on a set of combinations of input parameters
-#' @param leafgreen dataframe. leaf optical properties #1 (e.g. green vegetation)
-#' @param leafbrown dataframe. leaf optical properties #2 (e.g. brown vegetation)
+#' PRO4SAIL2 simulation based on a set of combinations of input parameters
+#' @param leafgreen dataframe. leaf optical properties #1 (e.g. green veg)
+#' @param leafbrown dataframe. leaf optical properties #2 (e.g. brown veg)
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
@@ -600,7 +601,7 @@ fourSAIL2  <- function(leafgreen, leafbrown,
 
     # Weighted sums over LIDF
 
-    for (i in 1:length(litab)){
+    for (i in seq_len(length(litab))){
       ttl <- litab[i]
       ctl <- cos(rd*ttl)
       # SAIL volscatt function gives interception coefficients
@@ -1062,8 +1063,8 @@ campbell  <- function(ala){
 #' @return foliar_distrib list. lidf and litab
 #' @export
 dladgen  <- function(a,b){
-  litab=c(5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.)
-  freq=c()
+  litab <- c(5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.)
+  freq <- c()
   for (i1 in 1:8){
     t <- i1*10
     freq[i1] <- dcum(a,b,t)
@@ -1073,10 +1074,8 @@ dladgen  <- function(a,b){
     freq[i2] <- dcum(a,b,t)
   }
   freq[13] <- 1
-  for (i in 13:2){
-    freq[i] <- freq[i]-freq[i-1]
-  }
-  foliar_distrib <- list("lidf" = freq,"litab" =litab)
+  for (i in 13:2) freq[i] <- freq[i]-freq[i-1]
+  foliar_distrib <- list('lidf' = freq, 'litab' = litab)
   return(foliar_distrib)
 }
 

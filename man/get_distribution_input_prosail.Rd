@@ -15,15 +15,15 @@ get_distribution_input_prosail(
 )
 }
 \arguments{
-\item{minval}{list. Defines the minimum value to be set for a list of parameters randomly produced}
+\item{minval}{list. minimum value for a list of parameters randomly produced}
 
-\item{maxval}{list. Defines the maximum value to be set for a list of parameters randomly produced}
+\item{maxval}{list. maximum value for a list of parameters randomly produced}
 
-\item{ParmSet}{list.Defines the parameters to be set to a given value}
+\item{ParmSet}{list. parameters to be set to a given value}
 
 \item{nbSamples}{numeric. Number of samples to be generated}
 
-\item{TypeDistrib}{list. specify if uniform or Gaussian distribution to be applied. default = Uniform}
+\item{TypeDistrib}{list. uniform/Gaussian distribution to be applied.}
 
 \item{Mean}{list. mean value for parameters with Gaussian distribution}
 
