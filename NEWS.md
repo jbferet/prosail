@@ -1,3 +1,9 @@
+# prosail v2.5.2
+
+## fix
+- use dplyr slice to select rows from dataframe when performing hybrid inversion 
+(allows using 1 variable only with liquidSVM)
+
 # prosail v2.5.1
 
 ## addition

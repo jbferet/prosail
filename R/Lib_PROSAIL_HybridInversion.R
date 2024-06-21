@@ -605,6 +605,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
 #' @importFrom progress progress_bar
 #' @importFrom simsalapar tryCatch.W.E
 #' @importFrom caret train trainControl
+#' @importFrom magrittr %>%
 #' @export
 
 PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
@@ -638,7 +639,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
   }
   for (i in seq_len(nbEnsemble)){
     TrainingSet <- list()
-    TrainingSet$X <- BRF_LUT[Subsets[i][[1]],]
+    TrainingSet$X <- BRF_LUT %>% dplyr::slice(Subsets[i][[1]])
     TrainingSet$Y <- InputVar[Subsets[i][[1]]]
 
     # if using caret
