@@ -1,3 +1,11 @@
+# prosail v2.5.3
+
+## fix
+- PROSAIL_Hybrid_Train: convert BRF_LUT into data.frame to apply dplyr::slice
+
+## change
+- update tutorial #2: 'wvl <- SpecPROSPECT_FullRange$lambda'
+
 # prosail v2.5.2
 
 ## fix
