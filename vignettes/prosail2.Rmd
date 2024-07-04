@@ -255,7 +255,7 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 
 ```{r Conversion}
 # apply sensor characteristics to simulated reflectance
-wvl <- SpecPROSPECT$lambda
+wvl <- SpecPROSPECT_FullRange$lambda
 BRF_4SAIL_S2 <- applySensorCharacteristics(wvl = wvl,
                                            SRF = SRF_S2,
                                            InRefl = BRF_4SAIL)

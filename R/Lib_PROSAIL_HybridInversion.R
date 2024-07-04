@@ -637,6 +637,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
       format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
       total = nbEnsemble, clear = FALSE, width= 100)
   }
+  BRF_LUT <- data.frame(BRF_LUT)
   for (i in seq_len(nbEnsemble)){
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT %>% dplyr::slice(Subsets[i][[1]])
