@@ -1,3 +1,10 @@
+# prosail v2.5.4
+
+## addition
+- finalize introduction of 4SAIL2 in PROSAIL inversion: introduce BrownLOP as 
+input variable for functions 'train_prosail_inversion'. 'Generate_LUT_PROSAIL' 
+and 'Generate_LUT_BRF'
+
 # prosail v2.5.3
 
 ## fix

@@ -17,6 +17,7 @@ train_prosail_inversion(
   GaussianDistrib = NULL,
   ParmSet = NULL,
   SAILversion = "4SAIL",
+  BrownLOP = NULL,
   nbSamples = 2000,
   nbSamplesPerRun = 100,
   nbModels = 20,
@@ -56,6 +57,8 @@ train_prosail_inversion(
 \item{ParmSet}{list. list of input parameters set to a specific value}
 
 \item{SAILversion}{character. Either 4SAIL or 4SAIL2}
+
+\item{BrownLOP}{character. Either 4SAIL or 4SAIL2}
 
 \item{nbSamples}{numeric. number of samples in training LUT}
 

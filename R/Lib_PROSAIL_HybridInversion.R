@@ -839,6 +839,7 @@ split_line <- function(x, separator, trim.blank = TRUE) {
 #' @param GaussianDistrib  list. Mean value and STD corresponding to the parameters sampled with gaussian distribution
 #' @param ParmSet list. list of input parameters set to a specific value
 #' @param SAILversion character. Either 4SAIL or 4SAIL2
+#' @param BrownLOP character. Either 4SAIL or 4SAIL2
 #' @param nbSamples numeric. number of samples in training LUT
 #' @param nbSamplesPerRun numeric. number of training sample per individual regression model
 #' @param nbModels numeric. number of individual models to be run for ensemble
@@ -864,6 +865,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                     minval = NULL, maxval = NULL,
                                     TypeDistrib = NULL, GaussianDistrib = NULL,
                                     ParmSet = NULL, SAILversion = '4SAIL',
+                                    BrownLOP = NULL,
                                     nbSamples = 2000, nbSamplesPerRun = 100,
                                     nbModels = 20, Replacement = TRUE,
                                     Parms2Estimate = 'lai', Bands2Select = NULL,
@@ -940,7 +942,8 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                   InputPROSAIL = InputPROSAIL,
                                   SpecPROSPECT = SpecPROSPECT,
                                   SpecSOIL = SpecSOIL,
-                                  SpecATM = SpecATM)
+                                  SpecATM = SpecATM,
+                                  BrownLOP = BrownLOP)
     } else if ('fCover' %in% Parms2Estimate |
                'albedo' %in% Parms2Estimate |
                'fAPAR' %in% Parms2Estimate){
@@ -948,7 +951,8 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                   InputPROSAIL = InputPROSAIL,
                                   SpecPROSPECT = SpecPROSPECT,
                                   SpecSOIL = SpecSOIL,
-                                  SpecATM = SpecATM)
+                                  SpecATM = SpecATM,
+                                  BrownLOP = BrownLOP)
       BRF_LUT <- res$BRF
       InputPROSAIL$fCover <- res$fCover
       InputPROSAIL$fAPAR <- res$fAPAR
