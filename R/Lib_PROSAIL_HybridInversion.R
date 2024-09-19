@@ -105,6 +105,7 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 #' inversion on raster data? check https://gitlab.com/jbferet/bigRaster for
 #' additional support
 #' @param progressBar boolean. should progressbar be displayed?
+#' @param filetype character. driver for raster file
 #'
 #'
 #' @return res character. path for output files corresponding to biophysical properties
@@ -117,7 +118,8 @@ apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
 Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     SelectedBands, bandname, MaskRaster = NULL,
                                     MultiplyingFactor = 10000, maxRows = 100,
-                                    bigRaster = FALSE, progressBar = TRUE){
+                                    bigRaster = FALSE, progressBar = TRUE,
+                                    filetype = 'GTiff'){
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute
@@ -166,7 +168,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                input_args = input_args,
                                output_rasters = output_rasters,
                                output_lyrs = 1,
-                               filetype = 'EHdr',
+                               filetype = filetype,
                                bandNames = bandNames,
                                maxRows = maxRows)
   } else {
@@ -213,14 +215,19 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
           total = pgbarlength, clear = FALSE, width= 100)
       }
       # output files
+      if (filetype == 'EHdr'){
+        formatfile <- 'ENVI'
+      } else {
+        formatfile <- filetype
+      }
       BPvarpath[[parm]] <- file.path(PathOut, paste(raster_name, parm, sep = '_'))
       BPvarSDpath[[parm]] <- file.path(PathOut,paste(raster_name, parm, 'STD', sep = '_'))
       r_outMean <- writeStart(raster(raster_path),
                               filename = BPvarpath[[parm]],
-                              format = "ENVI", overwrite = TRUE)
+                              format = formatfile, overwrite = TRUE)
       r_outSD <- writeStart(raster(raster_path),
                             filename = BPvarSDpath[[parm]],
-                            format = "ENVI", overwrite = TRUE)
+                            format = formatfile, overwrite = TRUE)
       Selbands <- match(SelectedBands[[parm]], bandname)
 
       # loop over blocks
@@ -267,9 +274,9 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
           for (modind in seq_len(length(HybridModel[[parm]]))) pb$tick()
         }
         r_outMean <- writeValues(r_outMean, Mean_EstimateFull, blk$row[i],
-                                 format = "ENVI", overwrite = TRUE)
+                                 format = formatfile, overwrite = TRUE)
         r_outSD <- writeValues(r_outSD, STD_EstimateFull, blk$row[i],
-                               format = "ENVI", overwrite = TRUE)
+                               format = formatfile, overwrite = TRUE)
       }
       # close files
       r_in <- readStop(r_in)
@@ -277,9 +284,20 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       r_outMean <- writeStop(r_outMean)
       r_outSD <- writeStop(r_outSD)
       # write biophysical variable name in headers
-      HDR <- read_ENVI_header(get_HDR_name(BPvarpath[[parm]]))
-      HDR$`band names` <- paste('{',parm,'}',sep = '')
-      write_ENVI_header(HDR, get_HDR_name(BPvarpath[[parm]]))
+      if (filetype %in% c('EHdr', 'ENVI')){
+        HDR <- read_ENVI_header(get_HDR_name(BPvarpath[[parm]]))
+        HDR$`band names` <- paste('{',parm,'}',sep = '')
+        write_ENVI_header(HDR, get_HDR_name(BPvarpath[[parm]]))
+        HDR <- read_ENVI_header(get_HDR_name(BPvarSDpath[[parm]]))
+        HDR$`band names` <- paste('{',parm,'}',sep = '')
+        write_ENVI_header(HDR, get_HDR_name(BPvarSDpath[[parm]]))
+        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.envi')
+        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.envi')
+      }
+      if (filetype %in% c('GTiff', 'COG')){
+        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.tif')
+        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.tif')
+      }
     }
     print('processing completed')
   }

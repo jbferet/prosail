@@ -1,3 +1,8 @@
+# prosail v2.5.5
+
+## addition
+- possibility to select file format for output BP rasters. default = 'GTiff' 
+
 # prosail v2.5.4
 
 ## addition

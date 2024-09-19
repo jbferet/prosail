@@ -15,7 +15,8 @@ Apply_prosail_inversion(
   MultiplyingFactor = 10000,
   maxRows = 100,
   bigRaster = FALSE,
-  progressBar = TRUE
+  progressBar = TRUE,
+  filetype = "GTiff"
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ inversion on raster data? check https://gitlab.com/jbferet/bigRaster for
 additional support}
 
 \item{progressBar}{boolean. should progressbar be displayed?}
+
+\item{filetype}{character. driver for raster file}
 }
 \value{
 res character. path for output files corresponding to biophysical properties
