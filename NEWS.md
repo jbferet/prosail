@@ -1,3 +1,9 @@
+# prosail v2.5.6
+
+## fix
+- correction on PROSAIL_Hybrid_Apply: seq_len(nbEnsemble) instead of seq_len(length(nbEnsemble))
+
+
 # prosail v2.5.5
 
 ## addition
