@@ -595,7 +595,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
       format = "Applying SVR models [:bar] :percent in :elapsed",
       total = nbEnsemble, clear = FALSE, width= 100)
   }
-  for (i in seq_len(length(nbEnsemble))){
+  for (i in seq_len(nbEnsemble)){
     EstimatedVal[[i]] <- predict(RegressionModels[[i]], Refl)
     if (progressBar == TRUE) pb$tick()
   }
