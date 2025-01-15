@@ -1,6 +1,6 @@
 Package: prosail
 Title: PROSAIL leaf and canopy radiative transfer model and inversion routines
-Version: 2.5.6
+Version: 2.5.7
 Authors@R: c(person(given = "Jean-Baptiste", 
 					    family = "Feret", 
 					    email = "jb.feret@teledetection.fr", 
@@ -38,7 +38,8 @@ Imports:
     prospect,
     XML,
     truncnorm,
-    magrittr
+    magrittr,
+    stringr
 Remotes: github::jbferet/prospect, 
          gitlab::jbferet/bigRaster
 VignetteBuilder: knitr
