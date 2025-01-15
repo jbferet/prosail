@@ -136,7 +136,7 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
     bigRaster <- FALSE
   }
   if (bigRaster){
-    funct <- wrapperBig_prosail_inversion
+    funct <- bigRaster::wrapperBig_prosail_inversion
     input_args <- list('HybridModel' = HybridModel,
                        'SelectedBands' = SelectedBands,
                        'bandname' = bandname,
@@ -154,11 +154,15 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       listname <- paste0('Mean_',parm)
       output_rasters[[listname]] <- file.path(PathOut, paste(raster_name, parm,
                                                              sep = '_'))
+      if (filetype %in% c('GTiff', 'COG'))
+        output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarpath[[parm]] <- output_rasters[[listname]]
 
       listname <- paste0('SD_',parm)
       output_rasters[[listname]] <- file.path(PathOut, paste(raster_name, parm,
                                                              'STD', sep = '_'))
+      if (filetype %in% c('GTiff', 'COG'))
+        output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarSDpath[[parm]] <- output_rasters[[listname]]
     }
     bandNames <- as.list(names(output_rasters))
@@ -295,8 +299,8 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.envi')
       }
       if (filetype %in% c('GTiff', 'COG')){
-        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.tif')
-        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.tif')
+        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.tiff')
+        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.tiff')
       }
     }
     print('processing completed')
@@ -624,6 +628,7 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
 #' @importFrom simsalapar tryCatch.W.E
 #' @importFrom caret train trainControl
 #' @importFrom magrittr %>%
+#' @importFrom stringr str_split
 #' @export
 
 PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
@@ -1060,6 +1065,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
 #' @param HDRpath Path of the hdr file
 #'
 #' @return None
+#' @importFrom stringr str_count
 #' @export
 
 write_ENVI_header <- function(HDR, HDRpath) {

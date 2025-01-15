@@ -1,3 +1,8 @@
+# prosail v2.5.7
+
+## change
+- added '.tiff' extension when needed when setting 'bigRaster = T' in Apply_prosail_inversion
+
 # prosail v2.5.6
 
 ## fix
