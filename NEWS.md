@@ -1,3 +1,8 @@
+# prosail v2.5.8
+
+## change
+- added option for progress bar in Generate_LUT_PROSAIL
+
 # prosail v2.5.7
 
 ## change
