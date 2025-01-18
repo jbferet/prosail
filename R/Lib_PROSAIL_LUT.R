@@ -572,6 +572,7 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
 #' @param BrownLOP list. Defines optical properties for brown vegetation, if not NULL
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
+#' @param progress boolean. set TRUE to get progress bar during production of LUT
 #'
 #' @return LUT numeric. list of BRF, fCover, fAPAR and albedo corresponding to InputPROSAIL
 #' @importFrom progress progress_bar
@@ -579,17 +580,19 @@ Generate_LUT_BRF <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
 
 Generate_LUT_PROSAIL <- function(InputPROSAIL, SpecPROSPECT,
                                  SpecSOIL, SpecATM, BandNames = NULL,
-                                 SAILversion='4SAIL', BrownLOP = NULL){
+                                 SAILversion='4SAIL', BrownLOP = NULL,
+                                 progress = T){
 
   nbSamples <- length(InputPROSAIL[[1]])
   BRF <- list()
   fCover <- fAPAR <- albedo <- c()
   Split <- round(nbSamples/10)
-  pb <- progress_bar$new(
-    format = "Generate LUT [:bar] :percent in :elapsed",
-    total = 10, clear = FALSE, width= 100)
+  if (progress)
+    pb <- progress_bar$new(
+      format = "Generate LUT [:bar] :percent in :elapsed",
+      total = 10, clear = FALSE, width= 100)
   for (i in seq_len(nbSamples)){
-    if (i %% Split == 0 & nbSamples>100) pb$tick()
+    if (progress & i %% Split == 0 & nbSamples>100) pb$tick()
     rsoil <- InputPROSAIL[i,]$psoil*SpecSOIL$Dry_Soil+(1-InputPROSAIL[i,]$psoil)*SpecSOIL$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){

@@ -12,7 +12,8 @@ Generate_LUT_PROSAIL(
   SpecATM,
   BandNames = NULL,
   SAILversion = "4SAIL",
-  BrownLOP = NULL
+  BrownLOP = NULL,
+  progress = T
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ Generate_LUT_PROSAIL(
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it
 }}
+
+\item{progress}{boolean. set TRUE to get progress bar during production of LUT}
 }
 \value{
 LUT numeric. list of BRF, fCover, fAPAR and albedo corresponding to InputPROSAIL
