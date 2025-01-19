@@ -44,7 +44,6 @@ A polygon corresponding to the study area can be downloaded from a repository.
 aoi_bbox <- sf::st_bbox(obj = c('xmin' = -2.25, 'ymin' = 38.94, 
                                 'xmax' = -1.73, 'ymax' = 39.22))
 sf::st_crs(x = aoi_bbox) <- 4326
-
 ```
 
 [Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) 
@@ -67,6 +66,10 @@ library(sf)
 output_dir_s2 <- './S2_images'
 dir.create(path = output_dir, showWarnings = F, recursive = T)
 datetime <- as.Date('2021-05-13')
+# save aoi as vector file
+path_bbox <- 'aoi_bbox.GPKG'
+sf::st_write(obj = preprocS2::bbox_to_poly(aoi_bbox), 
+             dsn = path_bbox, driver = 'GPKG')
 
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
@@ -86,9 +89,20 @@ Refl_L2A <- list_files$Refl_L2A
 vegetation_mask <- list_files$vegetation_mask
 # Sentinel-2 mask from provider ( = SCL from ESA products)
 SCL <- list_files$provider_mask
+# Sentinel-2 geometry of acquisition (if requested from CDSE)
+geometryAcquisition <- list_files$geometryAcquisition
 ```
 
 # Training and application of hybrid inversion model 
+
+The default parameterization for the distribution of input PROSAIL parameters applied 
+to simulate a training dataset follows the distribution described in the [ATBD document](https://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.0.pdf)
+
+However, PROSAIL inversion can be fully parameterized, in order to adapt the distribution of input parameters, geometry of acquisition, soil parameters, spectral bands to be used, noise level... 
+
+See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html) for detailed procedure. 
+
+The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to speed up the application of the inversion on large rasters if needed. 
 
 ```{r Hybrid_Inversion}
 library(prosail)
@@ -109,28 +123,19 @@ for (parm in Parms2Estimate){
 }
 ImgBandNames <- SRF$Spectral_Bands
 
-# get S2 geometry: read metadata file from S2 image
-angles <- c('saa', 'sza', 'vaa', 'vza')
-angles_path <- file.path(output_dir_s2, 'geomAcq_S2', 
-                         paste(angles, '_', datetime, '.tiff', sep = ''))
-names(angles_path) <- angles
-geom <- MeanAngle <- list()
-for (angle in angles){
-  geom[[angle]] <- terra::crop(x = terra::rast(angles_path[angle]), 
-                               y = as(aoi_bbox, "Spatial"))
-  MeanAngle[[angle]] <- mean(terra::values(geom[[angle]]))
-}
-MeanAngle$psi <- abs(MeanAngle$vaa - MeanAngle$saa)
-if (MeanAngle$psi>180)
-  MeanAngle$psi <- 360-MeanAngle$psi
-
+# get S2 geometry from preprocS2
+angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
+                                        path_bbox = path_bbox)
 # define ranges for zenith angles of acquisition
-GeomAcq <- list('min' = data.frame('tto' = MeanAngle$vza,
-                                   'tts' = MeanAngle$sza, 
-                                   'psi' = MeanAngle$psi), 
-                'max' = data.frame('tto' = MeanAngle$vza, 
-                                   'tts' = MeanAngle$sza,
-                                   'psi' = MeanAngle$psi))
+GeomAcq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
+                                   'tts' = angles_path$MinAngle['sza'], 
+                                   'psi' = angles_path$MinAngle['psi']), 
+                'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
+                                   'tts' = angles_path$MaxAngle['sza'], 
+                                   'psi' = angles_path$MaxAngle['psi']))
+
+# users can define GeomAcq following their own conditions by following the list 
+# structure above if preprocS2 is not applied to get imagery
 
 # train regression model
 # set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in the 
@@ -143,6 +148,10 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     method = 'liquidSVM')
 
 # apply regression model on Sentinel-2 raster data
+# bigRaster = F by default. Do not mention it if the package is not installed
+# Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
+# Adapt MultiplyingFactor if not the case 
+# MultiplyingFactor = 1 if reflectance defined between 0 and 1
 BPvars <- Apply_prosail_inversion(raster_path = Refl_path, 
                                   HybridModel = modelSVR, 
                                   PathOut = PROSAIL_ResPath,
