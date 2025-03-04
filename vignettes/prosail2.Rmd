@@ -70,7 +70,7 @@ If no value, their default value is set.
     characterized by the average leaf inclination angle in degree
         * if `TypeLidf=2` then `LIDFa` controls the average leaf angle
 
-* `lai`: leaf area angle
+* `lai`: leaf area index
 
 * `q`: hot spot parameter
 
