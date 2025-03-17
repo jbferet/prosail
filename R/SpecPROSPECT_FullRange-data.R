@@ -16,8 +16,8 @@
 #'  - *SAC_CAR*: specific absorption coefficient for carotenoids
 #'  - *SAC_ANT*: specific absorption coefficient for anthocyanins
 #'  - *SAC_BROWN*: specific absorption coefficient for brown pigments
-#'  - *SAC_EWT*: specific absorption coefficient for water content (Equivalent Water Thickness)
-#'  - *SAC_LMA*: specific absorption coefficient for dry matter (Leaf Mass per Area)
+#'  - *SAC_EWT*: specific absorption coefficient for water content (EWT)
+#'  - *SAC_LMA*: specific absorption coefficient for dry matter (LMA)
 #'  - *SAC_PROT*: specific absorption coefficient for proteins
 #'  - *SAC_CBC*: specific absorption coefficient for carbon-base constituents
 #'  - *calctav_90*: transmissivity of a dielectric plane surface, averaged over

@@ -43,18 +43,18 @@ sensor response function to all optical constants used in PROSAIL.
 ```{r simulate_LUT_Alternative}
 # apply sensor characteristics to PROSPECT optical constants
 wvl <- SpecPROSPECT$lambda
-Spec_Sensor <- applySensorCharacteristics(wvl,SpecPROSPECT,SRF)
+Spec_Sensor <- apply_sensor_characteristics(wvl,SpecPROSPECT,SRF)
 # apply sensor characteristics to atmospheric properties
-SpecATM_Sensor <- applySensorCharacteristics(wvl,SpecATM,SRF)
+SpecATM_Sensor <- apply_sensor_characteristics(wvl,SpecATM,SRF)
 # apply sensor characteristics to soil properties
-SpecSOIL_Sensor <- applySensorCharacteristics(wvl,SpecSOIL,SRF)
+SpecSOIL_Sensor <- apply_sensor_characteristics(wvl,SpecSOIL,SRF)
 ```
 
-This conversion can also be done using a unique function `PrepareSensorSimulation`: 
+This conversion can also be done using a unique function `prepare_sensor_simulation`: 
 
 ```{r conversion_SRF_OptCst}
 # apply sensor characteristics to PROSPECT optical constants
-PropSensor <- PrepareSensorSimulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+PropSensor <- prepare_sensor_simulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
 Spec_Sensor <- PropSensor$SpecPROSPECT_Sensor
 SpecSOIL_Sensor <- PropSensor$SpecSOIL_Sensor
 SpecATM_Sensor <- PropSensor$SpecATM_Sensor
@@ -67,24 +67,25 @@ SpecATM_Sensor <- PropSensor$SpecATM_Sensor
 # FWHM is a vector giving FWHM for each band in nanometer
 rsoil <- SpecSOIL_Sensor$Dry_Soil
 Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,
-                       CHL = 40, CAR = 10, EWT = 0.01, ANT = 0, LMA = 0.01, N = 1.5,
-                       TypeLidf = 2, LIDFa = 50, lai = 4, q = 0.1, 
-                       tts = 27, tto = 0, psi = 100, rsoil = SpecSOIL_Sensor$Dry_Soil)
+                       CHL = 40, CAR = 10, EWT = 0.01, ANT = 0, LMA = 0.01, 
+                       N = 1.5, TypeLidf = 2, LIDFa = 50, lai = 4, q = 0.1, 
+                       tts = 27, tto = 0, psi = 100, 
+                       rsoil = SpecSOIL_Sensor$Dry_Soil)
 
-# Computes bidirectional reflectance factor based on outputs from PROSAIL and sun position
-BRF_Sensor <- Compute_BRF(rdot = Ref_Sensor$rdot, 
+# Computes BRF based on outputs from PROSAIL and sun position
+BRF_Sensor <- compute_BRF(rdot = Ref_Sensor$rdot, 
                           rsot = Ref_Sensor$rsot, 
                           tts = tts,
                           SpecATM_Sensor = SpecATM_Sensor)
 
 # Computes fAPAR based on outputs from PROSAIL and sun position
-fAPAR_Sensor <- Compute_fAPAR(abs_dir = Ref_Sensor$abs_dir, 
+fAPAR_Sensor <- compute_fAPAR(abs_dir = Ref_Sensor$abs_dir, 
                               abs_hem = Ref_Sensor$abs_hem, 
                               tts = tts, 
                               SpecATM_Sensor = SpecATM_Sensor)
 
 # Computes albedo based on outputs from PROSAIL and sun position
-albedo_Sensor <- Compute_albedo(rsdstar = Ref_Sensor$rsdstar, 
+albedo_Sensor <- compute_albedo(rsdstar = Ref_Sensor$rsdstar, 
                                 rddstar = Ref_Sensor$rddstar, 
                                 tts = tts,
                                 SpecATM_Sensor = SpecATM_Sensor)

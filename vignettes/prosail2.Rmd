@@ -125,7 +125,7 @@ LIDFa <- 30   # mean leaf angle
 tts <- 30     # geometry of acquisition: sun zenith angle
 tto <- 10     # geometry of acquisition: observer zenith angle
 psi <- 90     # geometry of acquisition: sun-observer azimuth 
-rsoil <- SpecSOIL$Dry_Soil # soil reflectance (SpecSOIL includes Dry_Soil and Wet_Soil properties)
+rsoil <- SpecSOIL$Dry_Soil # soil reflectance (SpecSOIL: Dry_Soil and Wet_Soil)
 
 # run PROSAIL with 4SAIL
 Ref_4SAIL <- PRO4SAIL(Input_PROSPECT = Input_PROSPECT, 
@@ -155,7 +155,7 @@ Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',
 
 ## Compute simplified bidirectional reflectance factor (BRF) under the assumption of clear conditions conditions
 
-The function `Compute_BRF` computes the bi-directional reflectance factor in the 
+The function `compute_BRF` computes the bi-directional reflectance factor in the 
 direction of the observer, by combining both hemispherical-directional and 
 bi-directional reflectance factors.
 The direct and diffuse light are taken into account as described by 
@@ -164,13 +164,14 @@ share of diffuse flux in global radiation `skyl` based on the equation proposed
 by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
 
 ```{r compute BRF}
-# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous illustration
+# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous 
+# illustration.
 # SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot,
+BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot,
                          rsot = Ref_4SAIL$rsot,
                          tts = tts,
                          SpecATM_Sensor = SpecATM)
-BRF_4SAIL2 <- Compute_BRF(rdot = Ref_4SAIL2$rdot,
+BRF_4SAIL2 <- compute_BRF(rdot = Ref_4SAIL2$rdot,
                           rsot = Ref_4SAIL2$rsot,
                           tts = tts,
                           SpecATM_Sensor = SpecATM)
@@ -179,12 +180,12 @@ BRF_4SAIL2 <- Compute_BRF(rdot = Ref_4SAIL2$rdot,
 
 ## Compute fraction of absorbed photosyntehtically active radiation (fAPAR)
 
-The function `Compute_fAPAR` computes the fAPAR in the direction of the observer, 
+The function `compute_fAPAR` computes the fAPAR in the direction of the observer, 
 by combining both canopy absorptance for direct solar incident flux and canopy 
 absorptance for hemispherical diffuse incident flux. 
 
 ```{r compute fAPAR}
-fAPAR_4SAIL <- Compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
+fAPAR_4SAIL <- compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
                              abs_hem = Ref_4SAIL$abs_hem,
                              tts = tts,
                              SpecATM_Sensor = SpecATM)
@@ -192,12 +193,12 @@ fAPAR_4SAIL <- Compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
 
 ## Compute albedo
 
-The function `Compute_albedo` computes the albedo by combining the contribution 
+The function `compute_albedo` computes the albedo by combining the contribution 
 of direct solar incident flux (rsdstar) and the contribution of hemispherical 
 diffuse incident flux (rddstar). 
 
 ```{r compute albedo}
-albedo_4SAIL <- Compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
+albedo_4SAIL <- compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
                                rddstar = Ref_4SAIL$rddstar,
                                tts = tts,
                                SpecATM_Sensor = SpecATM)
@@ -226,7 +227,7 @@ SensorName <- 'Sentinel_2A'
 # if interested in a different satellite, please use Path_SensorResponse to 
 # locate the SRF file expected to be named 'SensorName_Spectral_Response.csv' 
 # (separator = tabulations)
-SRF_S2 <- GetRadiometry(SensorName,Path_SensorResponse = NULL)
+SRF_S2 <- get_radiometry(SensorName,Path_SensorResponse = NULL)
 ```
 
 Other satellites can be simulated as long as the SRF is provided as CSV file, 
@@ -234,11 +235,12 @@ following the same
 [template](https://gitlab.com/jbferet/prosail/-/blob/master/data-raw/Sentinel_2_Spectral_Response.csv) 
 as for the SRF of Sentinel-2 satellites. 
 
-SRF can also be directly computed for any sensor under the hypothesis of Gaussian 
-response for each spectral band, and information about the central wavelength and 
-FWHM corresponding to each spectral band. 
-The following example produces SRF corresponding to a hyperspectral sensor covering 
-the spectral domain from 400 nm to 2400 nm with a FWHM of 10 nm for each channel
+SRF can also be directly computed for any sensor under the hypothesis of 
+Gaussian response for each spectral band, and information about the central 
+wavelength and FWHM corresponding to each spectral band. 
+The following example produces SRF corresponding to a hyperspectral sensor 
+covering the spectral domain from 400 nm to 2400 nm with a FWHM of 10 nm for 
+each channel.
 
 ```{r SRF 2}
 # WL is a vector giving central wavelength for each band in nanometer
@@ -246,7 +248,7 @@ WL <- seq(400, 2400, by = 10)
 # FWHM is a vector giving FWHM for each band in nanometer
 FWHM <- 10+ 0*seq(400, 2400, by = 10)
 # compute corresponding SRF
-SRF_SH <- Compute_SRF(WL,FWHM)
+SRF_SH <- compute_SRF(WL,FWHM)
 ```
 
 Then, reflectance can be converted from 1-nm spectral sampling (default 
@@ -256,7 +258,7 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 ```{r Conversion}
 # apply sensor characteristics to simulated reflectance
 wvl <- SpecPROSPECT_FullRange$lambda
-BRF_4SAIL_S2 <- applySensorCharacteristics(wvl = wvl,
+BRF_4SAIL_S2 <- apply_sensor_characteristics(wvl = wvl,
                                            SRF = SRF_S2,
                                            InRefl = BRF_4SAIL)
 ```

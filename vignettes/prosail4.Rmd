@@ -50,12 +50,17 @@ sf::st_crs(x = aoi_bbox) <- 4326
 is then used in order to identify an acquisition with minimum cloud cover.
 
 Once a date of acquisition is identified, the S2 product is then downloaded. 
-The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used for this purpose. 
-`preprocS2` will download S2 data from a STAC catalog based on spatial and temporal information.
-The default STAC collection is `sentinel-2-l2a` from the Planetary computer catalog.
+The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used for 
+this purpose. 
+`preprocS2` will download S2 data from a STAC catalog based on spatial and 
+temporal information.
+The default STAC collection is `sentinel-2-l2a` from the Planetary computer 
+catalog.
 
-Optionally, `preprocS2` can download the geometry of acquisition corresponding to the S2 acquisition.
-Access to geometry of acquisition is provided by the package [`CDSE`](https://zivankaraman.github.io/CDSE/).
+Optionally, `preprocS2` can download the geometry of acquisition corresponding 
+to the S2 acquisition.
+Access to geometry of acquisition is provided by the package 
+[`CDSE`](https://zivankaraman.github.io/CDSE/).
 
 ```{r download_S2_product}
 # library
@@ -64,7 +69,7 @@ library(sf)
 
 # 1- define input & output directories
 output_dir_s2 <- './S2_images'
-dir.create(path = output_dir, showWarnings = F, recursive = T)
+dir.create(path = output_dir, showWarnings = FALSE, recursive = TRUE)
 datetime <- as.Date('2021-05-13')
 # save aoi as vector file
 path_bbox <- 'aoi_bbox.GPKG'
@@ -80,9 +85,11 @@ id <- "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 secret <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 authentication <- list('id' = id, 'pwd' = secret)
 
-list_files <- get_s2_raster(bbox = aoi_bbox, datetime = datetime, output_dir = output_dir_s2, 
-              path_S2tilinggrid = path_S2tilinggrid, siteName = 'Barrax',
-              overwrite = F, geomAcq = T, authentication = authentication)
+list_files <- get_s2_raster(bbox = aoi_bbox, datetime = datetime, 
+                            output_dir = output_dir_s2, 
+                            path_S2tilinggrid = path_S2tilinggrid, 
+                            siteName = 'Barrax', overwrite = FALSE, 
+                            geomAcq = TRUE,  authentication = authentication)
 # Sentinel-2 L2A reflectance
 Refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
@@ -95,14 +102,19 @@ geometryAcquisition <- list_files$geometryAcquisition
 
 # Training and application of hybrid inversion model 
 
-The default parameterization for the distribution of input PROSAIL parameters applied 
-to simulate a training dataset follows the distribution described in the [ATBD document](https://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.0.pdf)
+The default parameterization for the distribution of input PROSAIL parameters 
+applied to simulate a training dataset follows the distribution described in the 
+[ATBD document](https://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.0.pdf)
 
-However, PROSAIL inversion can be fully parameterized, in order to adapt the distribution of input parameters, geometry of acquisition, soil parameters, spectral bands to be used, noise level... 
+However, PROSAIL inversion can be fully parameterized, in order to adapt the 
+distribution of input parameters, geometry of acquisition, soil parameters, 
+spectral bands to be used, noise level... 
 
-See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html) for detailed procedure. 
+See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html) 
+for detailed procedure. 
 
-The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to speed up the application of the inversion on large rasters if needed. 
+The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to 
+speed up the application of the inversion on large rasters if needed. 
 
 ```{r Hybrid_Inversion}
 library(prosail)
@@ -110,7 +122,7 @@ output_dir_BP <- './PROSAIL'
 dir.create(path = output_dir_BP, showWarnings = FALSE,recursive = TRUE)
 # get sensor response for Sentinel-2
 SensorName <- 'Sentinel_2'
-SRF <- GetRadiometry(SensorName)
+SRF <- get_radiometry(SensorName)
 
 # define parameters to estimate
 Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
@@ -138,8 +150,8 @@ GeomAcq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
 # structure above if preprocS2 is not applied to get imagery
 
 # train regression model
-# set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in the 
-# R package caret instead of liquidSVM
+# set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in 
+# the R package caret instead of liquidSVM
 modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     atbd = TRUE, GeomAcq = GeomAcq, 
                                     SRF = SRF, 
@@ -149,10 +161,10 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
 
 # apply regression model on Sentinel-2 raster data
 # bigRaster = F by default. Do not mention it if the package is not installed
-# Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
+# S2 imagery is provided with refl defined as integer between 0 and 10000
 # Adapt MultiplyingFactor if not the case 
 # MultiplyingFactor = 1 if reflectance defined between 0 and 1
-BPvars <- Apply_prosail_inversion(raster_path = Refl_path, 
+BPvars <- apply_prosail_inversion(raster_path = Refl_path, 
                                   HybridModel = modelSVR, 
                                   PathOut = PROSAIL_ResPath,
                                   SelectedBands = S2BandSelect, 
@@ -163,7 +175,7 @@ BPvars <- Apply_prosail_inversion(raster_path = Refl_path,
 ```
 
 
-Assessed biophysical properties computed with `Apply_prosail_inversion` are then 
+Assessed biophysical properties computed with `apply_prosail_inversion` are then 
 saved as individual raster files. 
 For each biophysical variable, the mean value and standard deviation defined by 
 the input variable `nbModels` from `modelSVR` (default = 20 models) is saved.

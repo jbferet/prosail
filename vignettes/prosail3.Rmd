@@ -75,20 +75,22 @@ When running  __4SAIL__, the expected list of parameters includes:
 `TypeLidf = 2` and `alpha = 40`).
 
 There are currently three ways to define `InputPROSAIL`. 
-The function `get_InputPROSAIL` allows generating `InputPROSAIL`:  
+The function `get_input_PROSAIL` allows generating `InputPROSAIL`:  
 
-- when setting the parameter `atbd = TRUE`, `InputPROSAIL` is generated following 
-the distribution and co-distribution described in the ATBD of the Sentinel-2 toolbox. 
+- when setting the parameter `atbd = TRUE`, `InputPROSAIL` is generated 
+following the distribution and co-distribution described in the ATBD of the 
+Sentinel-2 toolbox. 
 
-- when setting min and max values for a list of parameters (`minval` and `maxval`) 
-as well as the type of distribution for each parameter (`uniform` or `Gaussian`), 
-`InputPROSAIL` is generated following these criteria. Gaussian distribution also 
-requires definition of a list `GaussianDistrib` including `Mean` and `Std` for 
-each input parameter when relevant.
+- when setting min and max values for a list of parameters (`minval` and 
+`maxval`) as well as the type of distribution for each parameter (`uniform` or 
+`Gaussian`), `InputPROSAIL` is generated following these criteria. Gaussian 
+distribution also requires definition of a list `GaussianDistrib` including 
+`Mean` and `Std` for each input parameter when relevant.
 
-Finally, users can define their own `InputPROSAIL` values based on the distribution 
-and co-distribution of their choice. When `InputPROSAIL` is provided as input, 
-the options corresponding to the function `get_InputPROSAIL` are ignored. 
+Finally, users can define their own `InputPROSAIL` values based on the 
+distribution and co-distribution of their choice. When `InputPROSAIL` is 
+provided as input, the options corresponding to the function `get_input_PROSAIL` 
+are ignored. 
 
 
 
@@ -98,13 +100,13 @@ the options corresponding to the function `get_InputPROSAIL` are ignored.
 
 ## Produce simulated BRF LUT corresponding to `InputPROSAIL`
 
-The BRF LUT is produced from `InputPROSAIL` with the function `Generate_LUT_BRF`.
+The BRF LUT is produced from `InputPROSAIL` with the function `generate_LUT_BRF`.
 This function is expecting the variables `SpecPROSPECT`, `SpecSOIL` and `SpecATM` 
 to share the same spectral sampling. 
 An error message will be displayed if this is not the case. 
 
 The BRF LUT obtained then corresponds to spectral information covering the 
-spectral domain from 400 nm to 2500 nm with 1 nm spectral samplingm unless these 
+spectral domain from 400 nm to 2500 nm with 1 nm spectral sampling, unless these 
 variables were modified by user. 
 This can be the case when adjusting `SpecSOIL` based on soil reflectance 
 extracted from an acquisition. 
@@ -120,10 +122,10 @@ __Sentinel-2A__, __Sentinel-2B__, __Landsat 7__, __Landsat 8__, __Landsat 9__,
 __Venus__, __MODIS__, __Pleiades 1A__, __Pleiades 1B__ and __SPOT 6-7__.
 
 The SRF of these sensors can then be obtained by calling the function 
-`GetRadiometry` and providing the name of the sensor of interest as input 
+`get_radiometry` and providing the name of the sensor of interest as input 
 variable `SensorName`.
 
-Alternatively, SRF can be computed from `GetRadiometry` by defining a list 
+Alternatively, SRF can be computed from `get_radiometry` by defining a list 
 `SpectralProps` including `wl` which corresponds to the central wavelength and 
 `fwhm` which corresponds to the FWHM. 
 In this case, the sensor bands are assumed to have a gaussian response.
@@ -159,7 +161,7 @@ estimation of LAI, CHL, EWT and LMA when using Sentinel-2 data.
 library(prosail)
 # get sensor response for Sentinel-2
 SensorName <- 'Sentinel_2'
-SRF <- GetRadiometry(SensorName)
+SRF <- get_radiometry(SensorName)
 
 # define parameters to estimate
 Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
@@ -194,14 +196,14 @@ down as follows:
 
 - produce InputPROSAIL
 ```{r generate_InputPROSAIL_atbd}
-InputPROSAIL <- get_InputPROSAIL(atbd = TRUE, 
+InputPROSAIL <- get_input_PROSAIL(atbd = TRUE, 
                                  GeomAcq = GeomAcq)
 
 ```
 
 - produce BRF LUT
 ```{r Generate_BRF_LUT_atbd}
-res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL',
+res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
                             InputPROSAIL = InputPROSAIL,
                             SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL,
@@ -215,9 +217,9 @@ InputPROSAIL$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_atbd}
-BRF_LUT <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                      SRF = SRF, 
-                                      InRefl = BRF_LUT_1nm)
+BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
+                                        SRF = SRF, 
+                                        InRefl = BRF_LUT_1nm)
 # identify spectral bands in LUT
 rownames(BRF_LUT) <- SRF$Spectral_Bands
 ```
@@ -244,15 +246,15 @@ Once the SVR models are produced from `PROSAIL_Hybrid_Train` or from
 `train_prosail_inversion`, they can be applied on a dataset for each variable 
 with the function `PROSAIL_Hybrid_Apply`.
 
-The following example applies the regression models to the simulated BRF produced 
-during the training stage. 
+The following example applies the regression models to the simulated BRF 
+produced during the training stage. 
 This is of course not recommended, and used only for illustrative purpose.
 
 ```{r Apply_Hybrid_atbd}
 ###########################################################
 # perform prediction based on models in previous steps
-# the prediction returns mean value obtained form the ensemble of regression models for each sample, 
-# as well as corresponding standard deviation
+# the prediction returns mean value obtained form the ensemble of regression 
+# models for each sample, as well as corresponding standard deviation
 MeanEstimate <- StdEstimate <- list()
 for (parm in Parms2Estimate){
   HybridRes <- PROSAIL_Hybrid_Apply(RegressionModels = modelSVR[[parm]],
@@ -288,13 +290,15 @@ for (parm in Parms2Estimate){
                         'estimated' = MeanEstimate[[parm]])
   statsReg1 <- cor.test(Results$measured, Results$estimated)$estimate
   statsReg2 <- rmserr(Results$measured, Results$estimated)$rmse
-  statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,3))
+  statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", 
+                     round(statsReg2,3))
   
   ggplot(data = Results, aes(x=estimated, y=measured)) +
     geom_point(alpha=0.6) +
     geom_smooth(method=lm, aes(group = 1)) +
     coord_fixed(ratio = 1,xlim = xylim[[parm]], ylim = xylim[[parm]]) +
-    geom_abline(intercept = 0, slope = 1, linetype = "dashed", linewidth = 0.5, color='gray')+
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", linewidth = 0.5, 
+                color='gray')+
     ggtitle(statsReg) +
     ylab(paste('Measured', parm)) +
     xlab(paste('Estimated', parm))
@@ -337,8 +341,8 @@ The resulting estimated values are displayed:
 
 ## Produce simulated BRF LUT corresponding to `InputPROSAIL`
 
-In this second example, the range and distribution of the input PROSAIL variables 
-are defined by user. 
+In this second example, the range and distribution of the input PROSAIL 
+variables are defined by user. 
 This allows additional flexibility when adjusting regression models. 
 Users are then expected to provide min and max value for parameters which should 
 follow a uniform or Gaussian distribution. 
@@ -356,7 +360,7 @@ maxval <- data.frame('N' = 2.0, 'CHL' = 60, 'CAR' = 15, 'ANT' = 5, 'EWT' = 0.045
                      'LMA' = 0.040, 'BROWN'=0.5, 'psoil' = 1.0, 'LIDFa' = 70, 
                      'lai' = 5.0,'q'=0.5,'tto' = 5,'tts' = 30, 'psi' = 150)
 
-# Define distribution for PROSAIL input variables: choose between 'Gaussian' and 'Uniform'
+# Define distribution for PROSAIL input variables: 'Gaussian' or 'Uniform'
 TypeDistrib <- data.frame('CHL' = 'Gaussian', 'CAR' = 'Uniform', 
                           'ANT' = 'Uniform', 'BROWN'='Uniform', 
                           'EWT' = 'Uniform', 'LMA' = 'Uniform',
@@ -403,14 +407,14 @@ down as follows:
 - produce InputPROSAIL
 
 ```{r generate_InputPROSAIL_user}
-InputPROSAIL <- get_InputPROSAIL(minval = minval, maxval = maxval, 
+InputPROSAIL <- get_input_PROSAIL(minval = minval, maxval = maxval, 
                                  TypeDistrib = TypeDistrib, 
                                  GaussianDistrib = GaussianDistrib)
 ```
 
 - produce BRF LUT
 ```{r Generate_BRF_LUT_user}
-res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL',
+res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
                             InputPROSAIL = InputPROSAIL,
                             SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL,
@@ -423,9 +427,9 @@ InputPROSAIL$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_user}
-BRF_LUT <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                      SRF = SRF, 
-                                      InRefl = BRF_LUT_1nm)
+BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
+                                        SRF = SRF, 
+                                        InRefl = BRF_LUT_1nm)
 # identify spectral bands in LUT
 rownames(BRF_LUT) <- SRF$Spectral_Bands
 ```
@@ -435,8 +439,10 @@ rownames(BRF_LUT) <- SRF$Spectral_Bands
 BRF_LUT_Noise <- modelSVR <- list()
 for (parm in Parms2Estimate){
   subsetRefl <- BRF_LUT[Bands2Select[[parm]],]
-  BRF_LUT_Noise[[parm]] <- subsetRefl + subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),0,NoiseLevel[[parm]]),
-                                                          nrow = nrow(subsetRefl))
+  BRF_LUT_Noise[[parm]] <- subsetRefl + 
+    subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),
+                            0,NoiseLevel[[parm]]),
+                      nrow = nrow(subsetRefl))
   modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],
                                            InputVar = InputPROSAIL[[parm]])
 }
@@ -456,8 +462,8 @@ This is of course not recommended, and used only for illustrative purpose.
 ```{r Apply_Hybrid_user}
 ###########################################################
 # perform prediction based on models in previous steps
-# the prediction returns mean value obtained form the ensemble of regression models for each sample, 
-# as well as corresponding standard deviation
+# the prediction returns mean value obtained form the ensemble of regression 
+# models for each sample, as well as corresponding standard deviation
 MeanEstimate <- StdEstimate <- list()
 for (parm in Parms2Estimate){
   HybridRes <- PROSAIL_Hybrid_Apply(RegressionModels = modelSVR[[parm]],
@@ -477,8 +483,10 @@ __(!!! Only for illustration. Always use independent dataset to assess performan
 ```{r Plot_Results_user}
 ###########################################################
 # plot resulting estimated values
-xylim <- list('lai' = c(minval$lai, maxval$lai), 'CHL' = c(minval$CHL, maxval$CHL),
-              'EWT' = c(minval$EWT, maxval$EWT), 'LMA' = c(minval$LMA, maxval$LMA), 
+xylim <- list('lai' = c(minval$lai, maxval$lai), 
+              'CHL' = c(minval$CHL, maxval$CHL),
+              'EWT' = c(minval$EWT, maxval$EWT), 
+              'LMA' = c(minval$LMA, maxval$LMA), 
               'fCover' = c(0,1), 'fAPAR' = c(0,1), 'albedo' = c(0,0.4))
 
 for (parm in Parms2Estimate){
@@ -487,13 +495,15 @@ for (parm in Parms2Estimate){
                         'estimated' = MeanEstimate[[parm]])
   statsReg1 <- cor.test(Results$measured, Results$estimated)$estimate
   statsReg2 <- rmserr(Results$measured, Results$estimated)$rmse
-  statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", round(statsReg2,3))
+  statsReg <- paste0("r = ", round(statsReg1,2), 
+                     ", RMSE = ", round(statsReg2,3))
   
   ggplot(data = Results, aes(x=estimated, y=measured)) +
     geom_point(alpha=0.6) +
     geom_smooth(method=lm, aes(group = 1)) +
     coord_fixed(ratio = 1,xlim = xylim[[parm]], ylim = xylim[[parm]]) +
-    geom_abline(intercept = 0, slope = 1,linetype="dashed", linewidth = 0.5, color = 'gray')+
+    geom_abline(intercept = 0, slope = 1,linetype="dashed", 
+                linewidth = 0.5, color = 'gray')+
     ggtitle(statsReg) +
     ylab(paste('Measured', parm)) +
     xlab(paste('Estimated', parm))
