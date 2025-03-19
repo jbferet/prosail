@@ -41,9 +41,9 @@ A polygon corresponding to the study area can be downloaded from a repository.
 
 ```{r identify_S2_product}
 # define bounding box for area of interest
-aoi_bbox <- sf::st_bbox(obj = c('xmin' = -2.25, 'ymin' = 38.94, 
-                                'xmax' = -1.73, 'ymax' = 39.22))
-sf::st_crs(x = aoi_bbox) <- 4326
+aoi_bbox <- sf::st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
+                                'xmax' = 582995, 'ymax' = 4331253))
+aoi <- preprocS2::bbox_to_poly(aoi_bbox, crs = 32630)
 ```
 
 [Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) 
@@ -67,9 +67,8 @@ output_dir_s2 <- './S2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
 # save aoi as vector file
-path_bbox <- 'aoi_bbox.GPKG'
-sf::st_write(obj = preprocS2::bbox_to_poly(aoi_bbox), 
-             dsn = path_bbox, driver = 'GPKG')
+path_aoi <- 'barrax_aoi.GPKG'
+sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
 
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
@@ -78,7 +77,6 @@ path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
 # https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings
 id <- "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
 secret <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
 # tip to save credential on your computer: run the following command : 
 # > file.edit("~/.Renviron")
 # add ID and password for CDSE as well as CURL_SSL_BACKEND using this template
@@ -88,12 +86,13 @@ secret <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # save .Renviron file and restart R session then load your credential this way: 
 # > id <- Sys.getenv("CDSE_ID")
 # > secret <- Sys.getenv("CDSE_SECRET")
-
 authentication <- list('id' = id, 'pwd' = secret)
 
-list_files <- get_s2_raster(bbox = aoi_bbox, datetime = datetime, output_dir = output_dir_s2, 
-              path_S2tilinggrid = path_S2tilinggrid, siteName = 'Barrax',
-              overwrite = F, geomAcq = T, authentication = authentication)
+list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
+                            output_dir = output_dir_s2, 
+                            path_S2tilinggrid = path_S2tilinggrid, 
+                            siteName = 'Barrax', overwrite = F, geomAcq = T, 
+                            authentication = authentication)
 # Sentinel-2 L2A reflectance
 Refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
@@ -169,7 +168,7 @@ BPvars <- Apply_prosail_inversion(raster_path = Refl_L2A,
                                   SelectedBands = S2BandSelect, 
                                   bandname = ImgBandNames, 
                                   MaskRaster = vegetation_mask, 
-                                  bigRaster = T, 
+                                  bigRaster = F, 
                                   MultiplyingFactor = 10000)
 ```
 
