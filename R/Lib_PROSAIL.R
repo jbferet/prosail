@@ -811,9 +811,7 @@ fourSAIL2  <- function(leafgreen, leafbrown,
     rsdt <- rsd+tup*tdd
     rdot <- rdo+tdd*(rddb*tdo+rdob*too)/rn
     rsodt <- rsod+(tss*rsodb+tdn*rdob)*too+tup*tdo
-
     rsost <- (w1*s1+w2*s2)*lai
-
     rsot <- rsost+rsodt
 
     # Diffuse reflectances at the top and the bottom are now different

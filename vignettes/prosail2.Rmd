@@ -65,6 +65,16 @@ If no value, their default value is set.
     [Verhoef (1998)](https://edepot.wur.nl/210943).
         * if `TypeLidf=1` then `LIDFa` controls the average leaf slope and 
         `LIDFb` controls the distribution's bimodality
+        * This LIDF requires |LIDFa| + |LIDFb| < 1
+| LIDF type    |   LIDFa   |   LIDFb   
+| :----------: |:---------:|:---------:|
+| Planophile   |     1     |     0     |
+| Erectophile  |    -1     |     0     |
+| Plagiophile  |     0     |    -1     |
+| Extremophile |     0     |     1     |
+| Spherical    |   -0.35   |   -0.15   |
+| Uniform      |     0     |     0     |
+
     * Define `TypeLidf=2` if you want to use the 
     [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) 
     characterized by the average leaf inclination angle in degree
@@ -72,7 +82,8 @@ If no value, their default value is set.
 
 * `lai`: leaf area index
 
-* `q`: hot spot parameter
+* `q`: foliage hot spot parameter. It corresponds to the ratio of the 
+correlation length of leaf projections in the horizontal plane and the canopy height [@doi:10.1016/j.rse.2006.12.013; @kuusk1985]
 
 * `tts`: sun zenith angle (0 degrees = sun at the vertical of surface)
 
