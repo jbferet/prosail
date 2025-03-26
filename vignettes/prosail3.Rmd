@@ -194,9 +194,7 @@ down as follows:
 
 - produce InputPROSAIL
 ```{r generate_InputPROSAIL_atbd}
-InputPROSAIL <- get_InputPROSAIL(atbd = TRUE, 
-                                 GeomAcq = GeomAcq)
-
+InputPROSAIL <- get_InputPROSAIL(atbd = TRUE, GeomAcq = GeomAcq)
 ```
 
 - produce BRF LUT
@@ -225,16 +223,16 @@ rownames(BRF_LUT) <- SRF$Spectral_Bands
 - Add noise in BRF
 ```{r Noise_atbd}
 BRF_LUT_Noise <- list()
-for (parm in Parms2Estimate) BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT)
+for (parm in Parms2Estimate) 
+  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT)
 ```
 
 - Train SVM regression model
 ```{r Train_SVR}
 modelSVR <- list()
-for (parm in Parms2Estimate){
+for (parm in Parms2Estimate)
   modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],
                                            InputVar = InputPROSAIL[[parm]])
-}
 ```
 
 

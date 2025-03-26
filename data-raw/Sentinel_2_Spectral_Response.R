@@ -15,7 +15,7 @@ Spectral_Bands <- Spectral_Bands[-1]
 # 5- check if conversion of spctral bands into numeric values
 SensorRadiometry <-SRFraw[,-1]
 SensorRadiometry <- t(SensorRadiometry)
-Central_WL <- c(492.4, 559.8, 664.6, 704.1, 740.5, 782.8, 832.8, 864.7,
+Central_WL <- c(492.7, 559.8, 664.6, 704.1, 740.5, 782.8, 832.8, 864.7,
                 1613.7, 2202.4)
 Sentinel_2 <- list('Spectral_Response' = SensorRadiometry,
                    'Spectral_Bands' = Spectral_Bands,
