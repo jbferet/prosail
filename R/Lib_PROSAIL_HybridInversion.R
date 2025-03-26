@@ -120,6 +120,8 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     MultiplyingFactor = 10000, maxRows = 100,
                                     bigRaster = FALSE, progressBar = TRUE,
                                     filetype = 'GTiff'){
+
+  dir.create(PathOut, showWarnings = F, recursive = T)
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute
@@ -898,6 +900,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                     Path_Results = './', FigPlot = FALSE,
                                     method = 'liquidSVM', verbose = FALSE){
 
+  dir.create(Path_Results, showWarnings = F, recursive = T)
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###     1- DEFINE THE LUT USED TO TRAIN THE HYBRID INVERSION          ###
   ### == == == == == == == == == == == == == == == == == == == == == == ###

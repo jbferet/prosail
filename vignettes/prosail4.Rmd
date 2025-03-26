@@ -40,6 +40,9 @@ Barrax is a well-studied area for remote sensing applications on crop monitoring
 A polygon corresponding to the study area can be downloaded from a repository. 
 
 ```{r identify_S2_product}
+# libraries
+library(preprocS2)
+library(sf)
 # define bounding box for area of interest
 aoi_bbox <- sf::st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
                                 'xmax' = 582995, 'ymax' = 4331253))
@@ -50,18 +53,26 @@ aoi <- preprocS2::bbox_to_poly(aoi_bbox, crs = 32630)
 is then used in order to identify an acquisition with minimum cloud cover.
 
 Once a date of acquisition is identified, the S2 product is then downloaded. 
-The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used for this purpose. 
-`preprocS2` will download S2 data from a STAC catalog based on spatial and temporal information.
-The default STAC collection is `sentinel-2-l2a` from the Planetary computer catalog.
+The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used for 
+this purpose. 
+`preprocS2` will download S2 data from a STAC catalog based on spatial and 
+temporal information.
+The default STAC collection is `sentinel-2-l2a` from the Planetary computer 
+catalog.
 
-Optionally, `preprocS2` can download the geometry of acquisition corresponding to the S2 acquisition.
-Access to geometry of acquisition is provided by the package [`CDSE`](https://zivankaraman.github.io/CDSE/).
+Optionally, `preprocS2` can download the geometry of acquisition corresponding 
+to the S2 acquisition by setting `geomAcq = T` and providing authentication to 
+the [CDSE](https://dataspace.copernicus.eu/analyse/apis).
+
+Authentication for CDSE should be obtained by activating an OAuth clients ID, 
+following [`this link`](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings). 
+Please make sure you copy the password related to your OAuth clients ID as you 
+will not be able to access it once you close the page.
+
+Access to geometry of acquisition is provided by the package 
+[`CDSE`](https://zivankaraman.github.io/CDSE/).
 
 ```{r download_S2_product}
-# library
-library(preprocS2)
-library(sf)
-
 # 1- define input & output directories
 output_dir_s2 <- './S2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
@@ -105,14 +116,20 @@ geometryAcquisition <- list_files$geometryAcquisition
 
 # Training and application of hybrid inversion model 
 
-The default parameterization for the distribution of input PROSAIL parameters applied 
-to simulate a training dataset follows the distribution described in the [ATBD document](https://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.0.pdf)
+The default parameterization for the distribution of input PROSAIL parameters 
+applied to simulate a training dataset follows the distribution described in the 
+[ATBD document](https://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.0.pdf)
 
-However, PROSAIL inversion can be fully parameterized, in order to adapt the distribution of input parameters, geometry of acquisition, soil parameters, spectral bands to be used, noise level... 
+However, PROSAIL inversion can be fully parameterized, in order to adapt the 
+distribution of input parameters, geometry of acquisition, soil parameters, 
+spectral bands to be used, noise level... 
 
-See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html) for detailed procedure. 
+See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html) 
+for detailed procedure. 
 
-The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to speed up the application of the inversion on large rasters if needed. 
+The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to 
+handle inversion over large rasters if needed, but may be more time consuming 
+over smaller raster data. 
 
 ```{r Hybrid_Inversion}
 library(prosail)
