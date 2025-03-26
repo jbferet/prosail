@@ -21,24 +21,26 @@ generate_LUT_PROSAIL(
 
 \item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted}
+\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique
+soil sample if the psoil parameter is not inverted}
 
-\item{SpecATM}{list. Includes direct and diffuse radiation for clear conditions}
+\item{SpecATM}{list. direct and diffuse radiation for clear conditions}
 
 \item{BandNames}{character. Name of the spectral bands of the sensor}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownLOP}{list. Defines optical properties for brown vegetation, if not NULL
+\item{BrownLOP}{list. Defines optical properties for brown vegetation
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it
 }}
 
-\item{progress}{boolean. set TRUE to get progress bar during production of LUT}
+\item{progress}{boolean. set TRUE for progress bar during production of LUT}
 }
 \value{
-LUT numeric. list of BRF, fCover, fAPAR and albedo corresponding to InputPROSAIL
+LUT numeric. list of BRF, fCover, fAPAR and albedo corresponding
+to InputPROSAIL
 }
 \description{
 This function generates a LUT of PROSAIL outputs, including BRF, fAPAR,

@@ -35,7 +35,7 @@ merit_RMSE_PROSAIL(
 for optimization of psoil, or a unique spectrun)}
 
 \item{SpecATM_Sensor}{list. Includes diffuse and direct light
-refractive index, specific absorption coefficients and corresponding spectral bands}
+refractive index, specific absorption coefs and corresponding spectral bands}
 
 \item{Parms2Estimate}{numeric. rank of variables to be inverted
 to be estimated through inversion}
@@ -50,11 +50,12 @@ to be estimated through inversion}
 
 \item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
 
-\item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
+\item{PriorInfoSD}{list. prior SD of parameters defined as xprior}
 
-\item{Parms2Prior}{numeric. rank of the parameters which should be used with prior information}
+\item{Parms2Prior}{numeric. rank of parameters to be used with prior info}
 
-\item{WeightPrior}{numeric. Weight to be applied on prior information to modulate its importance}
+\item{WeightPrior}{numeric. Weight to be applied on prior information
+to modulate its importance}
 }
 \value{
 fc estimates of the parameters

@@ -10,7 +10,8 @@ check_spectral_sampling(SpecPROSPECT, SpecSOIL, SpecATM)
 \arguments{
 \item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique soil sample if the psoil parameter is not inverted}
+\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique
+soil sample if the psoil parameter is not inverted}
 
 \item{SpecATM}{list. direct and diffuse radiation for clear conditions}
 }

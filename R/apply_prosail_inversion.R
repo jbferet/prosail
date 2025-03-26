@@ -37,6 +37,8 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     MultiplyingFactor = 10000, maxRows = 100,
                                     bigRaster = FALSE, progressBar = TRUE,
                                     filetype = 'GTiff'){
+
+  dir.create(PathOut, showWarnings = FALSE, recursive = TRUE)
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute

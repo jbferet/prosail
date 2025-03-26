@@ -22,25 +22,26 @@ get_input_PROSAIL(
 )
 }
 \arguments{
-\item{atbd}{boolean. should input parameter distribution from ATBD be applied ?}
+\item{atbd}{boolean. TRUE to apply input parameter distribution from ATBD}
 
-\item{GeomAcq}{list. geometry of acquisiton. list should contain min and max values for tts, tto and psi}
+\item{GeomAcq}{list. geom of acquisiton: min and max val for tts, tto & psi}
 
 \item{Codist_LAI}{boolean. set TYRUE if codistribution with LAI accounted for}
 
-\item{minval}{list. minimum value for input parameters sampled to produce a training LUT}
+\item{minval}{list. min val for input parameters}
 
-\item{maxval}{list. maximum value for input parameters sampled to produce a training LUT}
+\item{maxval}{list. max val for input parameters}
 
-\item{TypeDistrib}{list. Type of distribution. Either 'Uniform' or 'Gaussian'}
+\item{TypeDistrib}{list. Type of distribution: 'Uniform' or 'Gaussian'}
 
-\item{GaussianDistrib}{list. Mean value and STD corresponding to the parameters sampled with gaussian distribution}
+\item{GaussianDistrib}{list. Mean & SD for parms sampled with gaussian dist}
 
 \item{ParmSet}{list. list of input parameters set to a specific value}
 
 \item{nbSamples}{numeric. number of samples in training LUT}
 
-\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
+\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter
+adjustment performed during training}
 }
 \value{
 InputPROSAIL

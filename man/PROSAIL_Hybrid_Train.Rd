@@ -15,18 +15,20 @@ PROSAIL_Hybrid_Train(
 )
 }
 \arguments{
-\item{BRF_LUT}{numeric. LUT of bidirectional reflectances factors used for training}
+\item{BRF_LUT}{numeric. LUT of BRF used for training}
 
-\item{InputVar}{numeric. biophysical parameter corresponding to the reflectance}
+\item{InputVar}{numeric. biophysical parameter corresponding to reflectance}
 
-\item{nbEnsemble}{numeric. Number of individual subsets should be generated from BRF_LUT}
+\item{nbEnsemble}{numeric. nb of individual subsets generated from BRF_LUT}
 
-\item{WithReplacement}{Boolean. should subsets be generated with or without replacement?}
+\item{WithReplacement}{Boolean. subsets generated with / without replacement}
 
-\item{method}{character. which machine learning regression method should be used?
-default = SVM with liquidSVM. svmRadial and svmLinear from caret package also implemented. More to come}
+\item{method}{character. which machine learning regression method used?
+default = SVM with liquidSVM. svmRadial and svmLinear from caret package
+also implemented. More to come}
 
-\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter adjustment performed during training}
+\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter
+adjustment performed during training}
 
 \item{progressBar}{boolean. should progressbar be displayed?}
 }

@@ -36,8 +36,8 @@ vegetation parameter}
 \item{MaskRaster}{character. path for binary mask defining ON (1) and OFF (0)
 pixels in the raster}
 
-\item{MultiplyingFactor}{numeric. multiplying factor used to write reflectance
-in the raster
+\item{MultiplyingFactor}{numeric. multiplying factor used to write
+reflectance in the raster
 --> PROSAIL simulates reflectance between 0 and 1, and raster data expected
 in the same range}
 
@@ -52,7 +52,8 @@ additional support}
 \item{filetype}{character. driver for raster file}
 }
 \value{
-res character. path for output files corresponding to biophysical properties
+res character. path for output files corresponding to
+biophysical properties
 }
 \description{
 This function applies SVR model on raster data in order to estimate

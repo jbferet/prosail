@@ -13,8 +13,8 @@ A dataframe including 2101 rows and 10 columns
 \item \emph{SAC_CAR}: specific absorption coefficient for carotenoids
 \item \emph{SAC_ANT}: specific absorption coefficient for anthocyanins
 \item \emph{SAC_BROWN}: specific absorption coefficient for brown pigments
-\item \emph{SAC_EWT}: specific absorption coefficient for water content (Equivalent Water Thickness)
-\item \emph{SAC_LMA}: specific absorption coefficient for dry matter (Leaf Mass per Area)
+\item \emph{SAC_EWT}: specific absorption coefficient for water content (EWT)
+\item \emph{SAC_LMA}: specific absorption coefficient for dry matter (LMA)
 \item \emph{SAC_PROT}: specific absorption coefficient for proteins
 \item \emph{SAC_CBC}: specific absorption coefficient for carbon-base constituents
 \item \emph{calctav_90}: transmissivity of a dielectric plane surface, averaged over

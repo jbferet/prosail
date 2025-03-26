@@ -31,7 +31,7 @@ invert_PROSAIL(
 \item{UpperBound}{list. Upper bound}
 
 \item{SpecPROSPECT_Sensor}{list. Includes optical constants
-refractive index, specific absorption coefficients and corresponding spectral bands}
+refractive index, specific absorption coefs and corresponding spectral bands}
 
 \item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
 
@@ -42,12 +42,12 @@ or a unique soil sample if the psoil parameter is not inverted}
 
 \item{ParmSet}{list. Parameters set to a fixed value by user}
 
-\item{MeritFunction}{character. name of the function to be used as merit function
+\item{MeritFunction}{character. name of the merit function
 with given criterion to minimize (default = RMSE)}
 
 \item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
 
-\item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
+\item{PriorInfoSD}{list. prior SD of parameters defined as xprior}
 
 \item{WeightPrior}{numeric. Weight to be applied on prior information to
 modulate its importance}

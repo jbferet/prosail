@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_S2geometry_from_SAFE.R
 \name{get_S2geometry_from_SAFE}
 \alias{get_S2geometry_from_SAFE}
-\title{This function returns geometry of acquisition for S2 image processed with Sen2Cor
+\title{This function returns geometry of acquisition for S2 image processed with
+Sen2Cor
 \itemize{
 \item SZA = list of sun zenith angle
 \item SAA = list of sun azimuth angle
@@ -13,13 +14,14 @@
 get_S2geometry_from_SAFE(s2xml)
 }
 \arguments{
-\item{s2xml}{list. list produced from reading XML metadata file with package XML}
+\item{s2xml}{list. produced from reading XML metadata file with package XML}
 }
 \value{
 List of S2 angles (SZA, SAA, VZA, VAA)
 }
 \description{
-This function returns geometry of acquisition for S2 image processed with Sen2Cor
+This function returns geometry of acquisition for S2 image processed with
+Sen2Cor
 \itemize{
 \item SZA = list of sun zenith angle
 \item SAA = list of sun azimuth angle

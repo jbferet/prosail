@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_S2geometry_from_THEIA.R
 \name{get_S2geometry_from_THEIA}
 \alias{get_S2geometry_from_THEIA}
-\title{This function returns geometry of acquisition for S2 image processed with MAJA
+\title{returns geometry of acquisition for S2 image processed with MAJA
 \itemize{
 \item SZA = list of sun zenith angle
 \item SAA = list of sun azimuth angle
@@ -13,13 +13,13 @@
 get_S2geometry_from_THEIA(s2xml)
 }
 \arguments{
-\item{s2xml}{list. list produced from reading XML metadata file with package XML}
+\item{s2xml}{list. produced from reading XML metadata file with package XML}
 }
 \value{
 List of S2 angles (SZA, SAA, VZA, VAA)
 }
 \description{
-This function returns geometry of acquisition for S2 image processed with MAJA
+returns geometry of acquisition for S2 image processed with MAJA
 \itemize{
 \item SZA = list of sun zenith angle
 \item SAA = list of sun azimuth angle

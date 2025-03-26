@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_distribution_input_prosail.R
 \name{get_distribution_input_prosail}
 \alias{get_distribution_input_prosail}
-\title{This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL}
+\title{This function generates distribution of biophysical parameters used as input
+parameters in PRO4SAIL}
 \usage{
 get_distribution_input_prosail(
   minval = NULL,
@@ -30,8 +31,10 @@ get_distribution_input_prosail(
 \item{Std}{list. standard deviation for parameters with Gaussian distribution}
 }
 \value{
-InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
+InputPROSAIL list. list of nbSamples input parameters for
+PRO4SAIL simulation
 }
 \description{
-This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL
+This function generates distribution of biophysical parameters used as input
+parameters in PRO4SAIL
 }

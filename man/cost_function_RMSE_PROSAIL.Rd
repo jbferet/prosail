@@ -18,13 +18,15 @@ cost_function_RMSE_PROSAIL(
 
 \item{brfMOD}{numeric. Simulated bidirectional reflectance}
 
-\item{xprior}{list. values of the parameters for which prior information is provided}
+\item{xprior}{list. values of the parameters for which prior information is
+provided}
 
 \item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
 
-\item{PriorInfoSD}{list. prior standard deviation of parameters defined as xprior}
+\item{PriorInfoSD}{list. prior standard dev of parameters defined as xprior}
 
-\item{WeightPrior}{numeric. Weight to be applied on prior information to modulate its importance}
+\item{WeightPrior}{numeric. Weight to be applied on prior information to
+modulate its importance}
 }
 \value{
 res list. Includes Parms2Estimate, Parms2Set,

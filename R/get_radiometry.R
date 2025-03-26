@@ -33,6 +33,10 @@ get_radiometry <- function(SensorName = 'Custom',
                                         'SENTINEL-2B', 'SENTINEL_2B')){
     SRF <- prosail::Sentinel_2B
     SRF$Sensor <- 'Sentinel_2B'
+  } else if (toupper(SensorName) %in% c('S2C', 'SENTINEL2C',
+                                        'SENTINEL-2C', 'SENTINEL_2C')){
+    SRF <- prosail::Sentinel_2C
+    SRF$Sensor <- 'Sentinel_2C'
   } else if (toupper(SensorName) =='VENUS'){
     SRF <- prosail::Venus
     SRF$Sensor <- 'Venus'

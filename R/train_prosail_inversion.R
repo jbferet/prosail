@@ -57,6 +57,7 @@ train_prosail_inversion <- function(InputPROSAIL = NULL, BRF_LUT = NULL,
                                     FigPlot = FALSE, method = 'liquidSVM',
                                     verbose = FALSE){
 
+  dir.create(Path_Results, showWarnings = FALSE, recursive = TRUE)
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###     1- DEFINE THE LUT USED TO TRAIN THE HYBRID INVERSION          ###
   ### == == == == == == == == == == == == == == == == == == == == == == ###

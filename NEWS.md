@@ -1,3 +1,9 @@
+# prosail v2.5.10
+
+## addition
+- added SRF for Sentinel-2C and updated SRF for 2A and 2B
+- added test-PRO4SAIL_iterative_opt
+
 # prosail v2.5.9
 
 ## change

@@ -2,12 +2,12 @@
 % Please edit documentation in R/compute_BRF.R
 \name{compute_BRF}
 \alias{compute_BRF}
-\title{Computes bidirectional reflectance factor based on outputs from PROSAIL & SZA}
+\title{Computes BRF based on outputs from PROSAIL & SZA}
 \usage{
 compute_BRF(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL)
 }
 \arguments{
-\item{rdot}{numeric. Hemispherical-directional reflectance factor in viewing direction}
+\item{rdot}{numeric. Hemispherical-directional refl factor viewing direction}
 
 \item{rsot}{numeric. Bi-directional reflectance factor}
 

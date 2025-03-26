@@ -2,8 +2,9 @@
 % Please edit documentation in R/get_spec_sensor.R
 \name{get_spec_sensor}
 \alias{get_spec_sensor}
-\title{Computes spectral sensor characteristics for optical constants required for PROSPECT
-soil parameters as well as direct and diffuse radiation for clear conditions}
+\title{Computes spectral sensor characteristics for optical constants required for
+PROSPECT soil parameters as well as direct and diffuse radiation for clear
+conditions}
 \usage{
 get_spec_sensor(
   SensorName = "MyCustomSensor",
@@ -25,6 +26,7 @@ SRF list. Spectral response function, corresponding spectral bands,
 and Original Bands
 }
 \description{
-Computes spectral sensor characteristics for optical constants required for PROSPECT
-soil parameters as well as direct and diffuse radiation for clear conditions
+Computes spectral sensor characteristics for optical constants required for
+PROSPECT soil parameters as well as direct and diffuse radiation for clear
+conditions
 }

@@ -7,9 +7,10 @@
 PROSAIL_Hybrid_Apply(RegressionModels, Refl, progressBar = FALSE)
 }
 \arguments{
-\item{RegressionModels}{list. List of regression models produced by PROSAIL_Hybrid_Train}
+\item{RegressionModels}{list. regression models produced by
+PROSAIL_Hybrid_Train}
 
-\item{Refl}{numeric. LUT of bidirectional reflectances factors used for training}
+\item{Refl}{numeric. LUT of BRF used for training}
 
 \item{progressBar}{boolean. should progressbar be displayed?}
 }

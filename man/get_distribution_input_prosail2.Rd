@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_distribution_input_prosail2.R
 \name{get_distribution_input_prosail2}
 \alias{get_distribution_input_prosail2}
-\title{This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL}
+\title{This function generates distribution of biophysical parameters used as input
+parameters in PRO4SAIL}
 \usage{
 get_distribution_input_prosail2(
   minval,
@@ -15,23 +16,24 @@ get_distribution_input_prosail2(
 )
 }
 \arguments{
-\item{minval}{list. Defines the minimum value to be set for a list of parameters randomly produced}
+\item{minval}{list. min val set for list of parameters randomly produced}
 
-\item{maxval}{list. Defines the maximum value to be set for a list of parameters randomly produced}
+\item{maxval}{list. max val set for list of parameters randomly produced}
 
 \item{ParmSet}{list.Defines the parameters to be set to a given value}
 
 \item{nbSamples}{numeric. Number of samples to be generated}
 
-\item{TypeDistrib}{list. specify if uniform or Gaussian distribution to be applied. default = Uniform}
+\item{TypeDistrib}{list. uniform / Gaussian distribution to be applied}
 
 \item{Mean}{list. mean value for parameters with Gaussian distribution}
 
 \item{Std}{list. standard deviation for parameters with Gaussian distribution}
 }
 \value{
-InputPROSAIL list. list of nbSamples input parameters for PRO4SAIL simulation
+InputPROSAIL list. nbSamples input parameters for PRO4SAIL simulation
 }
 \description{
-This function generates distribution of biophysical parameters used as input parameters in PRO4SAIL
+This function generates distribution of biophysical parameters used as input
+parameters in PRO4SAIL
 }
