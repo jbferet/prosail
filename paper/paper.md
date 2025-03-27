@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 The PROSAIL model is a widely used radiative transfer model that combines the 
 PROSPECT leaf optical properties model with the SAIL canopy bidirectional 
-reflectance model [@jacquemoud2009, @berger2018].
+reflectance model [@jacquemoud2009; @berger2018].
 It is designed to simulate the reflectance of vegetation canopies across a broad 
 spectral domain, including the visible, near-infrared, shortwave infrared and 
 thermal infrared regions of the electromagnetic spectrum.
@@ -73,7 +73,7 @@ and scattering mechanisms.
 At leaf scale, the model PROSPECT (leaf optical PROperties SPECtra) [@feret2024] 
 is currently the most popular physical model for the simulation of leaf optical 
 properties and the accurate estimation of leaf chemistry 
-[@feret2019, @spafford2021]. 
+[@feret2019; @spafford2021]. 
 At canopy scale, various models can be employed, and the choice for a specific 
 model may be driven by the complexity of the system to be simulated, as well as 
 the capacity to describe the scene. 
@@ -207,7 +207,7 @@ unique parameter corresponding to the average leaf angle.
 
 - a foliage hot spot parameter which corresponds to the ratio of the correlation 
 length of leaf projections in the horizontal plane and the canopy height 
-[@kuusk1991, @breon2002, @verhoefbach2007]
+[@kuusk1991; @breon2002; @verhoefbach2007]
 
 PROSAIL also requires information extrinsic to vegetation : 
 
