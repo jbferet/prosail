@@ -236,15 +236,24 @@ reflectance factors.
 Additional parameters required to compute albedo, fAPAR and fcover are also 
 provided as outputs. 
 The full list of outputs is then :
+
 - `rddt`: bi-hemispherical reflectance factor
+
 - `rsdt`: directional-hemispherical reflectance factor for solar incident flux
+
 - `rdot`: hemispherical-directional reflectance factor in viewing direction
+
 - `rsot`: bi-directional reflectance factor
+
 - `abs_dir`: canopy absorptance for direct solar incident flux
+
 - `abs_hem`: canopy absorptance for hemispherical diffuse incident flux
+
 - `fcover`: Fraction of green Vegetation Cover (equals to 1 - beam transmittance 
 in the target-view path)
+
 - `rsdstar`: contribution of direct solar incident flux to albedo
+
 - `rddstar`: contribution of hemispherical diffuse incident flux to albedo
 
 The function `PRO4SAIL` using `4SAIL` can be called as follows : 
@@ -563,7 +572,7 @@ produce BRF simulations and  train SVR models.
 It provides regression models as outputs, which can then be directly used to 
 estimate vegetation biophysical properties from data tables or raster data. 
 
-![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.tif){ width=90% }
+![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.tif){ width=75% }
 
 The example code below illustrates the training stage with the function
 `train_prosail_inversion`, to estimate LAI, fCover and fAPAR from Sentinel-2, 
