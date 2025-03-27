@@ -563,7 +563,7 @@ produce BRF simulations and  train SVR models.
 It provides regression models as outputs, which can then be directly used to 
 estimate vegetation biophysical properties from data tables or raster data. 
 
-![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.png){ width=90% }
+![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.tif){ width=90% }
 
 The example code below illustrates the training stage with the function
 `train_prosail_inversion`, to estimate LAI, fCover and fAPAR from Sentinel-2, 
