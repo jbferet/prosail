@@ -6,7 +6,7 @@
 \usage{
 PRO4SAIL(
   Spec_Sensor = NULL,
-  Input_PROSPECT = NULL,
+  input_prospect = NULL,
   N = 1.5,
   CHL = 40,
   CAR = 8,
@@ -31,14 +31,14 @@ PRO4SAIL(
   Cv = 1,
   Zeta = 1,
   SAILversion = "4SAIL",
-  BrownLOP = NULL
+  brown_lop = NULL
 )
 }
 \arguments{
 \item{Spec_Sensor}{list. Includes optical constants required for PROSPECT
 refractive index, specific absorption coefficients and spectral bands}
 
-\item{Input_PROSPECT}{list. PROSPECT input variables}
+\item{input_prospect}{list. PROSPECT input variables}
 
 \item{N}{numeric. Leaf structure parameter}
 
@@ -94,7 +94,7 @@ if TypeLidf ==2, unused}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownLOP}{dataframe. optical properties for brown vegetation
+\item{brown_lop}{dataframe. optical properties for brown vegetation
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it

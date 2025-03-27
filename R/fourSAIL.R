@@ -1,6 +1,6 @@
 #' Performs PROSAIL simulation based on a set of combinations of
 #' input parameters
-#' @param LeafOptics list. Includes leaf optical properties
+#' @param lop list. leaf optical properties
 #' (reflectance and transmittance) and corresponding spectral bands
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
@@ -29,15 +29,15 @@
 #' rddstar: contribution of hemispherical diffuse incident flux to albedo
 #' @export
 
-fourSAIL  <- function(LeafOptics, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
+fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
                       lai = 3, q = 0.1, tts = 30, tto = 0, psi = 60,
                       rsoil = NULL){
 
   ############################ #
   #	LEAF OPTICAL PROPERTIES	##
   ############################ #
-  rho <- LeafOptics$Reflectance
-  tau <- LeafOptics$Transmittance
+  rho <- lop$Reflectance
+  tau <- lop$Transmittance
 
   #	Geometric quantities
   rd <- pi/180

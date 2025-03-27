@@ -7,19 +7,19 @@ PROSPECT soil parameters as well as direct and diffuse radiation for clear
 conditions}
 \usage{
 get_spec_sensor(
-  SensorName = "MyCustomSensor",
-  SpectralProps = NULL,
-  Path_SensorResponse = NULL
+  sensor_name = "MyCustomSensor",
+  spectral_properties = NULL,
+  srf_path = NULL
 )
 }
 \arguments{
-\item{SensorName}{character. name of the sensor. Either already defined, or
+\item{sensor_name}{character. name of the sensor. Either already defined, or
 to be defined based on other inputs}
 
-\item{SpectralProps}{list. Sensor spectral characteristics including
-wl = central wavelength and fwhm = corresponding FWHM}
+\item{spectral_properties}{list. Sensor spectral characteristics including
+wl = central wavelength and fwhm = corresponding fwhm}
 
-\item{Path_SensorResponse}{character. Path where to get or save SRF}
+\item{srf_path}{character. Path where to get or save SRF}
 }
 \value{
 SRF list. Spectral response function, corresponding spectral bands,

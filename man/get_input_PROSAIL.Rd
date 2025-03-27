@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_input_PROSAIL.R
 \name{get_input_PROSAIL}
 \alias{get_input_PROSAIL}
-\title{generate InputPROSAIL, following
+\title{generate input_prosail, following
 \itemize{
 \item either distribution defined in ATBD
 \item or distribution defined in user
@@ -11,13 +11,13 @@
 get_input_PROSAIL(
   atbd = FALSE,
   GeomAcq = NULL,
-  Codist_LAI = TRUE,
+  codistribution_lai = TRUE,
   minval = NULL,
   maxval = NULL,
   TypeDistrib = NULL,
   GaussianDistrib = NULL,
-  ParmSet = NULL,
-  nbSamples = 2000,
+  parm_set = NULL,
+  nb_samples = 2000,
   verbose = FALSE
 )
 }
@@ -26,7 +26,7 @@ get_input_PROSAIL(
 
 \item{GeomAcq}{list. geom of acquisiton: min and max val for tts, tto & psi}
 
-\item{Codist_LAI}{boolean. set TYRUE if codistribution with LAI accounted for}
+\item{codistribution_lai}{boolean. set TYRUE if codistribution with LAI accounted for}
 
 \item{minval}{list. min val for input parameters}
 
@@ -36,18 +36,18 @@ get_input_PROSAIL(
 
 \item{GaussianDistrib}{list. Mean & SD for parms sampled with gaussian dist}
 
-\item{ParmSet}{list. list of input parameters set to a specific value}
+\item{parm_set}{list. list of input parameters set to a specific value}
 
-\item{nbSamples}{numeric. number of samples in training LUT}
+\item{nb_samples}{numeric. number of samples in training LUT}
 
 \item{verbose}{boolean. when set to TRUE, prints message if hyperparameter
 adjustment performed during training}
 }
 \value{
-InputPROSAIL
+input_prosail
 }
 \description{
-generate InputPROSAIL, following
+generate input_prosail, following
 \itemize{
 \item either distribution defined in ATBD
 \item or distribution defined in user

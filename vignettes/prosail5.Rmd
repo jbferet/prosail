@@ -64,7 +64,7 @@ SpecATM_Sensor <- PropSensor$SpecATM_Sensor
 
 ```{r Apply_SRF_Reflectance}
 # WL is a vector giving central wavelength for each band in nanometer
-# FWHM is a vector giving FWHM for each band in nanometer
+# fwhm is a vector giving fwhm for each band in nanometer
 rsoil <- SpecSOIL_Sensor$Dry_Soil
 Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,
                        CHL = 40, CAR = 10, EWT = 0.01, ANT = 0, LMA = 0.01, 

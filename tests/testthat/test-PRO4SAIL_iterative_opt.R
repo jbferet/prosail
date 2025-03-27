@@ -7,31 +7,31 @@ test_that("PROSAIL iterative optimization", {
   Init <- data.frame('CHL' = 40, 'CAR' = 10, 'EWT' = 0.01, 'LMA' = 0.01,
                      'lai' = 3, 'N' = 1.5)
   # define parameters which are already set for inversion
-  ParmSet <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
+  parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
                         'LIDFa' = 60, 'ANT' = 0, 'BROWN' = 0, 'q' = 0.1)
   # compute soil reflectance
-  rsoil <- ParmSet$psoil*SpecSOIL$Dry_Soil+(1-ParmSet$psoil)*SpecSOIL$Wet_Soil
+  rsoil <- parm_set$psoil*SpecSOIL$Dry_Soil+(1-parm_set$psoil)*SpecSOIL$Wet_Soil
   # simulate canopy BRF with 1 nm sampling
   truth <- data.frame('CHL' = 60, 'CAR' = 8, 'EWT' = 0.015, 'LMA' = 0.005,
                       'lai' = 5,  'N' = 1.8)
   Refl_1nm <- PRO4SAIL(N = truth$N, CHL = truth$CHL, CAR = truth$CAR,
-                       ANT = ParmSet$ANT, BROWN = ParmSet$BROWN, EWT = truth$EWT,
+                       ANT = parm_set$ANT, BROWN = parm_set$BROWN, EWT = truth$EWT,
                        LMA = truth$LMA, TypeLidf = 2, lai = truth$lai,
-                       q = ParmSet$q, LIDFa = ParmSet$LIDFa, rsoil = rsoil,
-                       tts = ParmSet$tts, tto = ParmSet$tto, psi = ParmSet$psi)
+                       q = parm_set$q, LIDFa = parm_set$LIDFa, rsoil = rsoil,
+                       tts = parm_set$tts, tto = parm_set$tto, psi = parm_set$psi)
   brf_1nm <- prosail::compute_BRF(rdot = Refl_1nm$rdot,
                                   rsot = Refl_1nm$rsot,
-                                  tts = ParmSet$tts,
+                                  tts = parm_set$tts,
                                   SpecATM_Sensor = SpecATM)
   # invert 1 nm data
-  est <- invert_PROSAIL(brfMES = brf_1nm$BRF,
-                        InitialGuess = Init,
-                        LowerBound = LB,
-                        UpperBound = UB,
+  est <- invert_PROSAIL(brf_mes = brf_1nm$BRF,
+                        initialization = Init,
+                        lower_bound = LB,
+                        upper_bound = UB,
                         SpecPROSPECT_Sensor = SpecPROSPECT_FullRange,
                         SpecATM_Sensor = SpecATM,
                         SpecSOIL_Sensor = SpecSOIL,
-                        TypeLidf = 2, ParmSet = ParmSet)
+                        TypeLidf = 2, parm_set = parm_set)
 
   nerr <- list()
   for (parm in names(truth))

@@ -24,6 +24,6 @@ prepare_sensor_simulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
   SpecSensor <- list('SpecPROSPECT_Sensor' = SpecPROSPECT_Sensor,
                      'SpecATM_Sensor' = SpecATM_Sensor,
                      'SpecSOIL_Sensor' = SpecSOIL_Sensor,
-                     'BandNames' = SRF$Spectral_Bands)
+                     'band_names' = SRF$Spectral_Bands)
   return(SpecSensor)
 }

@@ -20,7 +20,7 @@ get_S2geometry_from_SAFE <- function(s2xml){
     SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,
                                      split = ' ')[[1]]))
   }
-  SZA <- stats::na.omit(SZA)
+  # SZA <- stats::na.omit(SZA)
 
   # SAA
   Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
@@ -29,7 +29,7 @@ get_S2geometry_from_SAFE <- function(s2xml){
     SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,
                                      split = ' ')[[1]]))
   }
-  SAA <- stats::na.omit(SAA)
+  # SAA <- stats::na.omit(SAA)
 
   # VZA
   VZA <- c()
@@ -41,7 +41,7 @@ get_S2geometry_from_SAFE <- function(s2xml){
                                        split = ' ')[[1]]))
     }
   }
-  VZA <- stats::na.omit(VZA)
+  # VZA <- stats::na.omit(VZA)
 
   # VAA
   VAA <- c()
@@ -53,6 +53,6 @@ get_S2geometry_from_SAFE <- function(s2xml){
                                        split = ' ')[[1]]))
     }
   }
-  VAA <- stats::na.omit(VAA)
+  # VAA <- stats::na.omit(VAA)
   return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
 }

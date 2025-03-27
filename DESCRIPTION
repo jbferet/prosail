@@ -1,6 +1,6 @@
 Package: prosail
 Title: PROSAIL leaf and canopy radiative transfer model and inversion routines
-Version: 2.5.10
+Version: 3.0.0
 Authors@R: c(person(given = "Jean-Baptiste", 
 					    family = "Feret", 
 					    email = "jb.feret@teledetection.fr", 
@@ -13,8 +13,8 @@ Authors@R: c(person(given = "Jean-Baptiste",
 					    comment = c(ORCID = "0000-0002-2185-9952")))
 Description: The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
               It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.
-License: GPL-3
-Depends: R (>= 3.5.0)
+License: MIT + file LICENSE
+Depends: R (>= 4.4.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -2,21 +2,20 @@
 % Please edit documentation in R/generate_LUT_BRF.R
 \name{generate_LUT_BRF}
 \alias{generate_LUT_BRF}
-\title{This function generates a LUT of BRF based on a table of input variables for
-PRO4SAIL model}
+\title{generates a LUT of BRF based on a table of input variables for PRO4SAIL model}
 \usage{
 generate_LUT_BRF(
-  InputPROSAIL,
+  input_prosail,
   SpecPROSPECT,
   SpecSOIL,
   SpecATM,
-  BandNames = NULL,
+  band_names = NULL,
   SAILversion = "4SAIL",
-  BrownLOP = NULL
+  brown_lop = NULL
 )
 }
 \arguments{
-\item{InputPROSAIL}{list. PROSAIL input variables}
+\item{input_prosail}{list. PROSAIL input variables}
 
 \item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
 
@@ -26,20 +25,19 @@ soil sample if the psoil parameter is not inverted}
 \item{SpecATM}{list. Includes direct and diffuse radiation for
 clear conditions}
 
-\item{BandNames}{character. Name of the spectral bands of the sensor}
+\item{band_names}{character. Name of the spectral bands of the sensor}
 
 \item{SAILversion}{character. choose between 4SAIL and 4SAIL2}
 
-\item{BrownLOP}{list. Defines optical properties for brown vegetation
+\item{brown_lop}{list. Defines optical properties for brown vegetation
 \itemize{
 \item WVL, Reflectance, Transmittance
 \item Set to NULL if use PROSPECT to generate it
 }}
 }
 \value{
-BRF_LUT numeric. matrix of BRF corresponding to InputPROSAIL
+BRF_LUT numeric. matrix of BRF corresponding to input_prosail
 }
 \description{
-This function generates a LUT of BRF based on a table of input variables for
-PRO4SAIL model
+generates a LUT of BRF based on a table of input variables for PRO4SAIL model
 }

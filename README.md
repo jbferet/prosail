@@ -2,7 +2,7 @@
 
 # An R package for the simulation of canopy reflectance using the model PROSAIL (PROSPECT+SAIL).
 
-[![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)](https://www.r-project.org/Licenses/GPL-3)
+[![licence](https://img.shields.io/badge/Licence-MIT-blue.svg)](https://www.r-project.org/Licenses/MIT)
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
 
 # 1 Requirements
@@ -83,7 +83,7 @@ A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articl
 
 This research was supported by the Agence Nationale de la Recherche ([ANR](https://anr.fr/en/open-calls-and-preannouncements/), France) through the young researchers project **BioCop** (ANR-17-CE32-0001)
 
-We thank [Ingo Steinwart](ingo.steinwart@mathematik.uni-stuttgart.de) and [Philipp Thomann](philipp.thomann@mathematik.uni-stuttgart.de) (nstitute for Stochastics and Applications, University of Stuttgart, Germany) for the development of the package `liquidSVM`.
+We thank [Ingo Steinwart](ingo.steinwart@mathematik.uni-stuttgart.de) and [Philipp Thomann](philipp.thomann@mathematik.uni-stuttgart.de) (Institute for Stochastics and Applications, University of Stuttgart, Germany) for the development of the package `liquidSVM`.
 
 
 # 5 Citation

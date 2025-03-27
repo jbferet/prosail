@@ -1,9 +1,9 @@
 #' This function trains a support vector regression for a set of variables based on spectral data
 #'
 #' @param BRF_LUT numeric. LUT of BRF used for training
-#' @param InputVar numeric. biophysical parameter corresponding to reflectance
-#' @param nbEnsemble numeric. nb of individual subsets generated from BRF_LUT
-#' @param WithReplacement Boolean. subsets generated with / without replacement
+#' @param input_variables numeric. biophysical parameter corresponding to reflectance
+#' @param nb_bagg numeric. nb of individual subsets generated from BRF_LUT
+#' @param replacement Boolean. subsets generated with / without replacement
 #' @param method character. which machine learning regression method used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package
 #' also implemented. More to come
@@ -12,7 +12,7 @@
 #' @param progressBar boolean. should progressbar be displayed?
 #'
 #' @return modelsMLR list. ML regression models trained for the retrieval of
-#' InputVar based on BRF_LUT
+#' input_variables based on BRF_LUT
 #' @importFrom stats predict
 #' @importFrom progress progress_bar
 #' @importFrom simsalapar tryCatch.W.E
@@ -21,25 +21,25 @@
 #' @importFrom stringr str_split
 #' @export
 
-PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
-                                 WithReplacement = FALSE, method = 'liquidSVM',
+PROSAIL_Hybrid_Train <- function(BRF_LUT, input_variables, nb_bagg = 20,
+                                 replacement = FALSE, method = 'liquidSVM',
                                  verbose = FALSE, progressBar = FALSE){
 
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
-  # split the LUT into nbEnsemble subsets
-  nbSamples <- length(InputVar)
-  if (dim(BRF_LUT)[2]==nbSamples)
+  # split the LUT into nb_bagg subsets
+  nb_samples <- length(input_variables)
+  if (dim(BRF_LUT)[2]==nb_samples)
     BRF_LUT <- t(BRF_LUT)
   # if subsets are generated from BRF_LUT with replacement
-  if (WithReplacement==TRUE){
+  if (replacement==TRUE){
     Subsets <- list()
-    samples_per_run <- round(nbSamples/nbEnsemble)
-    for (run in seq_len(nbEnsemble))
-      Subsets[[run]] <- sample(seq_len(nbSamples), samples_per_run,
+    samples_per_run <- round(nb_samples/nb_bagg)
+    for (run in seq_len(nb_bagg))
+      Subsets[[run]] <- sample(seq_len(nb_samples), samples_per_run,
                                replace = TRUE)
     # if subsets are generated from BRF_LUT without replacement
-  } else if (WithReplacement==FALSE){
-    Subsets <- split(sample(seq_len(nbSamples)),seq_len(nbEnsemble))
+  } else if (replacement==FALSE){
+    Subsets <- split(sample(seq_len(nb_samples)),seq_len(nb_bagg))
   }
 
   # run training for each subset
@@ -47,14 +47,14 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
 
   if (progressBar == TRUE){
     pb <- progress_bar$new(
-      format = "Training SVR on subsets [:bar] :percent in :elapsedfull , eta = :eta",
-      total = nbEnsemble, clear = FALSE, width= 100)
+      format = "Training SVR [:bar] :percent in :elapsedfull , eta = :eta",
+      total = nb_bagg, clear = FALSE, width= 100)
   }
   BRF_LUT <- data.frame(BRF_LUT)
-  for (i in seq_len(nbEnsemble)){
+  for (i in seq_len(nb_bagg)){
     TrainingSet <- list()
     TrainingSet$X <- BRF_LUT %>% dplyr::slice(Subsets[i][[1]])
-    TrainingSet$Y <- InputVar[Subsets[i][[1]]]
+    TrainingSet$Y <- input_variables[Subsets[i][[1]]]
 
     # if using caret
     control <- caret::trainControl(method="cv", number = 5)
@@ -79,7 +79,7 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
                                         pattern = 'lambda=')[[1]][2]
         if (!is.na(as.numeric(ValGamma))){
           if (verbose==TRUE)
-            { message('Adjusting Gamma accordingly')}
+          { message('Adjusting Gamma accordingly')}
           ValGamma <- as.numeric(ValGamma)
           tunedModel <- liquidSVM::svmRegression(TrainingSet$X,
                                                  TrainingSet$Y,

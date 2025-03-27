@@ -1,7 +1,7 @@
 #' PROSAIL simulation based on a set of combinations of input parameters
 #' @param Spec_Sensor list. Includes optical constants required for PROSPECT
 #' refractive index, specific absorption coefficients and spectral bands
-#' @param Input_PROSPECT  list. PROSPECT input variables
+#' @param input_prospect  list. PROSPECT input variables
 #' @param N numeric. Leaf structure parameter
 #' @param CHL numeric. Chlorophyll content (microg.cm-2)
 #' @param CAR numeric. Carotenoid content (microg.cm-2)
@@ -32,7 +32,7 @@
 #' @param Zeta numeric. Tree shape factor
 #' = ratio of crown diameter to crown height
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
-#' @param BrownLOP dataframe. optical properties for brown vegetation
+#' @param brown_lop dataframe. optical properties for brown vegetation
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
@@ -43,32 +43,32 @@
 #' rddt: bi-hemispherical reflectance factor
 #' @import prospect
 #' @export
-PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL, N = 1.5,
+PRO4SAIL <- function(Spec_Sensor = NULL, input_prospect = NULL, N = 1.5,
                      CHL = 40.0, CAR = 8.0, ANT = 0.0, BROWN = 0.0, EWT = 0.01,
                      LMA = NULL, PROT = 0.0, CBC = 0.0, alpha = 40.0,
                      TypeLidf = 2, LIDFa = 60, LIDFb = NULL, lai = 3,
                      q = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
                      fraction_brown = 0.0, diss = 0.0, Cv = 1, Zeta = 1,
-                     SAILversion = '4SAIL', BrownLOP = NULL){
+                     SAILversion = '4SAIL', brown_lop = NULL){
 
   if (is.null(Spec_Sensor)) Spec_Sensor <- prospect::SpecPROSPECT_FullRange
   if (is.null(rsoil)) rsoil <- prosail::SpecSOIL$Dry_Soil
   #	PROSPECT: LEAF OPTICAL PROPERTIES
   LOP <- adjust_PROSPECT_2_SAIL(SAILversion = SAILversion,
                                 Spec_Sensor = Spec_Sensor,
-                                Input_PROSPECT = Input_PROSPECT,
+                                input_prospect = input_prospect,
                                 CHL = CHL, CAR = CAR, ANT = ANT, BROWN = BROWN,
                                 EWT = EWT, LMA = LMA, PROT = PROT, CBC = CBC,
-                                N = N, alpha = alpha, BrownLOP = BrownLOP,
+                                N = N, alpha = alpha, brown_lop = brown_lop,
                                 fraction_brown = fraction_brown)
   #	SAIL: CANOPY REFLECTANCE
   if (SAILversion == '4SAIL'){
-    Ref <- fourSAIL(LeafOptics = LOP$GreenLOP,
+    Ref <- fourSAIL(lop = LOP$green_lop,
                     TypeLidf = TypeLidf, LIDFa = LIDFa, LIDFb = LIDFb,
                     lai = lai, q = q, tts = tts, tto = tto, psi = psi,
                     rsoil = rsoil)
   } else if (SAILversion == '4SAIL2'){
-    Ref <- fourSAIL2(leafgreen = LOP$GreenLOP, leafbrown = LOP$BrownLOP,
+    Ref <- fourSAIL2(leaf_green = LOP$green_lop, leaf_brown = LOP$brown_lop,
                      TypeLidf = TypeLidf, LIDFa = LIDFa, LIDFb = LIDFb,
                      lai = lai, q = q, tts = tts, tto = tto, psi = psi,
                      rsoil = rsoil, fraction_brown = fraction_brown,

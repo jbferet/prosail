@@ -15,7 +15,8 @@
 #' @return list. tdd, rdd, tsd, rsd, tdo, rdo, rsod
 #'
 #' @export
-conservative_scattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
+conservative_scattering <- function(m, lai, att, sigb, ks, ko, sf, sb, vf, vb,
+                                    tss, too){
 
   # Near or complete conservative scattering
   J4 <- Jfunc4(m,lai)
@@ -28,21 +29,20 @@ conservative_scattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
 
   dns <- ks*ks-m*m
   dno <- ko*ko-m*m
-  cks <- (sb*(ks-att)-sf*sigb)/dns
-  cko <- (vb*(ko-att)-vf*sigb)/dno
-  dks <- (-sf*(ks+att)-sb*sigb)/dns
-  dko <- (-vf*(ko+att)-vb*sigb)/dno
+  cks <- (sb*(ks-att) - sf*sigb)/dns
+  cko <- (vb*(ko-att) - vf*sigb)/dno
+  dks <- (-sf*(ks+att) - sb*sigb)/dns
+  dko <- (-vf*(ko+att) - vb*sigb)/dno
   ho <- (sf*cko+sb*dko)/(ko+ks)
 
-  rsd <- cks*(1-tss*tdd)-dks*rdd
-  rdo <- cko*(1-too*tdd)-dko*rdd
-  tsd <- dks*(tss-tdd)-cks*tss*rdd
-  tdo <- dko*(too-tdd)-cko*too*rdd
+  rsd <- cks*(1-tss*tdd) - dks*rdd
+  rdo <- cko*(1-too*tdd) - dko*rdd
+  tsd <- dks*(tss-tdd) - cks*tss*rdd
+  tdo <- dko*(too-tdd) - cko*too*rdd
   # Multiple scattering contribution to bidirectional canopy reflectance
-  rsod <- ho*(1-tss*too)-cko*tsd*too-dko*rsd
+  rsod <- ho*(1-tss*too) - cko*tsd*too - dko*rsd
 
-  my_list <- list("tdd" = tdd, "rdd" = rdd, "tsd" = tsd,
-                  "rsd" = rsd, "tdo" = tdo, "rdo" = rdo,
-                  "rsod" = rsod)
+  my_list <- list("tdd" = tdd, "rdd" = rdd, "tsd" = tsd, "rsd" = rsd,
+                  "tdo" = tdo, "rdo" = rdo, "rsod" = rsod)
   return(my_list)
 }

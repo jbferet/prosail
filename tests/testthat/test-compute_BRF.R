@@ -7,11 +7,11 @@ test_that("PRO4AIL and PRO4SAIL2 produce physically possible BRF values", {
                            SpecATM_Sensor = prosail::SpecATM)
 
   # run PROSAIL with 4SAIL2
-  Input_PROSPECT <- data.frame('CHL' = c(40, 5), 'CAR' = c(8, 4),
+  input_prospect <- data.frame('CHL' = c(40, 5), 'CAR' = c(8, 4),
                                'ANT' = c(0.0, 1), 'EWT' = c(0.02, 0.01),
                                'LMA' = c(0.009, 0.009), 'N' = c(1.5, 2),
                                'BROWN' = c(0, 1))
-  Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2', Input_PROSPECT= Input_PROSPECT,
+  Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2', input_prospect= input_prospect,
                          TypeLidf = 2, LIDFa = 30, lai = 5, q = 0.1, tts = 30,
                          tto = 10, psi = 90, rsoil = prosail::SpecSOIL$Dry_Soil,
                          fraction_brown = 0.5, diss = 0.5, Cv = 1, Zeta = 1)

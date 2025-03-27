@@ -7,19 +7,15 @@
 merit_RMSE_PROSAIL(
   xinit,
   parms_xinit,
-  brfMES,
+  brf_mes,
   SpecPROSPECT_Sensor,
   SpecSOIL_Sensor,
   SpecATM_Sensor,
   Parms2Estimate,
-  Parm2Set,
-  ParmSet,
-  InVar,
+  input_prosail,
   TypeLidf,
-  PriorInfoMean = NULL,
-  PriorInfoSD = NULL,
-  Parms2Prior = NULL,
-  WeightPrior = 0.01
+  prior_info = NULL,
+  Parms2Prior = NULL
 )
 }
 \arguments{
@@ -27,7 +23,7 @@ merit_RMSE_PROSAIL(
 
 \item{parms_xinit}{character. name of parameters corresponding to xinit}
 
-\item{brfMES}{numeric. measured BRF}
+\item{brf_mes}{numeric. measured BRF}
 
 \item{SpecPROSPECT_Sensor}{list. Includes optical constants for PROSPECT}
 
@@ -40,21 +36,13 @@ refractive index, specific absorption coefs and corresponding spectral bands}
 \item{Parms2Estimate}{numeric. rank of variables to be inverted
 to be estimated through inversion}
 
-\item{Parm2Set}{numeric. rank of variables to be set out of inversion}
-
-\item{ParmSet}{list. value of variables to be set out of inversion}
-
-\item{InVar}{dataframe. full set of PROSAIL input variables}
+\item{input_prosail}{dataframe. full set of PROSAIL input variables}
 
 \item{TypeLidf}{numeric. type of leaf inclination distribution function}
 
-\item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
+\item{prior_info}{list. prior mean, sd & weight of parms defined as xprior}
 
-\item{PriorInfoSD}{list. prior SD of parameters defined as xprior}
-
-\item{Parms2Prior}{numeric. rank of parameters to be used with prior info}
-
-\item{WeightPrior}{numeric. Weight to be applied on prior information
+\item{Parms2Prior}{numeric. rank of parameters to be used with prior info
 to modulate its importance}
 }
 \value{

@@ -24,8 +24,7 @@ compute_BRF  <- function(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL){
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
   if (is.null(skyl))
-    skyl <- 0.847 - 1.61*sin((90-tts)*rd) +
-    1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
+    skyl <- 0.847-1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
   PARdiro <- (1-skyl)*Es
   PARdifo <- skyl*Ed
   BRF <- (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)

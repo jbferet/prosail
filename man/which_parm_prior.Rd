@@ -4,12 +4,12 @@
 \alias{which_parm_prior}
 \title{function identifying for which parameters prior information is known}
 \usage{
-which_parm_prior(PriorInfoMean, PriorInfoSD)
+which_parm_prior(prior_mean, prior_sd)
 }
 \arguments{
-\item{PriorInfoMean}{list. mean value expected for a list of parameters}
+\item{prior_mean}{list. mean value expected for a list of parameters}
 
-\item{PriorInfoSD}{list. dtandard deviation to the mean expected for a list
+\item{prior_sd}{list. standard deviation expected for a list
 of parameters}
 }
 \value{

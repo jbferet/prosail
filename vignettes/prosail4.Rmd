@@ -40,10 +40,13 @@ Barrax is a well-studied area for remote sensing applications on crop monitoring
 A polygon corresponding to the study area can be downloaded from a repository. 
 
 ```{r identify_S2_product}
+# libraries
+library(preprocS2)
+library(sf)
 # define bounding box for area of interest
-aoi_bbox <- sf::st_bbox(obj = c('xmin' = -2.25, 'ymin' = 38.94, 
-                                'xmax' = -1.73, 'ymax' = 39.22))
-sf::st_crs(x = aoi_bbox) <- 4326
+aoi_bbox <- sf::st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
+                                'xmax' = 582995, 'ymax' = 4331253))
+aoi <- preprocS2::bbox_to_poly(aoi_bbox, crs = 32630)
 ```
 
 [Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) 
@@ -58,9 +61,20 @@ The default STAC collection is `sentinel-2-l2a` from the Planetary computer
 catalog.
 
 Optionally, `preprocS2` can download the geometry of acquisition corresponding 
-to the S2 acquisition.
+to the S2 acquisition by setting `geomAcq = T` and providing authentication to 
+the [CDSE](https://dataspace.copernicus.eu/analyse/apis).
+
+Authentication for CDSE should be obtained by activating an OAuth clients ID, 
+following [`this link`](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings). 
+Please make sure you copy the password related to your OAuth clients ID as you 
+will not be able to access it once you close the page.
+
 Access to geometry of acquisition is provided by the package 
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
+
+Make sure you follow the procedure described in the `preprocS2` installation doc 
+to save credentials for CDSE
+
 
 ```{r download_S2_product}
 # library
@@ -69,27 +83,21 @@ library(sf)
 
 # 1- define input & output directories
 output_dir_s2 <- './S2_images'
-dir.create(path = output_dir, showWarnings = FALSE, recursive = TRUE)
-datetime <- as.Date('2021-05-13')
+dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
+datetime <- '2021-05-13'
 # save aoi as vector file
-path_bbox <- 'aoi_bbox.GPKG'
-sf::st_write(obj = preprocS2::bbox_to_poly(aoi_bbox), 
-             dsn = path_bbox, driver = 'GPKG')
+path_aoi <- 'barrax_aoi.GPKG'
+sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
 
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
 
 # 3- get S2 acquisition and geometry of acquisition for study area
-# https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings
-id <- "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-secret <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-authentication <- list('id' = id, 'pwd' = secret)
-
-list_files <- get_s2_raster(bbox = aoi_bbox, datetime = datetime, 
+list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
                             output_dir = output_dir_s2, 
                             path_S2tilinggrid = path_S2tilinggrid, 
                             siteName = 'Barrax', overwrite = FALSE, 
-                            geomAcq = TRUE,  authentication = authentication)
+                            geomAcq = TRUE)
 # Sentinel-2 L2A reflectance
 Refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
@@ -99,6 +107,14 @@ SCL <- list_files$provider_mask
 # Sentinel-2 geometry of acquisition (if requested from CDSE)
 geometryAcquisition <- list_files$geometryAcquisition
 ```
+
+The RGB representation of the Sentinel-2 acquisition is displayed below. 
+<p>
+
+<img src="../man/figures/S2/SiteRGB.png" width="100%" height="100%" class="center">
+
+</p>
+
 
 # Training and application of hybrid inversion model 
 
@@ -114,26 +130,26 @@ See [previous tutorial](https://jbferet.gitlab.io/prosail/articles/prosail3.html
 for detailed procedure. 
 
 The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to 
-speed up the application of the inversion on large rasters if needed. 
-
+handle inversion over large rasters if needed, but may be more time consuming 
+over smaller raster data. 
 ```{r Hybrid_Inversion}
 library(prosail)
 output_dir_BP <- './PROSAIL'
 dir.create(path = output_dir_BP, showWarnings = FALSE,recursive = TRUE)
 # get sensor response for Sentinel-2
-SensorName <- 'Sentinel_2'
-SRF <- get_radiometry(SensorName)
+sensor_name <- 'Sentinel_2'
+SRF <- get_radiometry(sensor_name)
 
 # define parameters to estimate
 Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
-S2BandSelect <- Bands2Select <- list()
-for (parm in Parms2Estimate){
-  S2BandSelect[[parm]] <- c('B3','B4','B5','B6','B7','B8','B11','B12')
-  Bands2Select[[parm]] <- match(S2BandSelect[[parm]],SRF$Spectral_Bands)
-}
-ImgBandNames <- SRF$Spectral_Bands
+S2BandSel <- list('lai' = c('B3','B4','B8'), 'fCover' = c('B3','B4','B8'), 
+                  'fAPAR' = c('B3','B4','B8'), 'CHL' = c('B3','B4','B5','B6','B7','B8'), 
+                  'EWT' = c('B8A','B11','B12'), 'LMA' = c('B8A','B11','B12'))
+Bands2Select <- list()
+for (parm in Parms2Estimate)
+  Bands2Select[[parm]] <- match(S2BandSel[[parm]], SRF$Spectral_Bands)
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
@@ -156,26 +172,53 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     atbd = TRUE, GeomAcq = GeomAcq, 
                                     SRF = SRF, 
                                     Bands2Select = Bands2Select, 
-                                    Path_Results = PROSAIL_ResPath, 
+                                    output_dir = output_dir_BP, 
                                     method = 'liquidSVM')
 
 # apply regression model on Sentinel-2 raster data
 # bigRaster = F by default. Do not mention it if the package is not installed
-# S2 imagery is provided with refl defined as integer between 0 and 10000
-# Adapt MultiplyingFactor if not the case 
-# MultiplyingFactor = 1 if reflectance defined between 0 and 1
-BPvars <- apply_prosail_inversion(raster_path = Refl_path, 
+# Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
+# Adapt multiplying_factor if not the case 
+# multiplying_factor = 1 if reflectance defined between 0 and 1
+BPvars <- apply_prosail_inversion(raster_path = Refl_L2A, 
                                   HybridModel = modelSVR, 
-                                  PathOut = PROSAIL_ResPath,
-                                  SelectedBands = S2BandSelect, 
-                                  bandname = ImgBandNames, 
-                                  MaskRaster = Cloud_File, 
-                                  bigRaster = T, 
-                                  MultiplyingFactor = 10000)
+                                  output_path = PROSAIL_ResPath,
+                                  selected_bands = S2BandSelect, 
+                                  bandname = SRF$Spectral_Bands, 
+                                  mask_path = vegetation_mask, 
+                                  multiplying_factor = 10000)
 ```
 
 
 Assessed biophysical properties computed with `apply_prosail_inversion` are then 
 saved as individual raster files. 
 For each biophysical variable, the mean value and standard deviation defined by 
-the input variable `nbModels` from `modelSVR` (default = 20 models) is saved.
+the input variable `nb_models` from `modelSVR` (default = 20 models) is saved.
+
+The biophysical variables `CHL`, `lai`, `fAPAR` and `fCover` are displayed 
+below:
+
+<p float="left">
+  <img src="../man/figures/S2/CHL.png" width="50%" />
+  <img src="../man/figures/S2/lai.png" width="50%" />
+</p>
+<p float="left">
+  <img src="../man/figures/S2/fAPAR.png" width="50%" />
+  <img src="../man/figures/S2/fCover.png" width="50%" />
+</p>
+
+
+# Comparison with SNAP outputs 
+
+The LAI, fAPAR and fCover are compared with the values produced with the 
+Biophysical Processor of the SNAP toolbox over the same acquisition
+The comparison is diplayed in the figure below. 
+It shows that the two implementations provides consistent estimation for these 
+variables when following the ATBD sampling strategy for the training samples, 
+despite the differences in terms of machine learning algorithm. 
+
+<p>
+
+<img src="../man/figures/Hybrid_Inversion/compare_SNAP_prosail.png" width="100%" height="100%" class="center">
+
+</p>

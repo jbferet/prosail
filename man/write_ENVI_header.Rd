@@ -4,12 +4,12 @@
 \alias{write_ENVI_header}
 \title{writes ENVI hdr file}
 \usage{
-write_ENVI_header(HDR, HDRpath)
+write_ENVI_header(HDR, hdr_path)
 }
 \arguments{
 \item{HDR}{content to be written}
 
-\item{HDRpath}{Path of the hdr file}
+\item{hdr_path}{Path of the hdr file}
 }
 \value{
 None

@@ -6,7 +6,7 @@
 input parameters}
 \usage{
 fourSAIL(
-  LeafOptics,
+  lop,
   TypeLidf = 2,
   LIDFa = 60,
   LIDFb = NULL,
@@ -19,7 +19,7 @@ fourSAIL(
 )
 }
 \arguments{
-\item{LeafOptics}{list. Includes leaf optical properties
+\item{lop}{list. leaf optical properties
 (reflectance and transmittance) and corresponding spectral bands}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}

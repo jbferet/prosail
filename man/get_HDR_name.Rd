@@ -4,10 +4,10 @@
 \alias{get_HDR_name}
 \title{get hdr name from image file name, assuming it is BIL format}
 \usage{
-get_HDR_name(ImPath)
+get_HDR_name(image_path)
 }
 \arguments{
-\item{ImPath}{path of the image}
+\item{image_path}{path of the image}
 }
 \value{
 corresponding hdr

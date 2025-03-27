@@ -8,8 +8,8 @@ parameters in PRO4SAIL}
 get_distribution_input_prosail(
   minval = NULL,
   maxval = NULL,
-  ParmSet = NULL,
-  nbSamples = 2000,
+  parm_set = NULL,
+  nb_samples = 2000,
   TypeDistrib = NULL,
   Mean = NULL,
   Std = NULL
@@ -20,9 +20,9 @@ get_distribution_input_prosail(
 
 \item{maxval}{list. maximum value for a list of parameters randomly produced}
 
-\item{ParmSet}{list. parameters to be set to a given value}
+\item{parm_set}{list. parameters to be set to a given value}
 
-\item{nbSamples}{numeric. Number of samples to be generated}
+\item{nb_samples}{numeric. Number of samples to be generated}
 
 \item{TypeDistrib}{list. uniform/Gaussian distribution to be applied.}
 
@@ -31,7 +31,7 @@ get_distribution_input_prosail(
 \item{Std}{list. standard deviation for parameters with Gaussian distribution}
 }
 \value{
-InputPROSAIL list. list of nbSamples input parameters for
+input_prosail list. list of nb_samples input parameters for
 PRO4SAIL simulation
 }
 \description{

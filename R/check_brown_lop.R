@@ -1,26 +1,26 @@
 #' check if brown leaf optical properties are correctly defined
 #'
-#' @param BrownLOP dataframe. should include wvl, Reflectance & Transmittance
+#' @param brown_lop dataframe. should include wvl, Reflectance & Transmittance
 #' @param lambda numeric. spectral bands corresponding to data to simulate
-#' @param Input_PROSPECT dataframe. includes all prospect input parameters
+#' @param input_prospect dataframe. includes all prospect input parameters
 #'
 #' @return invisible
 #' @export
 
-check_brown_lop <- function(BrownLOP, lambda, Input_PROSPECT){
-  if  (!'Reflectance' %in%names(BrownLOP) |
-       !'Transmittance' %in%names(BrownLOP) |
-       !'wvl' %in%names(BrownLOP)){
-    message('BrownLOP must include "wvl", "Reflectance" and "Transmittance"')
+check_brown_lop <- function(brown_lop, lambda, input_prospect){
+  if  (!'Reflectance' %in%names(brown_lop) |
+       !'Transmittance' %in%names(brown_lop) |
+       !'wvl' %in%names(brown_lop)){
+    message('brown_lop must include "wvl", "Reflectance" and "Transmittance"')
     stop()
   }
   # spectral domain for brown vegetation matching input optical domain
-  if (length(setdiff(lambda, BrownLOP$wvl))>0){
-    message('Same spectral domain expected for BrownLOP & SpecPROSPECT')
+  if (length(setdiff(lambda, brown_lop$wvl))>0){
+    message('Same spectral domain expected for brown_lop & SpecPROSPECT')
     stop()
   }
-  if (dim(Input_PROSPECT)[1]>1){
-    message('BrownLOP defined along with multiple leaf chemical properties')
-    message('Only first set of leaf chemical properties will be used to simulate green vegetation')
+  if (dim(input_prospect)[1]>1){
+    message('brown_lop defined along with multiple leaf chemical properties')
+    message('green vegetation simulated with first set of leaf chemical traits')
   }
 }

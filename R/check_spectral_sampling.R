@@ -15,15 +15,15 @@ check_spectral_sampling <- function(SpecPROSPECT, SpecSOIL, SpecATM){
 
   if (!length(l1)==length(l2) | !length(l1)==length(l3) |
       !length(l3)==length(l2)){
-    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    message('matching spectral sampling required: SpecPROSPECT, SpecSOIL, SpecATM')
     stop()
   } else if (length(unique(l1-l2))>1 | length(unique(l1-l3))>1 |
              length(unique(l3-l2))>1) {
-    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    message('matching spectral sampling required: SpecPROSPECT, SpecSOIL, SpecATM')
     stop()
   } else if (!unique(l1-l2)==0 | !unique(l1-l3)==0 |
              !unique(l3-l2)==0){
-    message('Please ensure matching spectral sampling between SpecPROSPECT, SpecSOIL and SpecATM')
+    message('matching spectral sampling required: SpecPROSPECT, SpecSOIL, SpecATM')
     stop()
   }
   return(invisible())

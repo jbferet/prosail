@@ -1,3 +1,14 @@
+# prosail v3.0.0
+
+prepare for JOSS submission
+
+## changes
+- license MIT
+- function names more compliant with standards when not critical (lowercase)
+- input variable names more compliant with standards (lowercase)
+- update vignettes
+
+
 # prosail v2.5.10
 
 ## addition

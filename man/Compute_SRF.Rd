@@ -2,23 +2,23 @@
 % Please edit documentation in R/compute_SRF.R
 \name{compute_SRF}
 \alias{compute_SRF}
-\title{Computes spectral response function based on wavelength and FWHM
+\title{Computes spectral response function based on wavelength and fwhm
 characteristics}
 \usage{
-compute_SRF(wvl, FWHM, SensorName = "Custom")
+compute_SRF(wvl, fwhm, sensor_name = "Custom")
 }
 \arguments{
 \item{wvl}{numeric. spectral sampling of the sensor}
 
-\item{FWHM}{numeric. Full Width Half Maximum for each spectral band}
+\item{fwhm}{numeric. Full Width Half Maximum for each spectral band}
 
-\item{SensorName}{character. sensor name}
+\item{sensor_name}{character. sensor name}
 }
 \value{
 SRF list. spectral response, sensor Spectral Bands & Original Bands
 for which SRF is defined
 }
 \description{
-Computes spectral response function based on wavelength and FWHM
+Computes spectral response function based on wavelength and fwhm
 characteristics
 }

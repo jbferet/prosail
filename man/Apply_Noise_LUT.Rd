@@ -4,15 +4,15 @@
 \alias{apply_noise_lut}
 \title{This function applied noise on a matrix}
 \usage{
-apply_noise_lut(LUT, NoiseLevel, NoiseType = "relative")
+apply_noise_lut(LUT, noise_level = 0, noise_type = "relative")
 }
 \arguments{
 \item{LUT}{numeric. Matrix including data to add noise to}
 
-\item{NoiseLevel}{numeric. value of the normal noise proportional to LUT to
+\item{noise_level}{numeric. value of the normal noise proportional to LUT to
 apply on LUT}
 
-\item{NoiseType}{character.
+\item{noise_type}{character.
 \itemize{
 \item relative: noise proportional to actual value to add noise to
 \item absolute: noise not proportional to actual value to add noise to

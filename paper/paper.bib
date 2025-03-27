@@ -1,3 +1,33 @@
+@Article{berger2018,
+AUTHOR = {Berger, Katja and Atzberger, Clement and Danner, Martin and D’Urso, Guido and Mauser, Wolfram and Vuolo, Francesco and Hank, Tobias},
+TITLE = {Evaluation of the PROSAIL Model Capabilities for Future Hyperspectral Model Environments: A Review Study},
+JOURNAL = {Remote Sensing},
+VOLUME = {10},
+YEAR = {2018},
+NUMBER = {1},
+ARTICLE-NUMBER = {85},
+URL = {https://www.mdpi.com/2072-4292/10/1/85},
+ISSN = {2072-4292},
+ABSTRACT = {Upcoming satellite hyperspectral sensors require powerful and robust methodologies for making optimum use of the rich spectral data. This paper reviews the widely applied coupled PROSPECT and SAIL radiative transfer models (PROSAIL), regarding their suitability for the retrieval of biophysical and biochemical variables in the context of agricultural crop monitoring. Evaluation was carried out using a systematic literature review of 281 scientific publications with regard to their (i) spectral exploitation, (ii) vegetation type analyzed, (iii) variables retrieved, and (iv) choice of retrieval methods. From the analysis, current trends were derived, and problems identified and discussed. Our analysis clearly shows that the PROSAIL model is well suited for the analysis of imaging spectrometer data from future satellite missions and that the model should be integrated in appropriate software tools that are being developed in this context for agricultural applications. The review supports the decision of potential users to employ PROSAIL for their specific data analysis and provides guidelines for choosing between the diverse retrieval techniques.},
+DOI = {10.3390/rs10010085}
+}
+
+@article{breon2002,
+author = {Bréon, Francois-Marie and Maignan, Fabienne and Leroy, Marc and Grant, Ian},
+title = {Analysis of hot spot directional signatures measured from space},
+journal = {Journal of Geophysical Research: Atmospheres},
+volume = {107},
+number = {D16},
+pages = {AAC 1-1-AAC 1-15},
+keywords = {hot spot, POLDER, backscattering},
+doi = {https://doi.org/10.1029/2001JD001094},
+url = {https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2001JD001094},
+eprint = {https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2001JD001094},
+abstract = {Reflectance measurements from the spaceborne Polarization and Directionality of Earth Reflectances (POLDER) instrument are used to analyze the so-called hot spot directional signature in the backscattering direction. The hot spot is measured with an angular resolution better than half a degree using the directional capabilities of the radiometer, with some assumptions on the spatial homogeneity of the surface. The analysis yields the first quantitative observation of the hot spot signature of vegetated surfaces, with such angular resolution. The measurements show that the hot spot reflectance is a function of the phase angle ξ rather than a function of a parameter Δ, often used in hot spot modeling, that quantifies the horizontal distance between Sun and view directions. The observed directional signature is very accurately fitted by a linear ratio of the phase angle, as predicted by a simple theory of radiative transfer within the canopy foliage. Most of the measured hot spot half widths are between 1° and 2°. Some dispersion occurs for the cases belonging to the forest and desert International Geosphere-Biosphere Program (IGBP) classes, in the range 1° to 5°. Theory predicts that the width is independent of wavelength. Our measurements indicate that the widths at 670 and 865 nm are very close, but with a significant scatter in regards to the rather small variability. The distribution of the width as a function of the IGBP surface classification shows a variability within the classes that is larger than between the classes, except for the “evergreen broadleaf” class. The hot spot reflectance amplitude is generally on the order of 0.10–0.20 at 865 nm and 0.03–0.18 at 670 nm, although the full range of values is wider. For thick canopies, it may be interpreted in terms of foliage element (leaf) reflectance. Retrieved values are on the order of 0.4 in the near infrared and in the range 0.05–0.20 at 670 nm. At 440 nm, the amplitude of the signature is very small, as is expected from the small surface reflectance. This confirms that the atmospheric contribution to the reflectance increase at the backscattering direction is negligible.},
+year = {2002}
+}
+
+
 @article{campbell1990,
 title = {Derivation of an angle density function for canopies with ellipsoidal leaf angle distributions},
 journal = {Agricultural and Forest Meteorology},
@@ -43,6 +73,20 @@ abstract = {Estimation of canopy biophysical variables from remote sensing data 
 	pages = {204--215},
 }
 
+@article{feret2019,
+title = {Estimating leaf mass per area and equivalent water thickness based on leaf optical properties: Potential and limitations of physical modeling and machine learning},
+journal = {Remote Sensing of Environment},
+volume = {231},
+pages = {110959},
+year = {2019},
+issn = {0034-4257},
+doi = {https://doi.org/10.1016/j.rse.2018.11.002},
+url = {https://www.sciencedirect.com/science/article/pii/S0034425718305030},
+author = {J.-B. Féret and G. {le Maire} and S. Jay and D. Berveiller and R. Bendoula and G. Hmimina and A. Cheraiet and J.C. Oliveira and F.J. Ponzoni and T. Solanki and F. {de Boissieu} and J. Chave and Y. Nouvellon and A. Porcar-Castell and C. Proisy and K. Soudani and J.-P. Gastellu-Etchegorry and M.-J. Lefèvre-Fonollosa},
+keywords = {Biophysical properties, Leaf spectroscopy, EWT, LMA, Radiative transfer model, Support vector machine, Vegetation},
+abstract = {Leaf mass per area (LMA) and leaf equivalent water thickness (EWT) are key leaf functional traits providing information for many applications including ecosystem functioning modeling and fire risk management. In this paper, we investigate two common conclusions generally made for LMA and EWT estimation based on leaf optical properties in the near-infrared (NIR) and shortwave infrared (SWIR) domains: (1) physically-based approaches estimate EWT accurately and LMA poorly, while (2) statistically-based and machine learning (ML) methods provide accurate estimates of both LMA and EWT. Using six experimental datasets including broadleaf species samples of >150 species collected over tropical, temperate and boreal ecosystems, we compared the performances of a physically-based method (PROSPECT model inversion) and a ML algorithm (support vector machine regression, SVM) to infer EWT and LMA based on leaf reflectance and transmittance. We assessed several merit functions to invert PROSPECT based on iterative optimization and investigated the spectral domain to be used for optimal estimation of LMA and EWT. We also tested several strategies to select the training samples used by the SVM, in order to investigate the generalization ability of the derived regression models. We evidenced that using spectral information from 1700 to 2400 nm leads to strong improvement in the estimation of EWT and LMA when performing a PROSPECT inversion, decreasing the LMA and EWT estimation errors by 55% and 33%, respectively. The comparison of various sampling strategies for the training set used with SVM suggests that regression models show limited generalization ability, particularly when the regression model is applied on data fully independent from the training set. Finally, our results demonstrate that, when using an appropriate spectral domain, the PROSPECT inversion outperforms SVM trained with experimental data for the estimation of EWT and LMA. Thus we recommend that estimation of LMA and EWT based on leaf optical properties should be physically-based using inversion of reflectance and transmittance measurements on the 1700 to 2400 nm spectral range.}
+}
+
 @article{feret2021,
 	title = {{PROSPECT}-{PRO} for estimating content of nitrogen-containing leaf proteins and other carbon-based constituents},
 	volume = {252},
@@ -85,7 +129,7 @@ shortwave broadband albedo using a canopy radiative transfer model},
 }
 
 @Article{gastellu2015,
-AUTHOR = {Gastellu-Etchegorry, Jean-Philippe and Yin, Tiangang and Lauret, Nicolas and Cajgfinger, Thomas and Gregoire, Tristan and Grau, Eloi and Feret, Jean-Baptiste and Lopes, Maïlys and Guilleux, Jordan and Dedieu, Gérard and Malenovský, Zbyněk and Cook, Bruce Douglas and Morton, Douglas and Rubio, Jeremy and Durrieu, Sylvie and Cazanave, Gregory and Martin, Emmanuel and Ristorcelli, Thomas},
+AUTHOR = {Gastellu-Etchegorry, Jean-Philippe and Yin, Tiangang and Lauret, Nicolas and Cajgfinger, Thomas and Gregoire, Tristan and Grau, Eloi and Féret, Jean-Baptiste and Lopes, Maïlys and Guilleux, Jordan and Dedieu, Gérard and Malenovský, Zbyněk and Cook, Bruce Douglas and Morton, Douglas and Rubio, Jeremy and Durrieu, Sylvie and Cazanave, Gregory and Martin, Emmanuel and Ristorcelli, Thomas},
 TITLE = {Discrete Anisotropic Radiative Transfer (DART 5) for Modeling Airborne and Satellite Spectroradiometer and LIDAR Acquisitions of Natural and Urban Landscapes},
 JOURNAL = {Remote Sensing},
 VOLUME = {7},
@@ -113,6 +157,21 @@ DOI = {10.3390/rs70201667}
 	month = nov,
 	year = {1990},
 	pages = {75--91},
+}
+
+@article{jacquemoud2009,
+title = {PROSPECT+SAIL models: A review of use for vegetation characterization},
+journal = {Remote Sensing of Environment},
+volume = {113},
+pages = {S56-S66},
+year = {2009},
+note = {Imaging Spectroscopy Special Issue},
+issn = {0034-4257},
+doi = {https://doi.org/10.1016/j.rse.2008.01.026},
+url = {https://www.sciencedirect.com/science/article/pii/S0034425709000765},
+author = {Stéphane Jacquemoud and Wout Verhoef and Frédéric Baret and Cédric Bacour and Pablo J. Zarco-Tejada and Gregory P. Asner and Christophe François and Susan L. Ustin},
+keywords = {Vegetation, Canopy spectral and directional reflectance, Radiative transfer models, PROSPECT, SAIL, PROSAIL},
+abstract = {The combined PROSPECT leaf optical properties model and SAIL canopy bidirectional reflectance model, also referred to as PROSAIL, has been used for about sixteen years to study plant canopy spectral and directional reflectance in the solar domain. PROSAIL has also been used to develop new methods for retrieval of vegetation biophysical properties. It links the spectral variation of canopy reflectance, which is mainly related to leaf biochemical contents, with its directional variation, which is primarily related to canopy architecture and soil/vegetation contrast. This link is key to simultaneous estimation of canopy biophysical/structural variables for applications in agriculture, plant physiology, or ecology, at different scales. PROSAIL has become one of the most popular radiative transfer tools due to its ease of use, general robustness, and consistent validation by lab/field/space experiments over the years. However, PROSPECT and SAIL are still evolving: they have undergone recent improvements both at the leaf and the plant levels. This paper provides an extensive review of the PROSAIL developments in the context of canopy biophysics and radiative transfer modeling.}
 }
 
 @Inbook{kuusk1991,
@@ -156,6 +215,20 @@ url="https://doi.org/10.1007/978-3-642-75389-3_5"
   pages={1249-1259},
   keywords={Training;Artificial neural networks;Biological system modeling;Kernel;Ground penetrating radar;Remote sensing;Graphical user interfaces;Biophysical parameter retrieval;CHRIS;graphical user interface (GUI) toolbox;HyMap;leaf area index (LAI);leaf chlorophyll content (LCC);machine learning;nonparametric regression;Sentinel-2 (S2)},
   doi={10.1109/JSTARS.2014.2298752}}
+
+@article{spafford2021,
+title = {Spectral subdomains and prior estimation of leaf structure improves PROSPECT inversion on reflectance or transmittance alone},
+journal = {Remote Sensing of Environment},
+volume = {252},
+pages = {112176},
+year = {2021},
+issn = {0034-4257},
+doi = {https://doi.org/10.1016/j.rse.2020.112176},
+url = {https://www.sciencedirect.com/science/article/pii/S0034425720305496},
+author = {Lynsay Spafford and Guerric {le Maire} and Andrew MacDougall and Florian {de Boissieu} and Jean-Baptiste Féret},
+keywords = {PROSPECT, Radiative transfer model, Leaf spectroscopy, Chlorophylls, Carotenoids, EWT, LMA, Biochemical constituents, Leaf structure, Leaf directional-hemispherical optical properties},
+abstract = {Leaf biochemical and structural traits are vegetation characteristics related to various physiological processes. Taking advantage of the physical relationship between optical properties and leaf biochemistry, field-based spectroscopy has allowed for the rapid estimation of leaf biochemical constituents and repeated non-destructive measurements through time. Leaf constituent retrieval from leaf optical properties following inversion of the physically-based radiative transfer model PROSPECT is now a popular method, but some cases prompt poor retrieval success and this approach requires a strict inversion procedure. We investigated the performances of different inversion procedures for the estimation of leaf constituents, specifically chlorophyll a and b, carotenoids, water (EWT), and dry matter (LMA) from >1400 broadleaf samples, including the definition of optimal spectral subdomains, and the use of leaf reflectance or transmittance alone. We also developed a strategy to obtain prior information on the leaf structure parameter (N) in PROSPECT, when only reflectance or transmittance is measured, and examined the influence of this prior information in combination with different inversion procedures. We found that using the full domain of reflectance or transmittance only systematically leads to suboptimal estimation of chlorophyll a and b, carotenoids, EWT, and LMA, due to either the combined absorption of multiple constituents or inaccurate estimation of the N parameter. Our study confirms that the selection of optimal spectral subdomains leads to improved estimation of all leaf constituents, from 700 to 720 nm for chlorophyll a and b, 520–560 nm for carotenoids, and from 1700 to 2400 nm for EWT and LMA. Prior information on N, computed directly from the spectra, leads to systematic improved estimation of leaf constituents when only reflectance or transmittance is measured, with reductions in normalized root mean square error from 8 to 37%. We strongly recommend using optimal subdomains when inverting PROSPECT to retrieve leaf constituents, and with the availability of only reflectance or transmittance we further recommend the use of prior information on the N parameter.}
+}
 
 @article{spitters1986,
 title = {Separating the diffuse and direct component of global radiation and its implications for modeling canopy photosynthesis Part I. Components of incoming radiation},
@@ -227,6 +300,17 @@ author = {Jochem Verrelst and Gustau Camps-Valls and Jordi Muñoz-Marí and Juan
 keywords = {Bio-geophysical variables, Parametric, Non-parametric, Physical, Hybrid, Machine learning, Operational variable retrieval},
 abstract = {Forthcoming superspectral satellite missions dedicated to land monitoring, as well as planned imaging spectrometers, will unleash an unprecedented data stream. The processing requirements for such large data streams involve processing techniques enabling the spatio-temporally explicit quantification of vegetation properties. Typically retrieval must be accurate, robust and fast. Hence, there is a strict requirement to identify next-generation bio-geophysical variable retrieval algorithms which can be molded into an operational processing chain. This paper offers a review of state-of-the-art retrieval methods for quantitative terrestrial bio-geophysical variable extraction using optical remote sensing imagery. We can categorize these methods into (1) parametric regression, (2) non-parametric regression, (3) physically-based and (4) hybrid methods. Hybrid methods combine generic capabilities of physically-based methods with flexible and computationally efficient methods, typically non-parametric regression methods. A review of the theoretical basis of all these methods is given first and followed by published applications. This paper focusses on: (1) retrievability of bio-geophysical variables, (2) ability to generate multiple outputs, (3) possibilities for model transparency description, (4) mapping speed, and (5) possibilities for uncertainty retrieval. Finally, the prospects of implementing these methods into future processing chains for operational retrieval of vegetation properties are presented and discussed.}
 }
+
+@ARTICLE{verrelst2016,
+  author={Verrelst, Jochem and Dethier, Sara and Rivera, Juan Pablo and Munoz-Mari, Jordi and Camps-Valls, Gustau and Moreno, Jose},
+  journal={IEEE Geoscience and Remote Sensing Letters}, 
+  title={Active Learning Methods for Efficient Hybrid Biophysical Variable Retrieval}, 
+  year={2016},
+  volume={13},
+  number={7},
+  pages={1012-1016},
+  keywords={Training;Training data;Biological system modeling;Data models;Kernel;Estimation;Computational modeling;Active learning (AL);hybrid retrieval methods;kernel methods;machine learning regression algorithms (MLRAs);PROSAIL;Sentinel-3;Active learning (AL);hybrid retrieval methods;kernel methods;machine learning regression algorithms (MLRAs);PROSAIL;Sentinel-3},
+  doi={10.1109/LGRS.2016.2560799}}
 
 @techreport{weiss2020,
   TITLE = {{S2ToolBox Level 2 products LAI, FAPAR, FCOVER}},

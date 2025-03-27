@@ -20,6 +20,7 @@
 #'
 #' @return foliar_distrib list. lidf and litab
 #' @export
+#'
 dladgen  <- function(a,b){
   litab <- c(5.,15.,25.,35.,45.,55.,65.,75.,81.,83.,85.,87.,89.)
   freq <- c()

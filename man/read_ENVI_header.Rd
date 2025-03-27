@@ -4,10 +4,10 @@
 \alias{read_ENVI_header}
 \title{Reads ENVI hdr file}
 \usage{
-read_ENVI_header(HDRpath)
+read_ENVI_header(hdr_path)
 }
 \arguments{
-\item{HDRpath}{Path of the hdr file}
+\item{hdr_path}{Path of the hdr file}
 }
 \value{
 list of the content of the hdr file

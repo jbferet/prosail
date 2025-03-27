@@ -7,7 +7,7 @@
 adjust_PROSPECT_2_SAIL(
   SAILversion,
   Spec_Sensor,
-  Input_PROSPECT,
+  input_prospect,
   CHL,
   CAR,
   ANT,
@@ -19,7 +19,7 @@ adjust_PROSPECT_2_SAIL(
   N,
   alpha,
   fraction_brown,
-  BrownLOP = NULL
+  brown_lop = NULL
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ adjust_PROSPECT_2_SAIL(
 
 \item{Spec_Sensor}{dataframe. spectral properties required to run PROSPECT}
 
-\item{Input_PROSPECT}{dataframe. includes all prospect input parameters}
+\item{input_prospect}{dataframe. includes all prospect input parameters}
 
 \item{CHL}{numeric. Chlorophyll content (microg.cm-2)}
 
@@ -51,7 +51,7 @@ adjust_PROSPECT_2_SAIL(
 
 \item{fraction_brown}{numeric. fraction of brown vegetation (0-1)}
 
-\item{BrownLOP}{dataframe. brown leaf optical properties, when available
+\item{brown_lop}{dataframe. brown leaf optical properties, when available
 
 (simulation of roughness)}
 }

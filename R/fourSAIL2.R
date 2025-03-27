@@ -1,6 +1,6 @@
-#' PRO4SAIL2 simulation based on a set of combinations of input parameters
-#' @param leafgreen dataframe. leaf optical properties #1 (e.g. green veg)
-#' @param leafbrown dataframe. leaf optical properties #2 (e.g. brown veg)
+#' 4SAIL2 simulation based on a set of combinations of input parameters
+#' @param leaf_green dataframe. leaf optical properties #1 (e.g. green veg)
+#' @param leaf_brown dataframe. leaf optical properties #2 (e.g. brown veg)
 #' @param TypeLidf numeric. Type of leaf inclination distribution function
 #' @param LIDFa numeric.
 #' if TypeLidf ==1, controls the average leaf slope
@@ -37,7 +37,7 @@
 
 #' @export
 
-fourSAIL2  <- function(leafgreen, leafbrown, TypeLidf = 2, LIDFa = 60,
+fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
                        LIDFb = NULL, lai = 3, q = 0.1, tts = 30, tto = 0,
                        psi = 60, rsoil = NULL, fraction_brown = 0.5, diss = 0.5,
                        Cv = 1, Zeta = 1){
@@ -105,21 +105,21 @@ fourSAIL2  <- function(leafgreen, leafbrown, TypeLidf = 2, LIDFa = 60,
     # if only green leaves
     if (fraction_brown==0.0){
       fb <- 0.5
-      leafbrown$Reflectance <- leafgreen$Reflectance
-      leafbrown$Transmittance <- leafgreen$Transmittance
+      leaf_brown$Reflectance <- leaf_green$Reflectance
+      leaf_brown$Transmittance <- leaf_green$Transmittance
     }
     if (fraction_brown==1.0){
       fb <- 0.5
-      leafgreen$Reflectance <- leafbrown$Reflectance
-      leafgreen$Transmittance <- leafbrown$Transmittance
+      leaf_green$Reflectance <- leaf_brown$Reflectance
+      leaf_green$Transmittance <- leaf_brown$Transmittance
     }
     s <- (1.0-diss)*fb*(1.0-fb)
     # rho1 & tau1 : green foliage
     # rho2 & tau2 : brown foliage (bottom layer)
-    rho1 <- ((1-fb-s)*leafgreen$Reflectance+s*leafbrown$Reflectance)/(1-fb)
-    tau1 <- ((1-fb-s)*leafgreen$Transmittance+s*leafbrown$Transmittance)/(1-fb)
-    rho2 <- (s*leafgreen$Reflectance+(fb-s)*leafbrown$Reflectance)/fb
-    tau2 <- (s*leafgreen$Transmittance+(fb-s)*leafbrown$Transmittance)/fb
+    rho1 <- ((1-fb-s)*leaf_green$Reflectance+s*leaf_brown$Reflectance)/(1-fb)
+    tau1 <- ((1-fb-s)*leaf_green$Transmittance+s*leaf_brown$Transmittance)/(1-fb)
+    rho2 <- (s*leaf_green$Reflectance+(fb-s)*leaf_brown$Reflectance)/fb
+    tau2 <- (s*leaf_green$Transmittance+(fb-s)*leaf_brown$Transmittance)/fb
 
     # angular distance, compensation of shadow length
     #	Calculate geometric factors associated with extinction and scattering

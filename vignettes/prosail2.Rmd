@@ -65,6 +65,15 @@ If no value, their default value is set.
     [Verhoef (1998)](https://edepot.wur.nl/210943).
         * if `TypeLidf=1` then `LIDFa` controls the average leaf slope and 
         `LIDFb` controls the distribution's bimodality
+        * This LIDF requires |LIDFa| + |LIDFb| < 1
+| LIDF type    |   LIDFa   |   LIDFb   
+| :----------: |:---------:|:---------:|
+| Planophile   |     1     |     0     |
+| Erectophile  |    -1     |     0     |
+| Plagiophile  |     0     |    -1     |
+| Extremophile |     0     |     1     |
+| Spherical    |   -0.35   |   -0.15   |
+| Uniform      |     0     |     0     |
     * Define `TypeLidf=2` if you want to use the 
     [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) 
     characterized by the average leaf inclination angle in degree
@@ -72,7 +81,8 @@ If no value, their default value is set.
 
 * `lai`: leaf area index
 
-* `q`: hot spot parameter
+* `q`: foliage hot spot parameter. It corresponds to the ratio of the 
+correlation length of leaf projections in the horizontal plane and the canopy height [@doi:10.1016/j.rse.2006.12.013; @kuusk1985]
 
 * `tts`: sun zenith angle (0 degrees = sun at the vertical of surface)
 
@@ -115,7 +125,7 @@ both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
 library(prosail)
 # define input variables for PROSPECT. 
 # refer to prospect tutorial for default values
-Input_PROSPECT <- data.frame('CHL' = 40, 'CAR' = 8, 'ANT' = 0.0, 
+input_prospect <- data.frame('CHL' = 40, 'CAR' = 8, 'ANT' = 0.0, 
                              'EWT' = 0.01, 'LMA' = 0.009, 'N' = 1.5)
 # define input variables for SAIL. 
 lai <- 5      # LAI
@@ -128,13 +138,13 @@ psi <- 90     # geometry of acquisition: sun-observer azimuth
 rsoil <- SpecSOIL$Dry_Soil # soil reflectance (SpecSOIL: Dry_Soil and Wet_Soil)
 
 # run PROSAIL with 4SAIL
-Ref_4SAIL <- PRO4SAIL(Input_PROSPECT = Input_PROSPECT, 
+Ref_4SAIL <- PRO4SAIL(input_prospect = input_prospect, 
                       TypeLidf = TypeLidf, LIDFa = LIDFa, lai = lai,
                       q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
 
 # run PROSAIL with 4SAIL2
 # define leaf chemical constituents corresponding green and brown leaves
-Input_PROSPECT <- data.frame('CHL' = c(40,5), 'CAR' = c(8,5), 'ANT' = c(0,1), 
+input_prospect <- data.frame('CHL' = c(40,5), 'CAR' = c(8,5), 'ANT' = c(0,1), 
                              'EWT' = c(0.01,0.005), 'LMA' = c(0.009,0.008), 
                              'BROWN' = c(0.0,0.5), 'N' = c(1.5,2))
 # define additional 4SAIL2 parameters
@@ -145,7 +155,7 @@ Zeta <- 1
 
 # run PROSAIL with 4SAIL2
 Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',
-                       Input_PROSPECT = Input_PROSPECT,
+                       input_prospect = input_prospect,
                        TypeLidf = TypeLidf, LIDFa = LIDFa, lai = lai,
                        q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, 
@@ -223,11 +233,11 @@ the sensor.
 
 ```{r SRF 1}
 # get the spectral response for Sentinel-2A
-SensorName <- 'Sentinel_2A'
-# if interested in a different satellite, please use Path_SensorResponse to 
-# locate the SRF file expected to be named 'SensorName_Spectral_Response.csv' 
+sensor_name <- 'Sentinel_2A'
+# if interested in a different satellite, please use srf_path to 
+# locate the SRF file expected to be named 'sensor_name_Spectral_Response.csv' 
 # (separator = tabulations)
-SRF_S2 <- get_radiometry(SensorName,Path_SensorResponse = NULL)
+SRF_S2 <- get_radiometry(sensor_name,srf_path = NULL)
 ```
 
 Other satellites can be simulated as long as the SRF is provided as CSV file, 
@@ -237,18 +247,18 @@ as for the SRF of Sentinel-2 satellites.
 
 SRF can also be directly computed for any sensor under the hypothesis of 
 Gaussian response for each spectral band, and information about the central 
-wavelength and FWHM corresponding to each spectral band. 
+wavelength and fwhm corresponding to each spectral band. 
 The following example produces SRF corresponding to a hyperspectral sensor 
-covering the spectral domain from 400 nm to 2400 nm with a FWHM of 10 nm for 
+covering the spectral domain from 400 nm to 2400 nm with a fwhm of 10 nm for 
 each channel.
 
 ```{r SRF 2}
 # WL is a vector giving central wavelength for each band in nanometer
 WL <- seq(400, 2400, by = 10)
-# FWHM is a vector giving FWHM for each band in nanometer
-FWHM <- 10+ 0*seq(400, 2400, by = 10)
+# fwhm is a vector giving fwhm for each band in nanometer
+fwhm <- 10+ 0*seq(400, 2400, by = 10)
 # compute corresponding SRF
-SRF_SH <- compute_SRF(WL,FWHM)
+SRF_SH <- compute_SRF(WL,fwhm)
 ```
 
 Then, reflectance can be converted from 1-nm spectral sampling (default 
@@ -260,5 +270,5 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 wvl <- SpecPROSPECT_FullRange$lambda
 BRF_4SAIL_S2 <- apply_sensor_characteristics(wvl = wvl,
                                            SRF = SRF_S2,
-                                           InRefl = BRF_4SAIL)
+                                           input_refl_table = BRF_4SAIL)
 ```

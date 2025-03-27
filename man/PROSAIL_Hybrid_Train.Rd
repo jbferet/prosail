@@ -6,9 +6,9 @@
 \usage{
 PROSAIL_Hybrid_Train(
   BRF_LUT,
-  InputVar,
-  nbEnsemble = 20,
-  WithReplacement = FALSE,
+  input_variables,
+  nb_bagg = 20,
+  replacement = FALSE,
   method = "liquidSVM",
   verbose = FALSE,
   progressBar = FALSE
@@ -17,11 +17,11 @@ PROSAIL_Hybrid_Train(
 \arguments{
 \item{BRF_LUT}{numeric. LUT of BRF used for training}
 
-\item{InputVar}{numeric. biophysical parameter corresponding to reflectance}
+\item{input_variables}{numeric. biophysical parameter corresponding to reflectance}
 
-\item{nbEnsemble}{numeric. nb of individual subsets generated from BRF_LUT}
+\item{nb_bagg}{numeric. nb of individual subsets generated from BRF_LUT}
 
-\item{WithReplacement}{Boolean. subsets generated with / without replacement}
+\item{replacement}{Boolean. subsets generated with / without replacement}
 
 \item{method}{character. which machine learning regression method used?
 default = SVM with liquidSVM. svmRadial and svmLinear from caret package
@@ -34,7 +34,7 @@ adjustment performed during training}
 }
 \value{
 modelsMLR list. ML regression models trained for the retrieval of
-InputVar based on BRF_LUT
+input_variables based on BRF_LUT
 }
 \description{
 This function trains a support vector regression for a set of variables based on spectral data

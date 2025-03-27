@@ -5,13 +5,13 @@
 #' @param HybridModel list. hybrid models produced from train_prosail_inversion
 #' each element of the list corresponds to a set of hybrid models for a
 #' vegetation parameter
-#' @param PathOut character. path for directory where results are written
-#' @param SelectedBands list. list of spectral bands to be selected from raster
+#' @param output_path character. path for directory where results are written
+#' @param selected_bands list. list of spectral bands to be selected from raster
 #' (identified by name of vegetation parameter)
 #' @param bandname character. spectral bands corresponding to the raster
-#' @param MaskRaster character. path for binary mask defining ON (1) and OFF (0)
+#' @param mask_path character. path for binary mask defining ON (1) and OFF (0)
 #' pixels in the raster
-#' @param MultiplyingFactor numeric. multiplying factor used to write
+#' @param multiplying_factor numeric. multiplying factor used to write
 #' reflectance in the raster
 #' --> PROSAIL simulates reflectance between 0 and 1, and raster data expected
 #' in the same range
@@ -30,15 +30,16 @@
 #' writeStart writeStop writeValues
 #' @importFrom matrixStats rowSds
 #' @importFrom tools file_path_sans_ext
+#' @importFrom utils installed.packages
 #' @export
 
-apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
-                                    SelectedBands, bandname, MaskRaster = NULL,
-                                    MultiplyingFactor = 10000, maxRows = 100,
+apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
+                                    selected_bands, bandname, mask_path = NULL,
+                                    multiplying_factor = 10000, maxRows = 100,
                                     bigRaster = FALSE, progressBar = TRUE,
                                     filetype = 'GTiff'){
 
-  dir.create(PathOut, showWarnings = FALSE, recursive = TRUE)
+  dir.create(output_path, showWarnings = FALSE, recursive = TRUE)
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute
@@ -46,10 +47,10 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
   # define path for maps produced for each biophysical variable
   BPvarpath <- BPvarSDpath <- list()
   # check if bigRaster supported
-  is_bigRaster_available <- require("bigRaster", quietly = TRUE)
+  is_bigRaster_available <- ("bigRaster" %in% rownames(installed.packages()))
   if (!is_bigRaster_available & bigRaster){
     message('bigRaster cannot be used to apply prosail inversion')
-    message('raster management will be performed with the package raster instead')
+    message('rasters will be processed with the package terra instead')
     message('this may require additional computational resource')
     message('check https://gitlab.com/jbferet/bigRaster for additional support')
     bigRaster <- FALSE
@@ -57,9 +58,9 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
   if (bigRaster){
     funct <- bigRaster::wrapperBig_prosail_inversion
     input_args <- list('HybridModel' = HybridModel,
-                       'SelectedBands' = SelectedBands,
+                       'selected_bands' = selected_bands,
                        'bandname' = bandname,
-                       'ReflFactor' = MultiplyingFactor)
+                       'ReflFactor' = multiplying_factor)
     if (inherits(x = HybridModel[[1]][[1]], what = 'liquidSVM')) {
       input_args$method <- 'liquidSVM'
     } else {
@@ -67,32 +68,32 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
     }
     input_rasters <- as.list(raster_path)
     names(input_rasters)[1] <- 'img'
-    if (!is.null(MaskRaster)) input_rasters$mask <- MaskRaster
+    if (!is.null(mask_path)) input_rasters$mask <- mask_path
     output_rasters <- list()
     for (parm in BPvar){
       listname <- paste0('Mean_',parm)
-      output_rasters[[listname]] <- file.path(PathOut, paste(raster_name, parm,
-                                                             sep = '_'))
+      output_rasters[[listname]] <- file.path(output_path, paste(raster_name, parm,
+                                                                 sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarpath[[parm]] <- output_rasters[[listname]]
 
       listname <- paste0('SD_',parm)
-      output_rasters[[listname]] <- file.path(PathOut, paste(raster_name, parm,
-                                                             'STD', sep = '_'))
+      output_rasters[[listname]] <- file.path(output_path, paste(raster_name, parm,
+                                                                 'STD', sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarSDpath[[parm]] <- output_rasters[[listname]]
     }
-    bandNames <- as.list(names(output_rasters))
-    names(bandNames) <- names(output_rasters)
+    band_names <- as.list(names(output_rasters))
+    names(band_names) <- names(output_rasters)
     bigRaster::apply_bigRaster(funct = funct,
                                input_rasters = input_rasters,
                                input_args = input_args,
                                output_rasters = output_rasters,
                                output_lyrs = 1,
                                filetype = filetype,
-                               bandNames = bandNames,
+                               band_names = band_names,
                                maxRows = maxRows)
   } else {
     for (parm in BPvar){
@@ -118,14 +119,14 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       r_in <- readStart(brick(raster_path))
       # mask file
       r_inmask <- FALSE
-      if (is.null(MaskRaster)){
+      if (is.null(mask_path)){
         SelectPixels <- 'ALL'
-      } else if (!is.null(MaskRaster)){
-        if (file.exists(MaskRaster)){
-          r_inmask <- readStart(raster(MaskRaster))
-        } else if (!file.exists(MaskRaster)){
+      } else if (!is.null(mask_path)){
+        if (file.exists(mask_path)){
+          r_inmask <- readStart(raster(mask_path))
+        } else if (!file.exists(mask_path)){
           message('WARNING: Mask file does not exist:')
-          print(MaskRaster)
+          print(mask_path)
           message('Processing all image')
           SelectPixels <- 'ALL'
         }
@@ -143,17 +144,17 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
       } else {
         formatfile <- filetype
       }
-      BPvarpath[[parm]] <- file.path(PathOut, paste(raster_name, parm,
-                                                    sep = '_'))
-      BPvarSDpath[[parm]] <- file.path(PathOut,paste(raster_name, parm, 'STD',
-                                                     sep = '_'))
+      BPvarpath[[parm]] <- file.path(output_path, paste(raster_name, parm,
+                                                        sep = '_'))
+      BPvarSDpath[[parm]] <- file.path(output_path,paste(raster_name, parm, 'STD',
+                                                         sep = '_'))
       r_outMean <- writeStart(raster(raster_path),
                               filename = BPvarpath[[parm]],
                               format = formatfile, overwrite = TRUE)
       r_outSD <- writeStart(raster(raster_path),
                             filename = BPvarSDpath[[parm]],
                             format = formatfile, overwrite = TRUE)
-      Selbands <- match(SelectedBands[[parm]], bandname)
+      Selbands <- match(selected_bands[[parm]], bandname)
 
       # loop over blocks
       for (i in seq_along(blk$row)) {
@@ -181,7 +182,7 @@ apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
         Mean_EstimateFull <- NA*vector(length = FullLength)
         STD_EstimateFull <- NA*vector(length = FullLength)
         if (length(SelectPixels)>0){
-          BlockVal <- BlockVal/MultiplyingFactor
+          BlockVal <- BlockVal/multiplying_factor
           modelSVR_Estimate <- list()
           for (modind in seq_len(length(HybridModel[[parm]]))){
             if (progressBar == TRUE) pb$tick()

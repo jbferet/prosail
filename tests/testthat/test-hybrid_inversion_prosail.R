@@ -1,7 +1,7 @@
 test_that("hybrid inversion ok", {
   # get sensor response for Sentinel-2
-  SensorName <- 'Sentinel_2'
-  SRF <- get_radiometry(SensorName)
+  sensor_name <- 'Sentinel_2'
+  SRF <- get_radiometry(sensor_name)
   # define parameters to estimate
   Parms2Estimate <- 'lai'
 
@@ -18,17 +18,18 @@ test_that("hybrid inversion ok", {
   GeomAcq$max <- data.frame('tto' = 10, 'tts' = 30, 'psi' = 360)
 
   # define inputs for PROSAIL following ATBD
-  InputPROSAIL <- get_input_PROSAIL(atbd = TRUE, GeomAcq = GeomAcq)
+  input_prosail <- get_input_PROSAIL(atbd = TRUE, GeomAcq = GeomAcq)
 
   # produce LUT
   res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
-                              InputPROSAIL = InputPROSAIL,
+                              input_prosail = input_prosail,
                               SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
                               SpecSOIL = prosail::SpecSOIL,
                               SpecATM = prosail::SpecATM)
   BRF_LUT_1nm <- res$BRF
   BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda,
-                                          SRF = SRF, InRefl = BRF_LUT_1nm)
+                                          SRF = SRF,
+                                          input_refl_table = BRF_LUT_1nm)
   # identify spectral bands in LUT
   rownames(BRF_LUT) <- SRF$Spectral_Bands
   # add noise
@@ -36,7 +37,7 @@ test_that("hybrid inversion ok", {
   BRF_LUT_Noise <- apply_noise_atbd(subsetRefl)
   # train model
   modelSVR <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise,
-                                   InputVar = InputPROSAIL$lai,
+                                   input_variables = input_prosail$lai,
                                    method = 'svmLinear')
 
   ###########################################################
@@ -45,5 +46,5 @@ test_that("hybrid inversion ok", {
   # models for each sample, as well as corresponding standard deviation
   HybridRes <- PROSAIL_Hybrid_Apply(RegressionModels = modelSVR,
                                     Refl = BRF_LUT_Noise)
-  expect_true(cor.test(HybridRes$MeanEstimate, InputPROSAIL$lai)$estimate>0.7)
+  expect_true(cor.test(HybridRes$MeanEstimate, input_prosail$lai)$estimate>0.7)
 })

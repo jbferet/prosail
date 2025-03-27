@@ -5,17 +5,21 @@
 \title{This function provides a LUT corresponding to PROSAIL input parameters to
 reproduce the distribution of parameters used in the ATBD}
 \usage{
-get_atbd_LUT_input(nbSamples = 2000, GeomAcq = NULL, Codist_LAI = TRUE)
+get_atbd_LUT_input(
+  nb_samples = 2000,
+  GeomAcq = NULL,
+  codistribution_lai = TRUE
+)
 }
 \arguments{
-\item{nbSamples}{numeric. number of samples to generate}
+\item{nb_samples}{numeric. number of samples to generate}
 
 \item{GeomAcq}{list. min and max values for tts, tto and psi}
 
-\item{Codist_LAI}{boolean. set TYRUE if codistribution with LAI accounted for}
+\item{codistribution_lai}{boolean. set TYRUE if codistribution with LAI accounted for}
 }
 \value{
-InputPROSAIL list. list of PROSAIL input parameters
+input_prosail list. list of PROSAIL input parameters
 }
 \description{
 This function provides a LUT corresponding to PROSAIL input parameters to

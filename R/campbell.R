@@ -45,6 +45,6 @@ campbell  <- function(ala){
   }
   sum0 <- sum(freq)
   freq0 <- freq/sum0
-  foliar_distrib <- list("lidf" = freq0,"litab" =litab)
+  foliar_distrib <- list("lidf" = freq0, "litab" =litab)
   return(foliar_distrib)
 }

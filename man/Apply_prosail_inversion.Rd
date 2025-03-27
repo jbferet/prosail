@@ -8,11 +8,11 @@ vegetation biophysical properties}
 apply_prosail_inversion(
   raster_path,
   HybridModel,
-  PathOut,
-  SelectedBands,
+  output_path,
+  selected_bands,
   bandname,
-  MaskRaster = NULL,
-  MultiplyingFactor = 10000,
+  mask_path = NULL,
+  multiplying_factor = 10000,
   maxRows = 100,
   bigRaster = FALSE,
   progressBar = TRUE,
@@ -26,17 +26,17 @@ apply_prosail_inversion(
 each element of the list corresponds to a set of hybrid models for a
 vegetation parameter}
 
-\item{PathOut}{character. path for directory where results are written}
+\item{output_path}{character. path for directory where results are written}
 
-\item{SelectedBands}{list. list of spectral bands to be selected from raster
+\item{selected_bands}{list. list of spectral bands to be selected from raster
 (identified by name of vegetation parameter)}
 
 \item{bandname}{character. spectral bands corresponding to the raster}
 
-\item{MaskRaster}{character. path for binary mask defining ON (1) and OFF (0)
+\item{mask_path}{character. path for binary mask defining ON (1) and OFF (0)
 pixels in the raster}
 
-\item{MultiplyingFactor}{numeric. multiplying factor used to write
+\item{multiplying_factor}{numeric. multiplying factor used to write
 reflectance in the raster
 --> PROSAIL simulates reflectance between 0 and 1, and raster data expected
 in the same range}

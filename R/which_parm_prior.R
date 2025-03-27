@@ -1,29 +1,29 @@
 #' function identifying for which parameters prior information is known
 #'
-#' @param PriorInfoMean list. mean value expected for a list of parameters
-#' @param PriorInfoSD list. dtandard deviation to the mean expected for a list
+#' @param prior_mean list. mean value expected for a list of parameters
+#' @param prior_sd list. standard deviation expected for a list
 #' of parameters
 #'
 #' @return fc estimates of the parameters
 #' @export
 #'
-which_parm_prior <- function(PriorInfoMean, PriorInfoSD) {
+which_parm_prior <- function(prior_mean, prior_sd) {
 
   Parms2Prior <- c()
   listParms <- c('CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'PROT', 'CBC', 'N',
                  'alpha', 'LIDFa', 'LIDFb', 'lai', 'q', 'tts', 'tto', 'psi',
                  'psoil')
-  PriorInfoMean_Update <- PriorInfoSD_Update <- list()
+  prior_mean_update <- prior_sd_update <- list()
   for (parm in listParms){
-    if (parm %in% names(PriorInfoMean) & parm %in% names(PriorInfoSD)){
+    if (parm %in% names(prior_mean) & parm %in% names(prior_sd)){
       Parms2Prior <- c(Parms2Prior,parm)
-      PriorInfoMean_Update[[parm]] <- PriorInfoMean[[parm]]
-      PriorInfoSD_Update[[parm]] <- PriorInfoSD[[parm]]
+      prior_mean_update[[parm]] <- prior_mean[[parm]]
+      prior_sd_update[[parm]] <- prior_sd[[parm]]
     }
   }
-  PriorInfoMean_Update <- data.frame(PriorInfoMean_Update)
-  PriorInfoSD_Update <- data.frame(PriorInfoSD_Update)
+  prior_mean_update <- data.frame(prior_mean_update)
+  prior_sd_update <- data.frame(prior_sd_update)
   return(list('Parms2Prior' = Parms2Prior,
-              'PriorInfoMean' = PriorInfoMean_Update,
-              'PriorInfoSD' = PriorInfoSD_Update))
+              'mean' = prior_mean_update,
+              'sd' = prior_sd_update))
 }

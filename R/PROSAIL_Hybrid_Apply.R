@@ -26,14 +26,14 @@ PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
   if (!ncol(Refl)==nbFeatures & nrow(Refl)==nbFeatures){
     Refl <- t(Refl)
   }
-  nbEnsemble <- length( RegressionModels)
+  nb_bagg <- length( RegressionModels)
   EstimatedVal <- list()
   if (progressBar == TRUE){
     pb <- progress_bar$new(
       format = "Applying SVR models [:bar] :percent in :elapsed",
-      total = nbEnsemble, clear = FALSE, width= 100)
+      total = nb_bagg, clear = FALSE, width= 100)
   }
-  for (i in seq_len(nbEnsemble)){
+  for (i in seq_len(nb_bagg)){
     EstimatedVal[[i]] <- predict(RegressionModels[[i]], Refl)
     if (progressBar == TRUE) pb$tick()
   }

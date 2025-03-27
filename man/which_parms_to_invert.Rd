@@ -4,26 +4,26 @@
 \alias{which_parms_to_invert}
 \title{function identifying which parameters should be estimated during inversion}
 \usage{
-which_parms_to_invert(InitialGuess, LowerBound, UpperBound, ParmSet)
+which_parms_to_invert(initialization, lower_bound, upper_bound, parm_set)
 }
 \arguments{
-\item{InitialGuess}{list. Initial values during inversion}
+\item{initialization}{list. Initial values during inversion}
 
-\item{LowerBound}{list. Lower bound values during inversion}
+\item{lower_bound}{list. Lower bound values during inversion}
 
-\item{UpperBound}{list. Upper bound values during inversion}
+\item{upper_bound}{list. Upper bound values during inversion}
 
-\item{ParmSet}{list. Values for variables out of inversion}
+\item{parm_set}{list. Values for variables out of inversion}
 }
 \value{
 res list. includes
 \itemize{
 \item Parms2Estimate
 \item Parms2Set
-\item InitialGuess
-\item LowerBound
-\item UpperBound
-\item ParmSet
+\item initialization
+\item lower_bound
+\item upper_bound
+\item parm_set
 \item InVar
 fc estimates of the parameters
 }

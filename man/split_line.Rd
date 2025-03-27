@@ -4,7 +4,7 @@
 \alias{split_line}
 \title{ENVI functions}
 \usage{
-split_line(x, separator, trim.blank = TRUE)
+split_line(x, separator = "=", trim.blank = TRUE)
 }
 \arguments{
 \item{x}{character.}

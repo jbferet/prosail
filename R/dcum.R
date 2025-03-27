@@ -1,4 +1,5 @@
 #' dcum function
+#'
 #' @param a numeric. controls the average leaf slope
 #' @param b numeric. controls the distribution's bimodality
 #' @param t numeric. angle

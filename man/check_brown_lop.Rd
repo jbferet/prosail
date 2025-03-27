@@ -4,14 +4,14 @@
 \alias{check_brown_lop}
 \title{check if brown leaf optical properties are correctly defined}
 \usage{
-check_brown_lop(BrownLOP, lambda, Input_PROSPECT)
+check_brown_lop(brown_lop, lambda, input_prospect)
 }
 \arguments{
-\item{BrownLOP}{dataframe. should include wvl, Reflectance & Transmittance}
+\item{brown_lop}{dataframe. should include wvl, Reflectance & Transmittance}
 
 \item{lambda}{numeric. spectral bands corresponding to data to simulate}
 
-\item{Input_PROSPECT}{dataframe. includes all prospect input parameters}
+\item{input_prospect}{dataframe. includes all prospect input parameters}
 }
 \value{
 invisible

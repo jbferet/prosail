@@ -11,7 +11,7 @@
 #' @return list.
 #' @export
 
-split_line <- function(x, separator, trim.blank = TRUE) {
+split_line <- function(x, separator = '=', trim.blank = TRUE) {
   tmp <- regexpr(separator, x)
   key <- substr(x, 1, tmp - 1)
   value <- substr(x, tmp + 1, nchar(x))

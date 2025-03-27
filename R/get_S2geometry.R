@@ -3,6 +3,7 @@
 #' - SAA = list of sun azimuth angle
 #' - VZA = list of viewer zenith angle
 #' - VAA = list of viewer azimuth angle
+#'
 #' @param MTD_TL_xml character. Path for metadata file MTD_TL.xml
 #' @param verbose Boolean. Should messages be displayed?
 #'

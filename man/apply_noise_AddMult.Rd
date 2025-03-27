@@ -4,20 +4,24 @@
 \alias{apply_noise_AddMult}
 \title{This function applies additive and multiplicative noise to BRF data
 \itemize{
-\item if AdditiveNoise and MultiplicativeNoise are defined with a unique value,
+\item if additive_noise and multiplicative_noise are defined with a unique value,
 noise is homogeneous across all spectrum
-\item if AdditiveNoise and MultiplicativeNoise are the same length as the number
+\item if additive_noise and multiplicative_noise are the same length as the number
 of spectral bands (rows in BRF_LUT), noise is specific to each spectral band
 }}
 \usage{
-apply_noise_AddMult(BRF_LUT, AdditiveNoise = 0.01, MultiplicativeNoise = 0.02)
+apply_noise_AddMult(
+  BRF_LUT,
+  additive_noise = 0.01,
+  multiplicative_noise = 0.02
+)
 }
 \arguments{
 \item{BRF_LUT}{numeric. BRF LUT}
 
-\item{AdditiveNoise}{numeric. additive noise (0 = 0\%, 1 = 100\%)}
+\item{additive_noise}{numeric. additive noise (0 = 0\%, 1 = 100\%)}
 
-\item{MultiplicativeNoise}{numeric. multiplicative noise (0 = 0\%, 1 = 100\%)}
+\item{multiplicative_noise}{numeric. multiplicative noise (0 = 0\%, 1 = 100\%)}
 }
 \value{
 BRF_LUT_Noise numeric.
@@ -25,9 +29,9 @@ BRF_LUT_Noise numeric.
 \description{
 This function applies additive and multiplicative noise to BRF data
 \itemize{
-\item if AdditiveNoise and MultiplicativeNoise are defined with a unique value,
+\item if additive_noise and multiplicative_noise are defined with a unique value,
 noise is homogeneous across all spectrum
-\item if AdditiveNoise and MultiplicativeNoise are the same length as the number
+\item if additive_noise and multiplicative_noise are the same length as the number
 of spectral bands (rows in BRF_LUT), noise is specific to each spectral band
 }
 }

@@ -6,29 +6,27 @@
 in order to define estimate a set of user defined parameters}
 \usage{
 invert_PROSAIL(
-  brfMES,
-  InitialGuess = NULL,
-  LowerBound,
-  UpperBound,
+  brf_mes,
+  initialization = NULL,
+  lower_bound,
+  upper_bound,
   SpecPROSPECT_Sensor,
   SpecATM_Sensor,
   SpecSOIL_Sensor,
   TypeLidf,
-  ParmSet,
-  MeritFunction = "merit_RMSE_PROSAIL",
-  PriorInfoMean = NULL,
-  PriorInfoSD = NULL,
-  WeightPrior = 0.01
+  parm_set,
+  merit_function = "merit_RMSE_PROSAIL",
+  prior_info = NULL
 )
 }
 \arguments{
-\item{brfMES}{numeric. measured BRF to be used during inversion}
+\item{brf_mes}{numeric. measured BRF to be used during inversion}
 
-\item{InitialGuess}{list. Initial guess of Parms2Estimate for the inversion}
+\item{initialization}{list. Initial guess of Parms2Estimate for the inversion}
 
-\item{LowerBound}{list. Lower bound}
+\item{lower_bound}{list. Lower bound}
 
-\item{UpperBound}{list. Upper bound}
+\item{upper_bound}{list. Upper bound}
 
 \item{SpecPROSPECT_Sensor}{list. Includes optical constants
 refractive index, specific absorption coefs and corresponding spectral bands}
@@ -40,16 +38,12 @@ or a unique soil sample if the psoil parameter is not inverted}
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 
-\item{ParmSet}{list. Parameters set to a fixed value by user}
+\item{parm_set}{list. Parameters set to a fixed value by user}
 
-\item{MeritFunction}{character. name of the merit function
+\item{merit_function}{character. name of the merit function
 with given criterion to minimize (default = RMSE)}
 
-\item{PriorInfoMean}{list. prior mean value of parameters defined as xprior}
-
-\item{PriorInfoSD}{list. prior SD of parameters defined as xprior}
-
-\item{WeightPrior}{numeric. Weight to be applied on prior information to
+\item{prior_info}{list. prior mean, sd and weight of parameters defined as xprior
 modulate its importance}
 }
 \value{
