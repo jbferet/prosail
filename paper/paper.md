@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 The PROSAIL model is a widely used radiative transfer model that combines the 
 *leaf optical PROperties SPECtra* (PROSPECT) model with the *Scattering by 
-arbitrarily inclined leaves* (SAIL) canopy bidirectional reflectance model 
+Arbitrarily Inclined Leaves* (SAIL) canopy bidirectional reflectance model 
 [@jacquemoud2009; @berger2018].
 It is designed to simulate the reflectance of vegetation canopies across a broad 
 spectral domain, including the visible, near-infrared, shortwave infrared and 
@@ -201,7 +201,7 @@ parameters accounted for by the various versions of the PROSPECT model.
 
 - LAI, which is defined as the one-sided green leaf area per 
 unit ground surface area in broadleaf canopies. 
-It is dimensionless and is sometimes expressed in $$m^{2}.m^{-2}$$
+It is dimensionless and is sometimes expressed in $m^{2}.m^{-2}$
 
 - Leaf inclination distribution, which can be defined following different *Leaf 
 Inclination Distribution Functions* (LIDF). 
@@ -502,10 +502,9 @@ reference BRF and simulated BRF) can also be adjusted.
 ```r
 # define prior information on average leaf angle LIDFa
 prior_info <- list('mean' = data.frame('LIDFa' = 60), 
-				   'sd' = data.frame('LIDFa' = 10), 
-				   'WeightPrior' = 0.01)
-
-
+                   'sd' = data.frame('LIDFa' = 10), 
+                   'WeightPrior' = 0.01)
+                   
 # invert PROSAIL on BRF with 1 nm spectral sampling and probability density 
 # function for LIDFa
 est_1nm_p <- Invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
