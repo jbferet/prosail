@@ -28,8 +28,8 @@ bibliography: paper.bib
 # Summary
 
 The PROSAIL model is a widely used radiative transfer model that combines the 
-PROSPECT leaf optical properties model with the *Scattering by arbitrarily 
-inclined leaves* (SAIL) canopy bidirectional reflectance model 
+*leaf optical PROperties SPECtra* (PROSPECT) model with the *Scattering by 
+arbitrarily inclined leaves* (SAIL) canopy bidirectional reflectance model 
 [@jacquemoud2009; @berger2018].
 It is designed to simulate the reflectance of vegetation canopies across a broad 
 spectral domain, including the visible, near-infrared, shortwave infrared and 
@@ -76,7 +76,7 @@ and agrosystem functions, as well as carbon, water and energy budgets.
 Vegetation radiative transfer models (RTMs) aim at describing the interactions 
 between light and these biophysical and chemical properties, through absorption 
 and scattering mechanisms. 
-At leaf scale, the model PROSPECT (*leaf optical PROperties SPECtra*) [@feret2024] 
+At leaf scale, the model PROSPECT [@feret2024] 
 is currently the most popular physical model for the simulation of leaf optical 
 properties and the accurate estimation of leaf chemistry 
 [@feret2019; @spafford2021]. 
@@ -129,17 +129,18 @@ distribution and co-distribution of the input parameters, is described in the
 *Algorithmic Theoretical Background Document* (ATBD) [@weiss2020]) and cannot be 
 adjusted by users.
 Alternative distributions provide more interactive parameterization of the 
-inversion strategy, such as the ARTMO toolbox [@rivera2014] developed in Matlab.
+inversion strategy, such as the *Automated Radiative Transfer Models Operator*
+(ARTMO) toolbox [@rivera2014] developed in Matlab.
 
 The R package `prosail` includes the versions of the model PROSPECT implemented 
 in the package `prospect`: PROSPECT-D [@feret2017] and PROSPECT-PRO 
 [@feret2021]. 
 It also includes two versions of the model SAIL: 
 
-- *4SAIL* [@verhoef2007], a numerically stable adaptation of the SAILH version 
+- *4SAIL* [@verhoef2007], a numerically stable adaptation of the *SAILH* version 
 [@verhoef1998], which incorporate foliage hot spot to the original SAIL model
 
-- *4SAIL2* [@verhoefbach2007], a two layers version of 4SAIL accommodating 
+- *4SAIL2* [@verhoefbach2007], a two layers version of *4SAIL* accommodating 
 horizontal and vertical heterogeneities. 
 This version includes additional parameters to account for crown clumping, and 
 to describe the vertical distribution of two types of leaves described by 
@@ -200,7 +201,7 @@ parameters accounted for by the various versions of the PROSPECT model.
 
 - LAI, which is defined as the one-sided green leaf area per 
 unit ground surface area in broadleaf canopies. 
-It is dimensionless and is sometimes expressed in m[^2].m[^-2]
+It is dimensionless and is sometimes expressed in $$m^{2}.m^{-2}$$
 
 - Leaf inclination distribution, which can be defined following different *Leaf 
 Inclination Distribution Functions* (LIDF). 
@@ -287,6 +288,7 @@ rsoil <- SpecSOIL$Dry_Soil # soil reflectance
 Ref_4SAIL <- PRO4SAIL(input_prospect = input_prospect, 
                       TypeLidf = TypeLidf, LIDFa = LIDFa, lai = lai,
                       q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
+                      
 ```
 
 Additional input variables are required when using `4SAIL2` : 
@@ -309,6 +311,7 @@ Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2', input_prospect = input_prospect,
                        q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, 
                        Cv = Cv, Zeta = Zeta)
+
 ```
 
 ## Computation of BRF from PROSAIL outputs
@@ -332,6 +335,7 @@ BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
 # Compute BRF assuming clear sky conditions and using sun zenith angle
 BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
                          tts = 40, SpecATM_Sensor = SpecATM)
+
 ```
 
 ## Computation of fAPAR and albedo
@@ -344,6 +348,7 @@ hemispherical diffuse incident flux.
 fAPAR_4SAIL <- Compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
                              abs_hem = Ref_4SAIL$abs_hem,
                              tts = tts, SpecATM_Sensor = SpecATM)
+
 ```
 
 Finally, the albedo can be derived from direct solar incident flux and 
@@ -353,6 +358,7 @@ hemispherical diffuse incident flux.
 albedo_4SAIL <- Compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
                                rddstar = Ref_4SAIL$rddstar,
                                tts = tts, SpecATM_Sensor = SpecATM)
+
 ```
 
 ## Simulating sensor BRF
@@ -390,6 +396,7 @@ spectral_properties = data.frame(wl = wl, fwhm = fwhm)
 sensor_name <- 'Hyperspectral_Sensor'
 SRF_HSI <- prosail::GetRadiometry(sensor_name = sensor_name,
                                   spectral_properties = spectral_properties)
+
 ```
 
 ## PROSAIL inversion through iterative optimization
@@ -453,21 +460,24 @@ est_1nm <- Invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
 
 # convert spectral input based on Sentinel-2 SRF
 SRF_S2 <- GetRadiometry('Sentinel_2A')
-brf_S2 <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                     SRF = SRF_S2, InRefl = brf_1nm$BRF)
-SpecPROSPECT_s2 <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                           SRF = SRF_S2, InRefl = prospect::SpecPROSPECT_FullRange)
-SpecSOIL_s2 <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                           SRF = SRF_S2, InRefl = SpecSOIL)
-SpecATM_s2 <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                           SRF = SRF_S2, InRefl = SpecATM)
+lambda <- prospect::SpecPROSPECT_FullRange$lambda
+brf_S2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
+                                           InRefl = brf_1nm$BRF)
+SpecPROSPECT_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
+                                           InRefl = SpecPROSPECT_FullRange)
+SpecSOIL_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
+                                           InRefl = SpecSOIL)
+SpecATM_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
+                                           InRefl = SpecATM)
 
 # invert PROSAIL on Sentinel-2 BRF
 est_s2 <- Invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
                          lower_bound = LB, upper_bound = UB,
                          SpecPROSPECT_Sensor = SpecPROSPECT_s2,
-                         SpecATM_Sensor = SpecATM_s2, SpecSOIL_Sensor = SpecSOIL_s2,
+                         SpecATM_Sensor = SpecATM_s2, 
+                         SpecSOIL_Sensor = SpecSOIL_s2,
                          TypeLidf = 2, parm_set = parm_set)
+
 ```
 
 ### Iterative optimization with prior information
@@ -514,6 +524,7 @@ est_s2_p <- Invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
                            SpecSOIL_Sensor = SpecSOIL_s2,
                            TypeLidf = 2, parm_set = parm_set,
                            prior_info =  prior_info)
+
 ```
 
 ## PROSAIL hybrid inversion
@@ -613,6 +624,7 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     SRF = SRF, 
                                     Bands2Select = Bands2Select, 
                                     output_dir = PROSAIL_ResPath)
+                                    
 ```
 
 The processing steps called in `train_prosail_inversion` can be broken down as 
@@ -625,7 +637,7 @@ input_prosail <- get_input_prosail(atbd = TRUE, GeomAcq = GeomAcq)
 
 # generate a LUT with 1 nm spectral sampling
 res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL', input_prosail = input_prosail,
-                            SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
+                            SpecPROSPECT = SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL, SpecATM = SpecATM)
 
 # include fcover and fAPAR (derived from SAIL reflectance / absortion factors)
@@ -634,20 +646,23 @@ input_prosail$fCover <- res$fCover
 input_prosail$fAPAR <- res$fAPAR
 
 # apply Sentinel-2 SRF to get sensor BRF
-BRF_LUT <- applySensorCharacteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
-                                      SRF = SRF, InRefl = res$BRF)
+BRF_LUT <- applySensorCharacteristics(wvl = lambda, SRF = SRF, 
+                                      InRefl = res$BRF)
 # identify spectral bands in LUT
 rownames(BRF_LUT) <- SRF$Spectral_Bands
 
-# apply noise and produce a LUT for each parameter (may vary with variable to explain)
+# apply noise and produce a LUT for each parameter
 for (parm in Parms2Estimate) 
   BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT)
 
 # train a set of SVR models for each parameter
 modelSVR <- list()
-for (parm in Parms2Estimate)
+for (parm in Parms2Estimate){
+  input_variables <- input_prosail[[parm]]
   modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],
-                                           input_variables = input_prosail[[parm]])
+                                           input_variables = input_variables)
+}
+
 ```
 
 The resulting models can then be applied on data tables or raster data. 
@@ -663,6 +678,7 @@ for (parm in Parms2Estimate){
   MeanEstimate[[parm]] <- HybridRes$MeanEstimate
   StdEstimate[[parm]] <- HybridRes$StdEstimate
 }
+
 ```
 
 
@@ -710,6 +726,7 @@ st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG', delete_dsn = T)
 s2_products <- extract_from_safe(safe_path = safe_path, 
                                  path_aoi = path_aoi, 
                                  output_dir = out_s2)
+
 ```
 
 
