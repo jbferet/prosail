@@ -329,11 +329,11 @@ sun zenith angle and assuming clear sky conditions.
 
 ```r
 # Compute BRF with known skyl
-BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
+BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
                          skyl = 0.23, SpecATM_Sensor = SpecATM)
 
 # Compute BRF assuming clear sky conditions and using sun zenith angle
-BRF_4SAIL <- Compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
+BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
                          tts = 40, SpecATM_Sensor = SpecATM)
 
 ```
@@ -345,7 +345,7 @@ canopy absorptance for direct solar incident flux and canopy absorptance for
 hemispherical diffuse incident flux.
 
 ```r
-fAPAR_4SAIL <- Compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
+fAPAR_4SAIL <- compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
                              abs_hem = Ref_4SAIL$abs_hem,
                              tts = tts, SpecATM_Sensor = SpecATM)
 
@@ -355,7 +355,7 @@ Finally, the albedo can be derived from direct solar incident flux and
 hemispherical diffuse incident flux.
 
 ```r
-albedo_4SAIL <- Compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
+albedo_4SAIL <- compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
                                rddstar = Ref_4SAIL$rddstar,
                                tts = tts, SpecATM_Sensor = SpecATM)
 
@@ -386,7 +386,7 @@ exact SRF.
 
 ```r
 # get the spectral response function (SRF) for Sentinel-2A
-SRF_S2 <- GetRadiometry('Sentinel_2A')
+SRF_S2 <- get_radiometry('Sentinel_2A')
 
 # get the SRF corresponding to a sensor defined by user. 
 # Hyperspectral sensor: 10 nm spectral sampling & 10 nm fwhm for all bands
@@ -394,8 +394,8 @@ wl <- seq(400, 2500, by = 10)
 fwhm <- rep(x = 10, length = length(wl))
 spectral_properties = data.frame(wl = wl, fwhm = fwhm)
 sensor_name <- 'Hyperspectral_Sensor'
-SRF_HSI <- prosail::GetRadiometry(sensor_name = sensor_name,
-                                  spectral_properties = spectral_properties)
+SRF_HSI <- get_radiometry(sensor_name = sensor_name,
+                          spectral_properties = spectral_properties)
 
 ```
 
@@ -435,7 +435,7 @@ UB <- data.frame('CHL' = 80, 'CAR' = 20, 'EWT' = 0.03, 'LMA' = 0.03,
 
 # define parameters set for inversion
 parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
-                      'ANT' = 0, 'BROWN' = 0, 'q' = 0.1)
+                       'ANT' = 0, 'BROWN' = 0, 'q' = 0.1)
 
 # compute soil reflectance
 rsoil <- parm_set$psoil*SpecSOIL$Dry_Soil+(1-parm_set$psoil)*SpecSOIL$Wet_Soil
@@ -444,34 +444,36 @@ rsoil <- parm_set$psoil*SpecSOIL$Dry_Soil+(1-parm_set$psoil)*SpecSOIL$Wet_Soil
 truth <- data.frame('CHL' = 60, 'CAR' = 8, 'EWT' = 0.015, 'LMA' = 0.005,
                     'lai' = 3,  'LIDFa' = 60, 'N' = 1.8)
 Refl_1nm <- PRO4SAIL(N = truth$N, CHL = truth$CHL, CAR = truth$CAR,
-                     ANT = parm_set$ANT, BROWN = parm_set$BROWN, EWT = truth$EWT,
-                     LMA = truth$LMA, TypeLidf = 2, lai = truth$lai,
-                     q = parm_set$q, LIDFa = Init$LIDFa, rsoil = rsoil,
-                     tts = parm_set$tts, tto = parm_set$tto, psi = parm_set$psi)
-brf_1nm <- prosail::Compute_BRF(rdot = Refl_1nm$rdot, rsot = Refl_1nm$rsot,
-                                tts = parm_set$tts, SpecATM_Sensor = SpecATM)
+                     ANT = parm_set$ANT, BROWN = parm_set$BROWN, 
+                     EWT = truth$EWT, LMA = truth$LMA, TypeLidf = 2, 
+                     lai = truth$lai, q = parm_set$q, LIDFa = Init$LIDFa, 
+                     rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto, 
+                     psi = parm_set$psi)
+brf_1nm <- compute_BRF(rdot = Refl_1nm$rdot, rsot = Refl_1nm$rsot,
+                       tts = parm_set$tts, SpecATM_Sensor = SpecATM)
 
 # invert PROSAIL on BRF with 1 nm spectral sampling
-est_1nm <- Invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
+est_1nm <- invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
                           lower_bound = LB, upper_bound = UB,
                           SpecPROSPECT_Sensor = SpecPROSPECT_FullRange,
                           SpecATM_Sensor = SpecATM, SpecSOIL_Sensor = SpecSOIL,
                           TypeLidf = 2, parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
-SRF_S2 <- GetRadiometry('Sentinel_2A')
-lambda <- prospect::SpecPROSPECT_FullRange$lambda
-brf_S2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
-                                           InRefl = brf_1nm$BRF)
-SpecPROSPECT_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
-                                           InRefl = SpecPROSPECT_FullRange)
-SpecSOIL_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
-                                           InRefl = SpecSOIL)
-SpecATM_s2 <- applySensorCharacteristics(wvl = lambda, SRF = SRF_S2, 
-                                           InRefl = SpecATM)
+SRF_S2 <- get_radiometry(sensor_name = 'Sentinel_2A')
+SpecPROSPECT <- SpecPROSPECT_FullRange
+lambda <- SpecPROSPECT_FullRange$lambda
+brf_S2 <- apply_sensor_characteristics(wvl = lambda, SRF = SRF_S2, 
+                                       input_refl_table = brf_1nm$BRF)
+SpecPROSPECT_s2 <- apply_sensor_characteristics(wvl = lambda, SRF = SRF_S2, 
+                                                input_refl_table = SpecPROSPECT)
+SpecSOIL_s2 <- apply_sensor_characteristics(wvl = lambda, SRF = SRF_S2, 
+                                            input_refl_table = SpecSOIL)
+SpecATM_s2 <- apply_sensor_characteristics(wvl = lambda, SRF = SRF_S2, 
+                                           input_refl_table = SpecATM)
 
 # invert PROSAIL on Sentinel-2 BRF
-est_s2 <- Invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
+est_s2 <- invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
                          lower_bound = LB, upper_bound = UB,
                          SpecPROSPECT_Sensor = SpecPROSPECT_s2,
                          SpecATM_Sensor = SpecATM_s2, 
@@ -504,10 +506,10 @@ reference BRF and simulated BRF) can also be adjusted.
 prior_info <- list('mean' = data.frame('LIDFa' = 60), 
                    'sd' = data.frame('LIDFa' = 10), 
                    'WeightPrior' = 0.01)
-                   
+
 # invert PROSAIL on BRF with 1 nm spectral sampling and probability density 
 # function for LIDFa
-est_1nm_p <- Invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
+est_1nm_p <- invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
                             lower_bound = LB, upper_bound = UB,
                             SpecPROSPECT_Sensor = SpecPROSPECT_FullRange,
                             SpecATM_Sensor = SpecATM, 
@@ -516,7 +518,7 @@ est_1nm_p <- Invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
                             prior_info =  prior_info)
 
 # invert PROSAIL on Sentinel-2 BRF and probability density function for LIDFa
-est_s2_p <- Invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
+est_s2_p <- invert_PROSAIL(brf_mes = brf_S2, initialization = Init,
                            lower_bound = LB, upper_bound = UB,
                            SpecPROSPECT_Sensor = SpecPROSPECT_s2,
                            SpecATM_Sensor = SpecATM_s2, 
@@ -604,10 +606,9 @@ SRF <- get_radiometry('Sentinel_2')
 Parms2Estimate <- c('lai', 'fCover', 'fAPAR')
 
 # define spectral bands required to train SVR model for each variable
-Bands2Select <- list()
-S2BandSelect <- c('B3','B4','B8')
+selected_bands <- list()
 for (parm in Parms2Estimate)
-  Bands2Select[[parm]] <- match(S2BandSelect,SRF$Spectral_Bands)
+  selected_bands[[parm]] <- c('B3','B4','B8')
 
 # define output directory where LUTs will be saved
 prosail_dir <- './HybridInversion'
@@ -619,8 +620,7 @@ GeomAcq <- list('min' = data.frame('tto' = 0, 'tts' = 20, 'psi' = 0),
 # train model
 modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     atbd = TRUE, GeomAcq = GeomAcq, 
-                                    SRF = SRF, 
-                                    Bands2Select = Bands2Select, 
+                                    SRF = SRF, selected_bands = selected_bands, 
                                     output_dir = prosail_dir)
                                     
 ```
@@ -631,10 +631,10 @@ follows:
 
 ```r
 # produce input variables following ATBD specifications and geometry of acq.
-input_prosail <- get_input_prosail(atbd = TRUE, GeomAcq = GeomAcq)
+input_prosail <- get_input_PROSAIL(atbd = TRUE, GeomAcq = GeomAcq)
 
 # generate a LUT with 1 nm spectral sampling
-res <- Generate_LUT_PROSAIL(SAILversion = '4SAIL', input_prosail = input_prosail,
+res <- generate_LUT_PROSAIL(SAILversion = '4SAIL', input_prosail = input_prosail,
                             SpecPROSPECT = SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL, SpecATM = SpecATM)
 
@@ -644,14 +644,15 @@ input_prosail$fCover <- res$fCover
 input_prosail$fAPAR <- res$fAPAR
 
 # apply Sentinel-2 SRF to get sensor BRF
-BRF_LUT <- applySensorCharacteristics(wvl = lambda, SRF = SRF, 
-                                      InRefl = res$BRF)
+BRF_LUT <- apply_sensor_characteristics(wvl = lambda, SRF = SRF, 
+                                        InRefl = res$BRF)
 # identify spectral bands in LUT
 rownames(BRF_LUT) <- SRF$Spectral_Bands
 
 # apply noise and produce a LUT for each parameter
+BRF_LUT_Noise <- list()
 for (parm in Parms2Estimate) 
-  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT)
+  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT = BRF_LUT)
 
 # train a set of SVR models for each parameter
 modelSVR <- list()
@@ -701,7 +702,7 @@ the Sentinel-2 tile footprint.
 
 
 ```r
-# define path for original imagem subset and prosail outputs
+# define path for original image subset and prosail outputs
 main_dir <- './barrax'                              # main directory
 safe_dir <- file.path(main_dir, 's2_safe')          # SAFE directory
 out_s2 <- file.path(main_dir, 'S2_subset')          # S2 subset directory
