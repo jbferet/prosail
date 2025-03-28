@@ -28,27 +28,33 @@ bibliography: paper.bib
 # Summary
 
 The PROSAIL model is a widely used radiative transfer model that combines the 
-PROSPECT leaf optical properties model with the SAIL canopy bidirectional 
-reflectance model [@jacquemoud2009; @berger2018].
+PROSPECT leaf optical properties model with the *Scattering by arbitrarily 
+inclined leaves* (SAIL) canopy bidirectional reflectance model 
+[@jacquemoud2009; @berger2018].
 It is designed to simulate the reflectance of vegetation canopies across a broad 
 spectral domain, including the visible, near-infrared, shortwave infrared and 
 thermal infrared regions of the electromagnetic spectrum.
 
-PROSAIL integrates the optical properties of individual leaves, as calculated by 
-PROSPECT [@jacquemoud1990], with the structural characteristics of the canopy, 
-as modeled by SAIL [@verhoef1984]. 
+PROSAIL integrates the optical properties of individual leaves, calculated by 
+PROSPECT [@jacquemoud1990], with the structural characteristics of the canopy 
+modeled by SAIL [@verhoef1984]. 
 This combination allows for the simulation of how light interacts with 
 vegetation at both the leaf and canopy levels, taking into account factors such 
 as leaf chemical content, leaf structure, canopy architecture, and viewing and 
 illumination angles.
 
-PROSAIL is commonly used in remote sensing applications to retrieve biophysical 
-parameters of vegetation, such as leaf area index (LAI), leaf water and pigment 
-content, the fraction of absorbed photosynthetically active radiation (fAPAR), 
-albedo and fractional vegetation cover (fCover).
 PROSAIL's ability to simulate bidirectional reflectance factor (BRF) under 
 various conditions makes it a valuable tool for agricultural monitoring, 
-ecological studies, and climate research.
+ecological studies, and climate research, where PROSAIL can be used to simulate 
+vegetation optical properties [@poulter2023]. 
+It is also used in combination with inversion procedures to retrieve vegetation 
+biophysical properties.
+These biophysical properties include leaf area index (LAI), leaf water and 
+pigment content, the fraction of absorbed photosynthetically active radiation 
+(fAPAR), albedo and fractional vegetation cover (fCover) among others.
+The capacity to retrieve a biophysical property mainly depends on the spectral 
+characteristics of the sensor, and the acquisition of sufficient spectral 
+information to solve an ill-posed problem. 
 
 Here, we introduce `prosail`, an R package which provides multiple versions of 
 the model PROSAIL, coupled with the latest versions of PROSPECT distributed with 
@@ -70,7 +76,7 @@ and agrosystem functions, as well as carbon, water and energy budgets.
 Vegetation radiative transfer models (RTMs) aim at describing the interactions 
 between light and these biophysical and chemical properties, through absorption 
 and scattering mechanisms. 
-At leaf scale, the model PROSPECT (leaf optical PROperties SPECtra) [@feret2024] 
+At leaf scale, the model PROSPECT (*leaf optical PROperties SPECtra*) [@feret2024] 
 is currently the most popular physical model for the simulation of leaf optical 
 properties and the accurate estimation of leaf chemistry 
 [@feret2019; @spafford2021]. 
@@ -86,12 +92,13 @@ A system of four linear differential equations can then be analytically solved.
 Detailed description of the functioning of the different SAIL versions can be 
 found in [@verhoefbach2007] and [@verhoef2007].
 
-More complex models include the Soil Canopy Observation of Photosynthesis and 
-Energy fluxes (SCOPE) [@yang2021] model, which features layered description of 
+More complex models include the *Soil Canopy Observation of Photosynthesis and 
+Energy fluxes* (SCOPE) [@yang2021] model, which features layered description of 
 the vegetation, enabling the simulation of vegetation with an understorey or 
-with a vertical gradient in leaf properties, and the DART model [@gastellu2015], 
-which allows for explicit 3D description of the canopy using geometric 
-representations or point clouds derived from LiDAR acquisitions.
+with a vertical gradient in leaf properties, and the *Discrete Anisotropic 
+Radiative Transfer* DART model [@gastellu2015], which allows for explicit 
+3-dimensional description of the canopy using geometric representations or point 
+clouds derived from LiDAR acquisitions.
 
 RTMs are increasingly used in remote sensing applications, in combination with 
 machine learning: RTMs are used to produce a BRF dataset with corresponding 
@@ -112,14 +119,14 @@ accurate for row crops and heterogeneous canopies.
 
 Various softwares currently allow application of hybrid inversion with PROSAIL 
 simulations. 
-The Sentinel Toolbox Application (SNAP) includes the `Biophysical Processor` 
-module [@weiss2020], which provides an implementation of 
+The *Sentinel Toolbox Application Platform* (SNAP) includes the 
+`Biophysical Processor` module [@weiss2020], which provides an implementation of 
 PROSAIL hybrid inversion combining PROSAIL simulations with an artificial neural 
 network regression model, for the estimation of vegetation properties, such as 
 LAI, fAPAR, fcover, canopy chlorophyll content and canopy water content. 
 The sampling strategy for the definition of the training set, including the 
 distribution and co-distribution of the input parameters, is described in the 
-Algorithmic Theoretical Background Document (ATBD) [@weiss2020]) and cannot be 
+*Algorithmic Theoretical Background Document* (ATBD) [@weiss2020]) and cannot be 
 adjusted by users.
 Alternative distributions provide more interactive parameterization of the 
 inversion strategy, such as the ARTMO toolbox [@rivera2014] developed in Matlab.
@@ -129,10 +136,10 @@ in the package `prospect`: PROSPECT-D [@feret2017] and PROSPECT-PRO
 [@feret2021]. 
 It also includes two versions of the model SAIL: 
 
-- 4SAIL [@verhoef2007], a numerically stable adaptation of the SAILH version 
+- *4SAIL* [@verhoef2007], a numerically stable adaptation of the SAILH version 
 [@verhoef1998], which incorporate foliage hot spot to the original SAIL model
 
-- 4SAIL2 [@verhoefbach2007], a two layers version of 4SAIL accommodating 
+- *4SAIL2* [@verhoefbach2007], a two layers version of 4SAIL accommodating 
 horizontal and vertical heterogeneities. 
 This version includes additional parameters to account for crown clumping, and 
 to describe the vertical distribution of two types of leaves described by 
@@ -191,12 +198,12 @@ These leaf optical properties can be simulated with the R package `prospect`
 package for a comprehensive description of the leaf chemical and structure 
 parameters accounted for by the various versions of the PROSPECT model. 
 
-- Leaf Area Index (LAI), which is defined as the one-sided green leaf area per 
+- LAI, which is defined as the one-sided green leaf area per 
 unit ground surface area in broadleaf canopies. 
-It is dimensionless and is sometimes expressed in m<sup>2sup>.m<sup>-2sup>
+It is dimensionless and is sometimes expressed in m[^2].m[^-2]
 
-- Leaf inclination distribution, which can be defined following different Leaf 
-Inclination Distribution Functions (LIDF). 
+- Leaf inclination distribution, which can be defined following different *Leaf 
+Inclination Distribution Functions* (LIDF). 
 The LIDF used in the original version of SAIL [verhoef1998] describes leaf
 inclination based on two parameters: `LIDFa` controls the average leaf slope, 
 and `LIDFb` controls the distribution's bimodality. 
