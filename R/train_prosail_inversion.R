@@ -21,7 +21,7 @@
 #' @param nb_models numeric. number of individual models to be run for ensemble
 #' @param replacement bolean. is there replacement in subsampling?
 #' @param Parms2Estimate list. list of input parameters to be estimated
-#' @param Bands2Select list. bands used for regression for each input parameter
+#' @param selected_bands list. bands used for regression for each input parameter
 #' @param noise_level list. noise added to reflectance (defined per input parm)
 #' @param SRF list. Spectral response function
 #' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
@@ -49,14 +49,32 @@ train_prosail_inversion <- function(input_prosail = NULL, BRF_LUT = NULL,
                                     SAILversion = '4SAIL', brown_lop = NULL,
                                     nb_samples = 2000, nb_samplesPerRun = 100,
                                     nb_models = 20, replacement = TRUE,
-                                    Parms2Estimate = 'lai', Bands2Select = NULL,
+                                    Parms2Estimate = 'lai', selected_bands = NULL,
                                     noise_level = NULL, SRF = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL,
                                     SpecATM = NULL, output_dir = './',
                                     method = 'liquidSVM',
                                     verbose = FALSE){
 
+  # create output directory
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
+  # define bands to select for inversion of each Parms2Estimate
+  if (is.null(selected_bands)){
+    Bands2Select <- NULL
+  } else {
+    Bands2Select <- list()
+    if (is.null(SRF)){
+      message('SRF not defined, cannot select bands according to their name')
+      message('"selected_bands" and "SRF$Spectral_Bands" needs to partly match')
+      message('prosail inversion will be trained with all variables available')
+      Bands2Select <- NULL
+    } else {
+      for (parm in Parms2Estimate)
+        Bands2Select[[parm]] <- match(selected_bands[[parm]], SRF$Spectral_Bands)
+    }
+  }
+
   ### == == == == == == == == == == == == == == == == == == == == == == ###
   ###     1- DEFINE THE LUT USED TO TRAIN THE HYBRID INVERSION          ###
   ### == == == == == == == == == == == == == == == == == == == == == == ###
@@ -75,7 +93,8 @@ train_prosail_inversion <- function(input_prosail = NULL, BRF_LUT = NULL,
     if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('parameters to generate BRF LUT provided by user in "input_prosail"')
-        message('following input variables will be ignored: "atbd" "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
+        message('following input variables will be ignored: ')
+        message('"atbd" "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
       }
     }
     # check if all parameters defined & use default value for undefined parameters

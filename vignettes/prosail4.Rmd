@@ -144,9 +144,12 @@ SRF <- get_radiometry(sensor_name)
 Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
-S2BandSel <- list('lai' = c('B3','B4','B8'), 'fCover' = c('B3','B4','B8'), 
-                  'fAPAR' = c('B3','B4','B8'), 'CHL' = c('B3','B4','B5','B6','B7','B8'), 
-                  'EWT' = c('B8A','B11','B12'), 'LMA' = c('B8A','B11','B12'))
+S2BandSel <- list('lai' = c('B3','B4','B8'), 
+                  'fCover' = c('B3','B4','B8'), 
+                  'fAPAR' = c('B3','B4','B8'), 
+                  'CHL' = c('B3','B4','B5','B6','B7','B8'), 
+                  'EWT' = c('B8A','B11','B12'), 
+                  'LMA' = c('B8A','B11','B12'))
 Bands2Select <- list()
 for (parm in Parms2Estimate)
   Bands2Select[[parm]] <- match(S2BandSel[[parm]], SRF$Spectral_Bands)
@@ -183,7 +186,7 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
 BPvars <- apply_prosail_inversion(raster_path = Refl_L2A, 
                                   HybridModel = modelSVR, 
                                   output_path = PROSAIL_ResPath,
-                                  selected_bands = S2BandSelect, 
+                                  selected_bands = S2BandSel, 
                                   bandname = SRF$Spectral_Bands, 
                                   mask_path = vegetation_mask, 
                                   multiplying_factor = 10000)

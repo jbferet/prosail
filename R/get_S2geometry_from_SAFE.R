@@ -15,44 +15,53 @@ get_S2geometry_from_SAFE <- function(s2xml){
   Distrib_SunAngle <- list()
   # SZA
   Distrib_SunAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
-  SZA <- c()
+  SZA <- list()
   for (i in seq_len(length(Distrib_SunAngle$Zenith))){
-    SZA <- c(SZA,as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,
-                                     split = ' ')[[1]]))
+    SZA[[i]] <- as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,
+                                    split = ' ')[[1]])
   }
+  SZA <- do.call(what = rbind, args = SZA)
   # SZA <- stats::na.omit(SZA)
 
   # SAA
   Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
-  SAA <- c()
-  for (i in seq_len(length(Distrib_SunAngle$Zenith))){
-    SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,
-                                     split = ' ')[[1]]))
+  SAA <- list()
+  for (i in seq_len(length(Distrib_SunAngle$Azimuth))){
+    SAA[[i]] <- as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,
+                                    split = ' ')[[1]])
   }
-  # SAA <- stats::na.omit(SAA)
+  SAA <- do.call(what = rbind, args = SAA)
 
   # VZA
-  VZA <- c()
+  VZA <- list()
+  ii <- 0
   band_detector <- s2xml$Geometric_Info$Tile_Angles
   for (i in 3:(length(band_detector)-2)) {
-    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
-    for (j in seq_len(length(values))){
-      VZA <- c(VZA,as.numeric(strsplit(x = values[j]$VALUES,
-                                       split = ' ')[[1]]))
+    ii <- ii + 1
+    vza_d <- band_detector[i]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
+    for (j in seq_len(length(Distrib_SunAngle$Zenith))){
+      vza_d[[j]] <- as.numeric(strsplit(x = vza_d[[j]],
+                                      split = ' ')[[1]])
     }
+    VZA[[ii]] <- do.call(what = rbind, args = vza_d)
   }
-  # VZA <- stats::na.omit(VZA)
+  # get mean view zenith angle for all detectors
+  VZA <- apply(simplify2array(VZA), 1:2, mean, na.rm=T)
 
   # VAA
-  VAA <- c()
+  VAA <- list()
+  ii <- 0
   band_detector <- s2xml$Geometric_Info$Tile_Angles
   for (i in 3:(length(band_detector)-2)) {
-    values <- band_detector[i]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
-    for (j in seq_len(length(values))){
-      VAA <- c(VAA,as.numeric(strsplit(x = values[j]$VALUES,
-                                       split = ' ')[[1]]))
+    ii <- ii + 1
+    vaa_d <- band_detector[i]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
+    for (j in seq_len(length(Distrib_SunAngle$Azimuth))){
+      vaa_d[[j]] <- as.numeric(strsplit(x = vaa_d[[j]],
+                                        split = ' ')[[1]])
     }
+    VAA[[ii]] <- do.call(what = rbind, args = vaa_d)
   }
-  # VAA <- stats::na.omit(VAA)
+  # get mean view azimuth angle for all detectors
+  VAA <- apply(simplify2array(VAA), 1:2, mean, na.rm=T)
   return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
 }

@@ -23,7 +23,7 @@ train_prosail_inversion(
   nb_models = 20,
   replacement = TRUE,
   Parms2Estimate = "lai",
-  Bands2Select = NULL,
+  selected_bands = NULL,
   noise_level = NULL,
   SRF = NULL,
   SpecPROSPECT = NULL,
@@ -72,7 +72,7 @@ parameters sampled with gaussian distribution}
 
 \item{Parms2Estimate}{list. list of input parameters to be estimated}
 
-\item{Bands2Select}{list. bands used for regression for each input parameter}
+\item{selected_bands}{list. bands used for regression for each input parameter}
 
 \item{noise_level}{list. noise added to reflectance (defined per input parm)}
 

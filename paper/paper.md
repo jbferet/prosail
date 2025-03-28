@@ -685,34 +685,35 @@ for (parm in Parms2Estimate){
 
 Here, we illustrate how to run `prosail` hybrid inversion on Sentinel-2 imagery.
 This requires additional packages, including the package `sf` to handle vector 
-data, and the package [`preprocs2`](https://jbferet.gitlab.io/preprocs2/), which 
-is dedicated to downloading and preprocessing Sentinel-2 data. 
+data, and two additional packages to handle Sentinel-2 data.
+The package [`sen2proc`](https://gitlab.com/floriandeboissieu/sen2proc) and the 
+package [`preprocs2`](https://jbferet.gitlab.io/preprocs2/) are two 
+complementary packages dedicated to access Sentinel-2 data from different 
+providers, and to perform various preprocessing and processing steps. 
 
-Sentinel-2 data can be accessed using various modalities and providers.
-`preprocs2` allows access to Sentinel-2 data from STAC API. 
-However, for the sake of comparison between biophysical variables produced from 
-the SNAP toolbox and those produced with the `prosail` hybrid inversion, the 
-Sentinel-2 Level-2A product corresponding to tile 30SWJ acquired on May 13th, 
-2021 was downloaded from the 
-[Copernicus browser](https://browser.dataspace.copernicus.eu).
+Here, for the sake of comparison between biophysical variables produced from 
+SNAP and those produced with the `prosail` hybrid inversion, the Sentinel-2 
+Level-2A product corresponding to tile *30SWJ* acquired on *May 13th, 2021* was 
+downloaded from the [Copernicus browser](https://browser.dataspace.copernicus.eu).
 
-Once the SAFE product downloaded, `preprocs2` is used to crop and save 
-reflectance data corresponding to an area of interest defined within the 
-Sentinel-2 tile footprint. 
+Once the SAFE product downloaded with `sen2proc`, `preprocs2` is used to crop 
+and save reflectance data corresponding to an area of interest defined within 
+the Sentinel-2 tile footprint. 
 
 
 ```r
-# libraries
-library(prosail)
-library(preprocS2)
-library(sf)
-
-# define path for original image and outputs
+# define path for original imagem subset and prosail outputs
 main_dir <- './barrax'                              # main directory
-safe_path <- file.path(main_dir,                    # path to SAFE L2A S2 image
-                       'S2B_MSIL2A_20210513T105619_N0500_R094_T30SWJ_20230228T104126.SAFE')
+safe_dir <- file.path(main_dir, 's2_safe')          # SAFE directory
 out_s2 <- file.path(main_dir, 'S2_subset')          # S2 subset directory
 out_BP <- file.path(main_dir, 'prosail_inversion')  # prosail products directory
+
+# search for L2A scene of interest with sen2proc
+stac_items <- s2_search(start = "2021-05-13", level = "L2A", tile = "30SWJ")
+
+# download files with sen2proc
+dir.create(path = safe_dir, showWarnings = FALSE, recursive = TRUE)
+safe_path <- cdse_download(stac_items, outdir = safe_dir)
 
 # define area of interest included in S2 tile
 aoi_bbox <- st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
@@ -721,10 +722,57 @@ aoi <- bbox_to_poly(aoi_bbox, crs = 32630)
 path_aoi <- file.path(main_dir, 'barrax.gpkg')
 st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG', delete_dsn = T)
 
+# extract area of interest from SAFE with preprocS2
 s2_products <- extract_from_safe(safe_path = safe_path, 
                                  path_aoi = path_aoi, 
                                  output_dir = out_s2)
+raster_path <- s2_products$Refl_path
+mask_path <- s2_products$cloudmasks$BinaryMask
 
+```
+
+The resulting raster data can then be directly processed with `prosail` using the 
+code provided hereafter. 
+
+```r
+# get geometry of acquisition with preprocS2
+S2Geom <- get_S2geometry(MTD_TL_xml = s2_products$MTD_TL)
+GeomAcq <- list('min' = data.frame('tto' = min(S2Geom$VZA, na.rm = T), 
+                                   'tts' = min(S2Geom$SZA, na.rm = T), 
+                                   'psi' = min(abs(S2Geom$SAA-S2Geom$VAA), 
+                                               na.rm = T)),
+                'max' = data.frame('tto' = max(S2Geom$VZA, na.rm = T), 
+                                   'tts' = max(S2Geom$SZA, na.rm = T), 
+                                   'psi' = max(abs(S2Geom$SAA-S2Geom$VAA), 
+                                               na.rm = T)))
+# get sensor response for Sentinel-2
+SRF <- get_radiometry('Sentinel_2B')
+bandname <- SRF$Spectral_Bands
+
+# define parameters to estimate
+Parms2Estimate <- c('lai', 'fCover', 'fAPAR', 'CHL')
+
+# define spectral bands required to train SVR model for each variable
+selected_bands <- list('lai' = c('B3','B4','B8'), 
+                       'fCover' = c('B3','B4','B8'), 
+                       'fAPAR' = c('B3','B4','B8'), 
+                       'CHL' = c('B3','B4','B5','B6','B7','B8'))
+
+# train SVR model for each variable of interest
+modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
+                                    atbd = TRUE, GeomAcq = GeomAcq, 
+                                    SRF = SRF, 
+                                    selected_bands = selected_bands, 
+                                    output_dir = out_BP)
+
+# apply SVR on S2 L2A reflectance
+BPvars <- apply_prosail_inversion(raster_path = raster_path, 
+                                  HybridModel = modelSVR, 
+                                  output_path = out_BP,
+                                  selected_bands = selected_bands, 
+                                  bandname = bandname, 
+                                  mask_path = mask_path, 
+                                  multiplying_factor = 10000)
 ```
 
 
@@ -737,7 +785,7 @@ implemented in `prosail` are compared to those produced with SNAP in Figure
 ![Biophysical properties estimated with `prosail` vs Biophysical properties estimated with SNAP. \label{fig:SNAP_prosail}](compare_SNAP_prosail.png){ width=90% }
 
 The two methods show relatively good consistency with Pearson correlation 
-coefficient ranging between 0.98 and 0.99 for the three variables.
+coefficient ranging between 0.99 and 1.00 for the three variables.
 Differences remain between the two implementations, including differences in the 
 version of the PROSPECT model (SNAP uses a version anterior to PROSPECT-D), and 
 differences in the soil reflectance used to produce the BRF LUT. 
