@@ -611,8 +611,7 @@ for (parm in Parms2Estimate)
   Bands2Select[[parm]] <- match(S2BandSelect,SRF$Spectral_Bands)
 
 # define output directory where LUTs will be saved
-PROSAIL_ResPath <- './HybridInversion'
-dir.create(path = PROSAIL_ResPath, showWarnings = FALSE,recursive = TRUE)
+prosail_dir <- './HybridInversion'
 
 # define ranges for geometry of acquisition
 GeomAcq <- list('min' = data.frame('tto' = 0, 'tts' = 20, 'psi' = 0), 
@@ -623,7 +622,7 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     atbd = TRUE, GeomAcq = GeomAcq, 
                                     SRF = SRF, 
                                     Bands2Select = Bands2Select, 
-                                    output_dir = PROSAIL_ResPath)
+                                    output_dir = prosail_dir)
                                     
 ```
 
@@ -714,7 +713,6 @@ safe_path <- file.path(main_dir,                    # path to SAFE L2A S2 image
                        'S2B_MSIL2A_20210513T105619_N0500_R094_T30SWJ_20230228T104126.SAFE')
 out_s2 <- file.path(main_dir, 'S2_subset')          # S2 subset directory
 out_BP <- file.path(main_dir, 'prosail_inversion')  # prosail products directory
-dir.create(path = out_BP, showWarnings = FALSE,recursive = TRUE)
 
 # define area of interest included in S2 tile
 aoi_bbox <- st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
