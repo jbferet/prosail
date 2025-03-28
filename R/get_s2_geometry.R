@@ -11,21 +11,21 @@
 #' @importFrom XML xml xmlToList
 #' @export
 
-get_S2geometry <- function(MTD_TL_xml, verbose = FALSE){
+get_s2_geometry <- function(MTD_TL_xml, verbose = FALSE){
 
   # read XML file containing info about geometry of acquisition
   s2xml <- XML::xml(MTD_TL_xml)
   s2xml <- XML::xmlToList(s2xml)
   if (is.null(s2xml$Dataset_Identification$AUTHORITY)){
-    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
+    GeomS2 <- get_s2_geometry_from_SAFE(s2xml)
   } else if (s2xml$Dataset_Identification$AUTHORITY=='THEIA'){
     if (verbose==TRUE){
       message('identification of S2 image produced by THEIA')
       message(s2xml$Dataset_Identification$IDENTIFIER)
     }
-    GeomS2 <- get_S2geometry_from_THEIA(s2xml)
+    GeomS2 <- get_s2_geometry_from_THEIA(s2xml)
   } else {
-    GeomS2 <- get_S2geometry_from_SAFE(s2xml)
+    GeomS2 <- get_s2_geometry_from_SAFE(s2xml)
   }
   return(list('SAA' = GeomS2$SAA, 'SZA' = GeomS2$SZA,
               'VAA' = GeomS2$VAA, 'VZA' = GeomS2$VZA))

@@ -736,7 +736,7 @@ code provided hereafter.
 
 ```r
 # get geometry of acquisition with preprocS2
-S2Geom <- get_S2geometry(MTD_TL_xml = s2_products$MTD_TL)
+S2Geom <- get_s2_geometry(MTD_TL_xml = s2_products$MTD_TL)
 GeomAcq <- list('min' = data.frame('tto' = min(S2Geom$VZA, na.rm = T), 
                                    'tts' = min(S2Geom$SZA, na.rm = T), 
                                    'psi' = min(abs(S2Geom$SAA-S2Geom$VAA), 

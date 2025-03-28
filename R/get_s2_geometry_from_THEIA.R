@@ -9,7 +9,7 @@
 #' @importFrom stats na.omit
 #' @export
 
-get_S2geometry_from_THEIA <- function(s2xml){
+get_s2_geometry_from_THEIA <- function(s2xml){
 
   Distrib_SunAngle <- list()
   # SZA

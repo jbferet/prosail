@@ -99,7 +99,7 @@ list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime,
                             siteName = 'Barrax', overwrite = FALSE, 
                             geomAcq = TRUE)
 # Sentinel-2 L2A reflectance
-Refl_L2A <- list_files$Refl_L2A
+refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
 vegetation_mask <- list_files$vegetation_mask
 # Sentinel-2 mask from provider ( = SCL from ESA products)
@@ -135,7 +135,6 @@ over smaller raster data.
 ```{r Hybrid_Inversion}
 library(prosail)
 output_dir_BP <- './PROSAIL'
-dir.create(path = output_dir_BP, showWarnings = FALSE,recursive = TRUE)
 # get sensor response for Sentinel-2
 sensor_name <- 'Sentinel_2'
 SRF <- get_radiometry(sensor_name)
@@ -144,15 +143,12 @@ SRF <- get_radiometry(sensor_name)
 Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
-S2BandSel <- list('lai' = c('B3','B4','B8'), 
-                  'fCover' = c('B3','B4','B8'), 
-                  'fAPAR' = c('B3','B4','B8'), 
-                  'CHL' = c('B3','B4','B5','B6','B7','B8'), 
-                  'EWT' = c('B8A','B11','B12'), 
-                  'LMA' = c('B8A','B11','B12'))
-Bands2Select <- list()
-for (parm in Parms2Estimate)
-  Bands2Select[[parm]] <- match(S2BandSel[[parm]], SRF$Spectral_Bands)
+selected_bands <- list('lai' = c('B3','B4','B8'), 
+                       'fCover' = c('B3','B4','B8'), 
+                       'fAPAR' = c('B3','B4','B8'), 
+                       'CHL' = c('B3','B4','B5','B6','B7','B8'), 
+                       'EWT' = c('B8A','B11','B12'), 
+                       'LMA' = c('B8A','B11','B12'))
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
@@ -172,21 +168,19 @@ GeomAcq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
 # set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in 
 # the R package caret instead of liquidSVM
 modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
-                                    atbd = TRUE, GeomAcq = GeomAcq, 
-                                    SRF = SRF, 
-                                    Bands2Select = Bands2Select, 
+                                    atbd = TRUE, GeomAcq = GeomAcq, SRF = SRF, 
+                                    selected_bands = selected_bands, 
                                     output_dir = output_dir_BP, 
                                     method = 'liquidSVM')
 
 # apply regression model on Sentinel-2 raster data
-# bigRaster = F by default. Do not mention it if the package is not installed
 # Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
 # Adapt multiplying_factor if not the case 
 # multiplying_factor = 1 if reflectance defined between 0 and 1
-BPvars <- apply_prosail_inversion(raster_path = Refl_L2A, 
+BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
                                   HybridModel = modelSVR, 
                                   output_path = PROSAIL_ResPath,
-                                  selected_bands = S2BandSel, 
+                                  selected_bands = selected_bands, 
                                   bandname = SRF$Spectral_Bands, 
                                   mask_path = vegetation_mask, 
                                   multiplying_factor = 10000)
