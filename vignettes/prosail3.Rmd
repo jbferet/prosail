@@ -205,7 +205,7 @@ input_prosail <- get_input_PROSAIL(atbd = TRUE,
 ```{r Generate_BRF_LUT_atbd}
 res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
+                            SpecPROSPECT = SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL,
                             SpecATM = SpecATM)
 BRF_LUT_1nm <- res$BRF
@@ -217,7 +217,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_atbd}
-BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
+BRF_LUT <- apply_sensor_characteristics(wvl = SpecPROSPECT_FullRange$lambda, 
                                         SRF = SRF, 
                                         input_refl_table = BRF_LUT_1nm)
 # identify spectral bands in LUT
@@ -353,10 +353,10 @@ PROSAIL_ResPath <- 'HybridInversion_User'
 dir.create(path = PROSAIL_ResPath, showWarnings = FALSE,recursive = TRUE)
 
 # define min and max values for PROSAIL input variables
-minval <- data.frame('N' = 1.0, 'CHL' = 10, 'CAR' = 0, 'ANT' = 0, 'EWT' = 0.001, 
+minval <- data.frame('N' = 1.0, 'CHL' = 10, 'CAR' = 0, 'ANT' = 0, 'EWT' =0.001, 
                      'LMA' = 0.001, 'BROWN'=0.01, 'psoil' = 0.0, 'LIDFa' = 30, 
                      'lai' = 0.1, 'q'=0.1, 'tto' = 0, 'tts' = 20, 'psi' = 100)
-maxval <- data.frame('N' = 2.0, 'CHL' = 60, 'CAR' = 15, 'ANT' = 5, 'EWT' = 0.045, 
+maxval <- data.frame('N' = 2.0, 'CHL' = 60, 'CAR' = 15, 'ANT' = 5, 'EWT' =0.045, 
                      'LMA' = 0.040, 'BROWN'=0.5, 'psoil' = 1.0, 'LIDFa' = 70, 
                      'lai' = 5.0,'q'=0.5,'tto' = 5,'tts' = 30, 'psi' = 150)
 
@@ -416,7 +416,7 @@ input_prosail <- get_input_PROSAIL(minval = minval, maxval = maxval,
 ```{r Generate_BRF_LUT_user}
 res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
+                            SpecPROSPECT = SpecPROSPECT_FullRange,
                             SpecSOIL = SpecSOIL,
                             SpecATM = SpecATM)
 BRF_LUT_1nm <- res$BRF
@@ -427,7 +427,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_user}
-BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda, 
+BRF_LUT <- apply_sensor_characteristics(wvl = SpecPROSPECT_FullRange$lambda, 
                                         SRF = SRF, 
                                         input_refl_table = BRF_LUT_1nm)
 # identify spectral bands in LUT

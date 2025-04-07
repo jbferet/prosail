@@ -23,11 +23,11 @@ test_that("hybrid inversion ok", {
   # produce LUT
   res <- generate_LUT_PROSAIL(SAILversion = '4SAIL',
                               input_prosail = input_prosail,
-                              SpecPROSPECT = prospect::SpecPROSPECT_FullRange,
+                              SpecPROSPECT = SpecPROSPECT_FullRange,
                               SpecSOIL = prosail::SpecSOIL,
                               SpecATM = prosail::SpecATM)
   BRF_LUT_1nm <- res$BRF
-  BRF_LUT <- apply_sensor_characteristics(wvl = prospect::SpecPROSPECT_FullRange$lambda,
+  BRF_LUT <- apply_sensor_characteristics(wvl = SpecPROSPECT_FullRange$lambda,
                                           SRF = SRF,
                                           input_refl_table = BRF_LUT_1nm)
   # identify spectral bands in LUT

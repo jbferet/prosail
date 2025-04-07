@@ -174,7 +174,7 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
                                     method = 'liquidSVM')
 
 # apply regression model on Sentinel-2 raster data
-# Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
+# S2 imagery is provided with reflectance defined as integer between 0 and 10000
 # Adapt multiplying_factor if not the case 
 # multiplying_factor = 1 if reflectance defined between 0 and 1
 BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 

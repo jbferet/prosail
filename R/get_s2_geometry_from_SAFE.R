@@ -46,7 +46,7 @@ get_s2_geometry_from_SAFE <- function(s2xml){
     VZA[[ii]] <- do.call(what = rbind, args = vza_d)
   }
   # get mean view zenith angle for all detectors
-  VZA <- apply(simplify2array(VZA), 1:2, mean, na.rm=T)
+  VZA <- apply(simplify2array(VZA), 1:2, mean, na.rm = TRUE)
 
   # VAA
   VAA <- list()
@@ -62,6 +62,6 @@ get_s2_geometry_from_SAFE <- function(s2xml){
     VAA[[ii]] <- do.call(what = rbind, args = vaa_d)
   }
   # get mean view azimuth angle for all detectors
-  VAA <- apply(simplify2array(VAA), 1:2, mean, na.rm=T)
+  VAA <- apply(simplify2array(VAA), 1:2, mean, na.rm = TRUE)
   return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
 }

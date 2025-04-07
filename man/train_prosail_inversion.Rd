@@ -10,6 +10,7 @@ train_prosail_inversion(
   BRF_LUT = NULL,
   atbd = FALSE,
   GeomAcq = NULL,
+  SRF = NULL,
   codistribution_lai = TRUE,
   minval = NULL,
   maxval = NULL,
@@ -19,13 +20,11 @@ train_prosail_inversion(
   SAILversion = "4SAIL",
   brown_lop = NULL,
   nb_samples = 2000,
-  nb_samplesPerRun = 100,
   nb_models = 20,
   replacement = TRUE,
   Parms2Estimate = "lai",
   selected_bands = NULL,
   noise_level = NULL,
-  SRF = NULL,
   SpecPROSPECT = NULL,
   SpecSOIL = NULL,
   SpecATM = NULL,
@@ -44,6 +43,8 @@ to produce a training LUT}
 applied ?}
 
 \item{GeomAcq}{list. geometry of acquisition: min and max tts, tto & psi}
+
+\item{SRF}{list. Spectral response function}
 
 \item{codistribution_lai}{boolean. set TRUE if codistribution with LAI accounted for}
 
@@ -64,8 +65,6 @@ parameters sampled with gaussian distribution}
 
 \item{nb_samples}{numeric. number of samples in training LUT}
 
-\item{nb_samplesPerRun}{numeric. nb of training sample per individual regression model}
-
 \item{nb_models}{numeric. number of individual models to be run for ensemble}
 
 \item{replacement}{bolean. is there replacement in subsampling?}
@@ -75,8 +74,6 @@ parameters sampled with gaussian distribution}
 \item{selected_bands}{list. bands used for regression for each input parameter}
 
 \item{noise_level}{list. noise added to reflectance (defined per input parm)}
-
-\item{SRF}{list. Spectral response function}
 
 \item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
 

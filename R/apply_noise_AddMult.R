@@ -1,7 +1,7 @@
 #' This function applies additive and multiplicative noise to BRF data
 #' - if additive_noise and multiplicative_noise are defined with a unique value,
 #' noise is homogeneous across all spectrum
-#' - if additive_noise and multiplicative_noise are the same length as the number
+#' - if additive_noise and multiplicative_noise are the same length as the nb
 #' of spectral bands (rows in BRF_LUT), noise is specific to each spectral band
 #'
 #' @param BRF_LUT numeric. BRF LUT

@@ -53,8 +53,8 @@ adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor, input_prospect,
         brown_lop <- green_lop
       } else {
         if (!dim(input_prospect)[1]==2){
-          message('4SAIL2 needs two sets of optical properties for green and brown vegetation')
-          message('Currently one set is defined. will run 4SAIL instead of 4SAIL2')
+          message('4SAIL2 needs 2 sets of optical props for green & brown veg')
+          message('1 set only curently defined. Switch to 4SAIL')
           SAILversion <- '4SAIL'
         } else {
           inprospect_brown <- prospect::define_Input_PROSPECT(input_prospect[2,])

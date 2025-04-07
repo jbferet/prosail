@@ -15,10 +15,11 @@ test_that("PROSAIL iterative optimization", {
   truth <- data.frame('CHL' = 60, 'CAR' = 8, 'EWT' = 0.015, 'LMA' = 0.005,
                       'lai' = 5,  'N' = 1.8)
   Refl_1nm <- PRO4SAIL(N = truth$N, CHL = truth$CHL, CAR = truth$CAR,
-                       ANT = parm_set$ANT, BROWN = parm_set$BROWN, EWT = truth$EWT,
-                       LMA = truth$LMA, TypeLidf = 2, lai = truth$lai,
-                       q = parm_set$q, LIDFa = parm_set$LIDFa, rsoil = rsoil,
-                       tts = parm_set$tts, tto = parm_set$tto, psi = parm_set$psi)
+                       ANT = parm_set$ANT, BROWN = parm_set$BROWN,
+                       EWT = truth$EWT, LMA = truth$LMA, TypeLidf = 2,
+                       lai = truth$lai, q = parm_set$q, LIDFa = parm_set$LIDFa,
+                       rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto,
+                       psi = parm_set$psi)
   brf_1nm <- prosail::compute_BRF(rdot = Refl_1nm$rdot,
                                   rsot = Refl_1nm$rsot,
                                   tts = parm_set$tts,

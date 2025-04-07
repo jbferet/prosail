@@ -72,15 +72,18 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
     output_rasters <- list()
     for (parm in BPvar){
       listname <- paste0('Mean_',parm)
-      output_rasters[[listname]] <- file.path(output_path, paste(raster_name, parm,
+      output_rasters[[listname]] <- file.path(output_path, paste(raster_name,
+                                                                 parm,
                                                                  sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarpath[[parm]] <- output_rasters[[listname]]
 
       listname <- paste0('SD_',parm)
-      output_rasters[[listname]] <- file.path(output_path, paste(raster_name, parm,
-                                                                 'STD', sep = '_'))
+      output_rasters[[listname]] <- file.path(output_path, paste(raster_name,
+                                                                 parm,
+                                                                 'STD',
+                                                                 sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
       BPvarSDpath[[parm]] <- output_rasters[[listname]]
@@ -135,7 +138,8 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
         # initiate progress bar
         pgbarlength <- length(HybridModel[[parm]])*blk$n
         pb <- progress_bar$new(
-          format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull , estimated time remaining :eta",
+          format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull ,
+          estimated time remaining :eta",
           total = pgbarlength, clear = FALSE, width= 100)
       }
       # output files

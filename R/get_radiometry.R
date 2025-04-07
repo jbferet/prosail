@@ -52,7 +52,7 @@ get_radiometry <- function(sensor_name = 'Custom',
   } else if (toupper(sensor_name) == 'MODIS'){
     SRF <- prosail::MODIS
     SRF$Sensor <- 'MODIS'
-  } else if (toupper(sensor_name) %in% c('SPOT_6_7', 'SPOT_6', 'SPOT6', 'SPOT-6',
+  } else if (toupper(sensor_name) %in% c('SPOT_6_7','SPOT_6', 'SPOT6', 'SPOT-6',
                                          'SPOT_7', 'SPOT7', 'SPOT-7')){
     SRF <- prosail::SPOT_6_7
     SRF$Sensor <- 'SPOT_6_7'

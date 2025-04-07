@@ -7,7 +7,7 @@
 #' @param atbd boolean. should input parameter distribution from ATBD be
 #' applied ?
 #' @param GeomAcq list. geometry of acquisition: min and max tts, tto & psi
-#' @param codistribution_lai boolean. set TRUE if codistribution with LAI accounted for
+#' @param codistribution_lai boolean. TRUE: codistrib with LAI accounted for
 #' @param minval list. min val for input parms sampled to produce a training LUT
 #' @param maxval list. max val for input parms sampled to produce a training LUT
 #' @param TypeDistrib  list. Type of distribution. 'Uniform' or 'Gaussian'
@@ -17,11 +17,10 @@
 #' @param SAILversion character. Either 4SAIL or 4SAIL2
 #' @param brown_lop character. Either 4SAIL or 4SAIL2
 #' @param nb_samples numeric. number of samples in training LUT
-#' @param nb_samplesPerRun numeric. nb of training sample per individual regression model
 #' @param nb_models numeric. number of individual models to be run for ensemble
 #' @param replacement bolean. is there replacement in subsampling?
 #' @param Parms2Estimate list. list of input parameters to be estimated
-#' @param selected_bands list. bands used for regression for each input parameter
+#' @param selected_bands list. bands used for regression for each input param
 #' @param noise_level list. noise added to reflectance (defined per input parm)
 #' @param SRF list. Spectral response function
 #' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
@@ -42,19 +41,17 @@
 #' @export
 
 train_prosail_inversion <- function(input_prosail = NULL, BRF_LUT = NULL,
-                                    atbd = FALSE, GeomAcq = NULL,
+                                    atbd = FALSE, GeomAcq = NULL, SRF = NULL,
                                     codistribution_lai = TRUE, minval = NULL,
                                     maxval = NULL, TypeDistrib = NULL,
                                     GaussianDistrib = NULL, parm_set = NULL,
                                     SAILversion = '4SAIL', brown_lop = NULL,
-                                    nb_samples = 2000, nb_samplesPerRun = 100,
-                                    nb_models = 20, replacement = TRUE,
-                                    Parms2Estimate = 'lai', selected_bands = NULL,
-                                    noise_level = NULL, SRF = NULL,
+                                    nb_samples = 2000, nb_models = 20,
+                                    replacement = TRUE, Parms2Estimate = 'lai',
+                                    selected_bands = NULL, noise_level = NULL,
                                     SpecPROSPECT = NULL, SpecSOIL = NULL,
                                     SpecATM = NULL, output_dir = './',
-                                    method = 'liquidSVM',
-                                    verbose = FALSE){
+                                    method = 'liquidSVM', verbose = FALSE){
 
   # create output directory
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
@@ -92,12 +89,12 @@ train_prosail_inversion <- function(input_prosail = NULL, BRF_LUT = NULL,
     input_prosail <- data.frame(input_prosail)
     if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
-        message('parameters to generate BRF LUT provided by user in "input_prosail"')
+        message('parms to generate BRF LUT provided by user in "input_prosail"')
         message('following input variables will be ignored: ')
         message('"atbd" "minval" "maxval" "TypeDistrib" "GaussianDistrib"')
       }
     }
-    # check if all parameters defined & use default value for undefined parameters
+    # check if all parameters defined & use default value for undefined parms
     UndefinedParms <- ListParms[which(is.na(match(ListParms,
                                                   names(input_prosail))))]
     for (parm in UndefinedParms) input_prosail[[parm]] <- defaultVal[[parm]]
@@ -129,7 +126,7 @@ train_prosail_inversion <- function(input_prosail = NULL, BRF_LUT = NULL,
     }
   } else {
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
-    ### 2- PRODUCE BRF from input_prosail & ddefault spectral sampling = 1nm  ###
+    ### 2- PRODUCE BRF from input_prosail & ddefault spectral sampling = 1nm  ##
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default SpecPROSPECT, SpecSOIL and SpecATM if undefined
     if (is.null(SpecPROSPECT)) SpecPROSPECT <- prospect::SpecPROSPECT_FullRange
