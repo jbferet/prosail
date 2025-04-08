@@ -165,7 +165,7 @@ Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',
 
 ## Compute simplified bidirectional reflectance factor (BRF) under the assumption of clear conditions conditions
 
-The function `compute_BRF` computes the bi-directional reflectance factor in the 
+The function `compute_brf` computes the bi-directional reflectance factor in the 
 direction of the observer, by combining both hemispherical-directional and 
 bi-directional reflectance factors.
 The direct and diffuse light are taken into account as described by 
@@ -177,14 +177,14 @@ by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/016
 # Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous 
 # illustration.
 # SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot,
+BRF_4SAIL <- compute_brf(rdot = Ref_4SAIL$rdot,
                          rsot = Ref_4SAIL$rsot,
                          tts = tts,
-                         SpecATM_Sensor = SpecATM)
-BRF_4SAIL2 <- compute_BRF(rdot = Ref_4SAIL2$rdot,
+                         spec_atm_sensor = SpecATM)
+BRF_4SAIL2 <- compute_brf(rdot = Ref_4SAIL2$rdot,
                           rsot = Ref_4SAIL2$rsot,
                           tts = tts,
-                          SpecATM_Sensor = SpecATM)
+                          spec_atm_sensor = SpecATM)
 
 ```
 
@@ -198,7 +198,7 @@ absorptance for hemispherical diffuse incident flux.
 fAPAR_4SAIL <- compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
                              abs_hem = Ref_4SAIL$abs_hem,
                              tts = tts,
-                             SpecATM_Sensor = SpecATM)
+                             spec_atm_sensor = SpecATM)
 ```
 
 ## Compute albedo
