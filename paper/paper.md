@@ -97,8 +97,8 @@ Energy fluxes* (SCOPE) [@yang2021] model, which features layered description of
 the vegetation, enabling the simulation of vegetation with an understorey or 
 with a vertical gradient in leaf properties, and the *Discrete Anisotropic 
 Radiative Transfer* DART model [@gastellu2015], which allows for explicit 
-3-dimensional description of the canopy using geometric representations or point 
-clouds derived from LiDAR acquisitions.
+3-dimensional description of the canopy using geometric representations with
+triangular meshes or turbid voxels that can be derived from LiDAR acquisitions.
 
 RTMs are increasingly used in remote sensing applications, in combination with 
 machine learning: RTMs are used to produce a BRF dataset with corresponding 
@@ -380,7 +380,7 @@ A selection of SRF corresponding to multiple sensors is already implemented in
 - Pleiades 1
 
 Users can also define the sensor of their choice, either by providing central 
-wavelength and full width half maximum (fwhm) corresponding to each band and 
+wavelength and full width at half maximum (fwhm) corresponding to each band and 
 assuming Gaussian response for each band, or by providing a file describing the 
 exact SRF. 
 
@@ -421,7 +421,7 @@ This procedure is based on the function `fmincon` included in the package
 `pracma`.
 The default criterion for the cost function corresponds to the root mean square 
 error (RMSE) between a reference BRF and BRF simulated with PROSAIL. 
-The example code below provides an example of iterative optimization applied to
+The code below provides an example of iterative optimization applied to
 simulated BRF at native spectral sampling (1 nm), and to Sentinel-2 BRF. 
 
 ```r
