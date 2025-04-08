@@ -37,9 +37,9 @@ merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brf_mes, SpecPROSPECT_Sensor,
                   tts = input_prosail$tts, tto = input_prosail$tto,
                   psi = input_prosail$psi, rsoil = rsoil)
   # Computes BRF based on outputs from PROSAIL and sun position
-  brf_mod <- compute_BRF(rdot = Ref$rdot, rsot = Ref$rsot,
+  brf_mod <- compute_brf(rdot = Ref$rdot, rsot = Ref$rsot,
                          tts = input_prosail$tts,
-                         SpecATM_Sensor = SpecATM_Sensor)
+                         spec_atm_sensor = SpecATM_Sensor)
   # compute cost
   fc <- cost_function_RMSE_PROSAIL(brf_mes = brf_mes, brf_mod$BRF, xprior,
                                    prior_info = prior_info)

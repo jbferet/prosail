@@ -61,10 +61,10 @@ generate_LUT_BRF <- function(input_prosail, SpecPROSPECT, SpecSOIL, SpecATM,
                           brown_lop = brown_lop)
     }
     # Computes BRF based on outputs from PROSAIL and sun position
-    BRF[[i]] <- compute_BRF(rdot = RefSAIL$rdot,
+    BRF[[i]] <- compute_brf(rdot = RefSAIL$rdot,
                             rsot = RefSAIL$rsot,
                             tts = input_prosail$tts[[i]],
-                            SpecATM_Sensor = SpecATM)
+                            spec_atm_sensor = SpecATM)
   }
   BRF <- do.call(cbind,BRF)
   row.names(BRF) <- band_names

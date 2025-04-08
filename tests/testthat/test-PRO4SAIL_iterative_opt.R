@@ -20,10 +20,10 @@ test_that("PROSAIL iterative optimization", {
                        lai = truth$lai, q = parm_set$q, LIDFa = parm_set$LIDFa,
                        rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto,
                        psi = parm_set$psi)
-  brf_1nm <- prosail::compute_BRF(rdot = Refl_1nm$rdot,
+  brf_1nm <- prosail::compute_brf(rdot = Refl_1nm$rdot,
                                   rsot = Refl_1nm$rsot,
                                   tts = parm_set$tts,
-                                  SpecATM_Sensor = SpecATM)
+                                  spec_atm_sensor = SpecATM)
   # invert 1 nm data
   est <- invert_PROSAIL(brf_mes = brf_1nm$BRF,
                         initialization = Init,

@@ -10,23 +10,30 @@
 #' @param rdot numeric. Hemispherical-directional refl factor viewing direction
 #' @param rsot numeric. Bi-directional reflectance factor
 #' @param tts numeric. Solar zenith angle
-#' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
+#' @param spec_atm_sensor list. direct and diffuse radiation for clear conditions
 #' @param skyl numeric. values for skyl
 #' @return BRF numeric. Bidirectional reflectance factor
 #' @export
-compute_BRF  <- function(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL){
-
-  ############################## #
-  ##	direct / diffuse light	##
-  ############################## #
-  Es <- SpecATM_Sensor$Direct_Light
-  Ed <- SpecATM_Sensor$Diffuse_Light
-  rd <- pi/180
+compute_brf <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL) {
+  ##############################
+  ## 	direct / diffuse light	##
+  ##############################
+  e_s <- spec_atm_sensor$Direct_Light
+  e_d <- spec_atm_sensor$Diffuse_Light
+  rd <- pi / 180
   # diffuse radiation (Francois et al., 2002)
-  if (is.null(skyl))
-    skyl <- 0.847-1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
-  PARdiro <- (1-skyl)*Es
-  PARdifo <- skyl*Ed
-  BRF <- (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
-  return(data.frame('BRF' = BRF))
+  if (is.null(skyl)) {
+    skyl <- 0.847 - 1.61 * sin((90 - tts) * rd) + 1.04 * sin((90 - tts) * rd) * sin((90 - tts) * rd)
+  }
+  par_dir_o <- (1 - skyl) * e_s
+  par_dif_o <- skyl * e_d
+  brf <- (rdot * par_dif_o + rsot * par_dir_o) / (par_dir_o + par_dif_o)
+  return(data.frame("BRF" = brf))
+}
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_BRF <- function(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL) {
+  .Deprecated("compute_brf")
+  compute_brf(rdot, rsot, tts, SpecATM_Sensor, skyl)
 }

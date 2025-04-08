@@ -329,12 +329,12 @@ sun zenith angle and assuming clear sky conditions.
 
 ```r
 # Compute BRF with known skyl
-BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
-                         skyl = 0.23, SpecATM_Sensor = SpecATM)
+BRF_4SAIL <- compute_brf(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
+                         skyl = 0.23, spec_atm_sensor = SpecATM)
 
 # Compute BRF assuming clear sky conditions and using sun zenith angle
-BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
-                         tts = 40, SpecATM_Sensor = SpecATM)
+BRF_4SAIL <- compute_brf(rdot = Ref_4SAIL$rdot, rsot = Ref_4SAIL$rsot,
+                         tts = 40, spec_atm_sensor = SpecATM)
 
 ```
 
@@ -449,8 +449,8 @@ Refl_1nm <- PRO4SAIL(N = truth$N, CHL = truth$CHL, CAR = truth$CAR,
                      lai = truth$lai, q = parm_set$q, LIDFa = Init$LIDFa, 
                      rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto, 
                      psi = parm_set$psi)
-brf_1nm <- compute_BRF(rdot = Refl_1nm$rdot, rsot = Refl_1nm$rsot,
-                       tts = parm_set$tts, SpecATM_Sensor = SpecATM)
+brf_1nm <- compute_brf(rdot = Refl_1nm$rdot, rsot = Refl_1nm$rsot,
+                       tts = parm_set$tts, spec_atm_sensor = SpecATM)
 
 # invert PROSAIL on BRF with 1 nm spectral sampling
 est_1nm <- invert_PROSAIL(brf_mes = brf_1nm$BRF, initialization = Init,
