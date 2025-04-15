@@ -89,7 +89,7 @@ Access to geometry of acquisition is provided by the R package
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
 
 ```{r download_S2_product}
-# 1- define input & output directories
+# define input & output directories
 output_dir_s2 <- './S2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
@@ -99,19 +99,6 @@ sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
 
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
-
-# 3- get S2 acquisition and geometry of acquisition for study area
-# https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings
-# tip to save credential on your computer: run the following command : 
-# > file.edit("~/.Renviron")
-# add ID and password for CDSE as well as CURL_SSL_BACKEND using this template
-# > CDSE_ID="sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-# > CDSE_SECRET="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-# > CURL_SSL_BACKEND="openssl"
-# save .Renviron file and restart R session then load your credential this way: 
-# > id <- Sys.getenv("CDSE_ID")
-# > secret <- Sys.getenv("CDSE_SECRET")
-authentication <- list('id' = id, 'pwd' = secret)
 
 list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
                             output_dir = output_dir_s2, 
