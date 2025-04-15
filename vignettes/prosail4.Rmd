@@ -64,12 +64,28 @@ Optionally, `preprocS2` can download the geometry of acquisition corresponding
 to the S2 acquisition by setting `geomAcq = T` and providing authentication to 
 the [CDSE](https://dataspace.copernicus.eu/analyse/apis).
 
-Authentication for CDSE should be obtained by activating an OAuth clients ID, 
-following [`this link`](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings). 
-Please make sure you copy the password related to your OAuth clients ID as you 
-will not be able to access it once you close the page.
+These products are available from the STAC catalog provided by the 
+[Sentinel-hub](https://dataspace.copernicus.eu/analyse/apis/sentinel-hub) 
+Catalog API via [Copernicus Dataspace](https://dataspace.copernicus.eu/).
 
-Access to geometry of acquisition is provided by the package 
+To be able to download data from the Sentinel-hub STAC Catalog API via 
+[Copernicus Dataspace](https://dataspace.copernicus.eu/), 
+create an account on the CDSE plateform, and activate the **OAuth clients**
+following [this link](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings).
+Then add your credentials to your `~/.Renviron`:
+
+```r
+usethis::edit_r_environ()
+```
+
+and add the following lines before saving the `~/.Renviron` file. 
+
+```r
+PREPROCS2_CDSE_ID = "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+PREPROCS2_CDSE_SECRET = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+```
+
+Access to geometry of acquisition is provided by the R package 
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
 
 ```{r download_S2_product}
@@ -86,8 +102,6 @@ path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
 
 # 3- get S2 acquisition and geometry of acquisition for study area
 # https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings
-id <- "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-secret <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # tip to save credential on your computer: run the following command : 
 # > file.edit("~/.Renviron")
 # add ID and password for CDSE as well as CURL_SSL_BACKEND using this template
@@ -102,8 +116,8 @@ authentication <- list('id' = id, 'pwd' = secret)
 list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
                             output_dir = output_dir_s2, 
                             path_S2tilinggrid = path_S2tilinggrid, 
-                            siteName = 'Barrax', overwrite = F, geomAcq = T, 
-                            authentication = authentication)
+                            siteName = 'Barrax', overwrite = FALSE, 
+                            geomAcq = TRUE)
 # Sentinel-2 L2A reflectance
 Refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
