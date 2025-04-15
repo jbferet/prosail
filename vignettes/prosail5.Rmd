@@ -73,10 +73,10 @@ Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,
                        rsoil = SpecSOIL_Sensor$Dry_Soil)
 
 # Computes BRF based on outputs from PROSAIL and sun position
-BRF_Sensor <- compute_BRF(rdot = Ref_Sensor$rdot, 
+BRF_Sensor <- compute_brf(rdot = Ref_Sensor$rdot, 
                           rsot = Ref_Sensor$rsot, 
                           tts = tts,
-                          SpecATM_Sensor = SpecATM_Sensor)
+                          spec_atm_sensor = SpecATM_Sensor)
 
 # Computes fAPAR based on outputs from PROSAIL and sun position
 fAPAR_Sensor <- compute_fAPAR(abs_dir = Ref_Sensor$abs_dir, 
