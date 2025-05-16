@@ -5,7 +5,13 @@
 \title{Computes albedo
 borrowed from python package PROSAIL developed by Jose Gomez Dans}
 \usage{
-compute_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range = c(400, 2400))
+compute_albedo(
+  rsdstar,
+  rddstar,
+  tts,
+  spec_atm_sensor,
+  par_range = c(400, 2400)
+)
 }
 \arguments{
 \item{rsdstar}{numeric. reflectance from direct light}
@@ -14,9 +20,9 @@ compute_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range = c(400, 2400))
 
 \item{tts}{numeric. Solar zenith angle}
 
-\item{SpecATM_Sensor}{list. direct and diffuse radiation for clear conditions}
+\item{spec_atm_sensor}{list. direct & diffuse radiation for clear conditions}
 
-\item{PAR_range}{numeric. range (in nm) of spectral domain to integrate for
+\item{par_range}{numeric. range (in nm) of spectral domain to integrate for
 computation of albedo}
 }
 \value{

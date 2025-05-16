@@ -6,7 +6,7 @@
 spectral response from Sentinel-2 is already defined}
 \usage{
 get_radiometry(
-  sensor_name = "Custom",
+  sensor_name = "user_defined",
   spectral_properties = NULL,
   srf_path = "./",
   save_srf = TRUE
@@ -18,13 +18,13 @@ get_radiometry(
 \item{spectral_properties}{list. list of spectral properties including
 wl = central wavelength and fwhm = corresponding fwhm}
 
-\item{srf_path}{character. path for the file where SRF should be
+\item{srf_path}{character. path for the file where srf should be
 saved as CSV}
 
-\item{save_srf}{boolean. Should SRF be saved in file?}
+\item{save_srf}{boolean. Should srf be saved in file?}
 }
 \value{
-SRF list. Spectral response function, corresponding spectral bands,
+srf list. Spectral response function, corresponding spectral bands,
 and Original Bands
 }
 \description{

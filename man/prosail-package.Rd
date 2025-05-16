@@ -2,7 +2,6 @@
 % Please edit documentation in R/prosail-package.R
 \docType{package}
 \name{prosail-package}
-\alias{prosail}
 \alias{prosail-package}
 \title{prosail: PROSAIL leaf and canopy radiative transfer model and inversion routines}
 \description{

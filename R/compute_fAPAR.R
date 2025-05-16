@@ -10,28 +10,28 @@
 #' @param abs_dir numeric. fraction of direct light absorbed
 #' @param abs_hem numeric. fraction of diffuse light absorbed
 #' @param tts numeric. Solar zenith angle
-#' @param SpecATM_Sensor list. direct and diffuse radiation for clear conditions
-#' @param PAR_range numeric. range (in nm) of spectral domain to integrate for
+#' @param spec_atm_sensor list. direct & diffuse radiation for clear conditions
+#' @param par_range numeric. range (in nm) of spectral domain to integrate for
 #' computation of fAPAR
 #'
-#' @return fAPAR numeric. fAPAR
+#' @return fapar numeric. fAPAR
 #' @export
-compute_fAPAR  <- function(abs_dir, abs_hem, tts, SpecATM_Sensor,
-                           PAR_range = c(400, 700)){
+compute_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
+                           par_range = c(400, 700)){
 
   ############################## #
   ##	direct / diffuse light	##
   ############################## #
-  Es <- SpecATM_Sensor$Direct_Light
-  Ed <- SpecATM_Sensor$Diffuse_Light
+  es <- spec_atm_sensor$Direct_Light
+  ed <- spec_atm_sensor$Diffuse_Light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
   skyl <- 0.847 - 1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)
-  PARdiro <- (1-skyl)*Es
-  PARdifo <- skyl*Ed
-  top <- (abs_dir*PARdiro+abs_hem*PARdifo)
-  PARdomain <- which(SpecATM_Sensor$lambda >= PAR_range[1] &
-                       SpecATM_Sensor$lambda <= PAR_range[2])
-  fAPAR <- sum(top[PARdomain])/sum(PARdiro[PARdomain]+PARdifo[PARdomain])
-  return(fAPAR)
+  par_diro <- (1-skyl)*es
+  par_difo <- skyl*ed
+  top <- (abs_dir*par_diro+abs_hem*par_difo)
+  par_domain <- which(spec_atm_sensor$lambda >= par_range[1] &
+                       spec_atm_sensor$lambda <= par_range[2])
+  fapar <- sum(top[par_domain])/sum(par_diro[par_domain]+par_difo[par_domain])
+  return(fapar)
 }

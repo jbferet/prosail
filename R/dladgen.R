@@ -16,7 +16,7 @@
 #' Extremophile 	0		  1
 #' Spherical 	    -0.35 -0.15
 #' Uniform        0     0
-#' requirement: |LIDFa| + |LIDFb| < 1
+#' requirement: |lidf_a| + |lidf_b| < 1
 #'
 #' @return foliar_distrib list. lidf and litab
 #' @export

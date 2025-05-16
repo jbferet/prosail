@@ -6,13 +6,13 @@
 #' @param parm_set list. Values for variables out of inversion
 #'
 #' @return res list. includes
-#' - Parms2Estimate
-#' - Parms2Set
+#' - parms_to_estimate
+#' - parms_to_set
 #' - initialization
 #' - lower_bound
 #' - upper_bound
 #' - parm_set
-#' - InVar
+#' - input_prosail
 #' fc estimates of the parameters
 #' @export
 #'
@@ -20,37 +20,37 @@ which_parms_to_invert <- function(initialization, lower_bound,
                                   upper_bound, parm_set) {
 
   # define all parameters which can be assessed through iterativbe optimization
-  input_prosail <- data.frame('CHL' = 0, 'CAR' = 0, 'ANT' = 0, 'BROWN' = 0,
-                              'EWT' = 0, 'LMA' = 0, 'PROT' = 0, 'CBC' = 0,
-                              'N' = 0, 'alpha' = 40, 'LIDFa' = 0, 'LIDFb' = 0,
-                              'lai' = 0, 'q' = 0, 'tts' = 0, 'tto' = 0,
-                              'psi' = 0, 'psoil' = 0)
-  AllParms <- names(input_prosail)
-  Parms2Estimate <- parm_set_Final <- c()
-  initialization_Update <- lower_bound_Update <- upper_bound_Update <-
-    parm_set_Update <- list()
+  input_prosail <- data.frame('chl' = 0, 'car' = 0, 'ant' = 0, 'brown' = 0,
+                              'ewt' = 0, 'lma' = 0, 'prot' = 0, 'cbc' = 0,
+                              'n_struct' = 0, 'alpha' = 40, 'lidf_a' = 0,
+                              'lidf_b' = 0, 'lai' = 0, 'q' = 0, 'tts' = 0,
+                              'tto' = 0, 'psi' = 0, 'psoil' = 0)
+  all_parms <- names(input_prosail)
+  parms_to_estimate <- parm_set_final <- c()
+  initialization_update <- lower_bound_update <- upper_bound_update <-
+    parm_set_update <- list()
 
   # set parameters to user value defined in parm_set
-  for (parm in AllParms){
+  for (parm in all_parms){
     if (parm %in% names(initialization) & !parm %in% names(parm_set)){
-      Parms2Estimate <- c(Parms2Estimate,parm)
-      initialization_Update[[parm]] <- initialization[[parm]]
-      lower_bound_Update[[parm]] <- lower_bound[[parm]]
-      upper_bound_Update[[parm]] <- upper_bound[[parm]]
+      parms_to_estimate <- c(parms_to_estimate,parm)
+      initialization_update[[parm]] <- initialization[[parm]]
+      lower_bound_update[[parm]] <- lower_bound[[parm]]
+      upper_bound_update[[parm]] <- upper_bound[[parm]]
     } else if (!parm %in% names(initialization) & parm %in% names(parm_set)){
-      parm_set_Final <- c(parm_set_Final,parm)
-      parm_set_Update[[parm]] <- parm_set[[parm]]
+      parm_set_final <- c(parm_set_final,parm)
+      parm_set_update[[parm]] <- parm_set[[parm]]
     }
   }
-  initialization_Update <- data.frame(initialization_Update)
-  lower_bound_Update <- data.frame(lower_bound_Update)
-  upper_bound_Update <- data.frame(upper_bound_Update)
-  parm_set_Update <- data.frame(parm_set_Update)
-  return(list('Parms2Estimate' = Parms2Estimate,
-              'Parms2Set' = parm_set_Final,
-              'initialization' = initialization_Update,
-              'lower_bound' = lower_bound_Update,
-              'upper_bound' = upper_bound_Update,
-              'parm_set' = parm_set_Update,
-              'InVar' = input_prosail))
+  initialization_update <- data.frame(initialization_update)
+  lower_bound_update <- data.frame(lower_bound_update)
+  upper_bound_update <- data.frame(upper_bound_update)
+  parm_set_update <- data.frame(parm_set_update)
+  return(list('parms_to_estimate' = parms_to_estimate,
+              'parms_to_set' = parm_set_final,
+              'initialization' = initialization_update,
+              'lower_bound' = lower_bound_update,
+              'upper_bound' = upper_bound_update,
+              'parm_set' = parm_set_update,
+              'input_prosail' = input_prosail))
 }

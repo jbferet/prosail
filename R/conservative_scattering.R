@@ -19,7 +19,7 @@ conservative_scattering <- function(m, lai, att, sigb, ks, ko, sf, sb, vf, vb,
                                     tss, too){
 
   # Near or complete conservative scattering
-  J4 <- Jfunc4(m,lai)
+  J4 <- jfunc4(m,lai)
   amsig <- att-sigb
   apsig <- att+sigb
   rtp <- (1-amsig*J4)/(1+amsig*J4)

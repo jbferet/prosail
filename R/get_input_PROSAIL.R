@@ -3,12 +3,12 @@
 #' - or distribution defined in user
 #'
 #' @param atbd boolean. TRUE to apply input parameter distribution from ATBD
-#' @param GeomAcq list. geom of acquisiton: min and max val for tts, tto & psi
-#' @param codistribution_lai boolean. set TYRUE if codistribution with LAI accounted for
+#' @param geom_acq list. geom of acquisiton: min and max val for tts, tto & psi
+#' @param codistribution_lai boolean. TRUE accounts for codistribution with LAI
 #' @param minval list. min val for input parameters
 #' @param maxval list. max val for input parameters
-#' @param TypeDistrib  list. Type of distribution: 'Uniform' or 'Gaussian'
-#' @param GaussianDistrib  list. Mean & SD for parms sampled with gaussian dist
+#' @param type_distrib  list. Type of distribution: 'Uniform' or 'Gaussian'
+#' @param gaussian_distrib  list. Mean & SD for parms sampled with gaussian dist
 #' @param parm_set list. list of input parameters set to a specific value
 #' @param nb_samples numeric. number of samples in training LUT
 #' @param verbose boolean. when set to TRUE, prints message if hyperparameter
@@ -17,18 +17,11 @@
 #' @return input_prosail
 #' @export
 
-get_input_PROSAIL <- function(atbd = FALSE, GeomAcq = NULL,
+get_input_prosail <- function(atbd = FALSE, geom_acq = NULL,
                               codistribution_lai = TRUE, minval = NULL,
-                              maxval = NULL, TypeDistrib = NULL,
-                              GaussianDistrib = NULL, parm_set = NULL,
+                              maxval = NULL, type_distrib = NULL,
+                              gaussian_distrib = NULL, parm_set = NULL,
                               nb_samples = 2000, verbose = FALSE){
-
-  # default parameter values
-  defaultVal <- data.frame('CHL' = 40, 'CAR' = 10, 'ANT' = 0, 'EWT' = 0.01,
-                           'LMA' = 0.01, 'BROWN'=0.0, 'N' = 1.5, 'psoil' = 0.5,
-                           'LIDFa' = 60, 'lai' = 2.5, 'q'=0.1,
-                           'tto' = 0, 'tts' = 30, 'psi' = 80)
-  ListParms <- names(defaultVal)
 
   if (atbd==TRUE){
     #__________________________________________________________________________#
@@ -40,8 +33,8 @@ get_input_PROSAIL <- function(atbd = FALSE, GeomAcq = NULL,
         message('http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf')
       }
     }
-    input_prosail <- get_atbd_LUT_input(nb_samples = nb_samples,
-                                        GeomAcq = GeomAcq,
+    input_prosail <- get_atbd_lut_input(nb_samples = nb_samples,
+                                        geom_acq = geom_acq,
                                         codistribution_lai = codistribution_lai)
   } else {
     #__________________________________________________________________________#
@@ -49,20 +42,20 @@ get_input_PROSAIL <- function(atbd = FALSE, GeomAcq = NULL,
     #__________________________________________________________________________#
     # check consistency between user-defined variables
     # use default distribution if needed
-    res <- get_default_LUT_input(TypeDistrib = TypeDistrib,
-                                 GaussianDistrib = GaussianDistrib,
+    res <- get_default_lut_input(type_distrib = type_distrib,
+                                 gaussian_distrib = gaussian_distrib,
                                  minval = minval, maxval = maxval)
-    TypeDistrib <- res$TypeDistrib
-    GaussianDistrib <- res$GaussianDistrib
+    type_distrib <- res$type_distrib
+    gaussian_distrib <- res$gaussian_distrib
     minval <- res$minval
     maxval <- res$maxval
 
     # fixed parameters
-    if (is.na(match('TypeLidf', names(parm_set)))){
+    if (is.na(match('type_lidf', names(parm_set)))){
       if (is.null(parm_set)){
-        parm_set <- data.frame('TypeLidf' = 2)
+        parm_set <- data.frame('type_lidf' = 2)
       } else {
-        parm_set <- data.frame(parm_set, 'TypeLidf' = 2)
+        parm_set <- data.frame(parm_set, 'type_lidf' = 2)
       }
     }
     if (is.na(match('alpha', names(parm_set)))){
@@ -75,9 +68,9 @@ get_input_PROSAIL <- function(atbd = FALSE, GeomAcq = NULL,
     # produce input parameters distribution
     input_prosail <- get_distribution_input_prosail(minval, maxval,
                                                     parm_set, nb_samples,
-                                                    TypeDistrib = TypeDistrib,
-                                                    Mean = GaussianDistrib$Mean,
-                                                    Std = GaussianDistrib$Std)
+                                                    type_distrib = type_distrib,
+                                                    mean = gaussian_distrib$mean,
+                                                    sd = gaussian_distrib$sd)
   }
   input_prosail <- data.frame(input_prosail)
   return(input_prosail)

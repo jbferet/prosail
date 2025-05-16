@@ -1,59 +1,59 @@
 #' returns geometry of acquisition for S2 image processed with MAJA
-#' - SZA = list of sun zenith angle
-#' - SAA = list of sun azimuth angle
-#' - VZA = list of viewer zenith angle
-#' - VAA = list of viewer azimuth angle
+#' - sza = list of sun zenith angle
+#' - saa = list of sun azimuth angle
+#' - vza = list of viewer zenith angle
+#' - vaa = list of viewer azimuth angle
 #' @param s2xml list. produced from reading XML metadata file with package XML
 #'
-#' @return List of S2 angles (SZA, SAA, VZA, VAA)
+#' @return List of S2 angles (sza, saa, vza, vaa)
 #' @importFrom stats na.omit
 #' @export
 
 get_s2_geometry_from_THEIA <- function(s2xml){
 
-  Distrib_SunAngle <- list()
-  # SZA
-  Distrib_SunAngle$Zenith <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Zenith$Values_List
-  SZA <- c()
-  for (i in seq_len(length(Distrib_SunAngle$Zenith)))
-    SZA <- c(SZA, as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,
+  distrib_sun_angle <- list()
+  # sza
+  distrib_sun_angle$zenith <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Zenith$Values_List
+  sza <- c()
+  for (i in seq_len(length(distrib_sun_angle$zenith)))
+    sza <- c(sza, as.numeric(strsplit(x = distrib_sun_angle$zenith[i]$VALUES,
                                       split = ' ')[[1]]))
-  # SZA <- stats::na.omit(SZA)
+  # sza <- stats::na.omit(sza)
 
-  # SAA
-  Distrib_SunAngle$Azimuth <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Azimuth$Values_List
-  SAA <- c()
-  for (i in seq_len(length(Distrib_SunAngle$Zenith)))
-    SAA <- c(SAA,as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,
+  # saa
+  distrib_sun_angle$azimuth <- s2xml$Geometric_Informations$Angles_Grids_List$Sun_Angles_Grid$Azimuth$Values_List
+  saa <- c()
+  for (i in seq_len(length(distrib_sun_angle$zenith)))
+    saa <- c(saa,as.numeric(strsplit(x = distrib_sun_angle$azimuth[i]$VALUES,
                                      split = ' ')[[1]]))
-  # SAA <- stats::na.omit(SAA)
+  # saa <- stats::na.omit(saa)
 
-  # VZA
-  VZA <- c()
+  # vza
+  vza <- c()
   band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
   for (i in seq_len(length(band))) {
     detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
     for (j in seq_len((length(detector)-1))) {
       values  <- detector[j]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
       for (k in seq_len(length(values)))
-        VZA <- c(VZA,as.numeric(strsplit(x = values[k]$VALUES,
+        vza <- c(vza,as.numeric(strsplit(x = values[k]$VALUES,
                                          split = ' ')[[1]]))
     }
   }
-  # VZA <- stats::na.omit(VZA)
+  # vza <- stats::na.omit(vza)
 
-  # VAA
-  VAA <- c()
+  # vaa
+  vaa <- c()
   band <- s2xml$Geometric_Informations$Angles_Grids_List$Viewing_Incidence_Angles_Grids
   for (i in seq_len(length(band))) {
     detector <- band[i]$Band_Viewing_Incidence_Angles_Grids_List
     for (j in seq_len((length(detector)-1))) {
       values  <- detector[j]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
       for (k in seq_len(length(values)))
-        VAA <- c(VAA,as.numeric(strsplit(x = values[k]$VALUES,
+        vaa <- c(vaa,as.numeric(strsplit(x = values[k]$VALUES,
                                          split = ' ')[[1]]))
     }
   }
-  # VAA <- stats::na.omit(VAA)
-  return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
+  # vaa <- stats::na.omit(vaa)
+  return(list('saa' = saa, 'sza' = sza, 'vaa' = vaa, 'vza' = vza))
 }

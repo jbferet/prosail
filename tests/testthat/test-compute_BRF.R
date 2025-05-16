@@ -1,25 +1,25 @@
-test_that("PRO4AIL and PRO4SAIL2 produce physically possible BRF values", {
+test_that("prosail produces physically possible BRF values", {
   # run PROSAIL with 4SAIL2
-  Refl <- PRO4SAIL()
-  BRF_4SAIL <- compute_BRF(rdot = Refl$rdot,
-                           rsot = Refl$rsot,
+  refl <- prosail()
+  brf_4sail <- compute_brf(rdot = refl$rdot,
+                           rsot = refl$rsot,
                            tts = 30,
-                           SpecATM_Sensor = prosail::SpecATM)
+                           spec_atm_sensor = SpecATM)
 
   # run PROSAIL with 4SAIL2
-  input_prospect <- data.frame('CHL' = c(40, 5), 'CAR' = c(8, 4),
-                               'ANT' = c(0.0, 1), 'EWT' = c(0.02, 0.01),
-                               'LMA' = c(0.009, 0.009), 'N' = c(1.5, 2),
-                               'BROWN' = c(0, 1))
-  Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2', input_prospect= input_prospect,
-                         TypeLidf = 2, LIDFa = 30, lai = 5, q = 0.1, tts = 30,
-                         tto = 10, psi = 90, rsoil = prosail::SpecSOIL$Dry_Soil,
-                         fraction_brown = 0.5, diss = 0.5, Cv = 1, Zeta = 1)
-  BRF_4SAIL2 <- compute_BRF(rdot = Ref_4SAIL2$rdot,
-                            rsot = Ref_4SAIL2$rsot,
+  input_prospect <- data.frame('chl' = c(40, 5), 'car' = c(8, 4),
+                               'ant' = c(0.0, 1), 'ewt' = c(0.02, 0.01),
+                               'lma' = c(0.009, 0.009), 'n_struct' = c(1.5, 2),
+                               'brown' = c(0, 1))
+  refl_4sail2 <- prosail(SAILversion = '4SAIL2', input_prospect= input_prospect,
+                         type_lidf = 2, lidf_a = 30, lai = 5, q = 0.1, tts = 30,
+                         tto = 10, psi = 90, rsoil = SpecSOIL$Dry_Soil,
+                         fraction_brown = 0.5, diss = 0.5, cv = 1, zeta = 1)
+  brf_4sail2 <- compute_brf(rdot = refl_4sail2$rdot,
+                            rsot = refl_4sail2$rsot,
                             tts = 30,
-                            SpecATM_Sensor = prosail::SpecATM)
+                            spec_atm_sensor = SpecATM)
 
-  expect_true(all(BRF_4SAIL$BRF >= 0))
-  expect_true(all(BRF_4SAIL2$BRF >= 0))
+  expect_true(all(brf_4sail$BRF >= 0))
+  expect_true(all(brf_4sail2$BRF >= 0))
 })

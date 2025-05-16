@@ -1,69 +1,72 @@
 #' Sets default values for PROSAIL LUT simulation when not defined by user
 #'
-#' @param TypeDistrib list. uniform/Gaussian distribution to apply.
-#' @param GaussianDistrib  list. Mean & STD for parms with gaussian distribution
+#' @param type_distrib list. uniform/Gaussian distribution to apply.
+#' @param gaussian_distrib  list. mean & sd for parms with gaussian dist
 #' @param minval list. minimum value for a list of parameters randomly produced
 #' @param maxval list. maximum value for a list of parameters randomly produced
 #'
 #' @return res list. default values corresponding to NULL input parameters
 #' @export
 
-get_default_LUT_input <- function(TypeDistrib = NULL,
-                                  GaussianDistrib = NULL,
+get_default_lut_input <- function(type_distrib = NULL,
+                                  gaussian_distrib = NULL,
                                   minval = NULL,
                                   maxval = NULL){
 
   # define mean / sd for gaussian
-  if (is.null(GaussianDistrib)) GaussianDistrib <- list('Mean'=NULL,'Std'=NULL)
-  # check consistency between TypeDistrib and GaussianDistrib
-  if (!is.null(TypeDistrib)){
-    namesDist <- names(TypeDistrib)
-    whichGauss <- which(TypeDistrib=='Gaussian')
-    if (length(whichGauss)>0){
-      namesGauss <- names(GaussianDistrib$Mean)
-      selGauss <- namesDist[whichGauss]
-      matchGauss <- match(selGauss, namesGauss)
-      WhichMissed <- selGauss[which(is.na(matchGauss))]
-      if (length(WhichMissed)>0){
-        message(paste('missing Mean and Std for GaussianDistrib of parameter',
-                      WhichMissed))
+  if (is.null(gaussian_distrib)) gaussian_distrib <- list('mean'=NULL,'sd'=NULL)
+  # check consistency between type_distrib and gaussian_distrib
+  if (!is.null(type_distrib)){
+    names_dist <- names(type_distrib)
+    which_gauss <- which(type_distrib=='Gaussian')
+    if (length(which_gauss)>0){
+      names_gauss <- names(gaussian_distrib$Mean)
+      sel_gauss <- names_dist[which_gauss]
+      match_gauss <- match(sel_gauss, names_gauss)
+      which_missed <- sel_gauss[which(is.na(match_gauss))]
+      if (length(which_missed)>0){
+        message(paste('missing mean and sd for gaussian_distrib of parameter',
+                      which_missed))
         stop(message('abort process'))
       }
     }
   }
 
-  namesParms <- names(TypeDistrib)
-  namesMin <- names(minval)
-  namesMax <- names(maxval)
-  MatchingVars <- c(match(namesParms, namesMin), match(namesMin, namesParms),
-                    match(namesParms, namesMax), match(namesMax, namesParms),
-                    match(namesMin, namesMax), match(namesMax, namesMin))
-  if (length(which(is.na(MatchingVars)))>0){
-    message('Make sure TypeDistrib, minval & maxval share the same parameters')
+  names_parms <- names(type_distrib)
+  names_min <- names(minval)
+  names_max <- names(maxval)
+  matching_vars <- c(match(names_parms, names_min),
+                     match(names_min, names_parms),
+                     match(names_parms, names_max),
+                     match(names_max, names_parms),
+                     match(names_min, names_max),
+                     match(names_max, names_min))
+  if (length(which(is.na(matching_vars)))>0){
+    message('Make sure type_distrib, minval & maxval share the same parameters')
     stop(message('abort process'))
   }
   # define uniform / gaussian distribution
-  if (is.null(TypeDistrib))
-    TypeDistrib <- data.frame('CHL'='Uniform', 'CAR'='Uniform', 'ANT'='Uniform',
-                              'BROWN'='Uniform', 'EWT' = 'Uniform',
-                              'LMA' = 'Uniform', 'N' = 'Uniform',
-                              'psoil' = 'Uniform', 'LIDFa' = 'Uniform',
+  if (is.null(type_distrib))
+    type_distrib <- data.frame('chl'='Uniform', 'car'='Uniform', 'ant'='Uniform',
+                              'brown'='Uniform', 'ewt' = 'Uniform',
+                              'lma' = 'Uniform', 'n_struct' = 'Uniform',
+                              'psoil' = 'Uniform', 'lidf_a' = 'Uniform',
                               'lai' = 'Uniform', 'q'='Uniform',
                               'tto' = 'Uniform','tts' = 'Uniform',
                               'psi' = 'Uniform')
   # define min and max values
   if (is.null(minval))
-    minval <- data.frame('CHL' = 10, 'CAR' = 0, 'EWT' = 0.01, 'ANT' = 0,
-                         'LMA' = 0.005, 'N' = 1.0, 'psoil' = 0.0, 'BROWN'=0.0,
-                         'LIDFa' = 20, 'lai' = 0.5, 'q'=0.1, 'tto' = 0,
-                         'tts' = 20, 'psi' = 80)
+    minval <- data.frame('chl' = 10, 'car' = 0, 'ewt' = 0.01, 'ant' = 0,
+                         'lma' = 0.005, 'n_struct' = 1.0, 'psoil' = 0.0,
+                         'brown'=0.0, 'lidf_a' = 20, 'lai' = 0.5, 'q'=0.1,
+                         'tto' = 0, 'tts' = 20, 'psi' = 80)
   if (is.null(maxval))
-    maxval <- data.frame('CHL' = 75, 'CAR' = 15, 'EWT' = 0.03, 'ANT' = 2,
-                         'LMA' = 0.03, 'N' = 2.0, 'psoil' = 1.0, 'BROWN'=0.5,
-                         'LIDFa' = 70, 'lai' = 7, 'q'=0.2, 'tto' = 5,
-                         'tts' = 30, 'psi' = 110)
-  res <- list('TypeDistrib' = TypeDistrib,
-              'GaussianDistrib' = GaussianDistrib,
+    maxval <- data.frame('chl' = 75, 'car' = 15, 'ewt' = 0.03, 'ant' = 2,
+                         'lma' = 0.03, 'n_struct' = 2.0, 'psoil' = 1.0,
+                         'brown'=0.5, 'lidf_a' = 70, 'lai' = 7, 'q'=0.2,
+                         'tto' = 5, 'tts' = 30, 'psi' = 110)
+  res <- list('type_distrib' = type_distrib,
+              'gaussian_distrib' = gaussian_distrib,
               'minval' = minval, 'maxval' = maxval)
   return(res)
 }

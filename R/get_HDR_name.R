@@ -6,7 +6,7 @@
 #' @importFrom tools file_ext file_path_sans_ext
 #' @export
 
-get_HDR_name <- function(image_path) {
+get_hdr_name <- function(image_path) {
   if (tools::file_ext(image_path) == "") {
     hdr_path <- paste(image_path, ".hdr", sep = "")
   } else if (tools::file_ext(image_path) == "bil") {

@@ -1,10 +1,10 @@
-#' generates a LUT of BRF based on a table of input variables for PRO4SAIL model
+#' generates a LUT of brf based on a table of input variables for prosail model
 #'
 #' @param input_prosail list. PROSAIL input variables
-#' @param SpecPROSPECT list. Includes optical constants required for PROSPECT
-#' @param SpecSOIL list. Includes either dry soil and wet soil, or a unique
+#' @param spec_prospect list. Includes optical constants required for PROSPECT
+#' @param spec_soil list. Includes either dry soil and wet soil, or a unique
 #' soil sample if the psoil parameter is not inverted
-#' @param SpecATM list. Includes direct and diffuse radiation for
+#' @param spec_atm list. Includes direct and diffuse radiation for
 #' clear conditions
 #' @param band_names character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
@@ -12,61 +12,61 @@
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
-#' @return BRF_LUT numeric. matrix of BRF corresponding to input_prosail
+#' @return brf numeric. matrix of brf corresponding to input_prosail
 #' @importFrom progress progress_bar
 #' @export
 
-generate_LUT_BRF <- function(input_prosail, SpecPROSPECT, SpecSOIL, SpecATM,
+generate_lut_brf <- function(input_prosail, spec_prospect, spec_soil, spec_atm,
                              band_names = NULL, SAILversion = '4SAIL',
                              brown_lop = NULL){
 
   nb_samples <- length(input_prosail[[1]])
-  BRF <- list()
-  Split <- round(nb_samples/10)
+  brf <- list()
+  split_nb <- round(nb_samples/10)
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
     total = 10, clear = FALSE, width= 100)
   for (i in seq_len(nb_samples)){
-    if (i%%Split==0 & nb_samples>100) pb$tick()
-    rsoil <- input_prosail[i,]$psoil*SpecSOIL$Dry_Soil +
-      (1-input_prosail[i,]$psoil)*SpecSOIL$Wet_Soil
+    if (i%%split_nb==0 & nb_samples>100) pb$tick()
+    rsoil <- input_prosail[i,]$psoil*spec_soil$Dry_Soil +
+      (1-input_prosail[i,]$psoil)*spec_soil$Wet_Soil
     # if 4SAIL
     if (SAILversion=='4SAIL'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
-                          input_prospect = input_prosail[i,],
-                          TypeLidf = input_prosail[i,]$TypeLidf,
-                          LIDFa = input_prosail[i,]$LIDFa,
-                          LIDFb = input_prosail[i,]$LIDFb,
-                          lai = input_prosail[i,]$lai,
-                          q = input_prosail[i,]$q,
-                          tts = input_prosail[i,]$tts,
-                          tto = input_prosail[i,]$tto,
-                          psi = input_prosail[i,]$psi, rsoil = rsoil)
+      refl <- prosail(spec_sensor = spec_prospect,
+                      input_prospect = input_prosail[i,],
+                      type_lidf = input_prosail[i,]$type_lidf,
+                      lidf_a = input_prosail[i,]$lidf_a,
+                      lidf_b = input_prosail[i,]$lidf_b,
+                      lai = input_prosail[i,]$lai,
+                      q = input_prosail[i,]$q,
+                      tts = input_prosail[i,]$tts,
+                      tto = input_prosail[i,]$tto,
+                      psi = input_prosail[i,]$psi, rsoil = rsoil)
     } else if (SAILversion=='4SAIL2'){
-      RefSAIL <- PRO4SAIL(Spec_Sensor = SpecPROSPECT,
-                          input_prospect = input_prosail[i,],
-                          TypeLidf = input_prosail[i,]$TypeLidf,
-                          LIDFa = input_prosail[i,]$LIDFa,
-                          LIDFb = input_prosail[i,]$LIDFb,
-                          lai = input_prosail[i,]$lai,
-                          q = input_prosail[i,]$q,
-                          tts = input_prosail[i,]$tts,
-                          tto = input_prosail[i,]$tto,
-                          psi = input_prosail[i,]$psi, rsoil = rsoil,
-                          SAILversion = '4SAIL2',
-                          fraction_brown = input_prosail[i,]$fraction_brown,
-                          diss = input_prosail[i,]$diss,
-                          Cv = input_prosail[i,]$Cv,
-                          Zeta = input_prosail[i,]$Zeta,
-                          brown_lop = brown_lop)
+      refl <- prosail(spec_sensor = spec_prospect,
+                      input_prospect = input_prosail[i,],
+                      type_lidf = input_prosail[i,]$type_lidf,
+                      lidf_a = input_prosail[i,]$lidf_a,
+                      lidf_b = input_prosail[i,]$lidf_b,
+                      lai = input_prosail[i,]$lai,
+                      q = input_prosail[i,]$q,
+                      tts = input_prosail[i,]$tts,
+                      tto = input_prosail[i,]$tto,
+                      psi = input_prosail[i,]$psi, rsoil = rsoil,
+                      SAILversion = '4SAIL2',
+                      fraction_brown = input_prosail[i,]$fraction_brown,
+                      diss = input_prosail[i,]$diss,
+                      cv = input_prosail[i,]$cv,
+                      zeta = input_prosail[i,]$zeta,
+                      brown_lop = brown_lop)
     }
-    # Computes BRF based on outputs from PROSAIL and sun position
-    BRF[[i]] <- compute_BRF(rdot = RefSAIL$rdot,
-                            rsot = RefSAIL$rsot,
+    # Computes brf based on outputs from PROSAIL and sun position
+    brf[[i]] <- compute_brf(rdot = refl$rdot,
+                            rsot = refl$rsot,
                             tts = input_prosail$tts[[i]],
-                            SpecATM_Sensor = SpecATM)
+                            spec_atm_sensor = spec_atm)
   }
-  BRF <- do.call(cbind,BRF)
-  row.names(BRF) <- band_names
-  return(BRF)
+  brf <- do.call(cbind,brf)
+  row.names(brf) <- band_names
+  return(brf)
 }

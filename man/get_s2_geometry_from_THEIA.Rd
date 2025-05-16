@@ -4,10 +4,10 @@
 \alias{get_s2_geometry_from_THEIA}
 \title{returns geometry of acquisition for S2 image processed with MAJA
 \itemize{
-\item SZA = list of sun zenith angle
-\item SAA = list of sun azimuth angle
-\item VZA = list of viewer zenith angle
-\item VAA = list of viewer azimuth angle
+\item sza = list of sun zenith angle
+\item saa = list of sun azimuth angle
+\item vza = list of viewer zenith angle
+\item vaa = list of viewer azimuth angle
 }}
 \usage{
 get_s2_geometry_from_THEIA(s2xml)
@@ -16,14 +16,14 @@ get_s2_geometry_from_THEIA(s2xml)
 \item{s2xml}{list. produced from reading XML metadata file with package XML}
 }
 \value{
-List of S2 angles (SZA, SAA, VZA, VAA)
+List of S2 angles (sza, saa, vza, vaa)
 }
 \description{
 returns geometry of acquisition for S2 image processed with MAJA
 \itemize{
-\item SZA = list of sun zenith angle
-\item SAA = list of sun azimuth angle
-\item VZA = list of viewer zenith angle
-\item VAA = list of viewer azimuth angle
+\item sza = list of sun zenith angle
+\item saa = list of sun azimuth angle
+\item vza = list of viewer zenith angle
+\item vaa = list of viewer azimuth angle
 }
 }

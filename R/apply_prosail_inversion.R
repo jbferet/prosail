@@ -2,7 +2,7 @@
 #' vegetation biophysical properties
 #'
 #' @param raster_path character. path for a raster file
-#' @param HybridModel list. hybrid models produced from train_prosail_inversion
+#' @param hybrid_model list. hybrid models produced from train_prosail_inversion
 #' each element of the list corresponds to a set of hybrid models for a
 #' vegetation parameter
 #' @param output_path character. path for directory where results are written
@@ -33,7 +33,7 @@
 #' @importFrom utils installed.packages
 #' @export
 
-apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
+apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
                                     selected_bands, bandname, mask_path = NULL,
                                     multiplying_factor = 10000, maxRows = 100,
                                     bigRaster = FALSE, progressBar = TRUE,
@@ -43,9 +43,9 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
   # get raster name
   raster_name <- tools::file_path_sans_ext(basename(raster_path))
   # list of biophysical variables to compute
-  BPvar <- names(HybridModel)
+  bp_vars <- names(hybrid_model)
   # define path for maps produced for each biophysical variable
-  BPvarpath <- BPvarSDpath <- list()
+  bp_var_path <- bp_var_sd_path <- list()
   # check if bigRaster supported
   is_bigRaster_available <- ("bigRaster" %in% rownames(installed.packages()))
   if (!is_bigRaster_available & bigRaster){
@@ -57,11 +57,11 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
   }
   if (bigRaster){
     funct <- bigRaster::wrapperBig_prosail_inversion
-    input_args <- list('HybridModel' = HybridModel,
+    input_args <- list('hybrid_model' = hybrid_model,
                        'selected_bands' = selected_bands,
                        'bandname' = bandname,
                        'ReflFactor' = multiplying_factor)
-    if (inherits(x = HybridModel[[1]][[1]], what = 'liquidSVM')) {
+    if (inherits(x = hybrid_model[[1]][[1]], what = 'liquidSVM')) {
       input_args$method <- 'liquidSVM'
     } else {
       input_args$method <- 'caret'
@@ -70,14 +70,14 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
     names(input_rasters)[1] <- 'img'
     if (!is.null(mask_path)) input_rasters$mask <- mask_path
     output_rasters <- list()
-    for (parm in BPvar){
+    for (parm in bp_vars){
       listname <- paste0('Mean_',parm)
       output_rasters[[listname]] <- file.path(output_path, paste(raster_name,
                                                                  parm,
                                                                  sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
-      BPvarpath[[parm]] <- output_rasters[[listname]]
+      bp_var_path[[parm]] <- output_rasters[[listname]]
 
       listname <- paste0('SD_',parm)
       output_rasters[[listname]] <- file.path(output_path, paste(raster_name,
@@ -86,7 +86,7 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
                                                                  sep = '_'))
       if (filetype %in% c('GTiff', 'COG'))
         output_rasters[[listname]] <- paste0(output_rasters[[listname]],'.tiff')
-      BPvarSDpath[[parm]] <- output_rasters[[listname]]
+      bp_var_sd_path[[parm]] <- output_rasters[[listname]]
     }
     band_names <- as.list(names(output_rasters))
     names(band_names) <- names(output_rasters)
@@ -99,7 +99,7 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
                                band_names = band_names,
                                maxRows = maxRows)
   } else {
-    for (parm in BPvar){
+    for (parm in bp_vars){
       print(paste('Computing',parm,sep = ' '))
       # read by chunk to avoid memory problem
       blk <- blockSize(brick(raster_path))
@@ -123,7 +123,7 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
       # mask file
       r_inmask <- FALSE
       if (is.null(mask_path)){
-        SelectPixels <- 'ALL'
+        select_pixels <- 'ALL'
       } else if (!is.null(mask_path)){
         if (file.exists(mask_path)){
           r_inmask <- readStart(raster(mask_path))
@@ -131,12 +131,12 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
           message('WARNING: Mask file does not exist:')
           print(mask_path)
           message('Processing all image')
-          SelectPixels <- 'ALL'
+          select_pixels <- 'ALL'
         }
       }
       if (progressBar == TRUE){
         # initiate progress bar
-        pgbarlength <- length(HybridModel[[parm]])*blk$n
+        pgbarlength <- length(hybrid_model[[parm]])*blk$n
         pb <- progress_bar$new(
           format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull ,
           estimated time remaining :eta",
@@ -148,88 +148,88 @@ apply_prosail_inversion <- function(raster_path, HybridModel, output_path,
       } else {
         formatfile <- filetype
       }
-      BPvarpath[[parm]] <- file.path(output_path, paste(raster_name, parm,
-                                                        sep = '_'))
-      BPvarSDpath[[parm]] <- file.path(output_path,paste(raster_name, parm, 'STD',
-                                                         sep = '_'))
-      r_outMean <- writeStart(raster(raster_path),
-                              filename = BPvarpath[[parm]],
-                              format = formatfile, overwrite = TRUE)
-      r_outSD <- writeStart(raster(raster_path),
-                            filename = BPvarSDpath[[parm]],
-                            format = formatfile, overwrite = TRUE)
+      bp_var_path[[parm]] <- file.path(output_path, paste(raster_name, parm,
+                                                          sep = '_'))
+      bp_var_sd_path[[parm]] <- file.path(output_path,paste(raster_name, parm,
+                                                            'STD', sep = '_'))
+      r_out_mean <- writeStart(raster(raster_path),
+                               filename = bp_var_path[[parm]],
+                               format = formatfile, overwrite = TRUE)
+      r_out_sd <- writeStart(raster(raster_path),
+                             filename = bp_var_sd_path[[parm]],
+                             format = formatfile, overwrite = TRUE)
       Selbands <- match(selected_bands[[parm]], bandname)
 
       # loop over blocks
       for (i in seq_along(blk$row)) {
         # read values for block
         # format is a matrix with rows the cells values and columns the layers
-        BlockVal <- getValues(r_in, row = blk$row[i], nrows = blk$nrows[i])
-        FullLength <- dim(BlockVal)[1]
+        block_val <- getValues(r_in, row = blk$row[i], nrows = blk$nrows[i])
+        full_length <- dim(block_val)[1]
 
         if (typeof(r_inmask)=='logical'){
-          BlockVal <- BlockVal[,Selbands]
+          block_val <- block_val[,Selbands]
           # automatically filter pixels corresponding to negative values
-          SelectPixels <- which(BlockVal[,1]>0)
-          BlockVal <- BlockVal[SelectPixels,]
+          select_pixels <- which(block_val[,1]>0)
+          block_val <- block_val[select_pixels,]
         } else if (typeof(r_inmask)=='S4'){
           MaskVal <- getValues(r_inmask, row = blk$row[i], nrows = blk$nrows[i])
-          SelectPixels <- which(MaskVal ==1)
-          BlockVal <- BlockVal[SelectPixels,Selbands]
+          select_pixels <- which(MaskVal ==1)
+          block_val <- block_val[select_pixels,Selbands]
         }
         # add name for variables
 
-        if (!inherits(HybridModel[[parm]][[1]], what = 'liquidSVM')){
-          colnames(BlockVal) <- colnames(HybridModel[[parm]][[1]]$trainingData)[-1]
+        if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM')){
+          colnames(block_val) <- colnames(hybrid_model[[parm]][[1]]$trainingData)[-1]
         }
 
-        Mean_EstimateFull <- NA*vector(length = FullLength)
-        STD_EstimateFull <- NA*vector(length = FullLength)
-        if (length(SelectPixels)>0){
-          BlockVal <- BlockVal/multiplying_factor
-          modelSVR_Estimate <- list()
-          for (modind in seq_len(length(HybridModel[[parm]]))){
+        mean_estimate_full <- NA*vector(length = full_length)
+        sd_estimate_full <- NA*vector(length = full_length)
+        if (length(select_pixels)>0){
+          block_val <- block_val/multiplying_factor
+          estimates <- list()
+          for (modind in seq_len(length(hybrid_model[[parm]]))){
             if (progressBar == TRUE) pb$tick()
-            modelSVR_Estimate[[modind]] <- predict(HybridModel[[parm]][[modind]],
-                                                   BlockVal)
+            estimates[[modind]] <- predict(hybrid_model[[parm]][[modind]],
+                                           block_val)
           }
-          modelSVR_Estimate <- do.call(cbind,modelSVR_Estimate)
+          estimates <- do.call(cbind,estimates)
           # final estimated value = mean parm value for all models
-          Mean_Estimate <- rowMeans(modelSVR_Estimate)
+          mean_estimate <- rowMeans(estimates)
           # 'uncertainty' = STD value for all models
-          STD_Estimate <- matrixStats::rowSds(modelSVR_Estimate)
-          Mean_EstimateFull[SelectPixels] <- Mean_Estimate
-          STD_EstimateFull[SelectPixels] <- STD_Estimate
+          sd_estimate <- matrixStats::rowSds(estimates)
+          mean_estimate_full[select_pixels] <- mean_estimate
+          sd_estimate_full[select_pixels] <- sd_estimate
         } else {
-          for (modind in seq_len(length(HybridModel[[parm]]))) pb$tick()
+          for (modind in seq_len(length(hybrid_model[[parm]]))) pb$tick()
         }
-        r_outMean <- writeValues(r_outMean, Mean_EstimateFull, blk$row[i],
-                                 format = formatfile, overwrite = TRUE)
-        r_outSD <- writeValues(r_outSD, STD_EstimateFull, blk$row[i],
-                               format = formatfile, overwrite = TRUE)
+        r_out_mean <- writeValues(r_out_mean, mean_estimate_full, blk$row[i],
+                                  format = formatfile, overwrite = TRUE)
+        r_out_sd <- writeValues(r_out_sd, sd_estimate_full, blk$row[i],
+                                format = formatfile, overwrite = TRUE)
       }
       # close files
       r_in <- readStop(r_in)
       if (typeof(r_inmask)=='S4') r_inmask <- readStop(r_inmask)
-      r_outMean <- writeStop(r_outMean)
-      r_outSD <- writeStop(r_outSD)
+      r_out_mean <- writeStop(r_out_mean)
+      r_out_sd <- writeStop(r_out_sd)
       # write biophysical variable name in headers
       if (filetype %in% c('EHdr', 'ENVI')){
-        HDR <- read_ENVI_header(get_HDR_name(BPvarpath[[parm]]))
-        HDR$`band names` <- paste('{',parm,'}',sep = '')
-        write_ENVI_header(HDR, get_HDR_name(BPvarpath[[parm]]))
-        HDR <- read_ENVI_header(get_HDR_name(BPvarSDpath[[parm]]))
-        HDR$`band names` <- paste('{',parm,'}',sep = '')
-        write_ENVI_header(HDR, get_HDR_name(BPvarSDpath[[parm]]))
-        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.envi')
-        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.envi')
+        hdr <- read_envi_header(get_hdr_name(bp_var_path[[parm]]))
+        hdr$`band names` <- paste('{',parm,'}',sep = '')
+        write_envi_header(hdr, get_hdr_name(bp_var_path[[parm]]))
+        hdr <- read_envi_header(get_hdr_name(bp_var_sd_path[[parm]]))
+        hdr$`band names` <- paste('{',parm,'}',sep = '')
+        write_envi_header(hdr, get_hdr_name(bp_var_sd_path[[parm]]))
+        bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.envi')
+        bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.envi')
       }
       if (filetype %in% c('GTiff', 'COG')){
-        BPvarpath[[parm]] <- paste0(BPvarpath[[parm]],'.tiff')
-        BPvarSDpath[[parm]] <- paste0(BPvarSDpath[[parm]],'.tiff')
+        bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
+        bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.tiff')
       }
     }
     print('processing completed')
   }
-  return(list('mean' = BPvarpath, 'SD' = BPvarSDpath))
+  return(list('mean' = bp_var_path, 'SD' = bp_var_sd_path))
 }

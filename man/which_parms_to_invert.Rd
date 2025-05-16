@@ -18,13 +18,13 @@ which_parms_to_invert(initialization, lower_bound, upper_bound, parm_set)
 \value{
 res list. includes
 \itemize{
-\item Parms2Estimate
-\item Parms2Set
+\item parms_to_estimate
+\item parms_to_set
 \item initialization
 \item lower_bound
 \item upper_bound
 \item parm_set
-\item InVar
+\item input_prosail
 fc estimates of the parameters
 }
 }

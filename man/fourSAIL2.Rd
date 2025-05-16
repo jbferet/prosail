@@ -7,9 +7,9 @@
 fourSAIL2(
   leaf_green,
   leaf_brown,
-  TypeLidf = 2,
-  LIDFa = 60,
-  LIDFb = NULL,
+  type_lidf = 2,
+  lidf_a = 60,
+  lidf_b = NULL,
   lai = 3,
   q = 0.1,
   tts = 30,
@@ -18,8 +18,8 @@ fourSAIL2(
   rsoil = NULL,
   fraction_brown = 0.5,
   diss = 0.5,
-  Cv = 1,
-  Zeta = 1
+  cv = 1,
+  zeta = 1
 )
 }
 \arguments{
@@ -27,15 +27,15 @@ fourSAIL2(
 
 \item{leaf_brown}{dataframe. leaf optical properties #2 (e.g. brown veg)}
 
-\item{TypeLidf}{numeric. Type of leaf inclination distribution function}
+\item{type_lidf}{numeric. Type of leaf inclination distribution function}
 
-\item{LIDFa}{numeric.
-if TypeLidf ==1, controls the average leaf slope
-if TypeLidf ==2, controls the average leaf angle}
+\item{lidf_a}{numeric.
+if type_lidf ==1, controls the average leaf slope
+if type_lidf ==2, controls the average leaf angle}
 
-\item{LIDFb}{numeric.
-if TypeLidf ==1, unused
-if TypeLidf ==2, controls the distribution's bimodality}
+\item{lidf_b}{numeric.
+if type_lidf ==1, unused
+if type_lidf ==2, controls the distribution's bimodality}
 
 \item{lai}{numeric. Leaf Area Index}
 
@@ -55,10 +55,10 @@ leaf projections in the horizontal plane and the canopy height
 
 \item{diss}{numeric. Layer dissociation factor}
 
-\item{Cv}{numeric. vertical crown cover percentage
+\item{cv}{numeric. vertical crown cover percentage
 = \% ground area covered with crowns as seen from nadir direction}
 
-\item{Zeta}{numeric. Tree shape factor
+\item{zeta}{numeric. Tree shape factor
 = ratio of crown diameter to crown height}
 }
 \value{

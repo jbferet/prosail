@@ -10,17 +10,17 @@
 #' @importFrom stats dnorm
 #' @export
 
-compute_SRF <- function(wvl,fwhm, sensor_name = 'Custom'){
+compute_srf <- function(wvl,fwhm, sensor_name = 'Custom'){
 
   # define full spectral domain in optical domain
   lambda <- prosail::SpecPROSPECT_FullRange$lambda
-  Spectral_Response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
+  spectral_response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
   for (i in seq_len(length(wvl))){
     y <- dnorm(lambda,wvl[i],fwhm[i]/2.355)
-    Spectral_Response[,i] <- y/max(y)
+    spectral_response[,i] <- y/max(y)
   }
-  Spectral_Response[which(Spectral_Response < 0.001)] <- 0
-  SRF <- list('Spectral_Response' = Spectral_Response,
+  spectral_response[which(spectral_response < 0.001)] <- 0
+  SRF <- list('Spectral_Response' = spectral_response,
               'Spectral_Bands' = wvl,
               'Original_Bands' = lambda,
               'Central_WL' = wvl,

@@ -1,38 +1,38 @@
 test_that("PROSAIL iterative optimization", {
   # define lower and upper bounds for inversion, as well as initial value
-  LB <- data.frame('CHL' = 5, 'CAR' = 1, 'EWT' = 0.002, 'LMA' = 0,
-                   'lai' = 0.5, 'N' = 1)
-  UB <- data.frame('CHL' = 80, 'CAR' = 20, 'EWT' = 0.03, 'LMA' = 0.03,
-                   'lai' = 6, 'N' = 3)
-  Init <- data.frame('CHL' = 40, 'CAR' = 10, 'EWT' = 0.01, 'LMA' = 0.01,
-                     'lai' = 3, 'N' = 1.5)
+  lb <- data.frame('chl' = 5, 'car' = 1, 'ewt' = 0.002, 'lma' = 0,
+                   'lai' = 0.5, 'n_struct' = 1)
+  ub <- data.frame('chl' = 80, 'car' = 20, 'ewt' = 0.03, 'lma' = 0.03,
+                   'lai' = 6, 'n_struct' = 3)
+  init <- data.frame('chl' = 40, 'car' = 10, 'ewt' = 0.01, 'lma' = 0.01,
+                     'lai' = 3, 'n_struct' = 1.5)
   # define parameters which are already set for inversion
   parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
-                        'LIDFa' = 60, 'ANT' = 0, 'BROWN' = 0, 'q' = 0.1)
+                         'lidf_a' = 60, 'ant' = 0, 'brown' = 0, 'q' = 0.1)
   # compute soil reflectance
   rsoil <- parm_set$psoil*SpecSOIL$Dry_Soil+(1-parm_set$psoil)*SpecSOIL$Wet_Soil
   # simulate canopy BRF with 1 nm sampling
-  truth <- data.frame('CHL' = 60, 'CAR' = 8, 'EWT' = 0.015, 'LMA' = 0.005,
-                      'lai' = 5,  'N' = 1.8)
-  Refl_1nm <- PRO4SAIL(N = truth$N, CHL = truth$CHL, CAR = truth$CAR,
-                       ANT = parm_set$ANT, BROWN = parm_set$BROWN,
-                       EWT = truth$EWT, LMA = truth$LMA, TypeLidf = 2,
-                       lai = truth$lai, q = parm_set$q, LIDFa = parm_set$LIDFa,
-                       rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto,
-                       psi = parm_set$psi)
-  brf_1nm <- prosail::compute_BRF(rdot = Refl_1nm$rdot,
-                                  rsot = Refl_1nm$rsot,
-                                  tts = parm_set$tts,
-                                  SpecATM_Sensor = SpecATM)
+  truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
+                      'lai' = 5,  'n_struct' = 1.8)
+  refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
+                      ant = parm_set$ant, brown = parm_set$brown,
+                      ewt = truth$ewt, lma = truth$lma, type_lidf = 2,
+                      lai = truth$lai, q = parm_set$q, lidf_a = parm_set$lidf_a,
+                      rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto,
+                      psi = parm_set$psi)
+  brf_1nm <- compute_brf(rdot = refl_1nm$rdot,
+                         rsot = refl_1nm$rsot,
+                         tts = parm_set$tts,
+                         spec_atm_sensor = SpecATM)
   # invert 1 nm data
-  est <- invert_PROSAIL(brf_mes = brf_1nm$BRF,
-                        initialization = Init,
-                        lower_bound = LB,
-                        upper_bound = UB,
-                        SpecPROSPECT_Sensor = SpecPROSPECT_FullRange,
-                        SpecATM_Sensor = SpecATM,
-                        SpecSOIL_Sensor = SpecSOIL,
-                        TypeLidf = 2, parm_set = parm_set)
+  est <- invert_prosail(brf_mes = brf_1nm$BRF,
+                        initialization = init,
+                        lower_bound = lb,
+                        upper_bound = ub,
+                        spec_prospect_sensor = SpecPROSPECT_FullRange,
+                        spec_atm_sensor = SpecATM,
+                        spec_soil_sensor = SpecSOIL,
+                        type_lidf = 2, parm_set = parm_set)
 
   nerr <- list()
   for (parm in names(truth))

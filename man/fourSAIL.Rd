@@ -7,9 +7,9 @@ input parameters}
 \usage{
 fourSAIL(
   lop,
-  TypeLidf = 2,
-  LIDFa = 60,
-  LIDFb = NULL,
+  type_lidf = 2,
+  lidf_a = 60,
+  lidf_b = NULL,
   lai = 3,
   q = 0.1,
   tts = 30,
@@ -22,15 +22,15 @@ fourSAIL(
 \item{lop}{list. leaf optical properties
 (reflectance and transmittance) and corresponding spectral bands}
 
-\item{TypeLidf}{numeric. Type of leaf inclination distribution function}
+\item{type_lidf}{numeric. Type of leaf inclination distribution function}
 
-\item{LIDFa}{numeric.
-if TypeLidf ==1, controls the average leaf slope
-if TypeLidf ==2, controls the average leaf angle}
+\item{lidf_a}{numeric.
+if type_lidf ==1, controls the average leaf slope
+if type_lidf ==2, controls the average leaf angle}
 
-\item{LIDFb}{numeric.
-if TypeLidf ==1, controls the distribution's bimodality
-if TypeLidf ==2, unused}
+\item{lidf_b}{numeric.
+if type_lidf ==1, controls the distribution's bimodality
+if type_lidf ==2, unused}
 
 \item{lai}{numeric. Leaf Area Index}
 

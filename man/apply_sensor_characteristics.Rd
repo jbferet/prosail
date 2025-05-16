@@ -5,18 +5,18 @@
 \title{reads spectral response from known sensor
 spectral response from Sentinel-2 is already defined}
 \usage{
-apply_sensor_characteristics(wvl, input_refl_table, SRF)
+apply_sensor_characteristics(wvl, input_refl_table, srf)
 }
 \arguments{
 \item{wvl}{numeric. spectral sampling of the input spectral data}
 
 \item{input_refl_table}{numeric. input spectral data (unique sample)}
 
-\item{SRF}{list. Spectral response & Spectral Bands of the sensor & Original
-Bands for which SRF is defined}
+\item{srf}{list. Spectral response & Spectral Bands of the sensor & Original
+Bands for which srf is defined}
 }
 \value{
-OutRefl numeric. Output spectral data, sensor resolution
+refl_sensor numeric. Output spectral data, sensor resolution
 }
 \description{
 reads spectral response from known sensor

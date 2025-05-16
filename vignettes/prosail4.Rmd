@@ -137,38 +137,38 @@ library(prosail)
 output_dir_BP <- './PROSAIL'
 # get sensor response for Sentinel-2
 sensor_name <- 'Sentinel_2'
-SRF <- get_radiometry(sensor_name)
+srf <- get_radiometry(sensor_name)
 
 # define parameters to estimate
-Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
+parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
 selected_bands <- list('lai' = c('B3','B4','B8'), 
-                       'fCover' = c('B3','B4','B8'), 
-                       'fAPAR' = c('B3','B4','B8'), 
-                       'CHL' = c('B3','B4','B5','B6','B7','B8'), 
-                       'EWT' = c('B8A','B11','B12'), 
-                       'LMA' = c('B8A','B11','B12'))
+                       'fcover' = c('B3','B4','B8'), 
+                       'fapar' = c('B3','B4','B8'), 
+                       'chl' = c('B3','B4','B5','B6','B7','B8'), 
+                       'ewt' = c('B8A','B11','B12'), 
+                       'lma' = c('B8A','B11','B12'))
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
                                         path_bbox = path_bbox)
 # define ranges for zenith angles of acquisition
-GeomAcq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
+geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
                                    'tts' = angles_path$MinAngle['sza'], 
                                    'psi' = angles_path$MinAngle['psi']), 
                 'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
                                    'tts' = angles_path$MaxAngle['sza'], 
                                    'psi' = angles_path$MaxAngle['psi']))
 
-# users can define GeomAcq following their own conditions by following the list 
+# users can define geom_acq following their own conditions by following the list 
 # structure above if preprocS2 is not applied to get imagery
 
 # train regression model
 # set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in 
 # the R package caret instead of liquidSVM
-modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
-                                    atbd = TRUE, GeomAcq = GeomAcq, SRF = SRF, 
+modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
+                                    atbd = TRUE, geom_acq = geom_acq, srf = srf, 
                                     selected_bands = selected_bands, 
                                     output_dir = output_dir_BP, 
                                     method = 'liquidSVM')
@@ -178,10 +178,10 @@ modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
 # Adapt multiplying_factor if not the case 
 # multiplying_factor = 1 if reflectance defined between 0 and 1
 BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
-                                  HybridModel = modelSVR, 
+                                  hybrid_model = modelSVR, 
                                   output_path = PROSAIL_ResPath,
                                   selected_bands = selected_bands, 
-                                  bandname = SRF$Spectral_Bands, 
+                                  bandname = srf$Spectral_Bands, 
                                   mask_path = vegetation_mask, 
                                   multiplying_factor = 10000)
 ```
@@ -192,7 +192,7 @@ saved as individual raster files.
 For each biophysical variable, the mean value and standard deviation defined by 
 the input variable `nb_models` from `modelSVR` (default = 20 models) is saved.
 
-The biophysical variables `CHL`, `lai`, `fAPAR` and `fCover` are displayed 
+The biophysical variables `chl`, `lai`, `fapar` and `fcover` are displayed 
 below:
 
 <p float="left">

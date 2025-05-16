@@ -4,13 +4,13 @@
 \alias{apply_noise_atbd}
 \title{This function applies noise defined in S2 ATBD to BRF LUT}
 \usage{
-apply_noise_atbd(BRF_LUT)
+apply_noise_atbd(brf_lut)
 }
 \arguments{
-\item{BRF_LUT}{numeric. BRF LUT}
+\item{brf_lut}{numeric. BRF LUT}
 }
 \value{
-BRF_LUT_Noise numeric.
+brf_lut_noise numeric.
 }
 \description{
 This function applies noise defined in S2 ATBD to BRF LUT

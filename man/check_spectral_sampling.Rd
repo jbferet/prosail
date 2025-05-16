@@ -2,23 +2,23 @@
 % Please edit documentation in R/check_spectral_sampling.R
 \name{check_spectral_sampling}
 \alias{check_spectral_sampling}
-\title{check if spectral sampling is identical between SpecPROSPECT, SpecSOIL,
-SpecATM}
+\title{check if spectral sampling is identical between spec_prospect, spec_soil,
+spec_atm}
 \usage{
-check_spectral_sampling(SpecPROSPECT, SpecSOIL, SpecATM)
+check_spectral_sampling(spec_prospect, spec_soil, spec_atm)
 }
 \arguments{
-\item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
+\item{spec_prospect}{list. Includes optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique
+\item{spec_soil}{list. Includes either dry soil and wet soil, or a unique
 soil sample if the psoil parameter is not inverted}
 
-\item{SpecATM}{list. direct and diffuse radiation for clear conditions}
+\item{spec_atm}{list. direct and diffuse radiation for clear conditions}
 }
 \value{
 invisible
 }
 \description{
-check if spectral sampling is identical between SpecPROSPECT, SpecSOIL,
-SpecATM
+check if spectral sampling is identical between spec_prospect, spec_soil,
+spec_atm
 }

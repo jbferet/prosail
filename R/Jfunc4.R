@@ -5,7 +5,7 @@
 #' @return Jout numeric.
 #' @export
 #'
-Jfunc4 <- function(m,t){
+jfunc4 <- function(m,t){
 
   del <- m*t
   out <- 0*del

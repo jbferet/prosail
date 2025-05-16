@@ -3,16 +3,16 @@
 \name{get_distribution_input_prosail2}
 \alias{get_distribution_input_prosail2}
 \title{This function generates distribution of biophysical parameters used as input
-parameters in PRO4SAIL}
+parameters in prosail}
 \usage{
 get_distribution_input_prosail2(
   minval,
   maxval,
   parm_set,
   nb_samples,
-  TypeDistrib = NULL,
-  Mean = NULL,
-  Std = NULL
+  type_distrib = NULL,
+  mean = NULL,
+  sd = NULL
 )
 }
 \arguments{
@@ -24,16 +24,16 @@ get_distribution_input_prosail2(
 
 \item{nb_samples}{numeric. Number of samples to be generated}
 
-\item{TypeDistrib}{list. uniform / Gaussian distribution to be applied}
+\item{type_distrib}{list. uniform / Gaussian distribution to be applied}
 
-\item{Mean}{list. mean value for parameters with Gaussian distribution}
+\item{mean}{list. mean value for parameters with Gaussian distribution}
 
-\item{Std}{list. standard deviation for parameters with Gaussian distribution}
+\item{sd}{list. standard deviation for parameters with Gaussian distribution}
 }
 \value{
-input_prosail list. nb_samples input parameters for PRO4SAIL simulation
+input_prosail list. input parameters for prosail simulation
 }
 \description{
 This function generates distribution of biophysical parameters used as input
-parameters in PRO4SAIL
+parameters in prosail
 }

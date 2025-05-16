@@ -43,21 +43,21 @@ sensor response function to all optical constants used in PROSAIL.
 ```{r simulate_LUT_Alternative}
 # apply sensor characteristics to PROSPECT optical constants
 wvl <- SpecPROSPECT$lambda
-Spec_Sensor <- apply_sensor_characteristics(wvl,SpecPROSPECT,SRF)
+spec_sensor <- apply_sensor_characteristics(wvl,SpecPROSPECT,srf)
 # apply sensor characteristics to atmospheric properties
-SpecATM_Sensor <- apply_sensor_characteristics(wvl,SpecATM,SRF)
+spec_atm_sensor <- apply_sensor_characteristics(wvl,SpecATM,srf)
 # apply sensor characteristics to soil properties
-SpecSOIL_Sensor <- apply_sensor_characteristics(wvl,SpecSOIL,SRF)
+spec_soil_sensor <- apply_sensor_characteristics(wvl,SpecSOIL,srf)
 ```
 
 This conversion can also be done using a unique function `prepare_sensor_simulation`: 
 
 ```{r conversion_SRF_OptCst}
 # apply sensor characteristics to PROSPECT optical constants
-PropSensor <- prepare_sensor_simulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
-Spec_Sensor <- PropSensor$SpecPROSPECT_Sensor
-SpecSOIL_Sensor <- PropSensor$SpecSOIL_Sensor
-SpecATM_Sensor <- PropSensor$SpecATM_Sensor
+PropSensor <- prepare_sensor_simulation(SpecPROSPECT,SpecSOIL,SpecATM,srf)
+spec_sensor <- PropSensor$spec_prospect_sensor
+spec_soil_sensor <- PropSensor$spec_soil_sensor
+spec_atm_sensor <- PropSensor$spec_atm_sensor
 ```
 
 ... Then BRF, fAPAR and albedo can be computed based on these values:
@@ -65,30 +65,30 @@ SpecATM_Sensor <- PropSensor$SpecATM_Sensor
 ```{r Apply_SRF_Reflectance}
 # WL is a vector giving central wavelength for each band in nanometer
 # fwhm is a vector giving fwhm for each band in nanometer
-rsoil <- SpecSOIL_Sensor$Dry_Soil
-Ref_Sensor <- PRO4SAIL(Spec_Sensor = Spec_Sensor,
-                       CHL = 40, CAR = 10, EWT = 0.01, ANT = 0, LMA = 0.01, 
-                       N = 1.5, TypeLidf = 2, LIDFa = 50, lai = 4, q = 0.1, 
+rsoil <- spec_soil_sensor$Dry_Soil
+refl_sensor <- prosail(spec_sensor = spec_sensor,
+                       chl = 40, car = 10, ewt = 0.01, ant = 0, lma = 0.01, 
+                       n_struct = 1.5, type_lidf = 2, lidf_a = 50, lai = 4, q = 0.1, 
                        tts = 27, tto = 0, psi = 100, 
-                       rsoil = SpecSOIL_Sensor$Dry_Soil)
+                       rsoil = spec_soil_sensor$Dry_Soil)
 
-# Computes BRF based on outputs from PROSAIL and sun position
-BRF_Sensor <- compute_BRF(rdot = Ref_Sensor$rdot, 
-                          rsot = Ref_Sensor$rsot, 
+# Computes BRF based on outputs from prosail and sun position
+brf_sensor <- compute_brf(rdot = refl_sensor$rdot, 
+                          rsot = refl_sensor$rsot, 
                           tts = tts,
-                          SpecATM_Sensor = SpecATM_Sensor)
+                          spec_atm_sensor = spec_atm_sensor)
 
 # Computes fAPAR based on outputs from PROSAIL and sun position
-fAPAR_Sensor <- compute_fAPAR(abs_dir = Ref_Sensor$abs_dir, 
-                              abs_hem = Ref_Sensor$abs_hem, 
+fapar_sensor <- compute_fapar(abs_dir = refl_sensor$abs_dir, 
+                              abs_hem = refl_sensor$abs_hem, 
                               tts = tts, 
-                              SpecATM_Sensor = SpecATM_Sensor)
+                              spec_atm_sensor = spec_atm_sensor)
 
 # Computes albedo based on outputs from PROSAIL and sun position
-albedo_Sensor <- compute_albedo(rsdstar = Ref_Sensor$rsdstar, 
-                                rddstar = Ref_Sensor$rddstar, 
+albedo_sensor <- compute_albedo(rsdstar = refl_sensor$rsdstar, 
+                                rddstar = refl_sensor$rddstar, 
                                 tts = tts,
-                                SpecATM_Sensor = SpecATM_Sensor)
+                                spec_atm_sensor = spec_atm_sensor)
 ```
 
 ### Use alternative implementation of machine learning algorithm for hybrid inversion

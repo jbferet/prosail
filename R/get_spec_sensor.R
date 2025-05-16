@@ -7,20 +7,20 @@
 #' wl = central wavelength and fwhm = corresponding fwhm
 #' @param srf_path character. Path where to get or save SRF
 #'
-#' @return SRF list. Spectral response function, corresponding spectral bands,
+#' @return srf list. Spectral response function, corresponding spectral bands,
 #' and Original Bands
 #' @export
 
-get_spec_sensor <- function(sensor_name = 'MyCustomSensor',
+get_spec_sensor <- function(sensor_name = 'user_defined',
                             spectral_properties = NULL,
                             srf_path = NULL){
-  SRF <- get_radiometry(sensor_name = sensor_name,
+  srf <- get_radiometry(sensor_name = sensor_name,
                         spectral_properties = spectral_properties,
                         srf_path = srf_path)
-  if (is.null(SRF)) stop()
+  if (is.null(srf)) stop()
   # adjust optical constants from 1 nm sampling to S2 spectral sampling
-  SpecSensor <- prepare_sensor_simulation(prosail::SpecPROSPECT_FullRange,
-                                          prosail::SpecSOIL,
-                                          prosail::SpecATM,SRF)
-  return(SpecSensor)
+  spec_sensor <- prepare_sensor_simulation(SpecPROSPECT_FullRange,
+                                           SpecSOIL,
+                                           SpecATM, srf)
+  return(spec_sensor)
 }

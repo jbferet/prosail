@@ -7,7 +7,7 @@ PROSPECT soil parameters as well as direct and diffuse radiation for clear
 conditions}
 \usage{
 get_spec_sensor(
-  sensor_name = "MyCustomSensor",
+  sensor_name = "user_defined",
   spectral_properties = NULL,
   srf_path = NULL
 )
@@ -22,7 +22,7 @@ wl = central wavelength and fwhm = corresponding fwhm}
 \item{srf_path}{character. Path where to get or save SRF}
 }
 \value{
-SRF list. Spectral response function, corresponding spectral bands,
+srf list. Spectral response function, corresponding spectral bands,
 and Original Bands
 }
 \description{

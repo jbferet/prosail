@@ -9,12 +9,12 @@
 #'
 #' @return cost
 #' @export
-cost_function_RMSE_PROSAIL  <- function(brf_mes, brf_mod, xprior,
+cost_function_rmse_prosail  <- function(brf_mes, brf_mod, xprior,
                                         prior_info = NULL){
 
   fc <- sqrt(sum((brf_mes-brf_mod)**2)/length(brf_mes))
   if (!is.null(prior_info))
     fc <- fc +
-      prior_info$WeightPrior*mean(as.numeric((xprior-prior_info$mean)/prior_info$sd)**2)
+      prior_info$weight_prior*mean(as.numeric((xprior-prior_info$mean)/prior_info$sd)**2)
   return(fc)
 }

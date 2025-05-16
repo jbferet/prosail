@@ -2,13 +2,13 @@
 #' input parameters
 #' @param lop list. leaf optical properties
 #' (reflectance and transmittance) and corresponding spectral bands
-#' @param TypeLidf numeric. Type of leaf inclination distribution function
-#' @param LIDFa numeric.
-#' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, controls the average leaf angle
-#' @param LIDFb numeric.
-#' if TypeLidf ==1, controls the distribution's bimodality
-#' if TypeLidf ==2, unused
+#' @param type_lidf numeric. Type of leaf inclination distribution function
+#' @param lidf_a numeric.
+#' if type_lidf ==1, controls the average leaf slope
+#' if type_lidf ==2, controls the average leaf angle
+#' @param lidf_b numeric.
+#' if type_lidf ==1, controls the distribution's bimodality
+#' if type_lidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -29,7 +29,7 @@
 #' rddstar: contribution of hemispherical diffuse incident flux to albedo
 #' @export
 
-fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
+fourSAIL  <- function(lop, type_lidf = 2, lidf_a = 60, lidf_b = NULL,
                       lai = 3, q = 0.1, tts = 30, tto = 0, psi = 60,
                       rsoil = NULL){
 
@@ -51,13 +51,13 @@ fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
 
   #	Generate leaf angle distribution from average leaf angle (ellipsoidal)
   # or (a,b) parameters
-  if (TypeLidf==1){
-    foliar_distrib <- dladgen(LIDFa,LIDFb)
+  if (type_lidf==1){
+    foliar_distrib <- dladgen(lidf_a,lidf_b)
     lidf <- foliar_distrib$lidf
     litab <- foliar_distrib$litab
 
-  } else if (TypeLidf==2){
-    foliar_distrib <- campbell(LIDFa)
+  } else if (type_lidf==2){
+    foliar_distrib <- campbell(lidf_a)
     lidf <- foliar_distrib$lidf
     litab <- foliar_distrib$litab
   }
@@ -78,11 +78,11 @@ fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
     ctl <- cos(rd*ttl)
     #	SAIL volume scattering phase function gives interception and portions to
     #	be multiplied by rho and tau
-    resVolscatt <- volscatt(tts,tto,psi,ttl)
-    chi_s <- resVolscatt$chi_s
-    chi_o <- resVolscatt$chi_o
-    frho <- resVolscatt$frho
-    ftau <- resVolscatt$ftau
+    res_volscatt <- volscatt(tts,tto,psi,ttl)
+    chi_s <- res_volscatt$chi_s
+    chi_o <- res_volscatt$chi_o
+    frho <- res_volscatt$frho
+    ftau <- res_volscatt$ftau
 
     # **************************************************************************
     #                   SUITS SYSTEM COEFFICIENTS
@@ -167,10 +167,10 @@ fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
     re <- rinf*e1
     denom <- 1.-rinf2*e2
 
-    J1ks <- Jfunc1(ks,m,lai)
-    J2ks <- Jfunc2(ks,m,lai)
-    J1ko <- Jfunc1(ko,m,lai)
-    J2ko <- Jfunc2(ko,m,lai)
+    J1ks <- jfunc1(ks,m,lai)
+    J2ks <- jfunc2(ks,m,lai)
+    J1ko <- jfunc1(ko,m,lai)
+    J2ko <- jfunc2(ko,m,lai)
 
     Ps <- (sf+sb*rinf)*J1ks
     Qs <- (sf*rinf+sb)*J2ks
@@ -186,7 +186,7 @@ fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
 
     tss <- exp(-ks*lai)
     too <- exp(-ko*lai)
-    z <- Jfunc3(ks,ko,lai)
+    z <- jfunc3(ks,ko,lai)
     g1 <- (z-J1ks*too)/(ko+m)
     g2 <- (z-J1ko*tss)/(ks+m)
 
@@ -266,7 +266,7 @@ fourSAIL  <- function(lop, TypeLidf = 2, LIDFa = 60, LIDFb = NULL,
     rddstar <- rdd + (tdd * tdd * rsoil) / dn
   }
   my_list <- list('rdot' = rdot, 'rsot' = rsot, 'rddt' = rddt, 'rsdt' = rsdt,
-                  'fCover' = 1 - too, 'abs_dir' = abs_dir, 'abs_hem' = abs_hem,
+                  'fcover' = 1 - too, 'abs_dir' = abs_dir, 'abs_hem' = abs_hem,
                   'rsdstar' = rsdstar, 'rddstar' = rddstar)
   return(my_list)
 }

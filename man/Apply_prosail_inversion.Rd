@@ -7,7 +7,7 @@ vegetation biophysical properties}
 \usage{
 apply_prosail_inversion(
   raster_path,
-  HybridModel,
+  hybrid_model,
   output_path,
   selected_bands,
   bandname,
@@ -22,7 +22,7 @@ apply_prosail_inversion(
 \arguments{
 \item{raster_path}{character. path for a raster file}
 
-\item{HybridModel}{list. hybrid models produced from train_prosail_inversion
+\item{hybrid_model}{list. hybrid models produced from train_prosail_inversion
 each element of the list corresponds to a set of hybrid models for a
 vegetation parameter}
 

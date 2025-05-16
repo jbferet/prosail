@@ -1,13 +1,13 @@
 #' 4SAIL2 simulation based on a set of combinations of input parameters
 #' @param leaf_green dataframe. leaf optical properties #1 (e.g. green veg)
 #' @param leaf_brown dataframe. leaf optical properties #2 (e.g. brown veg)
-#' @param TypeLidf numeric. Type of leaf inclination distribution function
-#' @param LIDFa numeric.
-#' if TypeLidf ==1, controls the average leaf slope
-#' if TypeLidf ==2, controls the average leaf angle
-#' @param LIDFb numeric.
-#' if TypeLidf ==1, unused
-#' if TypeLidf ==2, controls the distribution's bimodality
+#' @param type_lidf numeric. Type of leaf inclination distribution function
+#' @param lidf_a numeric.
+#' if type_lidf ==1, controls the average leaf slope
+#' if type_lidf ==2, controls the average leaf angle
+#' @param lidf_b numeric.
+#' if type_lidf ==1, unused
+#' if type_lidf ==2, controls the distribution's bimodality
 #' @param lai numeric. Leaf Area Index
 #' @param q numeric. Hot Spot parameter = ratio of the correlation length of
 #' leaf projections in the horizontal plane and the canopy height
@@ -18,9 +18,9 @@
 #' @param rsoil numeric. Soil reflectance
 #' @param fraction_brown numeric. Fraction of brown leaf area
 #' @param diss numeric. Layer dissociation factor
-#' @param Cv numeric. vertical crown cover percentage
+#' @param cv numeric. vertical crown cover percentage
 #' = % ground area covered with crowns as seen from nadir direction
-#' @param Zeta numeric. Tree shape factor
+#' @param zeta numeric. Tree shape factor
 #' = ratio of crown diameter to crown height
 #'
 #' @return list. rdot,rsot,rddt,rsdt
@@ -37,10 +37,10 @@
 
 #' @export
 
-fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
-                       LIDFb = NULL, lai = 3, q = 0.1, tts = 30, tto = 0,
+fourSAIL2  <- function(leaf_green, leaf_brown, type_lidf = 2, lidf_a = 60,
+                       lidf_b = NULL, lai = 3, q = 0.1, tts = 30, tto = 0,
                        psi = 60, rsoil = NULL, fraction_brown = 0.5, diss = 0.5,
-                       Cv = 1, Zeta = 1){
+                       cv = 1, zeta = 1){
 
   #	This version does not include non-Lambertian soil properties.
   #	original codes do, and only need to add the following variables as input
@@ -51,12 +51,12 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
 
   #	Generate leaf angle distribution from average leaf angle (ellipsoidal)
   # or (a,b) parameters
-  if (TypeLidf==1){
-    foliar_distrib <- dladgen(LIDFa,LIDFb)
+  if (type_lidf==1){
+    foliar_distrib <- dladgen(lidf_a,lidf_b)
     lidf <- foliar_distrib$lidf
     litab <- foliar_distrib$litab
-  } else if (TypeLidf==2){
-    foliar_distrib <- campbell(LIDFa)
+  } else if (type_lidf==2){
+    foliar_distrib <- campbell(lidf_a)
     lidf <- foliar_distrib$lidf
     litab <- foliar_distrib$litab
   }
@@ -82,17 +82,17 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
 
     # Clumping effects
     Cs <- Co <- 1.0
-    if (Cv<=1.0){
-      Cs <- 1.0-(1.0-Cv)^(1.0/cts)
-      Co <- 1.0-(1.0-Cv)^(1.0/cto)
+    if (cv<=1.0){
+      Cs <- 1.0-(1.0-cv)^(1.0/cts)
+      Co <- 1.0-(1.0-cv)^(1.0/cto)
     }
-    Overlap <- 0.0
-    if (Zeta>0.0)
-      Overlap <- min(Cs*(1.0-Co),Co*(1.0-Cs))*exp(-dso/Zeta)
-    Fcd <- Cs*Co+Overlap
-    Fcs <- (1.0-Cs)*Co-Overlap
-    Fod <- Cs*(1.0-Co)-Overlap
-    Fos <- (1.0-Cs)*(1.0-Co)+Overlap
+    overlap <- 0.0
+    if (zeta>0.0)
+      overlap <- min(Cs*(1.0-Co),Co*(1.0-Cs))*exp(-dso/zeta)
+    Fcd <- Cs*Co+overlap
+    Fcs <- (1.0-Cs)*Co-overlap
+    Fod <- Cs*(1.0-Co)-overlap
+    Fos <- (1.0-Cs)*(1.0-Co)+overlap
     Fcdc <- 1.0-(1.0-Fcd)^(0.5/cts+0.5/cto)
 
     #	Part depending on diss, fraction_brown, and leaf optical properties
@@ -134,11 +134,11 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
       # SAIL volscatt function gives interception coefficients
       # and two portions of the volume scattering phase function to be
       # multiplied by rho and tau, respectively
-      resVolscatt <- volscatt(tts,tto,psi,ttl)
-      chi_s <- resVolscatt$chi_s
-      chi_o <- resVolscatt$chi_o
-      frho <- resVolscatt$frho
-      ftau <- resVolscatt$ftau
+      res_volscatt <- volscatt(tts,tto,psi,ttl)
+      chi_s <- res_volscatt$chi_s
+      chi_o <- res_volscatt$chi_o
+      frho <- res_volscatt$frho
+      ftau <- res_volscatt$ftau
       # Extinction coefficients
       ksli <- chi_s/cts
       koli <- chi_o/cto
@@ -236,37 +236,37 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
     m2 <- (att+sigb)*(att-sigb)
     m2[m2<0] <- 0
     m <- sqrt(m2)
-    Which_NCS <- which(m>0.01)
-    Which_CS <- which(m<=0.01)
+    which_ncs <- which(m>0.01)
+    which_cs <- which(m<=0.01)
 
     tdd <- rdd <- tsd <- rsd <- tdo <- rdo <- 0*m
     rsod <- 0*m
-    if (length(Which_NCS)>0){
-      resNCS <- non_conservative_scattering(m[Which_NCS], lai2, att[Which_NCS],
-                                          sigb[Which_NCS], ks, ko,
-                                          sf[Which_NCS], sb[Which_NCS],
-                                          vf[Which_NCS], vb[Which_NCS],
-                                          tss, too)
-      tdd[Which_NCS] <- resNCS$tdd
-      rdd[Which_NCS] <- resNCS$rdd
-      tsd[Which_NCS] <- resNCS$tsd
-      rsd[Which_NCS] <- resNCS$rsd
-      tdo[Which_NCS] <- resNCS$tdo
-      rdo[Which_NCS] <- resNCS$rdo
-      rsod[Which_NCS] <- resNCS$rsod
+    if (length(which_ncs)>0){
+      res_ncs <- non_conservative_scattering(m[which_ncs], lai2, att[which_ncs],
+                                             sigb[which_ncs], ks, ko,
+                                             sf[which_ncs], sb[which_ncs],
+                                             vf[which_ncs], vb[which_ncs],
+                                             tss, too)
+      tdd[which_ncs] <- res_ncs$tdd
+      rdd[which_ncs] <- res_ncs$rdd
+      tsd[which_ncs] <- res_ncs$tsd
+      rsd[which_ncs] <- res_ncs$rsd
+      tdo[which_ncs] <- res_ncs$tdo
+      rdo[which_ncs] <- res_ncs$rdo
+      rsod[which_ncs] <- res_ncs$rsod
     }
-    if (length(Which_CS)>0){
-      resCS <- conservative_scattering(m[Which_CS], lai2, att[Which_CS],
-                                      sigb[Which_CS], ks, ko, sf[Which_CS],
-                                      sb[Which_CS], vf[Which_CS], vb[Which_CS],
-                                      tss, too)
-      tdd[Which_CS] <- resCS$tdd
-      rdd[Which_CS] <- resCS$rdd
-      tsd[Which_CS] <- resCS$tsd
-      rsd[Which_CS] <- resCS$rsd
-      tdo[Which_CS] <- resCS$tdo
-      rdo[Which_CS] <- resCS$rdo
-      rsod[Which_CS] <- resCS$rsod
+    if (length(which_cs)>0){
+      res_cs <- conservative_scattering(m[which_cs], lai2, att[which_cs],
+                                        sigb[which_cs], ks, ko, sf[which_cs],
+                                        sb[which_cs], vf[which_cs],
+                                        vb[which_cs], tss, too)
+      tdd[which_cs] <- res_cs$tdd
+      rdd[which_cs] <- res_cs$rdd
+      tsd[which_cs] <- res_cs$tsd
+      rsd[which_cs] <- res_cs$rsd
+      tdo[which_cs] <- res_cs$tdo
+      rdo[which_cs] <- res_cs$rdo
+      rsod[which_cs] <- res_cs$rsod
     }
 
     # Set background properties equal to those of the bottom layer on black soil
@@ -298,37 +298,37 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
     m2 <- (att+sigb)*(att-sigb)
     m2[m2<0] <- 0
     m <- sqrt(m2)
-    Which_NCS <- which(m>0.01)
-    Which_CS <- which(m<=0.01)
+    which_ncs <- which(m>0.01)
+    which_cs <- which(m<=0.01)
 
     tdd <- rdd <- tsd <- rsd <- tdo <- rdo <- 0*m
     rsod <- 0*m
-    if (length(Which_NCS)>0){
-      resNCS <- non_conservative_scattering(m[Which_NCS], lai1, att[Which_NCS],
-                                          sigb[Which_NCS], ks, ko,
-                                          sf[Which_NCS], sb[Which_NCS],
-                                          vf[Which_NCS], vb[Which_NCS],
-                                          tss, too)
-      tdd[Which_NCS] <- resNCS$tdd
-      rdd[Which_NCS] <- resNCS$rdd
-      tsd[Which_NCS] <- resNCS$tsd
-      rsd[Which_NCS] <- resNCS$rsd
-      tdo[Which_NCS] <- resNCS$tdo
-      rdo[Which_NCS] <- resNCS$rdo
-      rsod[Which_NCS] <- resNCS$rsod
+    if (length(which_ncs)>0){
+      res_ncs <- non_conservative_scattering(m[which_ncs], lai1, att[which_ncs],
+                                             sigb[which_ncs], ks, ko,
+                                             sf[which_ncs], sb[which_ncs],
+                                             vf[which_ncs], vb[which_ncs],
+                                             tss, too)
+      tdd[which_ncs] <- res_ncs$tdd
+      rdd[which_ncs] <- res_ncs$rdd
+      tsd[which_ncs] <- res_ncs$tsd
+      rsd[which_ncs] <- res_ncs$rsd
+      tdo[which_ncs] <- res_ncs$tdo
+      rdo[which_ncs] <- res_ncs$rdo
+      rsod[which_ncs] <- res_ncs$rsod
     }
-    if (length(Which_CS)>0){
-      resCS <- conservative_scattering(m[Which_CS], lai1, att[Which_CS],
-                                      sigb[Which_CS], ks, ko, sf[Which_CS],
-                                      sb[Which_CS], vf[Which_CS], vb[Which_CS],
-                                      tss, too)
-      tdd[Which_CS] <- resCS$tdd
-      rdd[Which_CS] <- resCS$rdd
-      tsd[Which_CS] <- resCS$tsd
-      rsd[Which_CS] <- resCS$rsd
-      tdo[Which_CS] <- resCS$tdo
-      rdo[Which_CS] <- resCS$rdo
-      rsod[Which_CS] <- resCS$rsod
+    if (length(which_cs)>0){
+      res_cs <- conservative_scattering(m[which_cs], lai1, att[which_cs],
+                                        sigb[which_cs], ks, ko, sf[which_cs],
+                                        sb[which_cs], vf[which_cs],
+                                        vb[which_cs], tss, too)
+      tdd[which_cs] <- res_cs$tdd
+      rdd[which_cs] <- res_cs$rdd
+      tsd[which_cs] <- res_cs$tsd
+      rsd[which_cs] <- res_cs$rsd
+      tdo[which_cs] <- res_cs$tdo
+      rdo[which_cs] <- res_cs$rdo
+      rsod[which_cs] <- res_cs$rsod
     }
 
     # Combine with bottom layer reflectances and transmittances (adding method)
@@ -355,9 +355,9 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
     tddt <- tdd*tddb/rn
 
     # Apply clumping effects to vegetation layer
-    rddcb <- Cv*rddt_b
-    rddct <- Cv*rddt_t
-    tddc <- 1-Cv+Cv*tddt
+    rddcb <- cv*rddt_b
+    rddct <- cv*rddt_t
+    tddc <- 1-cv+cv*tddt
     rsdc <- Cs*rsdt
     tsdc <- Cs*tsdt
     rdoc <- Co*rdot
@@ -402,7 +402,7 @@ fourSAIL2  <- function(leaf_green, leaf_brown, TypeLidf = 2, LIDFa = 60,
     rddstar <- rdd + (tdd * tdd * rsoil) / rn
   }
   my_list <- list('rdot' = rdot, 'rsot' = rsot, 'rddt' = rddt, 'rsdt' =rsdt,
-                  'fCover' = 1 - too, 'abs_dir' = alfast, 'abs_hem' = alfadt,
+                  'fcover' = 1 - too, 'abs_dir' = alfast, 'abs_hem' = alfadt,
                   'rsdstar' = rsdstar, 'rddstar' = rddstar)
   return(my_list)
 }

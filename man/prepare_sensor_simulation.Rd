@@ -5,21 +5,21 @@
 \title{This function converts high resolution spectral info into broader
 spectral characteristics}
 \usage{
-prepare_sensor_simulation(SpecPROSPECT, SpecSOIL, SpecATM, SRF)
+prepare_sensor_simulation(spec_prospect, spec_soil, spec_atm, srf)
 }
 \arguments{
-\item{SpecPROSPECT}{list. optical constants required for PROSPECT}
+\item{spec_prospect}{list. optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. dry soil and wet soil, or a unique soil sample if
+\item{spec_soil}{list. dry soil and wet soil, or a unique soil sample if
 psoil parameter is not inverted}
 
-\item{SpecATM}{list. direct and diffuse radiation for clear conditions}
+\item{spec_atm}{list. direct and diffuse radiation for clear conditions}
 
-\item{SRF}{list. Spectral response function, corresponding spectral bands,
+\item{srf}{list. Spectral response function, corresponding spectral bands,
 and Original Bands}
 }
 \value{
-SpecSensor list. list of input specs with sensor resolution
+spec_sensor list. list of input specs with sensor resolution
 }
 \description{
 This function converts high resolution spectral info into broader

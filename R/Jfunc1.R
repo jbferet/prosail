@@ -6,7 +6,7 @@
 #' @return Jout numeric.
 #' @export
 #'
-Jfunc1 <- function(k,l,t){
+jfunc1 <- function(k,l,t){
   # J1 function with avoidance of singularity problem
   del <- (k-l)*t
   Jout <- 0*l

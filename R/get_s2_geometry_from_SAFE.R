@@ -1,67 +1,67 @@
 #' This function returns geometry of acquisition for S2 image processed with
 #' Sen2Cor
-#' - SZA = list of sun zenith angle
+#' - sza = list of sun zenith angle
 #' - SAA = list of sun azimuth angle
-#' - VZA = list of viewer zenith angle
-#' - VAA = list of viewer azimuth angle
+#' - vza = list of viewer zenith angle
+#' - vaa = list of viewer azimuth angle
 #' @param s2xml list. produced from reading XML metadata file with package XML
 #'
-#' @return List of S2 angles (SZA, SAA, VZA, VAA)
+#' @return List of S2 angles (sza, saa, vza, vaa)
 #' @importFrom stats na.omit
 #' @export
 
 get_s2_geometry_from_SAFE <- function(s2xml){
 
-  Distrib_SunAngle <- list()
-  # SZA
-  Distrib_SunAngle$Zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
-  SZA <- list()
-  for (i in seq_len(length(Distrib_SunAngle$Zenith))){
-    SZA[[i]] <- as.numeric(strsplit(x = Distrib_SunAngle$Zenith[i]$VALUES,
+  distrib_sun_angle <- list()
+  # sza
+  distrib_sun_angle$zenith <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Zenith$Values_List
+  sza <- list()
+  for (i in seq_len(length(distrib_sun_angle$zenith))){
+    sza[[i]] <- as.numeric(strsplit(x = distrib_sun_angle$zenith[i]$VALUES,
                                     split = ' ')[[1]])
   }
-  SZA <- do.call(what = rbind, args = SZA)
-  # SZA <- stats::na.omit(SZA)
+  sza <- do.call(what = rbind, args = sza)
+  # sza <- stats::na.omit(sza)
 
-  # SAA
-  Distrib_SunAngle$Azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
-  SAA <- list()
-  for (i in seq_len(length(Distrib_SunAngle$Azimuth))){
-    SAA[[i]] <- as.numeric(strsplit(x = Distrib_SunAngle$Azimuth[i]$VALUES,
+  # saa
+  distrib_sun_angle$azimuth <- s2xml$Geometric_Info$Tile_Angles$Sun_Angles_Grid$Azimuth$Values_List
+  saa <- list()
+  for (i in seq_len(length(distrib_sun_angle$azimuth))){
+    saa[[i]] <- as.numeric(strsplit(x = distrib_sun_angle$azimuth[i]$VALUES,
                                     split = ' ')[[1]])
   }
-  SAA <- do.call(what = rbind, args = SAA)
+  saa <- do.call(what = rbind, args = saa)
 
-  # VZA
-  VZA <- list()
+  # vza
+  vza <- list()
   ii <- 0
   band_detector <- s2xml$Geometric_Info$Tile_Angles
   for (i in 3:(length(band_detector)-2)) {
     ii <- ii + 1
     vza_d <- band_detector[i]$Viewing_Incidence_Angles_Grids$Zenith$Values_List
-    for (j in seq_len(length(Distrib_SunAngle$Zenith))){
+    for (j in seq_len(length(distrib_sun_angle$zenith))){
       vza_d[[j]] <- as.numeric(strsplit(x = vza_d[[j]],
                                       split = ' ')[[1]])
     }
-    VZA[[ii]] <- do.call(what = rbind, args = vza_d)
+    vza[[ii]] <- do.call(what = rbind, args = vza_d)
   }
   # get mean view zenith angle for all detectors
-  VZA <- apply(simplify2array(VZA), 1:2, mean, na.rm = TRUE)
+  vza <- apply(simplify2array(vza), 1:2, mean, na.rm = TRUE)
 
-  # VAA
-  VAA <- list()
+  # vaa
+  vaa <- list()
   ii <- 0
   band_detector <- s2xml$Geometric_Info$Tile_Angles
   for (i in 3:(length(band_detector)-2)) {
     ii <- ii + 1
     vaa_d <- band_detector[i]$Viewing_Incidence_Angles_Grids$Azimuth$Values_List
-    for (j in seq_len(length(Distrib_SunAngle$Azimuth))){
+    for (j in seq_len(length(distrib_sun_angle$azimuth))){
       vaa_d[[j]] <- as.numeric(strsplit(x = vaa_d[[j]],
                                         split = ' ')[[1]])
     }
-    VAA[[ii]] <- do.call(what = rbind, args = vaa_d)
+    vaa[[ii]] <- do.call(what = rbind, args = vaa_d)
   }
   # get mean view azimuth angle for all detectors
-  VAA <- apply(simplify2array(VAA), 1:2, mean, na.rm = TRUE)
-  return(list('SAA' = SAA, 'SZA' = SZA, 'VAA' = VAA, 'VZA' = VZA))
+  vaa <- apply(simplify2array(vaa), 1:2, mean, na.rm = TRUE)
+  return(list('saa' = saa, 'sza' = sza, 'vaa' = vaa, 'vza' = vza))
 }

@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 ## Run `prosail` in direct mode
 
 ### Input variables
-The function `PRO4SAIL` runs PROSAIL for individual canopy reflectances and 
+The function `prosail` runs PROSAIL for individual canopy reflectances and 
 expects the following input variables.
 
 * `SAILversion`: the version of SAIL to be used. The default version is __4SAIL__. 
@@ -43,30 +43,30 @@ adapting the information in `SpecPROSPECT`, which is loaded by default when
 calling the package `prospect`.
 
 * The biochemical and biophysical input variables of PROSPECT, including `N`, 
-`CHL`, `CAR`, `ANT`, `BROWN`, `EWT`, `LMA`, `PROT`, `CBC`, `alpha`. 
+`chl`, `car`, `ant`, `brown`, `ewt`, `lma`, `prot`, `cbc`, `alpha`. 
 If no value, their default value is set.
 
     * Note that a unique value (or no value) is expected for each of the leaf 
     constituents when running __4SAIL__. 
     __4SAIL2__ allows introduction of two distinct sets of leaf optical properties. 
     In the original version, one type is dedicated to 'Green leaves', and the 
-    other type is dedicated to 'Brown leaves'. 
+    other type is dedicated to 'brown leaves'. 
     User can decide either to simulate both types of leaf optical properties 
     using PROSPECT, or to directly define these leaf optical properties with the 
-    `BrownVegetation` input parameter, defined as follows
+    `brown_lop` input parameter, defined as follows
 
-    * `BrownVegetation` is a parameter specific to  __4SAIL2__. 
+    * `brown_lop` is a parameter specific to  __4SAIL2__. 
     It should be a list including `Reflectance` and `Transmittance`, 
     with the spectral sampling corresponding to the sampling defined in `Spec_Sensor`
     
-* `TypeLidf`: two leaf inclination distribution functions are implemented here. 
+* `type_lidf`: two leaf inclination distribution functions are implemented here. 
 
-    * Define `TypeLidf=1` if you want to use the original LIDF introduced by 
+    * Define `type_lidf=1` if you want to use the original LIDF introduced by 
     [Verhoef (1998)](https://edepot.wur.nl/210943).
-        * if `TypeLidf=1` then `LIDFa` controls the average leaf slope and 
-        `LIDFb` controls the distribution's bimodality
-        * This LIDF requires |LIDFa| + |LIDFb| < 1
-| LIDF type    |   LIDFa   |   LIDFb   
+        * if `type_lidf=1` then `lidf_a` controls the average leaf slope and 
+        `lidf_b` controls the distribution's bimodality
+        * This LIDF requires |lidf_a| + |lidf_b| < 1
+| LIDF type    |   lidf_a   |   lidf_b   
 | :----------: |:---------:|:---------:|
 | Planophile   |     1     |     0     |
 | Erectophile  |    -1     |     0     |
@@ -74,10 +74,10 @@ If no value, their default value is set.
 | Extremophile |     0     |     1     |
 | Spherical    |   -0.35   |   -0.15   |
 | Uniform      |     0     |     0     |
-    * Define `TypeLidf=2` if you want to use the 
+    * Define `type_lidf=2` if you want to use the 
     [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) 
     characterized by the average leaf inclination angle in degree
-        * if `TypeLidf=2` then `LIDFa` controls the average leaf angle
+        * if `type_lidf=2` then `lidf_a` controls the average leaf angle
 
 * `lai`: leaf area index
 
@@ -94,22 +94,22 @@ correlation length of leaf projections in the horizontal plane and the canopy he
 
 Additionally, __4SAIL2__ also includes the following parameters
 
-* `fraction_brown`: the Fraction of LAI corresponding to brown leaf area, 
+* `fraction_brown`: the fraction of LAI corresponding to brown leaf area, 
 between 0 and 1
 
 * `diss`: Layer dissociation factor
 
-* `Cv`: vertical crown cover percentage (= % ground area covered with crowns as 
+* `cv`: vertical crown cover percentage (= % ground area covered with crowns as 
 seen from nadir direction)
 
-* `Zeta`: Tree shape factor (= ratio of crown diameter to crown height)
+* `zeta`: Tree shape factor (= ratio of crown diameter to crown height)
 
-* `BrownVegetation`: optional input parameter. If user defined brown vegetation 
+* `brown_lop`: optional input parameter. If user defined brown vegetation 
 such as experimental measurements is available. If PROSPECT is used to define 
-both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
+both green and brown leaves, leave `brown_lop` undefined, or set to `NULL`
 
 ### Output variables
-`PRO4SAIL` returns a list containing : 
+`prosail` returns a list containing : 
 
 * `rddt`: bi-hemispherical reflectance factor
 * `rsdt`: directional-hemispherical reflectance factor for solar incident flux
@@ -125,47 +125,47 @@ both green and brown leaves, leave `BrownVegetation` undefined, or set to `NULL`
 library(prosail)
 # define input variables for PROSPECT. 
 # refer to prospect tutorial for default values
-input_prospect <- data.frame('CHL' = 40, 'CAR' = 8, 'ANT' = 0.0, 
-                             'EWT' = 0.01, 'LMA' = 0.009, 'N' = 1.5)
+input_prospect <- data.frame('chl' = 40, 'car' = 8, 'ant' = 0.0, 
+                             'ewt' = 0.01, 'lma' = 0.009, 'n_struct' = 1.5)
 # define input variables for SAIL. 
 lai <- 5      # LAI
 q <- 0.1      # Hot spot parameter
-TypeLidf <- 2 # leaf inclination distribution function 
-LIDFa <- 30   # mean leaf angle
+type_lidf <- 2 # leaf inclination distribution function 
+lidf_a <- 30   # mean leaf angle
 tts <- 30     # geometry of acquisition: sun zenith angle
 tto <- 10     # geometry of acquisition: observer zenith angle
 psi <- 90     # geometry of acquisition: sun-observer azimuth 
 rsoil <- SpecSOIL$Dry_Soil # soil reflectance (SpecSOIL: Dry_Soil and Wet_Soil)
 
-# run PROSAIL with 4SAIL
-Ref_4SAIL <- PRO4SAIL(input_prospect = input_prospect, 
-                      TypeLidf = TypeLidf, LIDFa = LIDFa, lai = lai,
+# run prosail with 4SAIL
+refl_prosail <- prosail(input_prospect = input_prospect, 
+                      type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
                       q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
 
-# run PROSAIL with 4SAIL2
+# run prosail with 4SAIL2
 # define leaf chemical constituents corresponding green and brown leaves
-input_prospect <- data.frame('CHL' = c(40,5), 'CAR' = c(8,5), 'ANT' = c(0,1), 
-                             'EWT' = c(0.01,0.005), 'LMA' = c(0.009,0.008), 
-                             'BROWN' = c(0.0,0.5), 'N' = c(1.5,2))
+input_prospect <- data.frame('chl' = c(40,5), 'car' = c(8,5), 'ant' = c(0,1), 
+                             'ewt' = c(0.01,0.005), 'lma' = c(0.009,0.008), 
+                             'brown' = c(0.0,0.5), 'n_struct' = c(1.5,2))
 # define additional 4SAIL2 parameters
 fraction_brown <- 0.5
 diss <- 0.5
 Cv <- 1
 Zeta <- 1
 
-# run PROSAIL with 4SAIL2
-Ref_4SAIL2 <- PRO4SAIL(SAILversion = '4SAIL2',
+# run prosail with 4SAIL2
+refl_prosail2 <- prosail(SAILversion = '4SAIL2',
                        input_prospect = input_prospect,
-                       TypeLidf = TypeLidf, LIDFa = LIDFa, lai = lai,
+                       type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
                        q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, 
-                       Cv = Cv, Zeta = Zeta)
+                       cv = cv, zeta = zeta)
 ```
 
 
 ## Compute simplified bidirectional reflectance factor (BRF) under the assumption of clear conditions conditions
 
-The function `compute_BRF` computes the bi-directional reflectance factor in the 
+The function `compute_brf` computes the bi-directional reflectance factor in the 
 direction of the observer, by combining both hemispherical-directional and 
 bi-directional reflectance factors.
 The direct and diffuse light are taken into account as described by 
@@ -174,31 +174,31 @@ share of diffuse flux in global radiation `skyl` based on the equation proposed
 by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/0168192386900602).
 
 ```{r compute BRF}
-# Ref_4SAIL is the variable obtained when running PRO4SAIL as in the previous 
+# refl_prosail is the variable obtained when running prosail as in the previous 
 # illustration.
 # SpecATM corresponds to the direct and diffuse radiation solar spectra
-BRF_4SAIL <- compute_BRF(rdot = Ref_4SAIL$rdot,
-                         rsot = Ref_4SAIL$rsot,
+BRF_4SAIL <- compute_brf(rdot = refl_prosail$rdot,
+                         rsot = refl_prosail$rsot,
                          tts = tts,
-                         SpecATM_Sensor = SpecATM)
-BRF_4SAIL2 <- compute_BRF(rdot = Ref_4SAIL2$rdot,
-                          rsot = Ref_4SAIL2$rsot,
+                         spec_atm_sensor = SpecATM)
+BRF_4SAIL2 <- compute_brf(rdot = refl_prosail2$rdot,
+                          rsot = refl_prosail2$rsot,
                           tts = tts,
-                          SpecATM_Sensor = SpecATM)
+                          spec_atm_sensor = SpecATM)
 
 ```
 
 ## Compute fraction of absorbed photosyntehtically active radiation (fAPAR)
 
-The function `compute_fAPAR` computes the fAPAR in the direction of the observer, 
+The function `compute_fapar` computes the fAPAR in the direction of the observer, 
 by combining both canopy absorptance for direct solar incident flux and canopy 
 absorptance for hemispherical diffuse incident flux. 
 
 ```{r compute fAPAR}
-fAPAR_4SAIL <- compute_fAPAR(abs_dir = Ref_4SAIL$abs_dir,
-                             abs_hem = Ref_4SAIL$abs_hem,
+fapar_4sail <- compute_fapar(abs_dir = refl_prosail$abs_dir,
+                             abs_hem = refl_prosail$abs_hem,
                              tts = tts,
-                             SpecATM_Sensor = SpecATM)
+                             spec_atm_sensor = SpecATM)
 ```
 
 ## Compute albedo
@@ -208,8 +208,8 @@ of direct solar incident flux (rsdstar) and the contribution of hemispherical
 diffuse incident flux (rddstar). 
 
 ```{r compute albedo}
-albedo_4SAIL <- compute_albedo(rsdstar = Ref_4SAIL$rsdstar,
-                               rddstar = Ref_4SAIL$rddstar,
+albedo_4SAIL <- compute_albedo(rsdstar = refl_prosail$rsdstar,
+                               rddstar = refl_prosail$rddstar,
                                tts = tts,
                                SpecATM_Sensor = SpecATM)
 ```
@@ -258,7 +258,7 @@ WL <- seq(400, 2400, by = 10)
 # fwhm is a vector giving fwhm for each band in nanometer
 fwhm <- 10+ 0*seq(400, 2400, by = 10)
 # compute corresponding SRF
-SRF_SH <- compute_SRF(WL,fwhm)
+SRF_SH <- compute_srf(WL,fwhm)
 ```
 
 Then, reflectance can be converted from 1-nm spectral sampling (default 
@@ -269,6 +269,6 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 # apply sensor characteristics to simulated reflectance
 wvl <- SpecPROSPECT_FullRange$lambda
 BRF_4SAIL_S2 <- apply_sensor_characteristics(wvl = wvl,
-                                           SRF = SRF_S2,
+                                           srf = SRF_S2,
                                            input_refl_table = BRF_4SAIL)
 ```

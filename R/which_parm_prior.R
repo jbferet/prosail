@@ -9,21 +9,21 @@
 #'
 which_parm_prior <- function(prior_mean, prior_sd) {
 
-  Parms2Prior <- c()
-  listParms <- c('CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'PROT', 'CBC', 'N',
-                 'alpha', 'LIDFa', 'LIDFb', 'lai', 'q', 'tts', 'tto', 'psi',
-                 'psoil')
+  parms_to_prior <- c()
+  list_parms <- c('chl', 'car', 'ant', 'brown', 'ewt', 'lma', 'prot', 'cbc',
+                  'n_struct', 'alpha', 'lidf_a', 'lidf_b', 'lai', 'q', 'tts',
+                  'tto', 'psi', 'psoil')
   prior_mean_update <- prior_sd_update <- list()
-  for (parm in listParms){
+  for (parm in list_parms){
     if (parm %in% names(prior_mean) & parm %in% names(prior_sd)){
-      Parms2Prior <- c(Parms2Prior,parm)
+      parms_to_prior <- c(parms_to_prior,parm)
       prior_mean_update[[parm]] <- prior_mean[[parm]]
       prior_sd_update[[parm]] <- prior_sd[[parm]]
     }
   }
   prior_mean_update <- data.frame(prior_mean_update)
   prior_sd_update <- data.frame(prior_sd_update)
-  return(list('Parms2Prior' = Parms2Prior,
+  return(list('parms_to_prior' = parms_to_prior,
               'mean' = prior_mean_update,
               'sd' = prior_sd_update))
 }

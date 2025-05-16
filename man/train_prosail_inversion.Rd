@@ -7,27 +7,27 @@ values for default parameters}
 \usage{
 train_prosail_inversion(
   input_prosail = NULL,
-  BRF_LUT = NULL,
+  brf_lut = NULL,
   atbd = FALSE,
-  GeomAcq = NULL,
-  SRF = NULL,
+  geom_acq = NULL,
+  srf = NULL,
   codistribution_lai = TRUE,
   minval = NULL,
   maxval = NULL,
-  TypeDistrib = NULL,
-  GaussianDistrib = NULL,
+  type_distrib = NULL,
+  gaussian_distrib = NULL,
   parm_set = NULL,
   SAILversion = "4SAIL",
   brown_lop = NULL,
   nb_samples = 2000,
   nb_models = 20,
   replacement = TRUE,
-  Parms2Estimate = "lai",
+  parms_to_estimate = "lai",
   selected_bands = NULL,
   noise_level = NULL,
-  SpecPROSPECT = NULL,
-  SpecSOIL = NULL,
-  SpecATM = NULL,
+  spec_prospect = NULL,
+  spec_soil = NULL,
+  spec_atm = NULL,
   output_dir = "./",
   method = "liquidSVM",
   verbose = FALSE
@@ -37,24 +37,24 @@ train_prosail_inversion(
 \item{input_prosail}{list. user-defined list of input parameters to be used
 to produce a training LUT}
 
-\item{BRF_LUT}{list. user-defined BRF LUT used to run the hybrid inversion}
+\item{brf_lut}{list. user-defined BRF LUT used to run the hybrid inversion}
 
 \item{atbd}{boolean. should input parameter distribution from ATBD be
 applied ?}
 
-\item{GeomAcq}{list. geometry of acquisition: min and max tts, tto & psi}
+\item{geom_acq}{list. geometry of acquisition: min and max tts, tto & psi}
 
-\item{SRF}{list. Spectral response function}
+\item{srf}{list. Spectral response function}
 
-\item{codistribution_lai}{boolean. set TRUE if codistribution with LAI accounted for}
+\item{codistribution_lai}{boolean. TRUE: codistrib with LAI accounted for}
 
 \item{minval}{list. min val for input parms sampled to produce a training LUT}
 
 \item{maxval}{list. max val for input parms sampled to produce a training LUT}
 
-\item{TypeDistrib}{list. Type of distribution. 'Uniform' or 'Gaussian'}
+\item{type_distrib}{list. Type of distribution. 'Uniform' or 'Gaussian'}
 
-\item{GaussianDistrib}{list. Mean value and STD corresponding to the
+\item{gaussian_distrib}{list. Mean value and STD corresponding to the
 parameters sampled with gaussian distribution}
 
 \item{parm_set}{list. list of input parameters set to a specific value}
@@ -69,18 +69,18 @@ parameters sampled with gaussian distribution}
 
 \item{replacement}{bolean. is there replacement in subsampling?}
 
-\item{Parms2Estimate}{list. list of input parameters to be estimated}
+\item{parms_to_estimate}{list. list of input parameters to be estimated}
 
-\item{selected_bands}{list. bands used for regression for each input parameter}
+\item{selected_bands}{list. bands used for regression for each input param}
 
 \item{noise_level}{list. noise added to reflectance (defined per input parm)}
 
-\item{SpecPROSPECT}{list. Includes optical constants required for PROSPECT}
+\item{spec_prospect}{list. Includes optical constants required for PROSPECT}
 
-\item{SpecSOIL}{list. Includes either dry soil and wet soil, or a unique
+\item{spec_soil}{list. Includes either dry soil and wet soil, or a unique
 soil sample if the psoil parameter is not inverted}
 
-\item{SpecATM}{list. direct and diffuse radiation for clear conditions}
+\item{spec_atm}{list. direct and diffuse radiation for clear conditions}
 
 \item{output_dir}{character. path for results
 variable during training step}
@@ -95,7 +95,7 @@ adjustment performed during training}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of
-input_variables based on BRF_LUT
+input_variables based on brf_lut
 }
 \description{
 This function performs full training for hybrid inversion using SVR with

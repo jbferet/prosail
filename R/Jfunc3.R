@@ -6,7 +6,7 @@
 #' @return Jout numeric.
 #' @export
 #'
-Jfunc3 <- function(k,l,t){
+jfunc3 <- function(k,l,t){
   out <- (1.-exp(-(k+l)*t))/(k+l)
   return(out)
 }

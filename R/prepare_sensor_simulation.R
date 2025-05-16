@@ -1,29 +1,29 @@
 #' This function converts high resolution spectral info into broader
 #' spectral characteristics
 #'
-#' @param SpecPROSPECT list. optical constants required for PROSPECT
-#' @param SpecSOIL list. dry soil and wet soil, or a unique soil sample if
+#' @param spec_prospect list. optical constants required for PROSPECT
+#' @param spec_soil list. dry soil and wet soil, or a unique soil sample if
 #'  psoil parameter is not inverted
-#' @param SpecATM list. direct and diffuse radiation for clear conditions
-#' @param SRF list. Spectral response function, corresponding spectral bands,
+#' @param spec_atm list. direct and diffuse radiation for clear conditions
+#' @param srf list. Spectral response function, corresponding spectral bands,
 #' and Original Bands
 #'
-#' @return SpecSensor list. list of input specs with sensor resolution
+#' @return spec_sensor list. list of input specs with sensor resolution
 #' @export
 
-prepare_sensor_simulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
+prepare_sensor_simulation <- function(spec_prospect, spec_soil, spec_atm, srf){
 
   # adjust optical constants
-  wvl <- SpecPROSPECT$lambda
+  wvl <- spec_prospect$lambda
   # leaf properties
-  SpecPROSPECT_Sensor <- apply_sensor_characteristics(wvl,SpecPROSPECT,SRF)
+  spec_prospect_sensor <- apply_sensor_characteristics(wvl,spec_prospect,srf)
   # atmospheric properties
-  SpecATM_Sensor <- apply_sensor_characteristics(wvl,SpecATM,SRF)
+  spec_atm_Sensor <- apply_sensor_characteristics(wvl,spec_atm,srf)
   # soil properties
-  SpecSOIL_Sensor <- apply_sensor_characteristics(wvl,SpecSOIL,SRF)
-  SpecSensor <- list('SpecPROSPECT_Sensor' = SpecPROSPECT_Sensor,
-                     'SpecATM_Sensor' = SpecATM_Sensor,
-                     'SpecSOIL_Sensor' = SpecSOIL_Sensor,
-                     'band_names' = SRF$Spectral_Bands)
-  return(SpecSensor)
+  spec_soil_sensor <- apply_sensor_characteristics(wvl,spec_soil,srf)
+  spec_sensor <- list('spec_prospect_sensor' = spec_prospect_sensor,
+                      'spec_atm_sensor' = spec_atm_Sensor,
+                      'spec_soil_sensor' = spec_soil_sensor,
+                      'band_names' = srf$Spectral_Bands)
+  return(spec_sensor)
 }

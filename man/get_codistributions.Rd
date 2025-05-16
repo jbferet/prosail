@@ -3,29 +3,37 @@
 \name{get_codistributions}
 \alias{get_codistributions}
 \title{This function adjusts variable values based on co-distribution rules as
-defined in ATBD co-distributions are all related to LAI}
+defined in ATBD co-distributions are all related to lai}
 \usage{
-get_codistributions(V, LAI, MaxLAI, Vmin0, Vmax0, VminLAImax, VmaxLAImax)
+get_codistributions(
+  V,
+  lai,
+  max_lai,
+  vmin_0,
+  vmax_0,
+  vmin_lai_max,
+  vmax_lai_max
+)
 }
 \arguments{
 \item{V}{numeric.}
 
-\item{LAI}{numeric.}
+\item{lai}{numeric.}
 
-\item{MaxLAI}{numeric.}
+\item{max_lai}{numeric.}
 
-\item{Vmin0}{numeric.}
+\item{vmin_0}{numeric.}
 
-\item{Vmax0}{numeric.}
+\item{vmax_0}{numeric.}
 
-\item{VminLAImax}{numeric.}
+\item{vmin_lai_max}{numeric.}
 
-\item{VmaxLAImax}{numeric.}
+\item{vmax_lai_max}{numeric.}
 }
 \value{
 Vstar numeric.
 }
 \description{
 This function adjusts variable values based on co-distribution rules as
-defined in ATBD co-distributions are all related to LAI
+defined in ATBD co-distributions are all related to lai
 }
