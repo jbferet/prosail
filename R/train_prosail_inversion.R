@@ -133,9 +133,12 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     ### 2- PRODUCE BRF from input_prosail & ddefault spectral sampling = 1nm  ##
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default spec_prospect, spec_soil and spec_atm if undefined
-    if (is.null(spec_prospect)) spec_prospect <- SpecPROSPECT_FullRange
-    if (is.null(spec_soil)) spec_soil <- SpecSOIL
-    if (is.null(spec_atm)) spec_atm <- SpecATM
+    if (is.null(spec_prospect))
+      spec_prospect <- SpecPROSPECT_FullRange
+    if (is.null(spec_soil))
+      spec_soil <- SpecSOIL
+    if (is.null(spec_atm))
+      spec_atm <- SpecATM
     # check if same spectral sampling for all key variables
     check_spectral_sampling(spec_prospect, spec_soil, spec_atm)
     # generate LUT of BRF corresponding to input_prosail, for a sensor
