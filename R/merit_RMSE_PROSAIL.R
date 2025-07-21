@@ -28,14 +28,14 @@ merit_rmse_prosail <- function(xinit, parms_xinit, brf_mes,
   input_prosail[parms_to_estimate] <- xinit[match(parms_xinit,
                                                   parms_to_estimate)]
   xprior <- input_prosail[parms_to_prior]
-  rsoil <- input_prosail$psoil*spec_soil_sensor$Dry_Soil +
-    (1-input_prosail$psoil)*spec_soil_sensor$Wet_Soil
+  rsoil <- input_prosail$psoil*spec_soil_sensor$max_refl +
+    (1-input_prosail$psoil)*spec_soil_sensor$min_refl
   # call PROSAIL to get reflectance from 4 fluxes
   refl <- prosail(spec_sensor = spec_prospect_sensor,
                   input_prospect = input_prosail,
                   type_lidf = type_lidf, lidf_a = input_prosail$lidf_a,
                   lidf_b = input_prosail$lidf_b,
-                  lai = input_prosail$lai, q = input_prosail$q,
+                  lai = input_prosail$lai, hotspot = input_prosail$hotspot,
                   tts = input_prosail$tts, tto = input_prosail$tto,
                   psi = input_prosail$psi, rsoil = rsoil)
   # Computes BRF based on outputs from PROSAIL and sun position

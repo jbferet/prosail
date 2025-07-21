@@ -80,7 +80,7 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
   # default parameter values
   default_val <- data.frame('chl'=40, 'car'=10, 'ant' = 0, 'ewt' = 0.01,
                             'lma' = 0.01, 'brown'=0.0, 'n_struct' = 1.5,
-                            'psoil' = 0.5, 'lidf_a' = 60, 'lai' = 2.5, 'q'=0.1,
+                            'psoil' = 0.5, 'lidf_a' = 60, 'lai' = 2.5, 'hotspot'=0.1,
                             'tto' = 0, 'tts' = 30, 'psi' = 80, 'type_lidf' = 2,
                             'alpha' = 40)
   list_parms <- names(default_val)
@@ -134,11 +134,11 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default spec_prospect, spec_soil and spec_atm if undefined
     if (is.null(spec_prospect))
-      spec_prospect <- SpecPROSPECT_FullRange
+      spec_prospect <- prosail::spec_prospect_fullrange
     if (is.null(spec_soil))
-      spec_soil <- SpecSOIL
+      spec_soil <- prosail::spec_soil
     if (is.null(spec_atm))
-      spec_atm <- SpecATM
+      spec_atm <- prosail::spec_atm
     # check if same spectral sampling for all key variables
     check_spectral_sampling(spec_prospect, spec_soil, spec_atm)
     # generate LUT of BRF corresponding to input_prosail, for a sensor

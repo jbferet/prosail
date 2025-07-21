@@ -23,7 +23,7 @@ which_parms_to_invert <- function(initialization, lower_bound,
   input_prosail <- data.frame('chl' = 0, 'car' = 0, 'ant' = 0, 'brown' = 0,
                               'ewt' = 0, 'lma' = 0, 'prot' = 0, 'cbc' = 0,
                               'n_struct' = 0, 'alpha' = 40, 'lidf_a' = 0,
-                              'lidf_b' = 0, 'lai' = 0, 'q' = 0, 'tts' = 0,
+                              'lidf_b' = 0, 'lai' = 0, 'hotspot' = 0, 'tts' = 0,
                               'tto' = 0, 'psi' = 0, 'psoil' = 0)
   all_parms <- names(input_prosail)
   parms_to_estimate <- parm_set_final <- c()

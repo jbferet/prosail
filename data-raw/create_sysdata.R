@@ -37,3 +37,16 @@ SpecATM <- data.frame('lambda' = dataSoil_Atm$lambda,
 usethis::use_data(SpecPROSPECT_FullRange, SpecSOIL, SpecATM,
                   internal = FALSE,
                   overwrite = TRUE)
+
+
+spec_soil <- data.frame('lambda' = dataSoil_Atm$lambda,
+                        'max_refl' = dataSoil_Atm$Dry_Soil,
+                        'min_refl' = dataSoil_Atm$Wet_Soil)
+spec_atm <- data.frame('lambda' = dataSoil_Atm$lambda,
+                       'direct_light' = dataSoil_Atm$Direct_Light,
+                       'diffuse_light' = dataSoil_Atm$Diffuse_Light)
+
+spec_prospect_fullrange <- SpecPROSPECT_FullRange
+usethis::use_data(spec_prospect_fullrange, spec_soil, spec_atm,
+                  internal = FALSE,
+                  overwrite = TRUE)

@@ -19,27 +19,27 @@ prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
   # make sure refl is right dimensions
   refl <- t(refl)
   if (inherits(regression_models[[1]], what = 'liquidSVM')){
-    nbFeatures <- regression_models[[1]]$dim
+    nb_features <- regression_models[[1]]$dim
   } else {
-    nbFeatures <- ncol(regression_models[[1]]$trainingData) - 1
+    nb_features <- ncol(regression_models[[1]]$trainingData) - 1
   }
-  if (!ncol(refl)==nbFeatures & nrow(refl)==nbFeatures){
+  if (!ncol(refl)==nb_features & nrow(refl)==nb_features)
     refl <- t(refl)
-  }
   nb_bagg <- length( regression_models)
-  EstimatedVal <- list()
+  estimated_val <- list()
   if (progressBar == TRUE){
     pb <- progress_bar$new(
       format = "Applying SVR models [:bar] :percent in :elapsed",
       total = nb_bagg, clear = FALSE, width= 100)
   }
   for (i in seq_len(nb_bagg)){
-    EstimatedVal[[i]] <- predict(regression_models[[i]], refl)
-    if (progressBar == TRUE) pb$tick()
+    estimated_val[[i]] <- predict(regression_models[[i]], refl)
+    if (progressBar == TRUE)
+      pb$tick()
   }
-  EstimatedVal <- do.call(cbind,EstimatedVal)
-  MeanEstimate <- rowMeans(EstimatedVal)
-  StdEstimate <- rowSds(EstimatedVal)
-  return(list("MeanEstimate" = MeanEstimate,
-              "StdEstimate" = StdEstimate))
+  estimated_val <- do.call(cbind,estimated_val)
+  mean_estimate <- rowMeans(estimated_val)
+  sd_estimate <- rowSds(estimated_val)
+  return(list("MeanEstimate" = mean_estimate,
+              "StdEstimate" = sd_estimate))
 }

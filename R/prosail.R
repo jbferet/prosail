@@ -20,7 +20,7 @@
 #' if type_lidf ==1, controls the distribution's bimodality
 #' if type_lidf ==2, unused
 #' @param lai numeric. Leaf Area Index
-#' @param q numeric. Hot Spot parameter
+#' @param hotspot numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
 #' @param tto numeric. Observer zeith angle
 #' @param psi numeric. Azimuth Sun / Observer
@@ -47,12 +47,14 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
                     chl = 40.0, car = 8.0, ant = 0.0, brown = 0.0, ewt = 0.01,
                     lma = NULL, prot = 0.0, cbc = 0.0, alpha = 40.0,
                     type_lidf = 2, lidf_a = 60, lidf_b = NULL, lai = 3,
-                    q = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
+                    hotspot = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
                     fraction_brown = 0.0, diss = 0.0, cv = 1, zeta = 1,
                     SAILversion = '4SAIL', brown_lop = NULL){
 
-  if (is.null(spec_sensor)) spec_sensor <- SpecPROSPECT_FullRange
-  if (is.null(rsoil)) rsoil <- SpecSOIL$Dry_Soil
+  if (is.null(spec_sensor))
+    spec_sensor <- prosail::spec_prospect_fullrange
+  if (is.null(rsoil))
+    rsoil <- prosail::spec_soil$max_refl
   #	PROSPECT: LEAF OPTICAL PROPERTIES
   lop <- adjust_prospect_to_sail(sail_version = SAILversion,
                                  spec_sensor = spec_sensor,
@@ -66,12 +68,12 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
   if (SAILversion == '4SAIL'){
     Ref <- fourSAIL(lop = lop$green_lop,
                     type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
-                    lai = lai, q = q, tts = tts, tto = tto, psi = psi,
+                    lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
                     rsoil = rsoil)
   } else if (SAILversion == '4SAIL2'){
     Ref <- fourSAIL2(leaf_green = lop$green_lop, leaf_brown = lop$brown_lop,
                      type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
-                     lai = lai, q = q, tts = tts, tto = tto, psi = psi,
+                     lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
                      rsoil = rsoil, fraction_brown = fraction_brown,
                      diss = diss, cv = cv, zeta = zeta)
   }

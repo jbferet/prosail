@@ -19,8 +19,9 @@ get_spec_sensor <- function(sensor_name = 'user_defined',
                         srf_path = srf_path)
   if (is.null(srf)) stop()
   # adjust optical constants from 1 nm sampling to S2 spectral sampling
-  spec_sensor <- prepare_sensor_simulation(SpecPROSPECT_FullRange,
-                                           SpecSOIL,
-                                           SpecATM, srf)
+  spec_sensor <- prepare_sensor_simulation(spec_prospect = prosail::spec_prospect_fullrange,
+                                           spec_soil = prosail::spec_soil,
+                                           spec_atm = prosail::spec_atm,
+                                           srf = srf)
   return(spec_sensor)
 }

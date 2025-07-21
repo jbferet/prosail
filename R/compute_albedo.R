@@ -23,8 +23,8 @@ compute_albedo  <- function(rsdstar, rddstar, tts, spec_atm_sensor,
   ############################## #
   ##	direct / diffuse light	##
   ############################## #
-  es <- spec_atm_sensor$Direct_Light
-  ed <- spec_atm_sensor$Diffuse_Light
+  es <- spec_atm_sensor$direct_light
+  ed <- spec_atm_sensor$diffuse_light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
   skyl <- 0.847 - 1.61*sin((90-tts)*rd) + 1.04*sin((90-tts)*rd)*sin((90-tts)*rd)

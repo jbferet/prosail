@@ -24,7 +24,7 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
                               'prot' = 'Uniform', 'cbc' = 'Uniform',
                               'n_struct' = 'Uniform', 'psoil' = 'Uniform',
                               'lidf_a' = 'Uniform', 'lai' = 'Uniform',
-                              'q'='Uniform', 'tto' = 'Uniform',
+                              'hotspot'='Uniform', 'tto' = 'Uniform',
                               'tts' = 'Uniform', 'psi' = 'Uniform',
                               'fraction_brown' = 'Uniform', 'diss' = 'Uniform',
                               'cv' = 'Uniform', 'zeta' = 'Uniform')
@@ -33,7 +33,7 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
   input_prosail <- list('chl' = c(), 'car' = c(), 'ant' = c(), 'brown' = c(),
                         'ewt' = c(), 'lma' = c(), 'prot' = c(), 'cbc' = c(),
                         'n_struct' = c(), 'alpha' = c(), 'lidf_a' = c(),
-                        'lidf_b' = c(), 'lai' = c(), 'q' = c(), 'tts' = c(),
+                        'lidf_b' = c(), 'lai' = c(), 'hotspot' = c(), 'tts' = c(),
                         'tto' = c(), 'psi' = c(), 'psoil' = c(),
                         'type_lidf' = c(), 'fraction_brown' = c(), 'diss' = c(),
                         'cv' = c(), 'zeta' = c())
@@ -42,7 +42,7 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
   default <- data.frame('chl' = 0, 'car' = 0, 'ant'=0, 'brown' = 0, 'ewt' = 0,
                         'lma' = 0, 'prot' = 0, 'cbc' = 0, 'n_struct' = 1.5,
                         'alpha' = 40, 'lidf_a' = 0, 'lidf_b' = 0, 'lai' = 2,
-                        'q' = 0, 'tts' = 0, 'tto' = 0,'psi'=0, 'psoil' = 1,
+                        'hotspot' = 0, 'tts' = 0, 'tto' = 0,'psi'=0, 'psoil' = 1,
                         'type_lidf' = 2, 'fraction_brown' = 0.5, 'diss' = 0.5,
                         'cv' = 1, 'zeta' = 1)
 
@@ -72,7 +72,8 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
 
   # define input_prosail # 1 default value
   if (length(set_to_default)>0){
-    for (i in set_to_default) input_prosail[[i]] <- default[,i]
+    for (i in set_to_default)
+      input_prosail[[i]] <- default[,i]
   }
 
   # define input_prosail # 2 Set parameters

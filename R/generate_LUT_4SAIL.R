@@ -29,8 +29,8 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
     total = 10, clear = FALSE, width= 100)
   for (i in seq_len(nb_samples)){
     if (i%%split_nb==0 & nb_samples>100) pb$tick()
-    rsoil <- input_prosail[i,]$psoil*spec_soil$Dry_Soil +
-      (1-input_prosail[i,]$psoil)*spec_soil$Wet_Soil
+    rsoil <- input_prosail[i,]$psoil*spec_soil$max_refl +
+      (1-input_prosail[i,]$psoil)*spec_soil$min_refl
     # if 4SAIL
     if (SAILversion=='4SAIL'){
       refl_sail <- prosail(spec_sensor = spec_prospect,
@@ -39,7 +39,7 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
                            lidf_a = input_prosail[i,]$lidf_a,
                            lidf_b = input_prosail[i,]$lidf_b,
                            lai = input_prosail[i,]$lai,
-                           q = input_prosail[i,]$q,
+                           hotspot = input_prosail[i,]$hotspot,
                            tts = input_prosail[i,]$tts,
                            tto = input_prosail[i,]$tto,
                            psi = input_prosail[i,]$psi,
@@ -51,7 +51,7 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
                            lidf_a = input_prosail[i,]$lidf_a,
                            lidf_b = input_prosail[i,]$lidf_b,
                            lai = input_prosail[i,]$lai,
-                           q = input_prosail[i,]$q,
+                           hotspot = input_prosail[i,]$hotspot,
                            tts = input_prosail[i,]$tts,
                            tto = input_prosail[i,]$tto,
                            psi = input_prosail[i,]$psi, rsoil = rsoil,
@@ -77,6 +77,6 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
   rddt <- do.call(cbind,rddt)
   row.names(brf) <- row.names(rdot) <- row.names(rsot) <- band_names
   row.names(rsdt) <- row.names(rddt) <- band_names
-  return(list('BRF' = brf, 'rdot' = rdot, 'rsot' = rsot,
+  return(list('brf' = brf, 'rdot' = rdot, 'rsot' = rsot,
               'rsdt' = rsdt, 'rddt' = rddt))
 }

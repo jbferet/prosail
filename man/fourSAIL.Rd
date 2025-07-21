@@ -11,7 +11,7 @@ fourSAIL(
   lidf_a = 60,
   lidf_b = NULL,
   lai = 3,
-  q = 0.1,
+  hotspot = 0.1,
   tts = 30,
   tto = 0,
   psi = 60,
@@ -34,7 +34,7 @@ if type_lidf ==2, unused}
 
 \item{lai}{numeric. Leaf Area Index}
 
-\item{q}{numeric. Hot Spot parameter}
+\item{hotspot}{numeric. Hot Spot parameter}
 
 \item{tts}{numeric. Sun zeith angle}
 

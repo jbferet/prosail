@@ -20,8 +20,8 @@ compute_brf  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
   ############################## #
   ##	direct / diffuse light	##
   ############################## #
-  es <- spec_atm_sensor$Direct_Light
-  ed <- spec_atm_sensor$Diffuse_Light
+  es <- spec_atm_sensor$direct_light
+  ed <- spec_atm_sensor$diffuse_light
   rd <- pi/180
   # diffuse radiation (Francois et al., 2002)
   if (is.null(skyl))

@@ -33,7 +33,8 @@ dladgen  <- function(a,b){
     freq[i2] <- dcum(a,b,t)
   }
   freq[13] <- 1
-  for (i in 13:2) freq[i] <- freq[i]-freq[i-1]
+  for (i in 13:2)
+    freq[i] <- freq[i]-freq[i-1]
   foliar_distrib <- list('lidf' = freq, 'litab' = litab)
   return(foliar_distrib)
 }

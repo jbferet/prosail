@@ -276,18 +276,18 @@ input_prospect <- data.frame('chl' = 40, 'car' = 8, 'ant' = 0.0,
 
 # define input variables for SAIL. 
 lai <- 5        # LAI
-q <- 0.1        # foliage hot spot parameter
+hotspot <- 0.1        # foliage hot spot parameter
 type_lidf <- 2  # leaf inclination distribution function : Campbell
 lidf_a <- 30    # average leaf angle (degrees)
 tts <- 30       # geometry of acquisition: sun zenith angle (degrees)
 tto <- 10       # geometry of acquisition: observer zenith angle (degrees)
 psi <- 90       # geometry of acquisition: sun-observer azimuth (degrees)
-rsoil <- SpecSOIL$Dry_Soil # soil reflectance
+rsoil <- spec_soil$max_refl # soil reflectance
 
 # run PROSAIL with 4SAIL
-ref_4sail <- PRO4SAIL(input_prospect = input_prospect, 
+ref_4sail <- prosail(input_prospect = input_prospect, 
                       type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                      q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
+                      hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
                       
 ```
 
@@ -306,9 +306,9 @@ cv <- 1                 # vertical crown cover percentage
 zeta <- 1               # tree shape factor
 
 # run PROSAIL with 4SAIL2
-ref_4sail2 <- PRO4SAIL(SAILversion = '4SAIL2', input_prospect = input_prospect,
+ref_4sail2 <- prosail(SAILversion = '4SAIL2', input_prospect = input_prospect,
                        type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                       q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
+                       hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, 
                        cv = cv, zeta = zeta)
 
@@ -330,11 +330,11 @@ sun zenith angle and assuming clear sky conditions.
 ```r
 # Compute BRF with known skyl
 brf_4sail <- compute_brf(rdot = ref_4sail$rdot, rsot = ref_4sail$rsot,
-                         skyl = 0.23, spec_atm_sensor = SpecATM)
+                         skyl = 0.23, spec_atm_sensor = spec_atm)
 
 # Compute BRF assuming clear sky conditions and using sun zenith angle
 brf_4sail <- compute_brf(rdot = ref_4sail$rdot, rsot = ref_4sail$rsot,
-                         tts = 40, spec_atm_sensor = SpecATM)
+                         tts = 40, spec_atm_sensor = spec_atm)
 
 ```
 
@@ -347,7 +347,7 @@ hemispherical diffuse incident flux.
 ```r
 fapar_4sail <- compute_fapar(abs_dir = ref_4sail$abs_dir,
                              abs_hem = ref_4sail$abs_hem,
-                             tts = tts, spec_atm_sensor = SpecATM)
+                             tts = tts, spec_atm_sensor = spec_atm)
 ```
 
 Finally, the albedo can be derived from direct solar incident flux and 
@@ -356,7 +356,7 @@ hemispherical diffuse incident flux.
 ```r
 albedo_4sail <- compute_albedo(rsdstar = ref_4sail$rsdstar,
                                rddstar = ref_4sail$rddstar,
-                               tts = tts, spec_atm_sensor = SpecATM)
+                               tts = tts, spec_atm_sensor = spec_atm)
 
 ```
 
@@ -434,42 +434,42 @@ ub <- data.frame('chl' = 80, 'car' = 20, 'ewt' = 0.03, 'lma' = 0.03,
 
 # define parameters set for inversion
 parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
-                       'ant' = 0, 'brown' = 0, 'q' = 0.1)
+                       'ant' = 0, 'brown' = 0, 'hotspot' = 0.1)
 
 # compute soil reflectance
-rsoil <- parm_set$psoil*SpecSOIL$Dry_Soil+(1-parm_set$psoil)*SpecSOIL$Wet_Soil
+rsoil <- parm_set$psoil*spec_soil$max_refl+(1-parm_set$psoil)*spec_soil$min_refl
 
 # simulate canopy BRF with 1 nm sampling
 truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
                     'lai' = 3,  'lidf_a' = 60, 'n_struct' = 1.8)
-refl_1nm <- PRO4SAIL(N = truth$n_struct, chl = truth$chl, car = truth$car,
+refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
                      ant = parm_set$ant, brown = parm_set$brown, 
                      ewt = truth$ewt, lma = truth$lma, type_lidf = 2, 
-                     lai = truth$lai, q = parm_set$q, lidf_a = init$lidf_a, 
+                     lai = truth$lai, hotspot = parm_set$hotspot, lidf_a = init$lidf_a, 
                      rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto, 
                      psi = parm_set$psi)
 brf_1nm <- compute_brf(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
-                       tts = parm_set$tts, spec_atm_sensor = SpecATM)
+                       tts = parm_set$tts, spec_atm_sensor = spec_atm)
 
 # invert PROSAIL on BRF with 1 nm spectral sampling
 est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                           lower_bound = lb, upper_bound = ub,
-                          spec_prospect_sensor = SpecPROSPECT_FullRange,
-                          spec_atm_sensor = SpecATM, spec_soil_sensor = SpecSOIL,
+                          spec_prospect_sensor = spec_prospect_fullrange,
+                          spec_atm_sensor = spec_atm, spec_soil_sensor = spec_soil,
                           type_lidf = 2, parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
 srf_s2 <- get_radiometry(sensor_name = 'Sentinel_2A')
-SpecPROSPECT <- SpecPROSPECT_FullRange
-lambda <- SpecPROSPECT_FullRange$lambda
+spec_prospect <- spec_prospect_fullrange
+lambda <- spec_prospect_fullrange$lambda
 brf_S2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
                                        input_refl_table = brf_1nm$BRF)
 spec_prospect_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                                input_refl_table = SpecPROSPECT)
+                                                input_refl_table = spec_prospect)
 spec_soil_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                            input_refl_table = SpecSOIL)
+                                            input_refl_table = spec_soil)
 spec_atm_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                           input_refl_table = SpecATM)
+                                           input_refl_table = spec_atm)
 
 # invert PROSAIL on Sentinel-2 BRF
 est_s2 <- invert_prosail(brf_mes = brf_S2, initialization = init,
@@ -510,9 +510,9 @@ prior_info <- list('mean' = data.frame('lidf_a' = 60),
 # function for lidf_a
 est_1nm_p <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                             lower_bound = lb, upper_bound = ub,
-                            spec_prospect_sensor = SpecPROSPECT_FullRange,
-                            spec_atm_sensor = SpecATM, 
-                            spec_soil_sensor = SpecSOIL,
+                            spec_prospect_sensor = spec_prospect_fullrange,
+                            spec_atm_sensor = spec_soil, 
+                            spec_soil_sensor = spec_soil,
                             type_lidf = 2, parm_set = parm_set,
                             prior_info =  prior_info)
 
@@ -579,7 +579,7 @@ Therefore, only 2000 samples are required for the training stage, which is
 relatively low compared to the 41472 cases used for the training of the 
 artificial neural networks used in the SNAP toolbox. 
 This parsimonious ensemble method ensures very fast training stage and similar 
-performances as those obtained with the SNAP toolbox. 
+retrieval performances as those obtained with the SNAP toolbox. 
 
 ### Performing full hybrid inversion
 
@@ -630,12 +630,12 @@ follows:
 
 ```r
 # produce input variables following ATBD specifications and geometry of acq.
-input_prosail <- get_input_PROSAIL(atbd = TRUE, geom_acq = geom_acq)
+input_prosail <- get_input_prosail(atbd = TRUE, geom_acq = geom_acq)
 
 # generate a LUT with 1 nm spectral sampling
-res <- generate_LUT_PROSAIL(SAILversion = '4SAIL', input_prosail = input_prosail,
-                            SpecPROSPECT = SpecPROSPECT_FullRange,
-                            SpecSOIL = SpecSOIL, SpecATM = SpecATM)
+res <- generate_lut_prosail(SAILversion = '4SAIL', input_prosail = input_prosail,
+                            spec_prospect = spec_prospect_fullrange,
+                            spec_soil = spec_soil, spec_atm = spec_atm)
 
 # include fcover and fAPAR (derived from SAIL reflectance / absortion factors)
 # in the pool of variables to explain
@@ -651,13 +651,13 @@ rownames(BRF_LUT) <- srf$Spectral_Bands
 # apply noise and produce a LUT for each parameter
 BRF_LUT_Noise <- list()
 for (parm in parms_to_estimate) 
-  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(BRF_LUT = BRF_LUT)
+  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(brf_lut = BRF_LUT)
 
 # train a set of SVR models for each parameter
 modelSVR <- list()
 for (parm in parms_to_estimate){
   input_variables <- input_prosail[[parm]]
-  modelSVR[[parm]] <- PROSAIL_Hybrid_Train(BRF_LUT = BRF_LUT_Noise[[parm]],
+  modelSVR[[parm]] <- prosail_hybrid_train(brf_lut = BRF_LUT_Noise[[parm]],
                                            input_variables = input_variables)
 }
 
@@ -671,8 +671,8 @@ models for each sample, as well as corresponding standard deviation.
 ```r
 MeanEstimate <- StdEstimate <- list()
 for (parm in parms_to_estimate){
-  HybridRes <- PROSAIL_Hybrid_Apply(RegressionModels = modelSVR[[parm]],
-                                    Refl = BRF_LUT_Noise[[parm]])
+  HybridRes <- prosail_hybrid_apply(regression_models = modelSVR[[parm]],
+                                    refl = BRF_LUT_Noise[[parm]])
   MeanEstimate[[parm]] <- HybridRes$MeanEstimate
   StdEstimate[[parm]] <- HybridRes$StdEstimate
 }
@@ -766,7 +766,7 @@ modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
 
 # apply SVR on S2 L2A reflectance
 BPvars <- apply_prosail_inversion(raster_path = raster_path, 
-                                  HybridModel = modelSVR, 
+                                  hybrid_model = modelSVR, 
                                   output_path = out_BP,
                                   selected_bands = selected_bands, 
                                   bandname = bandname, 

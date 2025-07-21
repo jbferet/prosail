@@ -81,7 +81,7 @@ If no value, their default value is set.
 
 * `lai`: leaf area index
 
-* `q`: foliage hot spot parameter. It corresponds to the ratio of the 
+* `hotspot`: foliage hot spot parameter. It corresponds to the ratio of the 
 correlation length of leaf projections in the horizontal plane and the canopy height [@doi:10.1016/j.rse.2006.12.013; @kuusk1985]
 
 * `tts`: sun zenith angle (0 degrees = sun at the vertical of surface)
@@ -129,18 +129,18 @@ input_prospect <- data.frame('chl' = 40, 'car' = 8, 'ant' = 0.0,
                              'ewt' = 0.01, 'lma' = 0.009, 'n_struct' = 1.5)
 # define input variables for SAIL. 
 lai <- 5      # LAI
-q <- 0.1      # Hot spot parameter
+hotspot <- 0.1      # Hot spot parameter
 type_lidf <- 2 # leaf inclination distribution function 
 lidf_a <- 30   # mean leaf angle
 tts <- 30     # geometry of acquisition: sun zenith angle
 tto <- 10     # geometry of acquisition: observer zenith angle
 psi <- 90     # geometry of acquisition: sun-observer azimuth 
-rsoil <- SpecSOIL$Dry_Soil # soil reflectance (SpecSOIL: Dry_Soil and Wet_Soil)
+rsoil <- spec_soil$max_refl # soil reflectance (spec_soil: min_refl and max_refl)
 
 # run prosail with 4SAIL
 refl_prosail <- prosail(input_prospect = input_prospect, 
                       type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                      q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
+                      hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
 
 # run prosail with 4SAIL2
 # define leaf chemical constituents corresponding green and brown leaves
@@ -157,7 +157,7 @@ Zeta <- 1
 refl_prosail2 <- prosail(SAILversion = '4SAIL2',
                        input_prospect = input_prospect,
                        type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                       q = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
+                       hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
                        fraction_brown = fraction_brown, diss = diss, 
                        cv = cv, zeta = zeta)
 ```
@@ -176,15 +176,15 @@ by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/016
 ```{r compute BRF}
 # refl_prosail is the variable obtained when running prosail as in the previous 
 # illustration.
-# SpecATM corresponds to the direct and diffuse radiation solar spectra
+# spec_atm corresponds to the direct and diffuse radiation solar spectra
 BRF_4SAIL <- compute_brf(rdot = refl_prosail$rdot,
                          rsot = refl_prosail$rsot,
                          tts = tts,
-                         spec_atm_sensor = SpecATM)
+                         spec_atm_sensor = spec_atm)
 BRF_4SAIL2 <- compute_brf(rdot = refl_prosail2$rdot,
                           rsot = refl_prosail2$rsot,
                           tts = tts,
-                          spec_atm_sensor = SpecATM)
+                          spec_atm_sensor = spec_atm)
 
 ```
 
@@ -198,7 +198,7 @@ absorptance for hemispherical diffuse incident flux.
 fapar_4sail <- compute_fapar(abs_dir = refl_prosail$abs_dir,
                              abs_hem = refl_prosail$abs_hem,
                              tts = tts,
-                             spec_atm_sensor = SpecATM)
+                             spec_atm_sensor = spec_atm)
 ```
 
 ## Compute albedo
@@ -211,7 +211,7 @@ diffuse incident flux (rddstar).
 albedo_4SAIL <- compute_albedo(rsdstar = refl_prosail$rsdstar,
                                rddstar = refl_prosail$rddstar,
                                tts = tts,
-                               SpecATM_Sensor = SpecATM)
+                               spec_atm_sensor = spec_atm)
 ```
 
 ## Simulating sensor BRF
@@ -267,7 +267,7 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 
 ```{r Conversion}
 # apply sensor characteristics to simulated reflectance
-wvl <- SpecPROSPECT_FullRange$lambda
+wvl <- spec_prospect_fullrange$lambda
 BRF_4SAIL_S2 <- apply_sensor_characteristics(wvl = wvl,
                                            srf = SRF_S2,
                                            input_refl_table = BRF_4SAIL)

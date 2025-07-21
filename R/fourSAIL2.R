@@ -9,7 +9,7 @@
 #' if type_lidf ==1, unused
 #' if type_lidf ==2, controls the distribution's bimodality
 #' @param lai numeric. Leaf Area Index
-#' @param q numeric. Hot Spot parameter = ratio of the correlation length of
+#' @param hotspot numeric. Hot Spot parameter = ratio of the correlation length of
 #' leaf projections in the horizontal plane and the canopy height
 #' (doi:10.1016/j.rse.2006.12.013)
 #' @param tts numeric. Sun zeith angle
@@ -38,7 +38,7 @@
 #' @export
 
 fourSAIL2  <- function(leaf_green, leaf_brown, type_lidf = 2, lidf_a = 60,
-                       lidf_b = NULL, lai = 3, q = 0.1, tts = 30, tto = 0,
+                       lidf_b = NULL, lai = 3, hotspot = 0.1, tts = 30, tto = 0,
                        psi = 60, rsoil = NULL, fraction_brown = 0.5, diss = 0.5,
                        cv = 1, zeta = 1){
 
@@ -167,8 +167,8 @@ fourSAIL2  <- function(leaf_green, leaf_brown, type_lidf = 2, lidf_a = 60,
     tss <- exp(-ks*lai)
     ck <- exp(-ks*lai1)
     alf <- 1e6
-    if (q > 0)
-      alf <- (dso/q)*2./(ks+ko)
+    if (hotspot > 0)
+      alf <- (dso/hotspot)*2./(ks+ko)
     if (alf>200.0)
       alf<- 200.0     # inserted H. Bach 1/3/04
     if (alf==0.0){

@@ -13,16 +13,17 @@ get_atbd_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
                                codistribution_lai = TRUE){
   # define paremertization for truncated gaussians
   t_gauss_parms <- list()
-  t_gauss_parms$min <- data.frame('lai' = 0, 'lidf_a' = 30, 'q' = 0.1,
+  t_gauss_parms$min <- data.frame('lai' = 0, 'lidf_a' = 30, 'hotspot' = 0.1,
                                   'n_struct' = 1.2, 'chl' = 20, 'lma' = 0.003,
                                   'cw_rel' = 0.6, 'brown' = 0.0, 'psoil' = 0)
-  t_gauss_parms$max <- data.frame('lai' = 15, 'lidf_a' = 80, 'q' = 0.5,
+  t_gauss_parms$max <- data.frame('lai' = 15, 'lidf_a' = 80, 'hotspot' = 0.5,
                                   'n_struct' = 1.8, 'chl' = 90, 'lma' = 0.011,
                                   'cw_rel' = 0.85, 'brown' = 2.0, 'psoil' = 1)
-  t_gauss_parms$mean <- data.frame('lai' = 2, 'lidf_a' = 60, 'q' = 0.2,
+  t_gauss_parms$mean <- data.frame('lai' = 2, 'lidf_a' = 60, 'hotspot' = 0.2,
                                    'n_struct' = 1.5, 'chl' = 45, 'lma' = 0.005,
-                                   'cw_rel' = 0.75, 'brown' = 0, 'psoil' = 0.25)
-  t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'q' = 0.5,
+                                   # 'cw_rel' = 0.75, 'brown' = 0, 'psoil' = 0.25)
+                                   'cw_rel' = 0.75, 'brown' = 0, 'psoil' = 0.5)
+t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
                                  'n_struct' = 0.3, 'chl' = 30, 'lma' = 0.005,
                                  'cw_rel' = 0.08, 'brown' = 0.30, 'psoil' = 0.6)
 
@@ -41,19 +42,19 @@ get_atbd_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
   # define co-distribution with LAI
   if (codistribution_lai==TRUE){
     codistribution_lai <- list()
-    codistribution_lai$vmin_0 <- data.frame('lidf_a' = 30, 'q' = 0.1,
+    codistribution_lai$vmin_0 <- data.frame('lidf_a' = 30, 'hotspot' = 0.1,
                                             'n_struct' = 1.2, 'chl' = 20,
                                             'lma' = 0.003, 'cw_rel' = 0.6,
                                            'brown' = 0.0, 'psoil' = 0)
-    codistribution_lai$vmax_0 <- data.frame('lidf_a' = 80, 'q' = 0.5,
+    codistribution_lai$vmax_0 <- data.frame('lidf_a' = 80, 'hotspot' = 0.5,
                                             'n_struct' = 1.8, 'chl' = 90,
                                             'lma' = 0.011, 'cw_rel' = 0.85,
                                            'brown' = 2.0, 'psoil' = 1)
-    codistribution_lai$vmin_lai_max <- data.frame('lidf_a' = 55, 'q' = 0.1,
+    codistribution_lai$vmin_lai_max <- data.frame('lidf_a' = 55, 'hotspot' = 0.1,
                                                   'n_struct' = 1.3, 'chl' = 45,
                                                   'lma' = 0.005, 'cw_rel' = 0.70,
                                                   'brown' = 0.0, 'psoil' = 0)
-    codistribution_lai$vmax_lai_max <- data.frame('lidf_a' = 65, 'q' = 0.5,
+    codistribution_lai$vmax_lai_max <- data.frame('lidf_a' = 65, 'hotspot' = 0.5,
                                                   'n_struct' = 1.8, 'chl' = 90,
                                                   'lma' = 0.011, 'cw_rel' = 0.80,
                                                   'brown' = 0.2, 'psoil' = 0.4)

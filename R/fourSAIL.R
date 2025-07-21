@@ -10,7 +10,7 @@
 #' if type_lidf ==1, controls the distribution's bimodality
 #' if type_lidf ==2, unused
 #' @param lai numeric. Leaf Area Index
-#' @param q numeric. Hot Spot parameter
+#' @param hotspot numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
 #' @param tto numeric. Observer zeith angle
 #' @param psi numeric. Azimuth Sun / Observer
@@ -30,7 +30,7 @@
 #' @export
 
 fourSAIL  <- function(lop, type_lidf = 2, lidf_a = 60, lidf_b = NULL,
-                      lai = 3, q = 0.1, tts = 30, tto = 0, psi = 60,
+                      lai = 3, hotspot = 0.1, tts = 30, tto = 0, psi = 60,
                       rsoil = NULL){
 
   ############################ #
@@ -202,9 +202,11 @@ fourSAIL  <- function(lop, type_lidf = 2, lidf_a = 60, lidf_b = NULL,
     #	Treatment of the hotspot-effect
     alf <- 1e6
     #	Apply correction 2/(K+k) suggested by F.-M. Breon
-    if (q>0) alf <- (dso/q)*2./(ks+ko)
+    if (hotspot>0) 
+      alf <- (dso/hotspot)*2./(ks+ko)
     # inserted H. Bach 1/3/04
-    if (alf>200) alf <- 200
+    if (alf>200) 
+      alf <- 200
     if (alf==0){
       #	The pure hotspot - no shadow
       tsstoo <- tss

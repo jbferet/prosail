@@ -158,7 +158,7 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
       r_out_sd <- writeStart(raster(raster_path),
                              filename = bp_var_sd_path[[parm]],
                              format = formatfile, overwrite = TRUE)
-      Selbands <- match(selected_bands[[parm]], bandname)
+      sel_bands <- match(selected_bands[[parm]], bandname)
 
       # loop over blocks
       for (i in seq_along(blk$row)) {
@@ -168,14 +168,14 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
         full_length <- dim(block_val)[1]
 
         if (typeof(r_inmask)=='logical'){
-          block_val <- block_val[,Selbands]
+          block_val <- block_val[,sel_bands]
           # automatically filter pixels corresponding to negative values
           select_pixels <- which(block_val[,1]>0)
           block_val <- block_val[select_pixels,]
         } else if (typeof(r_inmask)=='S4'){
           MaskVal <- getValues(r_inmask, row = blk$row[i], nrows = blk$nrows[i])
           select_pixels <- which(MaskVal ==1)
-          block_val <- block_val[select_pixels,Selbands]
+          block_val <- block_val[select_pixels,sel_bands]
         }
         # add name for variables
 
@@ -189,7 +189,8 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
           block_val <- block_val/multiplying_factor
           estimates <- list()
           for (modind in seq_len(length(hybrid_model[[parm]]))){
-            if (progressBar == TRUE) pb$tick()
+            if (progressBar == TRUE)
+              pb$tick()
             estimates[[modind]] <- predict(hybrid_model[[parm]][[modind]],
                                            block_val)
           }
@@ -201,7 +202,9 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
           mean_estimate_full[select_pixels] <- mean_estimate
           sd_estimate_full[select_pixels] <- sd_estimate
         } else {
-          for (modind in seq_len(length(hybrid_model[[parm]]))) pb$tick()
+          for (modind in seq_len(length(hybrid_model[[parm]])))
+            if (progressBar == TRUE)
+              pb$tick()
         }
         r_out_mean <- writeValues(r_out_mean, mean_estimate_full, blk$row[i],
                                   format = formatfile, overwrite = TRUE)
@@ -210,7 +213,8 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
       }
       # close files
       r_in <- readStop(r_in)
-      if (typeof(r_inmask)=='S4') r_inmask <- readStop(r_inmask)
+      if (typeof(r_inmask)=='S4')
+        r_inmask <- readStop(r_inmask)
       r_out_mean <- writeStop(r_out_mean)
       r_out_sd <- writeStop(r_out_sd)
       # write biophysical variable name in headers

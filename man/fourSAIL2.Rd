@@ -11,7 +11,7 @@ fourSAIL2(
   lidf_a = 60,
   lidf_b = NULL,
   lai = 3,
-  q = 0.1,
+  hotspot = 0.1,
   tts = 30,
   tto = 0,
   psi = 60,
@@ -39,7 +39,7 @@ if type_lidf ==2, controls the distribution's bimodality}
 
 \item{lai}{numeric. Leaf Area Index}
 
-\item{q}{numeric. Hot Spot parameter = ratio of the correlation length of
+\item{hotspot}{numeric. Hot Spot parameter = ratio of the correlation length of
 leaf projections in the horizontal plane and the canopy height
 (doi:10.1016/j.rse.2006.12.013)}
 

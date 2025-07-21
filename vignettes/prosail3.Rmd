@@ -69,7 +69,7 @@ variables.
 
 The production of a BRF LUT requires a variable `input_prosail` as input. 
 When running  __4SAIL__, the expected list of parameters includes: 
-`lai`, `lidf_a`, `q`, `n_struct`, `chl`, `lma`, `cw_rel`, `brown`, `psoil`, `ewt`, 
+`lai`, `lidf_a`, `hotspot`, `n_struct`, `chl`, `lma`, `cw_rel`, `brown`, `psoil`, `ewt`, 
 `cbc`, `prot`,  `ant`, `car`, `tts`, `tto`, `psi`, `type_lidf` and `alpha` 
 (note that `type_lidf` and `alpha` are usually set to their default value, 
 `type_lidf = 2` and `alpha = 40`).
@@ -101,16 +101,16 @@ are ignored.
 ## Produce simulated BRF LUT corresponding to `input_prosail`
 
 The BRF LUT is produced from `input_prosail` with the function `generate_lut_brf`.
-This function is expecting the variables `SpecPROSPECT`, `SpecSOIL` and `SpecATM` 
+This function is expecting the variables `spec_prospect`, `spec_soil` and `spec_atm` 
 to share the same spectral sampling. 
 An error message will be displayed if this is not the case. 
 
 The BRF LUT obtained then corresponds to spectral information covering the 
 spectral domain from 400 nm to 2500 nm with 1 nm spectral sampling, unless these 
 variables were modified by user. 
-This can be the case when adjusting `SpecSOIL` based on soil reflectance 
+This can be the case when adjusting `spec_soil` based on soil reflectance 
 extracted from an acquisition. 
-In this case, `SpecPROSPECT` and `SpecATM` should be adjusted in order to match 
+In this case, `spec_prospect` and `spec_atm` should be adjusted in order to match 
 the sensor characteristics before `train_prosail_inversion` is called.
 
 
@@ -205,9 +205,9 @@ input_prosail <- get_input_prosail(atbd = TRUE,
 ```{r Generate_brf_lut_atbd}
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            spec_prospect = SpecPROSPECT_FullRange,
-                            spec_soil = SpecSOIL,
-                            spec_atm = SpecATM)
+                            spec_prospect = spec_prospect_fullrange,
+                            spec_soil = spec_soil,
+                            spec_atm = spec_atm)
 brf_lut_1nm <- res$brf
 input_prosail$fcover <- res$fcover
 input_prosail$fapar <- res$fapar
@@ -217,7 +217,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_atbd}
-brf_lut <- apply_sensor_characteristics(wvl = SpecPROSPECT_FullRange$lambda, 
+brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda, 
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT
@@ -355,10 +355,10 @@ dir.create(path = PROSAIL_ResPath, showWarnings = FALSE,recursive = TRUE)
 # define min and max values for PROSAIL input variables
 minval <- data.frame('n_struct' = 1.0, 'chl' = 10, 'car' = 0, 'ant' = 0, 'ewt' =0.001, 
                      'lma' = 0.001, 'brown'=0.01, 'psoil' = 0.0, 'lidf_a' = 30, 
-                     'lai' = 0.1, 'q'=0.1, 'tto' = 0, 'tts' = 20, 'psi' = 100)
+                     'lai' = 0.1, 'hotspot'=0.1, 'tto' = 0, 'tts' = 20, 'psi' = 100)
 maxval <- data.frame('n_struct' = 2.0, 'chl' = 60, 'car' = 15, 'ant' = 5, 'ewt' =0.045, 
                      'lma' = 0.040, 'brown'=0.5, 'psoil' = 1.0, 'lidf_a' = 70, 
-                     'lai' = 5.0,'q'=0.5,'tto' = 5,'tts' = 30, 'psi' = 150)
+                     'lai' = 5.0,'hotspot'=0.5,'tto' = 5,'tts' = 30, 'psi' = 150)
 
 # Define distribution for PROSAIL input variables: 'Gaussian' or 'Uniform'
 type_distrib <- data.frame('chl' = 'Gaussian', 'car' = 'Uniform', 
@@ -366,7 +366,7 @@ type_distrib <- data.frame('chl' = 'Gaussian', 'car' = 'Uniform',
                           'ewt' = 'Uniform', 'lma' = 'Uniform',
                           'n_struct' = 'Uniform', 'psoil' = 'Uniform', 
                           'lidf_a' = 'Uniform', 'lai' = 'Gaussian',
-                          'q'='Uniform', 'tto' = 'Uniform', 
+                          'hotspot'='Uniform', 'tto' = 'Uniform', 
                           'tts' = 'Uniform', 'psi' = 'Uniform')
 
 # define mean and STD for gaussian distributions
@@ -416,9 +416,9 @@ input_prosail <- get_input_prosail(minval = minval, maxval = maxval,
 ```{r Generate_brf_lut_user}
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            SpecPROSPECT = SpecPROSPECT_FullRange,
-                            SpecSOIL = SpecSOIL,
-                            SpecATM = SpecATM)
+                            spec_prospect = spec_prospect_fullrange,
+                            spec_soil = spec_soil,
+                            spec_atm = spec_atm)
 brf_lut_1nm <- res$brf
 input_prosail$fcover <- res$fcover
 input_prosail$fapar <- res$fapar
@@ -427,7 +427,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_user}
-brf_lut <- apply_sensor_characteristics(wvl = SpecPROSPECT_FullRange$lambda, 
+brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda, 
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT

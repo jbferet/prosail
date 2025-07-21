@@ -11,7 +11,7 @@ which_parm_prior <- function(prior_mean, prior_sd) {
 
   parms_to_prior <- c()
   list_parms <- c('chl', 'car', 'ant', 'brown', 'ewt', 'lma', 'prot', 'cbc',
-                  'n_struct', 'alpha', 'lidf_a', 'lidf_b', 'lai', 'q', 'tts',
+                  'n_struct', 'alpha', 'lidf_a', 'lidf_b', 'lai', 'hotspot', 'tts',
                   'tto', 'psi', 'psoil')
   prior_mean_update <- prior_sd_update <- list()
   for (parm in list_parms){
