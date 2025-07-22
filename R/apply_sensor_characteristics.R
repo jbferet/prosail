@@ -11,19 +11,19 @@ apply_sensor_characteristics <- function(wvl, input_refl_table, srf){
 
   input_refl_table <- data.frame(input_refl_table)
   nb_bands_origin <- length(wvl)
-  if (dim(srf$Spectral_Response)[1]==nb_bands_origin)
-    srf$Spectral_Response <- t(srf$Spectral_Response)
-  nb_bands_sensor <- dim(srf$Spectral_Response)[1]
+  if (dim(srf$spectral_response)[1]==nb_bands_origin)
+    srf$spectral_response <- t(srf$spectral_response)
+  nb_bands_sensor <- dim(srf$spectral_response)[1]
   array_input <- cbind(matrix(wvl,ncol = 1),input_refl_table)
   refl_sensor <- list()
   for (i in seq_len(nb_bands_sensor)){
     # for which spectral bands spectral response >0
-    index_in <- which(srf$Spectral_Response[i,]>0)
-    usfl_wvl <- srf$Original_Bands[index_in]
+    index_in <- which(srf$spectral_response[i,]>0)
+    usfl_wvl <- srf$original_bands[index_in]
     # which spectral bands from input_refl_table correspond to sensor bands
     index_out <- which(is.element(wvl,usfl_wvl))
     # for the given band defined in index_in
-    band_values <-srf$Spectral_Response[i,index_in]
+    band_values <-srf$spectral_response[i,index_in]
     # simulated reflectance based on weighting
     if (length(index_in) == length(index_out)){
       pond <- matrix(band_values,
@@ -36,7 +36,7 @@ apply_sensor_characteristics <- function(wvl, input_refl_table, srf){
       message(' (1 nm spectral sampling from 400 to 2500 m) ')
       message('         This is currently not the case      ')
       message('The follwing spectral band is out of spectral range')
-      print(srf$Spectral_Bands[i])
+      print(srf$spectral_bands[i])
       message('           Values will be set to 0           ')
       refl_sensor[[i]] <- matrix(0, ncol = ncol(input_refl_table), nrow =1)
     }

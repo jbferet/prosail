@@ -19,7 +19,11 @@ Central_WL <- c(494, 550, 662, 842, 640)
 Pleiades_1B <- list('Spectral_Response' = SensorRadiometry,
                     'Spectral_Bands' = Spectral_Bands,
                     'Original_Bands' = Original_Bands,
-                    'Central_WL' = Central_WL)
+                    'Central_WL' = Central_WL,
+                    'spectral_response' = SensorRadiometry,
+                    'spectral_bands' = Spectral_Bands,
+                    'original_bands' = Original_Bands,
+                    'central_wl' = Central_WL)
 
 ## code to prepare `Pleiades_1B_Spectral_Response` dataset goes here
 usethis::use_data(Pleiades_1B,compress = 'xz',overwrite = TRUE)

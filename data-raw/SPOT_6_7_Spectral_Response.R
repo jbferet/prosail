@@ -19,7 +19,11 @@ Central_WL <- c(485, 560, 660, 825)
 SPOT_6_7 <- list('Spectral_Response' = SensorRadiometry,
                  'Spectral_Bands' = Spectral_Bands,
                  'Original_Bands' = Original_Bands,
-                 'Central_WL' = Central_WL)
+                 'Central_WL' = Central_WL,
+                 'spectral_response' = SensorRadiometry,
+                 'spectral_bands' = Spectral_Bands,
+                 'original_bands' = Original_Bands,
+                 'central_wl' = Central_WL)
 
 ## code to prepare `SPOT_6_7_Spectral_Response` dataset goes here
 usethis::use_data(SPOT_6_7,compress = 'xz',overwrite = TRUE)

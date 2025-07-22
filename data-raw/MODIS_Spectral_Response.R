@@ -20,7 +20,11 @@ Central_WL <- c(659, 865, 470, 555, 1240, 1640, 2130, 415, 443, 490, 531,
 MODIS <- list('Spectral_Response' = SensorRadiometry,
               'Spectral_Bands' = Spectral_Bands,
               'Original_Bands' = Original_Bands,
-              'Central_WL' = Central_WL)
+              'Central_WL' = Central_WL,
+              'spectral_response' = SensorRadiometry,
+              'spectral_bands' = Spectral_Bands,
+              'original_bands' = Original_Bands,
+              'central_wl' = Central_WL)
 
 ## code to prepare `MODIS_Spectral_Response` dataset goes here
 usethis::use_data(MODIS,compress = 'xz',overwrite = TRUE)

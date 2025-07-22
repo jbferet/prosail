@@ -170,7 +170,7 @@ parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
 Bands2Select <- list()
 for (parm in parms_to_estimate){
   S2BandSelect <- c('B3','B4','B5','B6','B7','B8','B11','B12')
-  Bands2Select[[parm]] <- match(S2BandSelect,srf$Spectral_Bands)
+  Bands2Select[[parm]] <- match(S2BandSelect,srf$spectral_bands)
 }
 
 # define output directory where LUTs will be saved
@@ -221,7 +221,7 @@ brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda,
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT
-rownames(brf_lut) <- srf$Spectral_Bands
+rownames(brf_lut) <- srf$spectral_bands
 ```
 
 - Add noise in BRF
@@ -431,7 +431,7 @@ brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda,
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT
-rownames(brf_lut) <- srf$Spectral_Bands
+rownames(brf_lut) <- srf$spectral_bands
 ```
 
 - Add noise in BRF and produce SVR model

@@ -1,7 +1,6 @@
 ---
-title: '`prosail`: an R package to simulate canopy bi-directional reflectance 
-factor from vegetation biophysical properties with the coupled model PROSAIL 
-(PROSPECT + SAIL)'
+title: '`prosail`: an R package to simulate canopy reflectance with the coupled 
+model PROSAIL (PROSPECT + SAIL)'
 tags:
   - R
   - vegetation radiative transfer modeling 
@@ -21,7 +20,7 @@ authors:
 affiliations:
  - name: TETIS, INRAE, AgroParisTech, CIRAD, CNRS, Université Montpellier, Montpellier, France
    index: 1
-date: 26 March 2025
+date: 25 July 2025
 bibliography: paper.bib
 ---
 
@@ -276,7 +275,7 @@ input_prospect <- data.frame('chl' = 40, 'car' = 8, 'ant' = 0.0,
 
 # define input variables for SAIL. 
 lai <- 5        # LAI
-hotspot <- 0.1        # foliage hot spot parameter
+hotspot <- 0.1  # foliage hot spot parameter
 type_lidf <- 2  # leaf inclination distribution function : Campbell
 lidf_a <- 30    # average leaf angle (degrees)
 tts <- 30       # geometry of acquisition: sun zenith angle (degrees)
@@ -287,7 +286,8 @@ rsoil <- spec_soil$max_refl # soil reflectance
 # run PROSAIL with 4SAIL
 ref_4sail <- prosail(input_prospect = input_prospect, 
                       type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                      hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil)
+                      hotspot = hotspot, tts = tts, tto = tto, psi = psi, 
+                      rsoil = rsoil)
                       
 ```
 
@@ -308,9 +308,9 @@ zeta <- 1               # tree shape factor
 # run PROSAIL with 4SAIL2
 ref_4sail2 <- prosail(SAILversion = '4SAIL2', input_prospect = input_prospect,
                        type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                       hotspot = hotspot, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
-                       fraction_brown = fraction_brown, diss = diss, 
-                       cv = cv, zeta = zeta)
+                       hotspot = hotspot, tts = tts, tto = tto, psi = psi, 
+                       rsoil = rsoil, fraction_brown = fraction_brown, 
+                       diss = diss, cv = cv, zeta = zeta)
 
 ```
 
@@ -445,18 +445,18 @@ truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
 refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
                      ant = parm_set$ant, brown = parm_set$brown, 
                      ewt = truth$ewt, lma = truth$lma, type_lidf = 2, 
-                     lai = truth$lai, hotspot = parm_set$hotspot, lidf_a = init$lidf_a, 
-                     rsoil = rsoil, tts = parm_set$tts, tto = parm_set$tto, 
-                     psi = parm_set$psi)
+                     lai = truth$lai, hotspot = parm_set$hotspot, 
+                     lidf_a = init$lidf_a, rsoil = rsoil, tts = parm_set$tts, 
+                     tto = parm_set$tto, psi = parm_set$psi)
 brf_1nm <- compute_brf(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
                        tts = parm_set$tts, spec_atm_sensor = spec_atm)
 
 # invert PROSAIL on BRF with 1 nm spectral sampling
 est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
-                          lower_bound = lb, upper_bound = ub,
+                          lower_bound = lb, upper_bound = ub, type_lidf = 2, 
                           spec_prospect_sensor = spec_prospect_fullrange,
-                          spec_atm_sensor = spec_atm, spec_soil_sensor = spec_soil,
-                          type_lidf = 2, parm_set = parm_set)
+                          spec_atm_sensor = spec_atm, 
+                          spec_soil_sensor = spec_soil, parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
 srf_s2 <- get_radiometry(sensor_name = 'Sentinel_2A')
@@ -602,7 +602,7 @@ using the three spectral bands corresponding to green channel (B3), red channel
 srf <- get_radiometry('Sentinel_2')
 
 # define parameters to estimate
-parms_to_estimate <- c('lai', 'fCover', 'fAPAR')
+parms_to_estimate <- c('lai', 'fcover', 'fapar')
 
 # define spectral bands required to train SVR model for each variable
 selected_bands <- list()
@@ -633,20 +633,21 @@ follows:
 input_prosail <- get_input_prosail(atbd = TRUE, geom_acq = geom_acq)
 
 # generate a LUT with 1 nm spectral sampling
-res <- generate_lut_prosail(SAILversion = '4SAIL', input_prosail = input_prosail,
+res <- generate_lut_prosail(SAILversion = '4SAIL', 
+                            input_prosail = input_prosail,
                             spec_prospect = spec_prospect_fullrange,
                             spec_soil = spec_soil, spec_atm = spec_atm)
 
 # include fcover and fAPAR (derived from SAIL reflectance / absortion factors)
 # in the pool of variables to explain
-input_prosail$fCover <- res$fCover
-input_prosail$fAPAR <- res$fAPAR
+input_prosail$fcover <- res$fcover
+input_prosail$fapar <- res$fapar
 
 # apply Sentinel-2 SRF to get sensor BRF
 BRF_LUT <- apply_sensor_characteristics(wvl = lambda, srf = srf, 
-                                        input_refl_table = res$BRF)
+                                        input_refl_table = res$brf)
 # identify spectral bands in LUT
-rownames(BRF_LUT) <- srf$Spectral_Bands
+rownames(BRF_LUT) <- srf$spectral_bands
 
 # apply noise and produce a LUT for each parameter
 BRF_LUT_Noise <- list()
@@ -746,7 +747,7 @@ geom_acq <- list('min' = data.frame('tto' = min(s2_geom$VZA, na.rm = T),
                                                 na.rm = T)))
 # get sensor response for Sentinel-2
 srf <- get_radiometry('Sentinel_2B')
-bandname <- srf$Spectral_Bands
+bandname <- srf$spectral_bands
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'fCover', 'fAPAR', 'chl')

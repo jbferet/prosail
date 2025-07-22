@@ -7,6 +7,7 @@ prepare for JOSS submission
 - function names more compliant with standards when not critical (lowercase)
 - input variable names more compliant with standards (lowercase)
 - update vignettes
+- update names of sensor spectral response characteristics (lower_case)
 
 
 # prosail v2.5.10

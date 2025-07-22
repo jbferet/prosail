@@ -19,7 +19,11 @@ Central_WL <- c(443, 482.5, 562.5, 655, 865, 1375, 1610, 2200, 590)
 Landsat_8 <- list('Spectral_Response' = SensorRadiometry,
                   'Spectral_Bands' = Spectral_Bands,
                   'Original_Bands' = Original_Bands,
-                  'Central_WL' = Central_WL)
+                  'Central_WL' = Central_WL,
+                  'spectral_response' = SensorRadiometry,
+                  'spectral_bands' = Spectral_Bands,
+                  'original_bands' = Original_Bands,
+                  'central_wl' = Central_WL)
 
 ## code to prepare `Sentinel_2_Spectral_Response` dataset goes here
 usethis::use_data(Landsat_8,compress = 'xz',overwrite = TRUE)

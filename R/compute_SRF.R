@@ -20,10 +20,10 @@ compute_srf <- function(wvl,fwhm, sensor_name = 'Custom'){
     spectral_response[,i] <- y/max(y)
   }
   spectral_response[which(spectral_response < 0.001)] <- 0
-  srf <- list('Spectral_Response' = spectral_response,
-              'Spectral_Bands' = wvl,
-              'Original_Bands' = lambda,
-              'Central_WL' = wvl,
-              'Sensor' = sensor_name)
+  srf <- list('spectral_response' = spectral_response,
+              'spectral_bands' = wvl,
+              'original_bands' = lambda,
+              'central_wl' = wvl,
+              'sensor' = sensor_name)
   return(srf)
 }

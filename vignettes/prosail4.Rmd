@@ -181,7 +181,7 @@ BPvars <- apply_prosail_inversion(raster_path = refl_L2A,
                                   hybrid_model = modelSVR, 
                                   output_path = PROSAIL_ResPath,
                                   selected_bands = selected_bands, 
-                                  bandname = srf$Spectral_Bands, 
+                                  bandname = srf$spectral_bands, 
                                   mask_path = vegetation_mask, 
                                   multiplying_factor = 10000)
 ```

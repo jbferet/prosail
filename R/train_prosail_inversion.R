@@ -64,13 +64,13 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     bands_to_select <- list()
     if (is.null(srf)){
       message('srf not defined, cannot select bands according to their name')
-      message('"selected_bands" and "srf$Spectral_Bands" needs to partly match')
+      message('"selected_bands" and "srf$spectral_bands" needs to partly match')
       message('prosail inversion will be trained with all variables available')
       bands_to_select <- NULL
     } else {
       for (parm in parms_to_estimate)
         bands_to_select[[parm]] <- match(selected_bands[[parm]],
-                                         srf$Spectral_Bands)
+                                         srf$spectral_bands)
     }
   }
 
@@ -173,13 +173,13 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     # apply sensor spectral response function if provided
     wvl <- spec_prospect$lambda
     if (!is.null(srf)) {
-      if (!length(srf$Spectral_Bands)==nrow(brf_lut)){
+      if (!length(srf$spectral_bands)==nrow(brf_lut)){
         brf_lut <- apply_sensor_characteristics(wvl = wvl, srf = srf,
                                                 input_refl_table = brf_lut)
         spec_sensor <- prepare_sensor_simulation(spec_prospect, spec_soil,
                                                  spec_atm, srf)
       }
-      rownames(brf_lut) <- srf$Spectral_Bands
+      rownames(brf_lut) <- srf$spectral_bands
     }
 
     # write parameters LUT
@@ -208,7 +208,7 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     # if noise_level == NULL then use the same strategy than ATBD
     brf_lut_noise <- list()
     if (is.null(noise_level)){
-      if (srf$Sensor %in% c('Sentinel_2', 'Sentinel_2A', 'Sentinel_2B')){
+      if (srf$sensor %in% c('Sentinel_2', 'Sentinel_2A', 'Sentinel_2B')){
         brf_lut_noise_all <- apply_noise_atbd(brf_lut)
         for (parm in parms_to_estimate)
           brf_lut_noise[[parm]] <- brf_lut_noise_all[bands_to_select[[parm]],]

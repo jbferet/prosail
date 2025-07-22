@@ -36,7 +36,7 @@ expects the following input variables.
 __4SAIL2__ can also be called from the same function with additional parameters. 
 Both versions include the following input parameters:
 
-* `Spec_Sensor`: dataframe including the refractive index and specific absorption 
+* `spec_sensor`: dataframe including the refractive index and specific absorption 
 coefficients, defined for a given spectral range (max range: 400 nm - 2500 nm). 
 Simulation and inversion on different spectral domains can be performed by 
 adapting the information in `SpecPROSPECT`, which is loaded by default when 
@@ -57,7 +57,7 @@ If no value, their default value is set.
 
     * `brown_lop` is a parameter specific to  __4SAIL2__. 
     It should be a list including `Reflectance` and `Transmittance`, 
-    with the spectral sampling corresponding to the sampling defined in `Spec_Sensor`
+    with the spectral sampling corresponding to the sampling defined in `spec_sensor`
     
 * `type_lidf`: two leaf inclination distribution functions are implemented here. 
 
@@ -235,7 +235,7 @@ the sensor.
 # get the spectral response for Sentinel-2A
 sensor_name <- 'Sentinel_2A'
 # if interested in a different satellite, please use srf_path to 
-# locate the SRF file expected to be named 'sensor_name_Spectral_Response.csv' 
+# locate the SRF file expected to be named 'sensor_name_spectral_response.csv' 
 # (separator = tabulations)
 SRF_S2 <- get_radiometry(sensor_name,srf_path = NULL)
 ```

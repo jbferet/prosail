@@ -20,7 +20,11 @@ Central_WL <- c(489.0, 560.6, 666.5, 707.1, 741.1, 784.7, 834.6, 865.6,
 Sentinel_2C <- list('Spectral_Response' = SensorRadiometry,
                     'Spectral_Bands' = Spectral_Bands,
                     'Original_Bands' = Original_Bands,
-                    'Central_WL' = Central_WL)
+                    'Central_WL' = Central_WL,
+                    'spectral_response' = SensorRadiometry,
+                    'spectral_bands' = Spectral_Bands,
+                    'original_bands' = Original_Bands,
+                    'central_wl' = Central_WL)
 
 ## code to prepare `Sentinel_2C_Spectral_Response` dataset goes here
 usethis::use_data(Sentinel_2C,compress = 'xz',overwrite = TRUE)

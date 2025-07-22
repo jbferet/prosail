@@ -7,7 +7,7 @@ test_that("hybrid inversion ok", {
 
   # define spectral bands required to train SVR model for each variable
   S2BandSelect <- c('B3','B4','B8')
-  Bands2Select <- list('lai' = match(S2BandSelect,srf$Spectral_Bands))
+  Bands2Select <- list('lai' = match(S2BandSelect,srf$spectral_bands))
 
   # define output directory where LUTs will be saved
   PROSAIL_ResPath <- './'
@@ -31,7 +31,7 @@ test_that("hybrid inversion ok", {
                                           srf = srf,
                                           input_refl_table = brf_lut_1nm)
   # identify spectral bands in LUT
-  rownames(brf_lut) <- srf$Spectral_Bands
+  rownames(brf_lut) <- srf$spectral_bands
   # add noise
   subset_refl <- brf_lut[Bands2Select$lai,]
   brf_lut_noise <- apply_noise_atbd(subset_refl)

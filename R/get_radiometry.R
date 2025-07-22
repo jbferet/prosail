@@ -24,44 +24,44 @@ get_radiometry <- function(sensor_name = 'user_defined',
   if (toupper(sensor_name) %in% c('S2', 'SENTINEL2',
                                   'SENTINEL-2', 'SENTINEL_2')){
     srf <- prosail::Sentinel_2
-    srf$Sensor <- 'Sentinel_2'
+    srf$sensor <- 'Sentinel_2'
   } else if (toupper(sensor_name) %in% c('S2A', 'SENTINEL2A',
                                          'SENTINEL-2A', 'SENTINEL_2A')){
     srf <- prosail::Sentinel_2A
-    srf$Sensor <- 'Sentinel_2A'
+    srf$sensor <- 'Sentinel_2A'
   } else if (toupper(sensor_name) %in% c('S2B', 'SENTINEL2B',
                                          'SENTINEL-2B', 'SENTINEL_2B')){
     srf <- prosail::Sentinel_2B
-    srf$Sensor <- 'Sentinel_2B'
+    srf$sensor <- 'Sentinel_2B'
   } else if (toupper(sensor_name) %in% c('S2C', 'SENTINEL2C',
                                          'SENTINEL-2C', 'SENTINEL_2C')){
     srf <- prosail::Sentinel_2C
-    srf$Sensor <- 'Sentinel_2C'
+    srf$sensor <- 'Sentinel_2C'
   } else if (toupper(sensor_name) =='VENUS'){
     srf <- prosail::Venus
-    srf$Sensor <- 'Venus'
+    srf$sensor <- 'Venus'
   } else if (toupper(sensor_name) %in% c('L7', 'LANDSAT_7', 'LANDSAT-7')){
     srf <- prosail::Landsat_7
-    srf$Sensor <- 'Landsat_7'
+    srf$sensor <- 'Landsat_7'
   } else if (toupper(sensor_name) %in% c('L8', 'LANDSAT_8', 'LANDSAT-8')){
     srf <- prosail::Landsat_8
-    srf$Sensor <- 'Landsat_8'
+    srf$sensor <- 'Landsat_8'
   } else if (toupper(sensor_name) %in% c('L9', 'LANDSAT_9', 'LANDSAT-9')){
     srf <- prosail::Landsat_9
-    srf$Sensor <- 'Landsat_9'
+    srf$sensor <- 'Landsat_9'
   } else if (toupper(sensor_name) == 'MODIS'){
     srf <- prosail::MODIS
-    srf$Sensor <- 'MODIS'
+    srf$sensor <- 'MODIS'
   } else if (toupper(sensor_name) %in% c('SPOT_6_7','SPOT_6', 'SPOT6', 'SPOT-6',
                                          'SPOT_7', 'SPOT7', 'SPOT-7')){
     srf <- prosail::SPOT_6_7
-    srf$Sensor <- 'SPOT_6_7'
+    srf$sensor <- 'SPOT_6_7'
   } else if (toupper(sensor_name) %in% c('PLEIADES', 'PLEIADES_1A')){
     srf <- prosail::Pleiades_1A
-    srf$Sensor <- 'Pleiades_1A'
+    srf$sensor <- 'Pleiades_1A'
   } else if (toupper(sensor_name)=='PLEIADES_1B'){
     srf <- prosail::Pleiades_1B
-    srf$Sensor <- 'Pleiades_1B'
+    srf$sensor <- 'Pleiades_1B'
     # == == == == == == == == == == == == == == == == == == == == == == == == =
     ### if the spectral response function of the sensor is not defined      ###
     ###       but spectral characteristics (wl & fwhm) are provided         ###
@@ -90,13 +90,13 @@ get_radiometry <- function(sensor_name = 'user_defined',
                            fwhm = spectral_properties$fwhm,
                            sensor_name = sensor_name)
         # save srf as csv
-        srf_save <- cbind(srf$Original_Bands,format(srf$Spectral_Response,
+        srf_save <- cbind(srf$original_bands,format(srf$spectral_response,
                                                    digits = 4,
                                                    scientific = FALSE))
-        colnames(srf_save) <- c('SR_WL',srf$Spectral_Bands)
+        colnames(srf_save) <- c('SR_WL',srf$spectral_bands)
         if (save_srf==TRUE){
           path_srf <- file.path(srf_path,
-                                paste0(sensor_name,'_Spectral_Response.csv'))
+                                paste0(sensor_name,'_spectral_response.csv'))
           message('Saving sensor spectral response function here:')
           print(path_srf)
           write.table(x = srf_save,file = path_srf,
@@ -104,7 +104,7 @@ get_radiometry <- function(sensor_name = 'user_defined',
                       col.names = TRUE, row.names = FALSE)
         }
       }
-      srf$Spectral_Response <- t(srf$Spectral_Response)
+      srf$spectral_response <- t(srf$spectral_response)
 
       ## == == == == == == == == == == == == == == == == == == == == == == ==##
       ## if the spectral response function of the sensor is not defined      ##
@@ -113,7 +113,7 @@ get_radiometry <- function(sensor_name = 'user_defined',
       ## == == == == == == == == == == == == == == == == == == == == == == ==##
     } else {
       path_srf <- file.path(srf_path,
-                            paste0(sensor_name,'_Spectral_Response.csv'))
+                            paste0(sensor_name,'_spectral_response.csv'))
       if (file.exists(path_srf)){
         # read file containing spectral response
         message('_____ reading spectral response corresponding to ______')
@@ -130,11 +130,11 @@ get_radiometry <- function(sensor_name = 'user_defined',
           spectral_bands <- spectral_bands_tmp
         spectral_response <- srfraw[,-1]
         spectral_response <- t(spectral_response)
-        srf <- list('Spectral_Response' = spectral_response,
-                    'Spectral_Bands' = spectral_bands,
-                    'Original_Bands'= original_bands,
-                    'Central_WL' = spectral_bands,
-                    'Sensor' = sensor_name)
+        srf <- list('spectral_response' = spectral_response,
+                    'spectral_bands' = spectral_bands,
+                    'original_bands'= original_bands,
+                    'central_wl' = spectral_bands,
+                    'sensor' = sensor_name)
 
         ### == == == == == == == == == == == == == == == == == == == == == ==###
         ### if the spectral response function of the sensor is not defined   ###
