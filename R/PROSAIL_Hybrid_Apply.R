@@ -43,3 +43,12 @@ prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
   return(list("MeanEstimate" = mean_estimate,
               "StdEstimate" = sd_estimate))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+PROSAIL_Hybrid_Apply <- function(RegressionModels,Refl, progressBar = FALSE){
+  .Deprecated("prosail_hybrid_apply")
+  prosail_hybrid_apply(RegressionModels,Refl, progressBar)
+}
+

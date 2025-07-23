@@ -162,3 +162,17 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
   }
   return(models_mlr)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+
+PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
+                                 WithReplacement = FALSE,
+                                 method = 'liquidSVM',
+                                 verbose = FALSE, progressBar = FALSE){
+  .Deprecated("prosail_hybrid_train")
+  prosail_hybrid_train(BRF_LUT, InputVar, nbEnsemble, WithReplacement,
+                       method, verbose, progressBar)
+}
+

@@ -10,7 +10,7 @@
 #' @param ewt numeric. Equivalent Water Thickness (g.cm-2)
 #' @param lma numeric. Leaf Mass per Area (g.cm-2)
 #' @param prot numeric. protein content  (g.cm-2)
-#' @param cbc numeric. NonprotCarbon-based constituent content (g.cm-2)
+#' @param cbc numeric. Carbon-based constituent content (g.cm-2)
 #' @param n_struct numeric. Leaf structure parameter
 #' @param alpha numeric. Solid angle for incident light at surface of leaf
 #' (simulation of roughness)
@@ -66,4 +66,17 @@ adjust_prospect_to_sail <- function(sail_version, spec_sensor, input_prospect,
   }
   return(list('green_lop' = green_lop,
               'brown_lop' = brown_lop))
+}
+
+
+#' @rdname prosail-deprecated
+#' @export
+adjust_PROSPECT_2_SAIL <- function(SAILversion, Spec_Sensor, Input_PROSPECT,
+                                   CHL, CAR, ANT, BROWN, EWT, LMA,
+                                   PROT, CBC, N, alpha, fraction_brown,
+                                   BrownLOP = NULL){
+  .Deprecated("adjust_prospect_to_sail")
+  adjust_prospect_to_sail(SAILversion, Spec_Sensor, Input_PROSPECT, CHL, CAR,
+                          ANT, BROWN, EWT, LMA, PROT, CBC, N, alpha,
+                          fraction_brown, BrownLOP)
 }

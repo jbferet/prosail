@@ -23,3 +23,11 @@ get_hdr_name <- function(image_path) {
   }
   return(hdr_path)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_HDR_name <- function(ImPath){
+  .Deprecated("get_hdr_name")
+  get_hdr_name(ImPath)
+}

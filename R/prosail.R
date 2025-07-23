@@ -79,3 +79,20 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
   }
   return(Ref)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL, N = 1.5,
+                     CHL = 40.0, CAR = 8.0, ANT = 0.0, BROWN = 0.0, EWT = 0.01,
+                     LMA = NULL, PROT = 0.0, CBC = 0.0, alpha = 40.0,
+                     TypeLidf = 2, LIDFa = 60, LIDFb = NULL, lai = 3,
+                     q = 0.1, tts = 30, tto = 0, psi = 60, rsoil = NULL,
+                     fraction_brown = 0.0, diss = 0.0, Cv = 1, Zeta = 1,
+                     SAILversion = '4SAIL', BrownLOP = NULL){
+  .Deprecated("prosail")
+  prosail(Spec_Sensor, Input_PROSPECT, N, CHL, CAR, ANT, BROWN, EWT, LMA, PROT,
+          CBC, alpha, TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil,
+          fraction_brown, diss, Cv, Zeta, SAILversion, BrownLOP)
+}
+

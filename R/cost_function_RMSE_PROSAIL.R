@@ -18,3 +18,15 @@ cost_function_rmse_prosail  <- function(brf_mes, brf_mod, xprior,
       prior_info$weight_prior*mean(as.numeric((xprior-prior_info$mean)/prior_info$sd)**2)
   return(fc)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+CostVal_RMSE_PROSAIL  <- function(brfMES, brfMOD, xprior, PriorInfoMean = NULL,
+                                  PriorInfoSD = NULL, WeightPrior = 0.01){
+  .Deprecated("cost_function_rmse_prosail")
+  prior_info <- list('mean' = PriorInfoMean,
+                     'SD' = PriorInfoSD,
+                     'weight_prior' = WeightPrior)
+  cost_function_rmse_prosail(brfMES, brfMOD, xprior, prior_info)
+}

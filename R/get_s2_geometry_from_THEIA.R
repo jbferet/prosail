@@ -57,3 +57,12 @@ get_s2_geometry_from_THEIA <- function(s2xml){
   # vaa <- stats::na.omit(vaa)
   return(list('saa' = saa, 'sza' = sza, 'vaa' = vaa, 'vza' = vza))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_S2geometry_from_THEIA <- function(s2xml){
+  .Deprecated("get_s2_geometry_from_THEIA")
+  get_s2_geometry_from_THEIA(s2xml)
+}
+

@@ -35,3 +35,11 @@ compute_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
   fapar <- sum(top[par_domain])/sum(par_diro[par_domain]+par_difo[par_domain])
   return(fapar)
 }
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_fAPAR  <- function(abs_dir, abs_hem, tts, SpecATM_Sensor,
+                           PAR_range = c(400, 700)){
+  .Deprecated("compute_fapar")
+  compute_fapar(abs_dir, abs_hem, tts, SpecATM_Sensor, PAR_range)
+}

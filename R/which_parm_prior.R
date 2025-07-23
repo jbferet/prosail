@@ -27,3 +27,12 @@ which_parm_prior <- function(prior_mean, prior_sd) {
               'mean' = prior_mean_update,
               'sd' = prior_sd_update))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+WhichParmPrior <- function(PriorInfoMean, PriorInfoSD) {
+  .Deprecated("adjust_prospect_to_sail")
+  which_parm_prior(PriorInfoMean, PriorInfoSD)
+}
+

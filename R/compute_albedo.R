@@ -37,3 +37,12 @@ compute_albedo  <- function(rsdstar, rddstar, tts, spec_atm_sensor,
                                           par_difo[albedo_domain])
   return(albedo)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
+                            PAR_range = c(400, 2400)){
+  .Deprecated("compute_albedo")
+  compute_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range)
+}

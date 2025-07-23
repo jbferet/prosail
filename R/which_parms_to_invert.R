@@ -54,3 +54,13 @@ which_parms_to_invert <- function(initialization, lower_bound,
               'parm_set' = parm_set_update,
               'input_prosail' = input_prosail))
 }
+
+
+
+#' @rdname prosail-deprecated
+#' @export
+WhichParameters2Invert <- function(InitialGuess, LowerBound,
+                                   UpperBound, ParmSet) {
+  .Deprecated("which_parms_to_invert")
+  which_parms_to_invert(InitialGuess, LowerBound, UpperBound, ParmSet)
+}

@@ -152,3 +152,14 @@ get_radiometry <- function(sensor_name = 'user_defined',
   }
   return(srf)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+GetRadiometry <- function(SensorName = 'Custom',
+                          SpectralProps = NULL,
+                          Path_SensorResponse = './',
+                          SaveSRF = TRUE){
+  .Deprecated("get_radiometry")
+  get_radiometry(SensorName, SpectralProps, Path_SensorResponse, SaveSRF)
+}

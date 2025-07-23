@@ -31,3 +31,11 @@ compute_brf  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
   brf <- (rdot*par_difo+rsot*par_diro)/(par_diro+par_difo)
   return(data.frame('BRF' = brf))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_BRF  <- function(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL){
+  .Deprecated("compute_brf")
+  compute_brf(rdot, rsot, tts, SpecATM_Sensor, skyl)
+}

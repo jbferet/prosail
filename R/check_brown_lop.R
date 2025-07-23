@@ -24,3 +24,12 @@ check_brown_lop <- function(brown_lop, lambda, input_prospect){
     message('green vegetation simulated with first set of leaf chemical traits')
   }
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+check_BrownLOP <- function(BrownLOP, lambda, Input_PROSPECT){
+  .Deprecated("check_brown_lop")
+  check_brown_lop(BrownLOP, lambda, Input_PROSPECT)
+}
+

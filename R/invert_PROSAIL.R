@@ -62,3 +62,20 @@ invert_prosail  <- function(brf_mes, initialization = NULL, lower_bound,
   parms_to_invert$input_prosail[parms_to_invert$parms_to_estimate] <- res_inv$par
   return(parms_to_invert$input_prosail)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+Invert_PROSAIL  <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
+                            SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
+                            TypeLidf, ParmSet, MeritFunction = 'Merit_RMSE_PROSAIL',
+                            PriorInfoMean = NULL, PriorInfoSD = NULL,
+                            WeightPrior = 0.01){
+  .Deprecated("invert_prosail")
+  prior_info <- list('mean' = PriorInfoMean,
+                     'SD' = PriorInfoSD,
+                     'weight_prior' = WeightPrior)
+  invert_prosail(brfMES, InitialGuess, LowerBound, UpperBound,
+                 SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
+                 TypeLidf, ParmSet, MeritFunction, prior_info)
+}

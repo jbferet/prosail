@@ -60,3 +60,11 @@ non_conservative_scattering <- function(m, lai, att, sigb, ks, ko, sf, sb, vf,
                   "rsod" = rsod)
   return(my_list)
 }
+
+#' @rdname prosail-deprecated
+#' @export
+NonConservativeScattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
+  .Deprecated("non_conservative_scattering")
+  non_conservative_scattering(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too)
+}
+

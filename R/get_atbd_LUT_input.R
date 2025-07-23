@@ -99,3 +99,12 @@ t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
   input_prosail$alpha <- 40
   return(input_prosail)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_atbd_LUT_input <- function(nbSamples = 2000, GeomAcq = NULL,
+                               Codist_LAI = TRUE){
+  .Deprecated("get_atbd_lut_input")
+  get_atbd_lut_input(nbSamples, GeomAcq, Codist_LAI)
+}

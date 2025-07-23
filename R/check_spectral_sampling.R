@@ -31,3 +31,12 @@ check_spectral_sampling <- function(spec_prospect, spec_soil, spec_atm){
   }
   return(invisible())
 }
+
+
+
+#' @rdname prosail-deprecated
+#' @export
+check_SpectralSampling <- function(SpecPROSPECT, SpecSOIL, SpecATM){
+  .Deprecated("check_spectral_sampling")
+  check_spectral_sampling(SpecPROSPECT, SpecSOIL, SpecATM)
+}

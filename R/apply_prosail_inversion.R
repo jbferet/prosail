@@ -138,8 +138,7 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
         # initiate progress bar
         pgbarlength <- length(hybrid_model[[parm]])*blk$n
         pb <- progress_bar$new(
-          format = "Hybrid inversion on raster [:bar] :percent in :elapsedfull ,
-          estimated time remaining :eta",
+          format = "Mapping from raster [:bar] :percent in :elapsedfull , estimated time remaining :eta",
           total = pgbarlength, clear = FALSE, width= 100)
       }
       # output files
@@ -236,4 +235,17 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
     print('processing completed')
   }
   return(list('mean' = bp_var_path, 'SD' = bp_var_sd_path))
+}
+
+#' @rdname prosail-deprecated
+#' @export
+Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
+                                    SelectedBands, bandname, MaskRaster = NULL,
+                                    MultiplyingFactor = 10000, maxRows = 100,
+                                    bigRaster = FALSE, progressBar = TRUE,
+                                    filetype = 'GTiff'){
+  .Deprecated("apply_prosail_inversion")
+  apply_prosail_inversion(raster_path, HybridModel, PathOut, SelectedBands,
+                          bandname, MaskRaster, MultiplyingFactor, maxRows,
+                          bigRaster, progressBar, filetype)
 }

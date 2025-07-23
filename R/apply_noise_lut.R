@@ -22,3 +22,13 @@ apply_noise_lut <- function(lut, noise_level = 0, noise_type = 'relative'){
   }
   return(lut_noise)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+Apply_Noise_LUT <- function(LUT, NoiseLevel, NoiseType = 'relative'){
+  .Deprecated("apply_noise_lut")
+  apply_noise_lut(LUT, NoiseLevel, NoiseType)
+}
+
+

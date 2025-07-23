@@ -43,7 +43,7 @@ adjust_prospect_to_sail(
 
 \item{prot}{numeric. protein content  (g.cm-2)}
 
-\item{cbc}{numeric. NonprotCarbon-based constituent content (g.cm-2)}
+\item{cbc}{numeric. Carbon-based constituent content (g.cm-2)}
 
 \item{n_struct}{numeric. Leaf structure parameter}
 

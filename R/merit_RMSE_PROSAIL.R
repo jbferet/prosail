@@ -47,3 +47,22 @@ merit_rmse_prosail <- function(xinit, parms_xinit, brf_mes,
                                    prior_info = prior_info)
   return(fc)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
+                               SpecSOIL_Sensor, SpecATM_Sensor, Parms2Estimate,
+                               Parm2Set = NULL, ParmSet = NULL, InVar, TypeLidf,
+                               PriorInfoMean = NULL, PriorInfoSD = NULL,
+                               Parms2Prior = NULL, WeightPrior = 0.01){
+  prior_info <- list('mean' = PriorInfoMean,
+                     'SD' = PriorInfoSD,
+                     'weight_prior' = WeightPrior)
+  .Deprecated("merit_rmse_prosail")
+  merit_rmse_prosail(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
+                     SpecSOIL_Sensor, SpecATM_Sensor, Parms2Estimate,
+                     InVar, type_lidf = 2, prior_info = prior_info,
+                     parms_to_prior = Parms2Prior)
+}
+

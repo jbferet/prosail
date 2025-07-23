@@ -39,3 +39,12 @@ apply_noise_addmult <- function(brf_lut, additive_noise = 0.01,
   brf_lut_noise <- brf_lut*(1+(mult_comp)) + add_comp
   return(brf_lut_noise)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+apply_noise_AddMult <- function(BRF_LUT, AdditiveNoise = 0.01,
+                                MultiplicativeNoise = 0.02){
+  .Deprecated("apply_noise_addmult")
+  apply_noise_addmult(BRF_LUT, AdditiveNoise, MultiplicativeNoise)
+}

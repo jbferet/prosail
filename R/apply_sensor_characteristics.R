@@ -48,3 +48,11 @@ apply_sensor_characteristics <- function(wvl, input_refl_table, srf){
   names(refl_sensor) <- colnames(input_refl_table)
   return(refl_sensor)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+applySensorCharacteristics <- function(wvl, InRefl, SRF){
+  .Deprecated("apply_sensor_characteristics")
+  apply_sensor_characteristics(wvl, InRefl, SRF)
+}

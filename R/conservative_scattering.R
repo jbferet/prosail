@@ -46,3 +46,11 @@ conservative_scattering <- function(m, lai, att, sigb, ks, ko, sf, sb, vf, vb,
                   "tdo" = tdo, "rdo" = rdo, "rsod" = rsod)
   return(my_list)
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+ConservativeScattering <- function(m,lai,att,sigb,ks,ko,sf,sb,vf,vb,tss,too){
+  .Deprecated("conservative_scattering")
+  conservative_scattering(m, lai, att, sigb, ks, ko, sf, sb, vf, vb, tss, too)
+}

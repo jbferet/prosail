@@ -17,3 +17,10 @@ jfunc1 <- function(k,l,t){
     (1-del[which(abs(del)<=1e-3)]*del[which(abs(del)<=1e-3)]/12)
   return(Jout)
 }
+
+#' @rdname prosail-deprecated
+#' @export
+Jfunc1 <- function(k,l,t){
+  .Deprecated("jfunc1")
+  jfunc1(k,l,t)
+}

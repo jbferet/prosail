@@ -17,3 +17,10 @@ write_envi_header <- function(hdr, hdr_path) {
   writeLines(c("ENVI", paste(names(hdr), h, sep = " = ")), con = hdr_path)
   return(invisible())
 }
+
+#' @rdname prosail-deprecated
+#' @export
+write_ENVI_header <- function(HDR, HDRpath) {
+  .Deprecated("write_envi_header")
+  write_envi_header(HDR, HDRpath)
+}

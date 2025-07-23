@@ -70,3 +70,16 @@ get_default_lut_input <- function(type_distrib = NULL,
               'minval' = minval, 'maxval' = maxval)
   return(res)
 }
+
+
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_default_LUT_input <- function(TypeDistrib = NULL,
+                                  GaussianDistrib = NULL,
+                                  minval = NULL,
+                                  maxval = NULL){
+  .Deprecated("get_default_lut_input")
+  get_default_lut_input(TypeDistrib, GaussianDistrib, minval, maxval)
+}

@@ -30,3 +30,11 @@ get_s2_geometry <- function(MTD_TL_xml, verbose = FALSE){
   return(list('SAA' = geom_s2$saa, 'SZA' = geom_s2$sza,
               'VAA' = geom_s2$vaa, 'VZA' = geom_s2$vza))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_S2geometry <- function(MTD_TL_xml, verbose=FALSE){
+  .Deprecated("get_s2_geometry")
+  get_s2_geometry(MTD_TL_xml, verbose)
+}

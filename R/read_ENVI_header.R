@@ -47,3 +47,13 @@ read_envi_header <- function(hdr_path) {
   })
   return(hdr)
 }
+
+
+
+#' @rdname prosail-deprecated
+#' @export
+read_ENVI_header <- function(HDRpath) {
+  .Deprecated("read_envi_header")
+  read_envi_header(HDRpath)
+}
+

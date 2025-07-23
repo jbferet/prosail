@@ -65,3 +65,11 @@ get_s2_geometry_from_SAFE <- function(s2xml){
   vaa <- apply(simplify2array(vaa), 1:2, mean, na.rm = TRUE)
   return(list('saa' = saa, 'sza' = sza, 'vaa' = vaa, 'vza' = vza))
 }
+
+
+#' @rdname prosail-deprecated
+#' @export
+get_S2geometry_from_SAFE <- function(s2xml){
+  .Deprecated("get_s2_geometry_from_SAFE")
+  get_s2_geometry_from_SAFE(s2xml)
+}

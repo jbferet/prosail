@@ -27,3 +27,10 @@ prepare_sensor_simulation <- function(spec_prospect, spec_soil, spec_atm, srf){
                       'band_names' = srf$spectral_bands)
   return(spec_sensor)
 }
+
+#' @rdname prosail-deprecated
+#' @export
+PrepareSensorSimulation <- function(SpecPROSPECT,SpecSOIL,SpecATM,SRF){
+  .Deprecated("prepare_sensor_simulation")
+  prepare_sensor_simulation(SpecPROSPECT,SpecSOIL,SpecATM,SRF)
+}

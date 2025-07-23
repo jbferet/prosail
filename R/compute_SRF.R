@@ -10,7 +10,7 @@
 #' @importFrom stats dnorm
 #' @export
 
-compute_srf <- function(wvl,fwhm, sensor_name = 'Custom'){
+compute_srf <- function(wvl, fwhm, sensor_name = 'Custom'){
 
   # define full spectral domain in optical domain
   lambda <- prosail::spec_prospect_fullrange$lambda
@@ -26,4 +26,12 @@ compute_srf <- function(wvl,fwhm, sensor_name = 'Custom'){
               'central_wl' = wvl,
               'sensor' = sensor_name)
   return(srf)
+}
+
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_SRF <- function(wvl,FWHM, SensorName = 'Custom'){
+  .Deprecated("compute_srf")
+  compute_srf(wvl, FWHM, SensorName)
 }
