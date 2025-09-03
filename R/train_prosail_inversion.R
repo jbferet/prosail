@@ -92,6 +92,8 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     input_prosail <- data.frame(input_prosail)
     # ensure compatibility with variable names from previous versions
     input_prosail <- set_compatibility_input_prosail(input_prosail)
+    parms_to_estimate <- set_compatibility_parms_to_estimate(parms_to_estimate)
+
     if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('parms to generate BRF LUT provided by user in "input_prosail"')
@@ -102,7 +104,8 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     # check if all parameters defined & use default value for undefined parms
     undefined_parms <- list_parms[which(is.na(match(list_parms,
                                                     names(input_prosail))))]
-    for (parm in undefined_parms) input_prosail[[parm]] <- default_val[[parm]]
+    for (parm in undefined_parms)
+      input_prosail[[parm]] <- default_val[[parm]]
     # Set parameters
     if (length(parm_set)>0){
       for (parm in names(parm_set)){
@@ -228,7 +231,8 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     } else {
       # produce LUT with noise
       for (parm in parms_to_estimate){
-        if (is.null(noise_level[[parm]])) noise_level[[parm]] <- 0.01
+        if (is.null(noise_level[[parm]]))
+          noise_level[[parm]] <- 0.01
         refl_subset <- brf_lut[bands_to_select[[parm]],]
         brf_lut_noise[[parm]] <- refl_subset +
           refl_subset*matrix(rnorm(nrow(refl_subset)*ncol(refl_subset),
