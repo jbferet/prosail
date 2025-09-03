@@ -1,12 +1,11 @@
 #' make sure of the compatibility of variable names between versions of prosail
 #'
-#' @param input_prosail list. PROSAIL input variables
+#' @param parms_to_estimate list. PROSAIL input variables
 #'
-#' @return input_prosail numeric. updated input_prosail
+#' @return parms_to_estimate numeric. updated parms_to_estimate
 #' @export
 
 set_compatibility_parms_to_estimate <- function(parms_to_estimate){
-  name_vars <- parms_to_estimate
   old_names <- c('CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'CBC', 'PROT',
                  'q', 'Cw_rel', 'N', 'Cv', 'Zeta',
                  'LIDFa', 'LIDFb', 'TypeLidf')
