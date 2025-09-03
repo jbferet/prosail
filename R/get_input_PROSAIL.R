@@ -23,19 +23,26 @@ get_input_prosail <- function(atbd = FALSE, geom_acq = NULL,
                               gaussian_distrib = NULL, parm_set = NULL,
                               nb_samples = 2000, verbose = FALSE){
 
-  if (atbd==TRUE){
+  if (atbd==TRUE | tolower(x = atbd)=='v2'){
     #__________________________________________________________________________#
     #                         distribution defined in S2 ATBD                 ##
     #__________________________________________________________________________#
     if (!is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
-        message('using PROSAIL parameter distribution defined in S2 ATBD')
+        message('using PROSAIL parameter distribution defined in S2 ATBD v2')
         message('http://step.esa.int/docs/extra/ATBD_S2ToolBox_V2.1.pdf')
       }
     }
     input_prosail <- get_atbd_lut_input(nb_samples = nb_samples,
                                         geom_acq = geom_acq,
                                         codistribution_lai = codistribution_lai)
+  } else if (tolower(x = atbd)=='v3'){
+    #__________________________________________________________________________#
+    #                         distribution defined in S2 ATBD                 ##
+    #__________________________________________________________________________#
+    input_prosail <- get_atbd_v3_lut_input(nb_samples = nb_samples,
+                                           geom_acq = geom_acq,
+                                           codistribution_lai = codistribution_lai)
   } else {
     #__________________________________________________________________________#
     #                     user defined range and distribution                 ##

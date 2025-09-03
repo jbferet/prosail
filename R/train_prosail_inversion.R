@@ -90,6 +90,8 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
   ##############################################################################
   if (!is.null(input_prosail)){
     input_prosail <- data.frame(input_prosail)
+    # ensure compatibility with variable names from previous versions
+    input_prosail <- set_compatibility_input_prosail(input_prosail)
     if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
         message('parms to generate BRF LUT provided by user in "input_prosail"')

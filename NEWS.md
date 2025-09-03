@@ -9,6 +9,8 @@ prepare for JOSS submission
 - update vignettes
 - update names of sensor spectral response characteristics (lower_case)
 - add deprecated functions from previous versions (<3.0.0)
+- add set_compatibility_input_prosail to ensure compatibility of variable names
+- add parameters for S2 ATBD v3 (beta)
 
 
 # prosail v2.5.10
