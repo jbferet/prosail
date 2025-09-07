@@ -684,24 +684,34 @@ for (parm in parms_to_estimate){
 ### Application to imagery data
 
 Here, we illustrate how to run `prosail` hybrid inversion on Sentinel-2 imagery.
-This requires additional packages, including the package `sf` to handle vector 
-data, and two additional packages to handle Sentinel-2 data.
-The package [`sen2proc`](https://gitlab.com/floriandeboissieu/sen2proc) and the 
-package [`preprocs2`](https://jbferet.gitlab.io/preprocs2/) are two 
-complementary packages dedicated to access Sentinel-2 data from different 
-providers, and to perform various preprocessing and processing steps. 
+Sentinel-2 imagery handling requires the installation of 
+[`preprocs2`](https://jbferet.gitlab.io/preprocs2/), a package dedicated to 
+downloading and preprocessing of Sentinel-2 data from different providers. 
+It also requires the package `sf` to handle vector data. 
 
 Here, for the sake of comparison between biophysical variables produced from 
 SNAP and those produced with the `prosail` hybrid inversion, the Sentinel-2 
 Level-2A product corresponding to tile *30SWJ* acquired on *May 13th, 2021* was 
-downloaded from the [Copernicus browser](https://browser.dataspace.copernicus.eu).
+downloaded from the Copernicus Data Space Ecosystem 
+([CDSE](https://browser.dataspace.copernicus.eu)).
+This is important for the consistency of the processing baseline of Sentinel-2
+acquisitions, as the processing baseline used by alternative Sentinel-2 data 
+providers such as Microsoft Planetary Computers and Google Cloud may not be 
+consistent with the latest version provided by CDSE.
 
-Once the SAFE product downloaded with `sen2proc`, `preprocs2` is used to crop 
+Users are invited to go through the documentation of the package `prosail`, 
+which provides examples on how to download Sentinel-2 imagery data from specific 
+regions of interest instead of downloading a full SAFE tile.
+
+Once the SAFE product downloaded `preprocs2` is used to crop 
 and save reflectance data corresponding to an area of interest defined within 
 the Sentinel-2 tile footprint. 
 
 
 ```r
+# load preprocS2 and sf
+library(preprocS2)
+library(sf)
 # define path for original image subset and prosail outputs
 main_dir <- './barrax'                              # main directory
 safe_dir <- file.path(main_dir, 's2_safe')          # SAFE directory
@@ -750,12 +760,12 @@ srf <- get_radiometry('Sentinel_2B')
 bandname <- srf$spectral_bands
 
 # define parameters to estimate
-parms_to_estimate <- c('lai', 'fCover', 'fAPAR', 'chl')
+parms_to_estimate <- c('lai', 'fcover', 'fapar', 'chl')
 
 # define spectral bands required to train SVR model for each variable
 selected_bands <- list('lai' = c('B3','B4','B8'), 
-                       'fCover' = c('B3','B4','B8'), 
-                       'fAPAR' = c('B3','B4','B8'), 
+                       'fcover' = c('B3','B4','B8'), 
+                       'fapar' = c('B3','B4','B8'), 
                        'chl' = c('B3','B4','B5','B6','B7','B8'))
 
 # train SVR model for each variable of interest

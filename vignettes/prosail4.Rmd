@@ -72,8 +72,9 @@ will not be able to access it once you close the page.
 Access to geometry of acquisition is provided by the package 
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
 
-Make sure you follow the procedure described in the `preprocS2` installation doc 
-to save credentials for CDSE
+Make sure you follow the procedure described in the 
+[`preprocS2`](https://jbferet.gitlab.io/preprocs2/) installation doc 
+to save credentials for CDSE and OAuth client ID in your `~/.Renviron` file. 
 
 
 ```{r download_S2_product}
@@ -132,6 +133,7 @@ for detailed procedure.
 The package [`bigRaster`](https://gitlab.com/jbferet/bigRaster) can be used to 
 handle inversion over large rasters if needed, but may be more time consuming 
 over smaller raster data. 
+
 ```{r Hybrid_Inversion}
 library(prosail)
 output_dir_BP <- './PROSAIL'

@@ -151,6 +151,12 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
                                                           sep = '_'))
       bp_var_sd_path[[parm]] <- file.path(output_path,paste(raster_name, parm,
                                                             'STD', sep = '_'))
+
+      if (filetype %in% c('GTiff', 'COG')){
+        bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
+        bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.tiff')
+      }
+
       r_out_mean <- writeStart(raster(raster_path),
                                filename = bp_var_path[[parm]],
                                format = formatfile, overwrite = TRUE)
@@ -227,10 +233,10 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
         bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.envi')
         bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.envi')
       }
-      if (filetype %in% c('GTiff', 'COG')){
-        bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
-        bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.tiff')
-      }
+      # if (filetype %in% c('GTiff', 'COG')){
+      #   bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
+      #   bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.tiff')
+      # }
     }
     print('processing completed')
   }
@@ -245,7 +251,9 @@ Apply_prosail_inversion <- function(raster_path, HybridModel, PathOut,
                                     bigRaster = FALSE, progressBar = TRUE,
                                     filetype = 'GTiff'){
   .Deprecated("apply_prosail_inversion")
-  apply_prosail_inversion(raster_path, HybridModel, PathOut, SelectedBands,
-                          bandname, MaskRaster, MultiplyingFactor, maxRows,
-                          bigRaster, progressBar, filetype)
+  apply_prosail_inversion(raster_path = raster_path, hybrid_model = HybridModel,
+                          output_path = PathOut, selected_bands = SelectedBands,
+                          bandname = bandname, mask_path = MaskRaster,
+                          multiplying_factor = MultiplyingFactor, maxRows = maxRows, bigRaster = bigRaster,
+                          progressBar = progressBar, filetype = filetype)
 }
