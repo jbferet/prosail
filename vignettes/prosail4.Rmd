@@ -154,7 +154,7 @@ selected_bands <- list('lai' = c('B3','B4','B8'),
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
-                                        path_bbox = path_bbox)
+                                        path_bbox = path_aoi)
 # define ranges for zenith angles of acquisition
 geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
                                    'tts' = angles_path$MinAngle['sza'], 

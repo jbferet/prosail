@@ -18,6 +18,7 @@
 #' @importFrom progress progress_bar
 #' @importFrom simsalapar tryCatch.W.E
 #' @importFrom caret train trainControl
+#' @importFrom kernlab ksvm
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_split
 #' @export
@@ -94,6 +95,44 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
                                                   min_lambda = val_lambda)
         }
       }
+    } else if (method %in% c('nu-svr')){
+      # Define parameter grid
+      C_values <- c(0.1, 1, 10)
+      nu_values <- c(0.1, 0.3, 0.5, 0.7)
+      sigma_values <- c(0.001, 0.01, 0.05, 0.1, 0.5)
+      best_model <- NULL
+      min_err <- Inf
+      lut <- data.frame(training_set$X, 'target' = training_set$Y)
+      for (C_val in C_values) {
+        for (nu_val in nu_values) {
+          for (sigma_val in sigma_values) {
+            model <- kernlab::ksvm(
+              target ~ .,
+              data = lut,
+              type = "nu-svr",
+              kernel = "rbfdot",
+              kpar = list(sigma = sigma_val),
+              C = C_val,
+              nu = nu_val,
+              cross = 10  # Cross-validation folds
+            )
+            err_cv <- model@cross  # Mean squared error from CV
+            if (err_cv < min_err) {  # Negative because it's an error
+              min_err <- err_cv
+              best_model <- model
+              hyperparm_optim <- list('C' = C_val, 'nu' =nu_val, 'sigma' = sigma_val)
+            }
+          }
+        }
+      }
+      tuned_model <- kernlab::ksvm(
+        target ~ ., data = lut,
+        type="nu-svr", kernel="rbfdot",
+        kpar = list(hyperparm_optim$sigma),
+        C = hyperparm_optim$C,
+        nu = hyperparm_optim$nu
+      )
+
     } else if (method %in% c('svmRadial', 'svmLinear')){
       if (method =='svmRadial')
         tuneGrid <- expand.grid(C = exp(seq(-10, 0)),

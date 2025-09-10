@@ -184,7 +184,8 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
         }
         # add name for variables
 
-        if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM')){
+        if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM') &
+            !inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
           colnames(block_val) <- colnames(hybrid_model[[parm]][[1]]$trainingData)[-1]
         }
 

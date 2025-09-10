@@ -249,6 +249,7 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
   # train SVR for each variable and each run
   model_svr <- list()
   for (parm in parms_to_estimate){
+    message(paste('training regression model for', parm))
     ColParm <- which(parm==names(input_prosail))
     input_variables <- input_prosail[[ColParm]]
     model_svr[[parm]] <- prosail_hybrid_train(brf_lut = brf_lut_noise[[parm]],

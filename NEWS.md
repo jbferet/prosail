@@ -11,6 +11,7 @@ prepare for JOSS submission
 - add deprecated functions from previous versions (<3.0.0)
 - add set_compatibility_input_prosail to ensure compatibility of variable names
 - add parameters for S2 ATBD v3 (beta)
+- add kernlab::ksvm as svm regression method to skip liquidSVM
 
 
 # prosail v2.5.10
