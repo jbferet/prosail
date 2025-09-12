@@ -3,14 +3,14 @@ title: "4. Estimate vegetation properties from optical images"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
-  html_vignette:
-    number_sections: true
   html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+  html_vignette:
+    number_sections: true
 vignette: >
   \usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{4. Estimate vegetation properties from optical images}
@@ -181,7 +181,7 @@ modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
 # multiplying_factor = 1 if reflectance defined between 0 and 1
 BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
                                   hybrid_model = modelSVR, 
-                                  output_path = PROSAIL_ResPath,
+                                  output_path = output_dir_BP,
                                   selected_bands = selected_bands, 
                                   bandname = srf$spectral_bands, 
                                   mask_path = vegetation_mask, 

@@ -3,14 +3,14 @@ title: "5. Miscellaneous"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
-  html_vignette:
-    number_sections: true
   html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+  html_vignette:
+    number_sections: true
 vignette: >
   \usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{5. Miscellaneous}
