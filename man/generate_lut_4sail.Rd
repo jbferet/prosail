@@ -19,8 +19,8 @@ generate_lut_4sail(
 
 \item{spec_prospect}{list. Includes optical constants required for PROSPECT}
 
-\item{spec_soil}{list. Includes either dry soil and wet soil, or a unique
-soil sample if the psoil parameter is not inverted}
+\item{spec_soil}{list. Includes either a set of OSSL library reflectance
+spectra, or minimum reflectance and maximum reflectance}
 
 \item{spec_atm}{list. direct and diffuse radiation for clear conditions}
 

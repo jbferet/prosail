@@ -50,3 +50,15 @@ spec_prospect_fullrange <- SpecPROSPECT_FullRange
 usethis::use_data(spec_prospect_fullrange, spec_soil, spec_atm,
                   internal = FALSE,
                   overwrite = TRUE)
+
+
+# read soil reflectance from Open Soil Spectral Library (OSSL)
+# source #1: Sentinel-2 ATBD v3, 2023 https://hal.inrae.fr/hal-04884986v1/document
+# source #2: Shepherd et al., 2022 https://doi.org/10.1016/j.soisec.2022.100061
+spec_soil_ossl <- read.table(file = 'data-raw/dataSpec_SOIL_OSSL_ATBD_v3.txt',
+                             header = TRUE,
+                             sep = '\t')
+
+usethis::use_data(spec_soil_ossl,
+                  internal = FALSE,
+                  overwrite = TRUE)

@@ -54,7 +54,7 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
   if (is.null(spec_sensor))
     spec_sensor <- prosail::spec_prospect_fullrange
   if (is.null(rsoil))
-    rsoil <- prosail::spec_soil$max_refl
+    rsoil <- prosail::spec_soil_ossl$soil_01
   #	PROSPECT: LEAF OPTICAL PROPERTIES
   lop <- adjust_prospect_to_sail(sail_version = SAILversion,
                                  spec_sensor = spec_sensor,

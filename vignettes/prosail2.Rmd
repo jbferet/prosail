@@ -135,7 +135,9 @@ lidf_a <- 30   # mean leaf angle
 tts <- 30     # geometry of acquisition: sun zenith angle
 tto <- 10     # geometry of acquisition: observer zenith angle
 psi <- 90     # geometry of acquisition: sun-observer azimuth 
-rsoil <- spec_soil$max_refl # soil reflectance (spec_soil: min_refl and max_refl)
+rsoil <- spec_soil_ossl$soil_01 # soil reflectance 
+# - spec_soil: min_refl and max_refl
+# - spec_soil_ossl: selection of 47 reflectance spectral representative of OSSL
 
 # run prosail with 4SAIL
 refl_prosail <- prosail(input_prospect = input_prospect, 

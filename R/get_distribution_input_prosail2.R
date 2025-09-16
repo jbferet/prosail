@@ -23,6 +23,7 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
                               'lma' = 'Uniform', 'brown'='Uniform',
                               'prot' = 'Uniform', 'cbc' = 'Uniform',
                               'n_struct' = 'Uniform', 'psoil' = 'Uniform',
+                              'soil_brightness' = 'Uniform',
                               'lidf_a' = 'Uniform', 'lai' = 'Uniform',
                               'hotspot'='Uniform', 'tto' = 'Uniform',
                               'tts' = 'Uniform', 'psi' = 'Uniform',
@@ -35,8 +36,9 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
                         'n_struct' = c(), 'alpha' = c(), 'lidf_a' = c(),
                         'lidf_b' = c(), 'lai' = c(), 'hotspot' = c(), 'tts' = c(),
                         'tto' = c(), 'psi' = c(), 'psoil' = c(),
-                        'type_lidf' = c(), 'fraction_brown' = c(), 'diss' = c(),
-                        'cv' = c(), 'zeta' = c())
+                        'soil_brightness' = c(), 'type_lidf' = c(),
+                        'fraction_brown' = c(), 'diss' = c(), 'cv' = c(),
+                        'zeta' = c())
   input_prosail_names <- names(input_prosail)
 
   default <- data.frame('chl' = 0, 'car' = 0, 'ant'=0, 'brown' = 0, 'ewt' = 0,
@@ -44,7 +46,7 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
                         'alpha' = 40, 'lidf_a' = 0, 'lidf_b' = 0, 'lai' = 2,
                         'hotspot' = 0, 'tts' = 0, 'tto' = 0,'psi'=0, 'psoil' = 1,
                         'type_lidf' = 2, 'fraction_brown' = 0.5, 'diss' = 0.5,
-                        'cv' = 1, 'zeta' = 1)
+                        'cv' = 1, 'zeta' = 1, 'soil_brightness' = 1)
 
   # which input parameters should be randomly sampled?
   parm_random <- which(is.element(input_prosail_names,names(minval))==TRUE)

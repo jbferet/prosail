@@ -12,6 +12,7 @@ prepare for JOSS submission
 - add set_compatibility_input_prosail to ensure compatibility of variable names
 - add parameters for S2 ATBD v3 (beta)
 - add kernlab::ksvm as svm regression method to skip liquidSVM
+- add OSSL soil database (from ATBD v3)
 
 
 # prosail v2.5.10

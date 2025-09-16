@@ -100,9 +100,10 @@ are ignored.
 
 ## Produce simulated BRF LUT corresponding to `input_prosail`
 
-The BRF LUT is produced from `input_prosail` with the function `generate_lut_brf`.
-This function is expecting the variables `spec_prospect`, `spec_soil` and `spec_atm` 
-to share the same spectral sampling. 
+The BRF LUT is produced from `input_prosail` with the function 
+`generate_lut_brf`.
+This function is expecting the variables `spec_prospect`, `spec_soil` and 
+`spec_atm` to share the same spectral sampling. 
 An error message will be displayed if this is not the case. 
 
 The BRF LUT obtained then corresponds to spectral information covering the 
@@ -408,8 +409,8 @@ down as follows:
 
 ```{r generate_input_prosail_user}
 input_prosail <- get_input_prosail(minval = minval, maxval = maxval, 
-                                 type_distrib = type_distrib, 
-                                 get_input_prosail = gaussian_distrib)
+                                   type_distrib = type_distrib, 
+                                   get_input_prosail = gaussian_distrib)
 ```
 
 - produce BRF LUT

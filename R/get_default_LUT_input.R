@@ -53,17 +53,19 @@ get_default_lut_input <- function(type_distrib = NULL,
                               'psoil' = 'Uniform', 'lidf_a' = 'Uniform',
                               'lai' = 'Uniform', 'hotspot'='Uniform',
                               'tto' = 'Uniform','tts' = 'Uniform',
-                              'psi' = 'Uniform')
+                              'psi' = 'Uniform', 'soil_brightness' = 'Uniform')
   # define min and max values
   if (is.null(minval))
     minval <- data.frame('chl' = 10, 'car' = 0, 'ewt' = 0.01, 'ant' = 0,
-                         'lma' = 0.005, 'n_struct' = 1.0, 'psoil' = 0.0,
-                         'brown'=0.0, 'lidf_a' = 20, 'lai' = 0.5, 'hotspot'=0.1,
+                         'lma' = 0.005, 'brown'=0.0, 'n_struct' = 1.0,
+                         'psoil' = 0.0, 'soil_brightness' = 0.5,
+                         'lidf_a' = 20, 'lai' = 0.5, 'hotspot'=0.1,
                          'tto' = 0, 'tts' = 20, 'psi' = 80)
   if (is.null(maxval))
     maxval <- data.frame('chl' = 75, 'car' = 15, 'ewt' = 0.03, 'ant' = 2,
-                         'lma' = 0.03, 'n_struct' = 2.0, 'psoil' = 1.0,
-                         'brown'=0.5, 'lidf_a' = 70, 'lai' = 7, 'hotspot'=0.2,
+                         'lma' = 0.03, 'brown'=0.5, 'n_struct' = 2.0,
+                         'psoil' = 1.0, 'soil_brightness' = 3.5,
+                         'lidf_a' = 70, 'lai' = 7, 'hotspot'=0.2,
                          'tto' = 5, 'tts' = 30, 'psi' = 110)
   res <- list('type_distrib' = type_distrib,
               'gaussian_distrib' = gaussian_distrib,

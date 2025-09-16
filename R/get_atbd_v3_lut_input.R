@@ -16,16 +16,22 @@ get_atbd_v3_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
   t_gauss_parms$min <- data.frame('lai' = 0, 'lidf_a' = 30, 'hotspot' = 0.1,
                                   'n_struct' = 1.2, 'chl' = 5.1, 'lma' = 0.0015,
                                   'cw_rel' = 0.489, 'brown' = 0.0, 'psoil' = 0)
+                                  # 'soil_brightness' = 0.5)
   t_gauss_parms$max <- data.frame('lai' = 15, 'lidf_a' = 80, 'hotspot' = 0.5,
                                   'n_struct' = 1.8, 'chl' = 97.21, 'lma' = 0.0356,
                                   'cw_rel' = 0.92, 'brown' = 2.0, 'psoil' = 1)
+                                  # 'soil_brightness' = 3.5)
+
   t_gauss_parms$mean <- data.frame('lai' = 2, 'lidf_a' = 60, 'hotspot' = 0.2,
                                    'n_struct' = 1.5, 'chl' = 53.70, 'lma' = 0.008,
                                    # 'cw_rel' = 0.75, 'brown' = 0, 'psoil' = 0.25)
                                    'cw_rel' = 0.72, 'brown' = 0, 'psoil' = 0.5)
-t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
+                                   # 'soil_brightness' = 1.2)
+
+  t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
                                  'n_struct' = 0.3, 'chl' = 16.58, 'lma' = 0.006,
                                  'cw_rel' = 0.096, 'brown' = 0.30, 'psoil' = 0.6)
+                                 # 'soil_brightness' = 2,
 
   # get distribution corresponding to gaussians
   input_prosail <- list()
@@ -45,19 +51,24 @@ t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
     codistribution_lai$vmin_0 <- data.frame('lidf_a' = 30, 'hotspot' = 0.1,
                                             'n_struct' = 1.2, 'chl' = 5.1,
                                             'lma' = 0.0015, 'cw_rel' = 0.489,
-                                           'brown' = 0.0, 'psoil' = 0)
+                                            'brown' = 0.0, 'psoil' = 0)
+                                            # 'soil_brightness' = 0.5)
     codistribution_lai$vmax_0 <- data.frame('lidf_a' = 80, 'hotspot' = 0.5,
-                                            'n_struct' = 3, 'chl' = 97.21,
+                                            'n_struct' = 2.2, 'chl' = 97.21,
                                             'lma' = 0.0356, 'cw_rel' = 0.92,
-                                           'brown' = 2, 'psoil' = 1)
+                                            'brown' = 2, 'psoil' = 1)
+                                            # 'soil_brightness' = 3.5)
     codistribution_lai$vmin_lai_max <- data.frame('lidf_a' = 55, 'hotspot' = 0.1,
-                                                  'n_struct' = 1.6, 'chl' = 65,
+                                                  'n_struct' = 1.3, 'chl' = 5.1,
                                                   'lma' = 0.0015, 'cw_rel' = 0.489,
                                                   'brown' = 0.0, 'psoil' = 0)
+                                                  # 'soil_brightness' = 0.5)
     codistribution_lai$vmax_lai_max <- data.frame('lidf_a' = 65, 'hotspot' = 0.5,
-                                                  'n_struct' = 3, 'chl' = 90,
+                                                  'n_struct' = 1.8, 'chl' = 97.21,
                                                   'lma' = 0.0356, 'cw_rel' = 0.92,
-                                                  'brown' = 0.0, 'psoil' = 0.4)
+                                                  'brown' = 0.2, 'psoil' = 0.4)
+                                                  # 'soil_brightness' = 1.2)
+
     for (parm in names(codistribution_lai$vmin_0)){
       v_star <- get_codistributions(V = input_prosail[[parm]],
                                    lai = input_prosail$lai,
@@ -94,6 +105,11 @@ t_gauss_parms$sd <- data.frame('lai' = 3, 'lidf_a' = 30, 'hotspot' = 0.5,
                              max = geom_acq['tto', 'max'])
   input_prosail$psi <- runif(n = nb_samples, min = geom_acq['psi', 'min'],
                              max = geom_acq['psi', 'max'])
+
+  # soil ID
+  input_prosail$soil_brightness <- 1
+  input_prosail$soil_ID <- sample(x = 47, size = nb_samples, replace = T)
+
   # default values
   input_prosail$type_lidf <- 2
   input_prosail$alpha <- 40

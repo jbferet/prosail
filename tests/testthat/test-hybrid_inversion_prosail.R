@@ -24,7 +24,7 @@ test_that("hybrid inversion ok", {
   res <- generate_lut_prosail(SAILversion = '4SAIL',
                               input_prosail = input_prosail,
                               spec_prospect = spec_prospect_fullrange,
-                              spec_soil = prosail::spec_soil,
+                              spec_soil = prosail::spec_soil_ossl,
                               spec_atm = prosail::spec_atm)
   brf_lut_1nm <- res$brf
   brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda,

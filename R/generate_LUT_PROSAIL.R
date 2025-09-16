@@ -3,8 +3,8 @@
 #'
 #' @param input_prosail list. PROSAIL input variables
 #' @param spec_prospect list. Includes optical constants required for PROSPECT
-#' @param spec_soil list. Includes either dry soil and wet soil, or a unique
-#' soil sample if the psoil parameter is not inverted
+#' @param spec_soil list. Includes either a set of OSSL library reflectance
+#' spectra, or minimum reflectance and maximum reflectance
 #' @param spec_atm list. direct and diffuse radiation for clear conditions
 #' @param band_names character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
@@ -32,9 +32,18 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
       format = "Generate LUT [:bar] :percent in :elapsed",
       total = 10, clear = FALSE, width= 100)
   for (i in seq_len(nb_samples)){
-    if (progress & i %% split_nb == 0 & nb_samples>100) pb$tick()
-    rsoil <- input_prosail[i,]$psoil*spec_soil$max_refl +
-      (1-input_prosail[i,]$psoil)*spec_soil$min_refl
+
+    if (progress & i %% split_nb == 0 & nb_samples>100)
+      pb$tick()
+    if (!is.null(input_prosail[i,]$soil_brightness) &
+        !is.null(input_prosail[i,]$soil_ID)){
+      rsoil <- input_prosail[i,]$soil_brightness*
+        spec_soil[[input_prosail[i,]$soil_ID+1]]
+    } else if (is.null(input_prosail[i,]$soil_brightness) &
+               ! is.null(input_prosail[i,]$psoil)){
+      rsoil <- input_prosail[i,]$psoil*spec_soil$max_refl +
+        (1-input_prosail[i,]$psoil)*spec_soil$min_refl
+    }
     # if 4SAIL
     if (SAILversion=='4SAIL'){
       refl_sail <- prosail(spec_sensor = spec_prospect,
@@ -53,7 +62,7 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                            type_lidf = input_prosail[i,]$type_lidf,
                            lidf_a = input_prosail[i,]$lidf_a,
                            lidf_b = input_prosail[i,]$lidf_b,
-                           lai = input_prosail[i,]$lai, 
+                           lai = input_prosail[i,]$lai,
                            hotspot = input_prosail[i,]$hotspot,
                            tts = input_prosail[i,]$tts,
                            tto = input_prosail[i,]$tto,

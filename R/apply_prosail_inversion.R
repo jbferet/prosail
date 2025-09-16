@@ -197,8 +197,13 @@ apply_prosail_inversion <- function(raster_path, hybrid_model, output_path,
           for (modind in seq_len(length(hybrid_model[[parm]]))){
             if (progressBar == TRUE)
               pb$tick()
-            estimates[[modind]] <- predict(hybrid_model[[parm]][[modind]],
-                                           block_val)
+            if (!inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
+              estimates[[modind]] <- predict(hybrid_model[[parm]][[modind]],
+                                             block_val)
+            } else if (inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
+              estimates[[modind]] <- kernlab::predict(object = hybrid_model[[parm]][[modind]],
+                                                      block_val)
+            }
           }
           estimates <- do.call(cbind,estimates)
           # final estimated value = mean parm value for all models

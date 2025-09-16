@@ -28,8 +28,14 @@ merit_rmse_prosail <- function(xinit, parms_xinit, brf_mes,
   input_prosail[parms_to_estimate] <- xinit[match(parms_xinit,
                                                   parms_to_estimate)]
   xprior <- input_prosail[parms_to_prior]
-  rsoil <- input_prosail$psoil*spec_soil_sensor$max_refl +
-    (1-input_prosail$psoil)*spec_soil_sensor$min_refl
+
+  if (!is.null(input_prosail$soil_brightness)){
+    rsoil <- input_prosail$soil_brightness*spec_soil_sensor$refl
+  } else if (is.null(input_prosail$soil_brightness) &
+             ! is.null(input_prosail$psoil)){
+    rsoil <- input_prosail$psoil*spec_soil_sensor$max_refl +
+      (1-input_prosail$psoil)*spec_soil_sensor$min_refl
+  }
   # call PROSAIL to get reflectance from 4 fluxes
   refl <- prosail(spec_sensor = spec_prospect_sensor,
                   input_prospect = input_prosail,

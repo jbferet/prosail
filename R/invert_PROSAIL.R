@@ -31,6 +31,12 @@ invert_prosail  <- function(brf_mes, initialization = NULL, lower_bound,
                                            lower_bound = lower_bound,
                                            upper_bound = upper_bound,
                                            parm_set = parm_set)
+
+  # set names for spec_soil_sensor if needed
+  if (length(names(spec_soil_sensor)) == 2 &
+      !all(names(spec_soil_sensor) %in% c('lambda', 'refl')))
+    names(spec_soil_sensor) <- c('lambda', 'refl')
+
   parms_to_prior <- NULL
   if (!is.null(prior_info)){
     prior_info_sort <- which_parm_prior(prior_mean = prior_info$mean,

@@ -3,7 +3,7 @@
 \docType{data}
 \name{spec_atm}
 \alias{spec_atm}
-\title{soil reflectance for PROSAIL simulations}
+\title{direct and diffuse light for PROSAIL simulations}
 \format{
 A dataframe including 2101 rows and 10 columns
 \itemize{
@@ -16,6 +16,7 @@ A dataframe including 2101 rows and 10 columns
 spec_atm
 }
 \description{
-corresponds to spectral bands, dry soil and wet soil
+corresponds to spectral bands, direct radiation solar spectra, diffuse
+radiation solar spectra
 }
 \keyword{datasets}

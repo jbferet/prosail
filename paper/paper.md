@@ -281,7 +281,7 @@ lidf_a <- 30    # average leaf angle (degrees)
 tts <- 30       # geometry of acquisition: sun zenith angle (degrees)
 tto <- 10       # geometry of acquisition: observer zenith angle (degrees)
 psi <- 90       # geometry of acquisition: sun-observer azimuth (degrees)
-rsoil <- spec_soil$max_refl # soil reflectance
+rsoil <- spec_soil_ossl$soil_01 # soil reflectance selected from OSSL library
 
 # run PROSAIL with 4SAIL
 ref_4sail <- prosail(input_prospect = input_prospect, 
@@ -433,11 +433,12 @@ ub <- data.frame('chl' = 80, 'car' = 20, 'ewt' = 0.03, 'lma' = 0.03,
                  'lai' = 6, 'lidf_a' = 80, 'n_struct' = 3)
 
 # define parameters set for inversion
-parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
+parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60, 'soil_brightness' = 1,
                        'ant' = 0, 'brown' = 0, 'hotspot' = 0.1)
 
-# compute soil reflectance
-rsoil <- parm_set$psoil*spec_soil$max_refl+(1-parm_set$psoil)*spec_soil$min_refl
+# define soil reflectance (set as prior knowledge) and spec_soil variable
+rsoil <- parm_set$soil_brightness*spec_soil_ossl$soil_01
+spec_soil <- cbind(spec_soil_ossl$lambda, rsoil)
 
 # simulate canopy BRF with 1 nm sampling
 truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
@@ -456,7 +457,8 @@ est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                           lower_bound = lb, upper_bound = ub, type_lidf = 2, 
                           spec_prospect_sensor = spec_prospect_fullrange,
                           spec_atm_sensor = spec_atm, 
-                          spec_soil_sensor = spec_soil, parm_set = parm_set)
+                          spec_soil_sensor = spec_soil, 
+                          parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
 srf_s2 <- get_radiometry(sensor_name = 'Sentinel_2A')
@@ -511,7 +513,7 @@ prior_info <- list('mean' = data.frame('lidf_a' = 60),
 est_1nm_p <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                             lower_bound = lb, upper_bound = ub,
                             spec_prospect_sensor = spec_prospect_fullrange,
-                            spec_atm_sensor = spec_soil, 
+                            spec_atm_sensor = spec_atm, 
                             spec_soil_sensor = spec_soil,
                             type_lidf = 2, parm_set = parm_set,
                             prior_info =  prior_info)

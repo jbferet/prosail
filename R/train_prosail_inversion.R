@@ -24,8 +24,8 @@
 #' @param noise_level list. noise added to reflectance (defined per input parm)
 #' @param srf list. Spectral response function
 #' @param spec_prospect list. Includes optical constants required for PROSPECT
-#' @param spec_soil list. Includes either dry soil and wet soil, or a unique
-#' soil sample if the psoil parameter is not inverted
+#' @param spec_soil list. Includes either a set of OSSL library reflectance
+#' spectra, or minimum reflectance and maximum reflectance
 #' @param spec_atm list. direct and diffuse radiation for clear conditions
 #' @param output_dir character. path for results
 #' variable during training step
@@ -82,7 +82,7 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
                             'lma' = 0.01, 'brown'=0.0, 'n_struct' = 1.5,
                             'psoil' = 0.5, 'lidf_a' = 60, 'lai' = 2.5, 'hotspot'=0.1,
                             'tto' = 0, 'tts' = 30, 'psi' = 80, 'type_lidf' = 2,
-                            'alpha' = 40)
+                            'alpha' = 40, 'soil_brightness' = 1, 'soil_ID' = 1)
   list_parms <- names(default_val)
 
   ##############################################################################
@@ -141,7 +141,7 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     if (is.null(spec_prospect))
       spec_prospect <- prosail::spec_prospect_fullrange
     if (is.null(spec_soil))
-      spec_soil <- prosail::spec_soil
+      spec_soil <- prosail::spec_soil_ossl
     if (is.null(spec_atm))
       spec_atm <- prosail::spec_atm
     # check if same spectral sampling for all key variables

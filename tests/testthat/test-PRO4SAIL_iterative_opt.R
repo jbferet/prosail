@@ -7,10 +7,10 @@ test_that("PROSAIL iterative optimization", {
   init <- data.frame('chl' = 40, 'car' = 10, 'ewt' = 0.01, 'lma' = 0.01,
                      'lai' = 3, 'n_struct' = 1.5)
   # define parameters which are already set for inversion
-  parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'psoil' = 0,
+  parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60,  'soil_brightness' = 1,
                          'lidf_a' = 60, 'ant' = 0, 'brown' = 0, 'hotspot' = 0.1)
   # compute soil reflectance
-  rsoil <- parm_set$psoil*spec_soil$max_refl+(1-parm_set$psoil)*spec_soil$min_refl
+  rsoil <- parm_set$soil_brightness*spec_soil_ossl$soil_01
   # simulate canopy BRF with 1 nm sampling
   truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
                       'lai' = 5,  'n_struct' = 1.8)
@@ -25,13 +25,15 @@ test_that("PROSAIL iterative optimization", {
                          tts = parm_set$tts,
                          spec_atm_sensor = spec_atm)
   # invert 1 nm data
+  spec_soil_sensor <- spec_soil_ossl[c('lambda', 'soil_01')]
+  names(spec_soil_sensor) <- c('lambda', 'refl')
   est <- invert_prosail(brf_mes = brf_1nm$BRF,
                         initialization = init,
                         lower_bound = lb,
                         upper_bound = ub,
                         spec_prospect_sensor = spec_prospect_fullrange,
                         spec_atm_sensor = spec_atm,
-                        spec_soil_sensor = spec_soil,
+                        spec_soil_sensor = spec_soil_sensor,
                         type_lidf = 2, parm_set = parm_set)
 
   nerr <- list()
