@@ -64,7 +64,7 @@ apply_prosail_inversion <- function(raster_path, mask_path = NULL, hybrid_model,
     for (parm in names(hybrid_model)){
       output_vrt_path <- file.path(output_vrt, paste0(raster_name, '_', parm, '.vrt'))
       bp_path_vrt[[parm]] <- lapply(lapply(bp_path, '[[', 'mean'), '[[', parm)
-      v <- terra::vrt(x = unlist(bp_path_vrt), filename = output_vrt_path, overwrite = TRUE)
+      v <- terra::vrt(x = unlist(bp_path_vrt[[parm]]), filename = output_vrt_path, overwrite = TRUE)
     }
     bp_path <- bp_path_vrt
   }
