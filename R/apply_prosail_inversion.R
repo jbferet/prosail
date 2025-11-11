@@ -24,12 +24,13 @@
 #' @return res character. path for output files corresponding to
 #' biophysical properties
 #' @importFrom tools file_path_sans_ext
+#' @importFrom terra vrt
+#'
 #' @export
 
 apply_prosail_inversion <- function(raster_path, mask_path = NULL, hybrid_model,
                                     output_dir, band_names, selected_bands,
                                     options = NULL){
-
 
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
   # get raster name
@@ -48,7 +49,7 @@ apply_prosail_inversion <- function(raster_path, mask_path = NULL, hybrid_model,
                                                  selected_bands = selected_bands,
                                                  options = options)
 
-  if (options$tiling == TRUE)
+  if (options$tiling == TRUE){
     bp_path <- apply_prosail_inversion_per_tile(raster_path = raster_path,
                                                 mask_path = mask_path,
                                                 hybrid_model = hybrid_model,
@@ -56,7 +57,17 @@ apply_prosail_inversion <- function(raster_path, mask_path = NULL, hybrid_model,
                                                 band_names = band_names,
                                                 selected_bands = selected_bands,
                                                 options = options)
-
+    # create vrt for biophysical properties
+    output_vrt <- file.path(output_dir, 'vrt')
+    dir.create(path = output_vrt, showWarnings = FALSE, recursive = TRUE)
+    bp_path_vrt <- list()
+    for (parm in names(hybrid_model)){
+      output_vrt_path <- file.path(output_vrt, paste0(raster_name, '_', parm, '.vrt'))
+      bp_path_vrt[[parm]] <- lapply(lapply(bp_path, '[[', 'mean'), '[[', parm)
+      v <- terra::vrt(x = unlist(bp_path_vrt), filename = output_vrt_path, overwrite = TRUE)
+    }
+    bp_path <- bp_path_vrt
+  }
   print('processing completed')
   return(bp_path)
 }

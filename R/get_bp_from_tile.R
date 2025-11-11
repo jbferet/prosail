@@ -54,66 +54,69 @@ get_bp_from_tile <- function(individual_plot, plot_id, raster_path, bp_vars,
   bp_var_path <- bp_var_sd_path <- list()
   # for each parameter
   for (parm in bp_vars){
-    # define spectral bands
-    sel_bands <- match(selected_bands[[parm]], band_names)
-    block_val <- rast_val[, sel_bands]
-    if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM') &
-        !inherits(hybrid_model[[parm]][[1]], what = 'ksvm'))
-      colnames(block_val) <- colnames(hybrid_model[[parm]][[1]]$trainingData)[-1]
-
-    rast_mean <- rast_sd <- NA*rast_obj[[1]]
-    names(rast_mean) <- paste('mean', parm)
-    names(rast_sd) <- paste('sd', parm)
-    if (length(sel_pixels)>0){
-      block_val <- block_val/multiplying_factor
-      estimates <- list()
-      for (modind in seq_len(length(hybrid_model[[parm]]))){
-        if (!inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
-          estimates[[modind]] <- stats::predict(hybrid_model[[parm]][[modind]],
-                                         block_val)
-        } else if (inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
-          estimates[[modind]] <- kernlab::predict(object = hybrid_model[[parm]][[modind]],
-                                                  block_val)
-        }
-      }
-      estimates <- do.call(cbind,estimates)
-      # final estimated value = mean parm value for all models
-      mean_estimate <- rowMeans(estimates)
-      # 'uncertainty' = STD value for all models
-      sd_estimate <- matrixStats::rowSds(estimates)
-      rast_mean[sel_pixels] <- mean_estimate
-      rast_sd[sel_pixels] <- sd_estimate
-    }
-
+    # define file name and check if exists
     bp_var_path[[parm]] <- file.path(output_dir, paste(site_name, plot_id,
                                                        parm, sep = '_'))
     output_dir_sd <- file.path(output_dir, 'sd')
     dir.create(path = output_dir_sd, showWarnings = FALSE, recursive = TRUE)
-    bp_var_sd_path[[parm]] <- file.path(output_dir_sd,paste(site_name, plot_id,
-                                                         parm, 'sd', sep = '_'))
-
+    bp_var_sd_path[[parm]] <- file.path(output_dir_sd, paste(site_name, plot_id,
+                                                             parm, 'sd', sep = '_'))
     if (filetype %in% c('GTiff', 'COG')){
       bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
       bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.tiff')
     }
 
-    terra::writeRaster(x = rast_mean, filename = bp_var_path[[parm]],
-                       filetype = filetype, overwrite = TRUE,
-                       gdal=c("COMPRESS=DEFLATE", "TFW=YES"))
-    terra::writeRaster(x = rast_sd, filename = bp_var_sd_path[[parm]],
-                       filetype = filetype, overwrite = TRUE,
-                       gdal=c("COMPRESS=DEFLATE", "TFW=YES"))
+    # if files do not exist
+    if (! file.exists(bp_var_path[[parm]]) & ! file.exists(bp_var_sd_path[[parm]])){
+      # define spectral bands
+      sel_bands <- match(selected_bands[[parm]], band_names)
+      block_val <- rast_val[, sel_bands]
+      if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM') &
+          !inherits(hybrid_model[[parm]][[1]], what = 'ksvm'))
+        colnames(block_val) <- colnames(hybrid_model[[parm]][[1]]$trainingData)[-1]
 
-    # write biophysical variable name in headers
-    if (filetype %in% c('EHdr', 'ENVI')){
-      hdr <- read_envi_header(get_hdr_name(bp_var_path[[parm]]))
-      hdr$`band names` <- paste('{',parm,'}',sep = '')
-      write_envi_header(hdr, get_hdr_name(bp_var_path[[parm]]))
-      hdr <- read_envi_header(get_hdr_name(bp_var_sd_path[[parm]]))
-      hdr$`band names` <- paste('{',parm,'}',sep = '')
-      write_envi_header(hdr, get_hdr_name(bp_var_sd_path[[parm]]))
-      bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.envi')
-      bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.envi')
+      rast_mean <- rast_sd <- NA*rast_obj[[1]]
+      names(rast_mean) <- paste('mean', parm)
+      names(rast_sd) <- paste('sd', parm)
+      if (length(sel_pixels)>0){
+        block_val <- block_val/multiplying_factor
+        estimates <- list()
+        for (modind in seq_len(length(hybrid_model[[parm]]))){
+          if (!inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
+            estimates[[modind]] <- stats::predict(hybrid_model[[parm]][[modind]],
+                                                  block_val)
+          } else if (inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
+            estimates[[modind]] <- kernlab::predict(object = hybrid_model[[parm]][[modind]],
+                                                    block_val)
+          }
+        }
+        estimates <- do.call(cbind,estimates)
+        # final estimated value = mean parm value for all models
+        mean_estimate <- rowMeans(estimates)
+        # 'uncertainty' = STD value for all models
+        sd_estimate <- matrixStats::rowSds(estimates)
+        rast_mean[sel_pixels] <- mean_estimate
+        rast_sd[sel_pixels] <- sd_estimate
+      }
+
+      terra::writeRaster(x = rast_mean, filename = bp_var_path[[parm]],
+                         filetype = filetype, overwrite = TRUE,
+                         gdal=c("COMPRESS=DEFLATE", "TFW=YES"))
+      terra::writeRaster(x = rast_sd, filename = bp_var_sd_path[[parm]],
+                         filetype = filetype, overwrite = TRUE,
+                         gdal=c("COMPRESS=DEFLATE", "TFW=YES"))
+
+      # write biophysical variable name in headers if ENVI type
+      if (filetype %in% c('EHdr', 'ENVI')){
+        hdr <- read_envi_header(get_hdr_name(bp_var_path[[parm]]))
+        hdr$`band names` <- paste('{',parm,'}',sep = '')
+        write_envi_header(hdr, get_hdr_name(bp_var_path[[parm]]))
+        hdr <- read_envi_header(get_hdr_name(bp_var_sd_path[[parm]]))
+        hdr$`band names` <- paste('{',parm,'}',sep = '')
+        write_envi_header(hdr, get_hdr_name(bp_var_sd_path[[parm]]))
+        bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.envi')
+        bp_var_sd_path[[parm]] <- paste0(bp_var_sd_path[[parm]],'.envi')
+      }
     }
   }
   if (!is.null(p))
