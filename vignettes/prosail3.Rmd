@@ -123,10 +123,10 @@ __Sentinel-2A__, __Sentinel-2B__, __Landsat 7__, __Landsat 8__, __Landsat 9__,
 __Venus__, __MODIS__, __Pleiades 1A__, __Pleiades 1B__ and __SPOT 6-7__.
 
 The SRF of these sensors can then be obtained by calling the function 
-`get_radiometry` and providing the name of the sensor of interest as input 
+`get_spectral_response_function` and providing the name of the sensor of interest as input 
 variable `sensor_name`.
 
-Alternatively, SRF can be computed from `get_radiometry` by defining a list 
+Alternatively, SRF can be computed from `get_spectral_response_function` by defining a list 
 `spectral_properties` including `wl` which corresponds to the central wavelength and 
 `fwhm` which corresponds to the fwhm. 
 In this case, the sensor bands are assumed to have a gaussian response.
@@ -162,16 +162,16 @@ estimation of lai, chl, ewt and lma when using Sentinel-2 data.
 library(prosail)
 # get sensor response for Sentinel-2
 sensor_name <- 'Sentinel_2'
-srf <- get_radiometry(sensor_name)
+srf <- get_spectral_response_function(sensor_name)
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
 
 # define spectral bands required to train SVR model for each variable
-Bands2Select <- list()
+selected_bands <- list()
 for (parm in parms_to_estimate){
   S2BandSelect <- c('B3','B4','B5','B6','B7','B8','B11','B12')
-  Bands2Select[[parm]] <- match(S2BandSelect,srf$spectral_bands)
+  selected_bands[[parm]] <- match(S2BandSelect,srf$spectral_bands)
 }
 
 # define output directory where LUTs will be saved
@@ -187,7 +187,7 @@ geom_acq$max <- data.frame('tto' = 10, 'tts' = 30, 'psi' = 360)
 modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                     atbd = TRUE, geom_acq = geom_acq, 
                                     srf = srf, 
-                                    Bands2Select = Bands2Select, 
+                                    selected_bands = selected_bands, 
                                     output_dir = PROSAIL_ResPath)
 ```
 
@@ -397,7 +397,7 @@ modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                     minval = minval, maxval = maxval, 
                                     type_distrib = type_distrib, 
                                     gaussian_distrib = gaussian_distrib, 
-                                    Bands2Select = Bands2Select, 
+                                    selected_bands = selected_bands, 
                                     noise_level = noise_level, 
                                     output_dir = PROSAIL_ResPath)
 ```
@@ -439,7 +439,7 @@ rownames(brf_lut) <- srf$spectral_bands
 ```{r Noise_user}
 brf_lut_noise <- modelSVR <- list()
 for (parm in parms_to_estimate){
-  subsetRefl <- brf_lut[Bands2Select[[parm]],]
+  subsetRefl <- brf_lut[selected_bands[[parm]],]
   brf_lut_noise[[parm]] <- subsetRefl + 
     subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),
                             0,noise_level[[parm]]),

@@ -33,7 +33,13 @@ prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
       total = nb_bagg, clear = FALSE, width= 100)
   }
   for (i in seq_len(nb_bagg)){
-    estimated_val[[i]] <- predict(regression_models[[i]], refl)
+    if (!inherits(regression_models[[i]], what = 'ksvm')){
+      estimated_val[[i]] <- stats::predict(object = regression_models[[i]],
+                                           refl)
+    } else if (inherits(regression_models[[i]], what = 'ksvm')){
+      estimated_val[[i]] <- kernlab::predict(object = regression_models[[i]],
+                                             refl)
+    }
     if (progressBar == TRUE)
       pb$tick()
   }

@@ -40,7 +40,10 @@ Imports:
     truncnorm,
     magrittr,
     stringr,
-    kernlab
+    kernlab,
+    terra,
+    sf,
+    progressr
 Remotes: github::jbferet/prospect, 
          gitlab::jbferet/bigRaster
 VignetteBuilder: knitr

@@ -139,7 +139,7 @@ library(prosail)
 output_dir_BP <- './PROSAIL'
 # get sensor response for Sentinel-2
 sensor_name <- 'Sentinel_2'
-srf <- get_radiometry(sensor_name)
+srf <- get_spectral_response_function(sensor_name)
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
@@ -169,23 +169,28 @@ geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
 # train regression model
 # set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in 
 # the R package caret instead of liquidSVM
+options <- set_options_prosail(fun = 'train_prosail_inversion')
+options$method <- 'liquidSVM'
 modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                     atbd = TRUE, geom_acq = geom_acq, srf = srf, 
                                     selected_bands = selected_bands, 
                                     output_dir = output_dir_BP, 
-                                    method = 'liquidSVM')
+                                    method = options$method)
 
 # apply regression model on Sentinel-2 raster data
 # S2 imagery is provided with reflectance defined as integer between 0 and 10000
 # Adapt multiplying_factor if not the case 
 # multiplying_factor = 1 if reflectance defined between 0 and 1
+options <- set_options_prosail(fun = 'apply_prosail_inversion',
+                               options = options)
+options$multiplying_factor = 10000
 BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
                                   hybrid_model = modelSVR, 
-                                  output_path = output_dir_BP,
+                                  output_dir = output_dir_BP,
                                   selected_bands = selected_bands, 
-                                  bandname = srf$spectral_bands, 
+                                  band_names = srf$spectral_bands, 
                                   mask_path = vegetation_mask, 
-                                  multiplying_factor = 10000)
+                                  options = options)
 ```
 
 

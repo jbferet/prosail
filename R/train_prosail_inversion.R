@@ -1,58 +1,67 @@
 #' This function performs full training for hybrid inversion using SVR with
 #' values for default parameters
 #'
-#' @param input_prosail list. user-defined list of input parameters to be used
-#' to produce a training LUT
-#' @param brf_lut list. user-defined BRF LUT used to run the hybrid inversion
-#' @param atbd boolean. should input parameter distribution from ATBD be
-#' applied ?
-#' @param geom_acq list. geometry of acquisition: min and max tts, tto & psi
-#' @param codistribution_lai boolean. TRUE: codistrib with LAI accounted for
+#' @param input_prosail list. input parameters to produce a training LUT
+#' @param atbd boolean. apply input parameter distribution from ATBD
 #' @param minval list. min val for input parms sampled to produce a training LUT
 #' @param maxval list. max val for input parms sampled to produce a training LUT
-#' @param type_distrib  list. Type of distribution. 'Uniform' or 'Gaussian'
-#' @param gaussian_distrib  list. Mean value and STD corresponding to the
-#' parameters sampled with gaussian distribution
-#' @param parm_set list. list of input parameters set to a specific value
-#' @param SAILversion character. Either 4SAIL or 4SAIL2
-#' @param brown_lop character. Either 4SAIL or 4SAIL2
-#' @param nb_samples numeric. number of samples in training LUT
-#' @param nb_models numeric. number of individual models to be run for ensemble
-#' @param replacement bolean. is there replacement in subsampling?
+#' @param output_dir character. path for results
+#' @param brf_lut list. user-defined BRF LUT used to run the hybrid inversion
+#' @param geom_acq list. geometry of acquisition: min and max tts, tto & psi
+#' @param srf list. Spectral response function obtained from
 #' @param parms_to_estimate list. list of input parameters to be estimated
 #' @param selected_bands list. bands used for regression for each input param
-#' @param noise_level list. noise added to reflectance (defined per input parm)
-#' @param srf list. Spectral response function
-#' @param spec_prospect list. Includes optical constants required for PROSPECT
-#' @param spec_soil list. Includes either a set of OSSL library reflectance
-#' spectra, or minimum reflectance and maximum reflectance
-#' @param spec_atm list. direct and diffuse radiation for clear conditions
-#' @param output_dir character. path for results
-#' variable during training step
-#' @param method character. which machine learning regression method should be
-#' used?
+#' @param options list. options for train_prosail_inversion
+#' - codistribution_lai boolean. TRUE: codistrib with LAI accounted for
+#' - type_distrib  list. Type of distribution. 'Uniform' or 'Gaussian'
+#' - gaussian_distrib  list. Mean value and STD corresponding to the
+#' parameters sampled with gaussian distribution
+#' - parm_set list. list of input parameters set to a specific value
+#' - SAILversion character. Either 4SAIL or 4SAIL2
+#' - brown_lop character. Either 4SAIL or 4SAIL2
+#' - nb_samples numeric. number of samples in training LUT
+#' - nb_models numeric. number of individual models to be run for ensemble
+#' - replacement bolean. is there replacement in subsampling?
+#' - noise_level list. noise added to reflectance (defined per input parm)
+#' - spec_prospect list. Includes optical constants required for PROSPECT
+#' - spec_soil list. Includes either a set of OSSL library reflectance spectra,
+#' or minimum reflectance and maximum reflectance
+#' - spec_atm list. direct and diffuse radiation for clear conditions variable
+#' during training step
+#' - method character. which machine learning regression method should be used?
 #' default = SVM with liquidSVM. svmRadial and svmLinear from caret package also
 #' implemented. More to come
-#' @param verbose boolean. when set to TRUE, prints message if hyperparameter
+#' - verbose boolean. when set to TRUE, prints message if hyperparameter
 #' adjustment performed during training
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of
 #' input_variables based on brf_lut
 #' @export
 
-train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
-                                    atbd = FALSE, geom_acq = NULL, srf = NULL,
-                                    codistribution_lai = TRUE, minval = NULL,
-                                    maxval = NULL, type_distrib = NULL,
-                                    gaussian_distrib = NULL, parm_set = NULL,
-                                    SAILversion = '4SAIL', brown_lop = NULL,
-                                    nb_samples = 2000, nb_models = 20,
-                                    replacement = TRUE,
+train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
+                                    minval = NULL, maxval = NULL,
+                                    output_dir = './', brf_lut = NULL,
+                                    geom_acq = NULL, srf = NULL,
                                     parms_to_estimate = 'lai',
-                                    selected_bands = NULL, noise_level = NULL,
-                                    spec_prospect = NULL, spec_soil = NULL,
-                                    spec_atm = NULL, output_dir = './',
-                                    method = 'liquidSVM', verbose = FALSE){
+                                    selected_bands = NULL, options = NULL){
+
+  options <- set_options_prosail(fun = 'train_prosail_inversion',
+                                 options = options)
+  codistribution_lai <- options$codistribution_lai
+  type_distrib <- options$type_distrib
+  gaussian_distrib <- options$gaussian_distrib
+  parm_set <- options$parm_set
+  SAILversion <- options$SAILversion
+  brown_lop <- options$brown_lop
+  nb_samples <- options$nb_samples
+  nb_models <- options$nb_models
+  replacement <- options$replacement
+  noise_level <- options$noise_level
+  spec_prospect <- options$spec_prospect
+  spec_soil <- options$spec_soil
+  spec_atm <- options$spec_atm
+  method <- options$method
+  verbose <- options$verbose
 
   # create output directory
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
@@ -123,6 +132,8 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
                                        nb_samples = nb_samples,
                                        verbose = verbose)
   }
+  # fix waiting for soil samples update
+  input_prosail$soil_brightness <- input_prosail$soil_ID <- NULL
 
   if (!is.null(brf_lut)){
     for (parm in parms_to_estimate){
@@ -140,8 +151,11 @@ train_prosail_inversion <- function(input_prosail = NULL, brf_lut = NULL,
     # define default spec_prospect, spec_soil and spec_atm if undefined
     if (is.null(spec_prospect))
       spec_prospect <- prosail::spec_prospect_fullrange
-    if (is.null(spec_soil))
+    if (is.null(spec_soil) & !is.null(input_prosail$soil_ID)){
       spec_soil <- prosail::spec_soil_ossl
+    } else {
+      spec_soil <- prosail::spec_soil
+    }
     if (is.null(spec_atm))
       spec_atm <- prosail::spec_atm
     # check if same spectral sampling for all key variables

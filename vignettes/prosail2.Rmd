@@ -239,7 +239,7 @@ sensor_name <- 'Sentinel_2A'
 # if interested in a different satellite, please use srf_path to 
 # locate the SRF file expected to be named 'sensor_name_spectral_response.csv' 
 # (separator = tabulations)
-SRF_S2 <- get_radiometry(sensor_name,srf_path = NULL)
+SRF_S2 <- get_spectral_response_function(sensor_name,srf_path = NULL)
 ```
 
 Other satellites can be simulated as long as the SRF is provided as CSV file, 

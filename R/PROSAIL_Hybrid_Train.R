@@ -47,11 +47,11 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
   # run training for each subset
   models_mlr <- list()
 
-  if (progressBar == TRUE){
+  if (progressBar == TRUE)
     pb <- progress_bar$new(
       format = "Training SVR [:bar] :percent in :elapsedfull , eta = :eta",
       total = nb_bagg, clear = FALSE, width= 100)
-  }
+
   brf_lut <- data.frame(brf_lut)
   for (i in seq_len(nb_bagg)){
     training_set <- list()
@@ -69,10 +69,8 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
     training_data <- cbind(target,training_set$X)
 
     if (method == 'liquidSVM'){
-      # liquidSVM
       r1 <- tryCatch.W.E(tuned_model <- liquidSVM::svmRegression(training_set$X,
                                                                  training_set$Y))
-      # tuned_model <- liquidSVM::svmRegression(training_set$X, training_set$Y)
       if (!is.null(r1$warning)){
         msg <- r1$warning$message
         val_gamma <- stringr::str_split(string = msg,
@@ -128,9 +126,9 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
       tuned_model <- kernlab::ksvm(
         target ~ ., data = lut,
         type="nu-svr", kernel="rbfdot",
-        kpar = list(hyperparm_optim$sigma),
-        C = hyperparm_optim$C,
-        nu = hyperparm_optim$nu
+        kpar <- list(hyperparm_optim$sigma),
+        C <- hyperparm_optim$C,
+        nu <- hyperparm_optim$nu
       )
 
     } else if (method %in% c('svmRadial', 'svmLinear')){

@@ -7,91 +7,63 @@ values for default parameters}
 \usage{
 train_prosail_inversion(
   input_prosail = NULL,
-  brf_lut = NULL,
   atbd = FALSE,
-  geom_acq = NULL,
-  srf = NULL,
-  codistribution_lai = TRUE,
   minval = NULL,
   maxval = NULL,
-  type_distrib = NULL,
-  gaussian_distrib = NULL,
-  parm_set = NULL,
-  SAILversion = "4SAIL",
-  brown_lop = NULL,
-  nb_samples = 2000,
-  nb_models = 20,
-  replacement = TRUE,
+  output_dir = "./",
+  brf_lut = NULL,
+  geom_acq = NULL,
+  srf = NULL,
   parms_to_estimate = "lai",
   selected_bands = NULL,
-  noise_level = NULL,
-  spec_prospect = NULL,
-  spec_soil = NULL,
-  spec_atm = NULL,
-  output_dir = "./",
-  method = "liquidSVM",
-  verbose = FALSE
+  options = NULL
 )
 }
 \arguments{
-\item{input_prosail}{list. user-defined list of input parameters to be used
-to produce a training LUT}
+\item{input_prosail}{list. input parameters to produce a training LUT}
 
-\item{brf_lut}{list. user-defined BRF LUT used to run the hybrid inversion}
-
-\item{atbd}{boolean. should input parameter distribution from ATBD be
-applied ?}
-
-\item{geom_acq}{list. geometry of acquisition: min and max tts, tto & psi}
-
-\item{srf}{list. Spectral response function}
-
-\item{codistribution_lai}{boolean. TRUE: codistrib with LAI accounted for}
+\item{atbd}{boolean. apply input parameter distribution from ATBD}
 
 \item{minval}{list. min val for input parms sampled to produce a training LUT}
 
 \item{maxval}{list. max val for input parms sampled to produce a training LUT}
 
-\item{type_distrib}{list. Type of distribution. 'Uniform' or 'Gaussian'}
+\item{output_dir}{character. path for results}
 
-\item{gaussian_distrib}{list. Mean value and STD corresponding to the
-parameters sampled with gaussian distribution}
+\item{brf_lut}{list. user-defined BRF LUT used to run the hybrid inversion}
 
-\item{parm_set}{list. list of input parameters set to a specific value}
+\item{geom_acq}{list. geometry of acquisition: min and max tts, tto & psi}
 
-\item{SAILversion}{character. Either 4SAIL or 4SAIL2}
-
-\item{brown_lop}{character. Either 4SAIL or 4SAIL2}
-
-\item{nb_samples}{numeric. number of samples in training LUT}
-
-\item{nb_models}{numeric. number of individual models to be run for ensemble}
-
-\item{replacement}{bolean. is there replacement in subsampling?}
+\item{srf}{list. Spectral response function obtained from}
 
 \item{parms_to_estimate}{list. list of input parameters to be estimated}
 
 \item{selected_bands}{list. bands used for regression for each input param}
 
-\item{noise_level}{list. noise added to reflectance (defined per input parm)}
-
-\item{spec_prospect}{list. Includes optical constants required for PROSPECT}
-
-\item{spec_soil}{list. Includes either a set of OSSL library reflectance
-spectra, or minimum reflectance and maximum reflectance}
-
-\item{spec_atm}{list. direct and diffuse radiation for clear conditions}
-
-\item{output_dir}{character. path for results
-variable during training step}
-
-\item{method}{character. which machine learning regression method should be
-used?
+\item{options}{list. options for train_prosail_inversion
+\itemize{
+\item codistribution_lai boolean. TRUE: codistrib with LAI accounted for
+\item type_distrib  list. Type of distribution. 'Uniform' or 'Gaussian'
+\item gaussian_distrib  list. Mean value and STD corresponding to the
+parameters sampled with gaussian distribution
+\item parm_set list. list of input parameters set to a specific value
+\item SAILversion character. Either 4SAIL or 4SAIL2
+\item brown_lop character. Either 4SAIL or 4SAIL2
+\item nb_samples numeric. number of samples in training LUT
+\item nb_models numeric. number of individual models to be run for ensemble
+\item replacement bolean. is there replacement in subsampling?
+\item noise_level list. noise added to reflectance (defined per input parm)
+\item spec_prospect list. Includes optical constants required for PROSPECT
+\item spec_soil list. Includes either a set of OSSL library reflectance spectra,
+or minimum reflectance and maximum reflectance
+\item spec_atm list. direct and diffuse radiation for clear conditions variable
+during training step
+\item method character. which machine learning regression method should be used?
 default = SVM with liquidSVM. svmRadial and svmLinear from caret package also
-implemented. More to come}
-
-\item{verbose}{boolean. when set to TRUE, prints message if hyperparameter
-adjustment performed during training}
+implemented. More to come
+\item verbose boolean. when set to TRUE, prints message if hyperparameter
+adjustment performed during training
+}}
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of

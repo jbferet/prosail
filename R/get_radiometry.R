@@ -13,7 +13,7 @@
 #' @importFrom utils read.csv write.table
 #' @export
 
-get_radiometry <- function(sensor_name = 'user_defined',
+get_spectral_response_function <- function(sensor_name = 'user_defined',
                            spectral_properties = NULL,
                            srf_path = './',
                            save_srf = TRUE){
@@ -160,6 +160,6 @@ GetRadiometry <- function(SensorName = 'Custom',
                           SpectralProps = NULL,
                           Path_SensorResponse = './',
                           SaveSRF = TRUE){
-  .Deprecated("get_radiometry")
-  get_radiometry(SensorName, SpectralProps, Path_SensorResponse, SaveSRF)
+  .Deprecated("get_spectral_response_function")
+  get_spectral_response_function(SensorName, SpectralProps, Path_SensorResponse, SaveSRF)
 }

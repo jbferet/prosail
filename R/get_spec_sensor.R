@@ -14,7 +14,7 @@
 get_spec_sensor <- function(sensor_name = 'user_defined',
                             spectral_properties = NULL,
                             srf_path = NULL){
-  srf <- get_radiometry(sensor_name = sensor_name,
+  srf <- get_spectral_response_function(sensor_name = sensor_name,
                         spectral_properties = spectral_properties,
                         srf_path = srf_path)
   if (is.null(srf)) stop()

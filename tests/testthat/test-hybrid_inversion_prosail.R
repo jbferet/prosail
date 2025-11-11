@@ -1,7 +1,7 @@
 test_that("hybrid inversion ok", {
   # get sensor response for Sentinel-2
   sensor_name <- 'Sentinel_2'
-  srf <- get_radiometry(sensor_name)
+  srf <- get_spectral_response_function(sensor_name)
   # define parameters to estimate
   Parms2Estimate <- 'lai'
 
