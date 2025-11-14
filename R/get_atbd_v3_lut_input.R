@@ -84,6 +84,14 @@ get_atbd_v3_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
   # convert cw_rel into ewt
   input_prosail$ewt <- ((input_prosail$lma)/(1-input_prosail$cw_rel)) -
     input_prosail$lma
+
+  # eliminate unrealistic ewt values
+  too_high_ewt <- which(input_prosail$ewt>0.04)
+  if (length(too_high_ewt)>0){
+    sel <- runif(n = length(too_high_ewt), min = 0.004, max = 0.03)
+    input_prosail$ewt[too_high_ewt] <- sel
+  }
+
   # set ANT, PROT and CBC to 0
   input_prosail$ant <- input_prosail$prot <- input_prosail$cbc <- 0
   # set car to 0.25*chl

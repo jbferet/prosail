@@ -14,9 +14,9 @@
 #' @export
 
 get_spectral_response_function <- function(sensor_name = 'user_defined',
-                           spectral_properties = NULL,
-                           srf_path = './',
-                           save_srf = TRUE){
+                                           spectral_properties = NULL,
+                                           srf_path = './',
+                                           save_srf = TRUE){
 
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
@@ -91,8 +91,8 @@ get_spectral_response_function <- function(sensor_name = 'user_defined',
                            sensor_name = sensor_name)
         # save srf as csv
         srf_save <- cbind(srf$original_bands,format(srf$spectral_response,
-                                                   digits = 4,
-                                                   scientific = FALSE))
+                                                    digits = 4,
+                                                    scientific = FALSE))
         colnames(srf_save) <- c('SR_WL',srf$spectral_bands)
         if (save_srf==TRUE){
           path_srf <- file.path(srf_path,

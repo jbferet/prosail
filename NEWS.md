@@ -16,6 +16,7 @@ prepare for JOSS submission
 - add possibility to perform hybrid inversion on raster tiles with terra and vrt
 - change variable names to be consistent with packages preprocS2 and biodivMapR
 - change 'get_radiometry' to 'get_spectral_response_function'
+- adjust range of ewt to avoid extremely high values when calling 'get_atbd_v3_lut_input'
 
 ##fix 
 - fixed bug when introducing OSSL soil and disactivate OSSL for v3 beta
