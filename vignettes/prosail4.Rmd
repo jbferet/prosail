@@ -100,11 +100,13 @@ sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
 
+options <- set_options_preprocS2(fun = 'get_s2_raster')
+options$geom_acq <- TRUE
+options$overwrite <- FALSE
 list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
                             output_dir = output_dir_s2, 
                             path_S2tilinggrid = path_S2tilinggrid, 
-                            siteName = 'Barrax', overwrite = FALSE, 
-                            geomAcq = TRUE)
+                            site_name = 'Barrax', options = options)
 # Sentinel-2 L2A reflectance
 Refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
