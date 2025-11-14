@@ -87,18 +87,20 @@ output_dir_s2 <- './S2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
 # save aoi as vector file
-path_aoi <- 'barrax_aoi.GPKG'
-sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
+aoi_path <- 'barrax_aoi.GPKG'
+sf::st_write(obj = aoi, dsn = aoi_path, driver = 'GPKG')
 
 # get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
 path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
 
 # 3- get S2 acquisition and geometry of acquisition for study area
-list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
+options <- set_options_preprocS2(fun = 'get_s2_raster')
+options$geom_acq <- TRUE
+options$overwrite <- FALSE
+list_files <- get_s2_raster(aoi_path = aoi_path, datetime = datetime, 
                             output_dir = output_dir_s2, 
                             path_S2tilinggrid = path_S2tilinggrid, 
-                            siteName = 'Barrax', overwrite = FALSE, 
-                            geomAcq = TRUE)
+                            site_name = 'Barrax', options = options)
 # Sentinel-2 L2A reflectance
 refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
@@ -154,7 +156,7 @@ selected_bands <- list('lai' = c('B3','B4','B8'),
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
-                                        path_bbox = path_aoi)
+                                        path_bbox = aoi_path)
 # define ranges for zenith angles of acquisition
 geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
                                    'tts' = angles_path$MinAngle['sza'], 
