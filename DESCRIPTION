@@ -43,7 +43,9 @@ Imports:
     kernlab,
     terra,
     sf,
-    progressr
+    progressr,
+    mlr,
+    ParamHelpers
 Remotes: github::jbferet/prospect, 
          gitlab::jbferet/bigRaster
 VignetteBuilder: knitr

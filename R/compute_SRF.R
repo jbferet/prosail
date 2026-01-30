@@ -13,7 +13,7 @@
 compute_srf <- function(wvl, fwhm, sensor_name = 'Custom'){
 
   # define full spectral domain in optical domain
-  lambda <- prosail::spec_prospect_fullrange$lambda
+  lambda <- prosail::spec_prospect_full_range$lambda
   spectral_response <- matrix(0,ncol = length(wvl),nrow = length(lambda))
   for (i in seq_len(length(wvl))){
     y <- dnorm(lambda,wvl[i],fwhm[i]/2.355)

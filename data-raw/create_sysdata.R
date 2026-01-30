@@ -9,18 +9,22 @@
 #'  http://dx.doi.org/10.1016/j.rse.2017.03.004
 #'  https://doi.org/10.1016/j.rse.2020.112173
 #'
-SpecPROSPECT_FullRange <- read.table(file = 'data-raw/dataSpec_PRO.txt',
-                                     header = TRUE,
-                                     sep = '\t')
+
+spec_prospect_full_range <- read.table(file = 'data-raw/dataSpec_PRO_v2.txt',
+                                       header = TRUE,
+                                       sep = '\t')
+# SpecPROSPECT_FullRange <- read.table(file = 'data-raw/dataSpec_PRO.txt',
+#                                      header = TRUE,
+#                                      sep = '\t')
 
 #' calctav_90 & calctav_40: transmissivity of a dielectric plane surface,
 #' averaged over all directions of incidence and over all polarizations for
 #' solid angle of 90 and 40 degrees
 #'
-calctav_90 <- prospect::calctav(90, nr = SpecPROSPECT_FullRange$nrefrac)
-calctav_40 <- prospect::calctav(40, nr = SpecPROSPECT_FullRange$nrefrac)
-SpecPROSPECT_FullRange$calctav_90 <- calctav_90
-SpecPROSPECT_FullRange$calctav_40 <- calctav_40
+calctav_90 <- prospect::calctav(alpha = 90, nr = spec_prospect_full_range$nrefrac)
+calctav_40 <- prospect::calctav(alpha = 40, nr = spec_prospect_full_range$nrefrac)
+spec_prospect_full_range$calctav_90 <- calctav_90
+spec_prospect_full_range$calctav_40 <- calctav_40
 
 # read dataspec file and save it in a dataframe
 dataSoil_Atm <- read.table(file = 'data-raw/dataSpec_SOIL_ATM.txt',
@@ -34,7 +38,7 @@ SpecATM <- data.frame('lambda' = dataSoil_Atm$lambda,
                       'Direct_Light' = dataSoil_Atm$Direct_Light,
                       'Diffuse_Light' = dataSoil_Atm$Diffuse_Light)
 
-usethis::use_data(SpecPROSPECT_FullRange, SpecSOIL, SpecATM,
+usethis::use_data(spec_prospect_full_range, SpecSOIL, SpecATM,
                   internal = FALSE,
                   overwrite = TRUE)
 
@@ -46,16 +50,24 @@ spec_atm <- data.frame('lambda' = dataSoil_Atm$lambda,
                        'direct_light' = dataSoil_Atm$Direct_Light,
                        'diffuse_light' = dataSoil_Atm$Diffuse_Light)
 
-spec_prospect_fullrange <- SpecPROSPECT_FullRange
-usethis::use_data(spec_prospect_fullrange, spec_soil, spec_atm,
+usethis::use_data(spec_soil, spec_atm,
                   internal = FALSE,
                   overwrite = TRUE)
 
+# read soil reflectance from ATBD v2
+# source: Sentinel-2 ATBD v2.1, 2020 https://hal.inrae.fr/hal-05088193v1
+spec_soil_atbd_v2 <- read.table(file = 'data-raw/dataSpec_SOIL_atbd_v2.txt',
+                                header = TRUE,
+                                sep = '\t')
+
+usethis::use_data(spec_soil_atbd_v2,
+                  internal = FALSE,
+                  overwrite = TRUE)
 
 # read soil reflectance from Open Soil Spectral Library (OSSL)
 # source #1: Sentinel-2 ATBD v3, 2023 https://hal.inrae.fr/hal-04884986v1/document
 # source #2: Shepherd et al., 2022 https://doi.org/10.1016/j.soisec.2022.100061
-spec_soil_ossl <- read.table(file = 'data-raw/dataSpec_SOIL_OSSL_ATBD_v3.txt',
+spec_soil_ossl <- read.table(file = 'data-raw/dataSpec_SOIL_atbd_v3_ossl.txt',
                              header = TRUE,
                              sep = '\t')
 

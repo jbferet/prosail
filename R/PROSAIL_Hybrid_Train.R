@@ -6,11 +6,14 @@
 #' @param nb_bagg numeric. nb of individual subsets generated from brf_lut
 #' @param replacement Boolean. subsets generated with / without replacement
 #' @param method character. which machine learning regression method used?
-#' default = SVM with liquidSVM. svmRadial and svmLinear from caret package
-#' also implemented. More to come
+#' default = SVM with liquidSVM.
+#' set nu-svr for RBF SVM with kernlab package
+#' set svmRadial or svmLinear from SVM with caret package
+#' More to come
 #' @param verbose boolean. when set to TRUE, prints message if hyperparameter
 #' adjustment performed during training
 #' @param progressBar boolean. should progressbar be displayed?
+#' @param options list
 #'
 #' @return models_mlr list. ML regression models trained for the retrieval of
 #' input_variables based on brf_lut
@@ -25,8 +28,11 @@
 
 prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
                                  replacement = FALSE, method = 'liquidSVM',
-                                 verbose = FALSE, progressBar = FALSE){
-
+                                 verbose = FALSE, progressBar = FALSE,
+                                 options = NULL){
+  is_liquidSVM_available <- system.file(package = "liquidSVM")
+  if (method == 'liquidSVM' & is_liquidSVM_available=='')
+    method <- 'nu-svr'
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # split the LUT into nb_bagg subsets
   nb_samples <- length(input_variables)
@@ -95,9 +101,9 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
       }
     } else if (method %in% c('nu-svr')){
       # Define parameter grid
-      C_values <- c(0.1, 1, 10)
-      nu_values <- c(0.1, 0.3, 0.5, 0.7)
-      sigma_values <- c(0.001, 0.01, 0.05, 0.1, 0.5)
+      C_values <- c(0.1, 1, 10, 100)
+      nu_values <- c(0.01, 0.1, 0.25, 0.5, 0.75)
+      sigma_values <- c(0.001, 0.01, 0.1, 1, 10)
       best_model <- NULL
       min_err <- Inf
       lut <- data.frame(training_set$X, 'target' = training_set$Y)
@@ -112,13 +118,13 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
               kpar = list(sigma = sigma_val),
               C = C_val,
               nu = nu_val,
-              cross = 10  # Cross-validation folds
+              cross = 5  # Cross-validation folds
             )
             err_cv <- model@cross  # Mean squared error from CV
             if (err_cv < min_err) {  # Negative because it's an error
               min_err <- err_cv
               best_model <- model
-              hyperparm_optim <- list('C' = C_val, 'nu' =nu_val, 'sigma' = sigma_val)
+              optim_parms <- list('C' = C_val, 'nu' =nu_val, 'sigma' = sigma_val)
             }
           }
         }
@@ -126,10 +132,20 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
       tuned_model <- kernlab::ksvm(
         target ~ ., data = lut,
         type="nu-svr", kernel="rbfdot",
-        kpar <- list(hyperparm_optim$sigma),
-        C <- hyperparm_optim$C,
-        nu <- hyperparm_optim$nu
-      )
+        kpar <- list(optim_parms$sigma),
+        C <- optim_parms$C,
+        nu <- optim_parms$nu)
+
+      # # optimize hyperparameters based on bayesian optimization
+      # lut <- data.frame(training_set$X, 'target' = training_set$Y)
+      # optim_parms <- optimize_nusvr(lut = lut, options = options)
+      # # adjust model with tuned parms
+      # tuned_model <- kernlab::ksvm(
+      #   target ~ ., data = lut,
+      #   type="nu-svr", kernel="rbfdot",
+      #   kpar <- list(optim_parms$sigma),
+      #   C <- optim_parms$C,
+      #   nu <- optim_parms$nu)
 
     } else if (method %in% c('svmRadial', 'svmLinear')){
       if (method =='svmRadial')

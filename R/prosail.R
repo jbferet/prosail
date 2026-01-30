@@ -52,9 +52,9 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
                     SAILversion = '4SAIL', brown_lop = NULL){
 
   if (is.null(spec_sensor))
-    spec_sensor <- prosail::spec_prospect_fullrange
+    spec_sensor <- prosail::spec_prospect_full_range
   if (is.null(rsoil))
-    rsoil <- prosail::spec_soil_ossl$soil_01
+    rsoil <- prosail::spec_soil_atbd_v2$soil_01
   #	PROSPECT: LEAF OPTICAL PROPERTIES
   lop <- adjust_prospect_to_sail(sail_version = SAILversion,
                                  spec_sensor = spec_sensor,

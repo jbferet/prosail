@@ -1,4 +1,4 @@
-#' spec_prospect_fullrange: optical constants defined for PROSPECT
+#' spec_prospect_full_range: optical constants defined for PROSPECT
 #'
 #' Corresponds to spectral bands, refractive index and specific absorption
 #' coefficient for each chemica constituent, defined over the spectral domain
@@ -12,16 +12,16 @@
 #' @format A dataframe including 2101 rows and 10 columns
 #'  - *lambda*: wavelength, between 400 nm and 2500 nm
 #'  - *nrefrac*: refractive index
-#'  - *SAC_CHL*: specific absorption coefficient for chlorophylls
-#'  - *SAC_CAR*: specific absorption coefficient for carotenoids
-#'  - *SAC_ANT*: specific absorption coefficient for anthocyanins
-#'  - *SAC_BROWN*: specific absorption coefficient for brown pigments
-#'  - *SAC_EWT*: specific absorption coefficient for water content (EWT)
-#'  - *SAC_LMA*: specific absorption coefficient for dry matter (LMA)
-#'  - *SAC_PROT*: specific absorption coefficient for proteins
-#'  - *SAC_CBC*: specific absorption coefficient for carbon-base constituents
+#'  - *sac_chl*: specific absorption coefficient for chlorophylls
+#'  - *sac_car*: specific absorption coefficient for carotenoids
+#'  - *sac_ant*: specific absorption coefficient for anthocyanins
+#'  - *sac_brown*: specific absorption coefficient for brown pigments
+#'  - *sac_ewt*: specific absorption coefficient for water content (Equivalent Water Thickness)
+#'  - *sac_lma*: specific absorption coefficient for dry matter (Leaf Mass per Area)
+#'  - *sac_prot*: specific absorption coefficient for proteins
+#'  - *sac_cbc*: specific absorption coefficient for carbon-base constituents
 #'  - *calctav_90*: transmissivity of a dielectric plane surface, averaged over
 #'  all directions of incidence & all polarizations for solid angle of 90 deg
 #'  - *calctav_40*: transmissivity of a dielectric plane surface, averaged over
 #'  all directions of incidence & all polarizations for solid angle of 40 deg
-"spec_prospect_fullrange"
+"spec_prospect_full_range"

@@ -133,7 +133,8 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
                                        verbose = verbose)
   }
   # fix waiting for soil samples update
-  input_prosail$soil_brightness <- input_prosail$soil_ID <- NULL
+  if (!options$Bs)
+    input_prosail$soil_brightness <- input_prosail$soil_ID <- NULL
 
   if (!is.null(brf_lut)){
     for (parm in parms_to_estimate){
@@ -150,9 +151,14 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default spec_prospect, spec_soil and spec_atm if undefined
     if (is.null(spec_prospect))
-      spec_prospect <- prosail::spec_prospect_fullrange
+      spec_prospect <- prosail::spec_prospect_full_range
     if (is.null(spec_soil) & !is.null(input_prosail$soil_ID)){
-      spec_soil <- prosail::spec_soil_ossl
+      if (atbd == TRUE | tolower(atbd) == 'v2'){
+        spec_soil <- prosail::spec_soil_atbd_v2
+      } else if (tolower(atbd) == 'v3'){
+        spec_soil <- prosail::spec_soil_atbd_v2
+        # spec_soil <- prosail::spec_soil_ossl
+      }
     } else {
       spec_soil <- prosail::spec_soil
     }
@@ -195,8 +201,10 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
       if (!length(srf$spectral_bands)==nrow(brf_lut)){
         brf_lut <- apply_sensor_characteristics(wvl = wvl, srf = srf,
                                                 input_refl_table = brf_lut)
-        spec_sensor <- prepare_sensor_simulation(spec_prospect, spec_soil,
-                                                 spec_atm, srf)
+        spec_sensor <- prepare_sensor_simulation(spec_prospect = spec_prospect,
+                                                 spec_soil = spec_soil,
+                                                 spec_atm = spec_atm,
+                                                 srf = srf)
       }
       rownames(brf_lut) <- srf$spectral_bands
     }

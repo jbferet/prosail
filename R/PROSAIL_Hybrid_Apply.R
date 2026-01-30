@@ -12,6 +12,7 @@
 #' @importFrom matrixStats rowSds
 #' @importFrom progress progress_bar
 #' @importFrom methods is
+#' @importFrom kernlab xmatrix
 #' @export
 
 prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
@@ -20,8 +21,10 @@ prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
   refl <- t(refl)
   if (inherits(regression_models[[1]], what = 'liquidSVM')){
     nb_features <- regression_models[[1]]$dim
-  } else {
+  } else if (inherits(regression_models[[1]], what = 'train')){
     nb_features <- ncol(regression_models[[1]]$trainingData) - 1
+  } else if (inherits(regression_models[[1]], what = 'ksvm')){
+    nb_features <- ncol(kernlab::xmatrix(regression_models[[1]]))
   }
   if (!ncol(refl)==nb_features & nrow(refl)==nb_features)
     refl <- t(refl)

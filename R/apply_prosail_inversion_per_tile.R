@@ -67,25 +67,25 @@ apply_prosail_inversion_per_tile <- function(raster_path, mask_path = NULL,
   #   parallel::stopCluster(cl)
   #   plan(sequential)
   # } else {
-    handlers("cli")
-    suppressWarnings(with_progress({
-      p <- progressr::progressor(steps = length(plots),
-                                 message = 'compute BP from tiles')
-      bp_var_path <- mapply(FUN = get_bp_from_tile,
-                            individual_plot = plots,
-                            plot_id = as.list(names(plots)),
-                            MoreArgs = list(raster_path = raster_path,
-                                            mask_path = mask_path,
-                                            bp_vars = bp_vars,
-                                            hybrid_model = hybrid_model,
-                                            output_dir = output_dir,
-                                            selected_bands = selected_bands,
-                                            band_names = band_names,
-                                            site_name = site_name,
-                                            multiplying_factor = multiplying_factor,
-                                            filetype = filetype,
-                                            p = p),
-                            SIMPLIFY = F)}))
+  handlers("cli")
+  suppressWarnings(with_progress({
+    p <- progressr::progressor(steps = length(plots),
+                               message = 'compute BP from tiles')
+    bp_var_path <- mapply(FUN = get_bp_from_tile,
+                          individual_plot = plots,
+                          plot_id = as.list(names(plots)),
+                          MoreArgs = list(raster_path = raster_path,
+                                          mask_path = mask_path,
+                                          bp_vars = bp_vars,
+                                          hybrid_model = hybrid_model,
+                                          output_dir = output_dir,
+                                          selected_bands = selected_bands,
+                                          band_names = band_names,
+                                          site_name = site_name,
+                                          multiplying_factor = multiplying_factor,
+                                          filetype = filetype,
+                                          p = p),
+                          SIMPLIFY = F)}))
   # }
   return(bp_var_path)
 }

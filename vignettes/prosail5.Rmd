@@ -42,8 +42,8 @@ sensor response function to all optical constants used in PROSAIL.
 
 ```{r simulate_LUT_Alternative}
 # apply sensor characteristics to PROSPECT optical constants
-wvl <- spec_prospect_fullrange$lambda
-spec_sensor <- apply_sensor_characteristics(wvl,spec_prospect_fullrange,srf)
+wvl <- prosail::spec_prospect_full_range$lambda
+spec_sensor <- apply_sensor_characteristics(wvl,prosail::spec_prospect_full_range,srf)
 # apply sensor characteristics to atmospheric properties
 spec_atm_sensor <- apply_sensor_characteristics(wvl,spec_atm,srf)
 # apply sensor characteristics to soil properties
@@ -54,7 +54,7 @@ This conversion can also be done using a unique function `prepare_sensor_simulat
 
 ```{r conversion_SRF_OptCst}
 # apply sensor characteristics to PROSPECT optical constants
-properties_sensor <- prepare_sensor_simulation(spec_prospect_fullrange,spec_soil,spec_atm,srf)
+properties_sensor <- prepare_sensor_simulation(prosail::spec_prospect_full_range,spec_soil,spec_atm,srf)
 spec_sensor <- properties_sensor$spec_prospect_sensor
 spec_soil_sensor <- properties_sensor$spec_soil_sensor
 spec_atm_sensor <- properties_sensor$spec_atm_sensor
@@ -67,8 +67,8 @@ spec_atm_sensor <- properties_sensor$spec_atm_sensor
 # fwhm is a vector giving fwhm for each band in nanometer
 refl_sensor <- prosail(spec_sensor = spec_sensor,
                        chl = 40, car = 10, ewt = 0.01, ant = 0, lma = 0.01, 
-                       n_struct = 1.5, type_lidf = 2, lidf_a = 50, lai = 4, q = 0.1, 
-                       tts = 27, tto = 0, psi = 100, 
+                       n_struct = 1.5, type_lidf = 2, lidf_a = 50, lai = 4, 
+                       hotspot = 0.1, tts = 27, tto = 0, psi = 100, 
                        rsoil = spec_soil_sensor$max_refl)
 
 # Computes BRF based on outputs from prosail and sun position

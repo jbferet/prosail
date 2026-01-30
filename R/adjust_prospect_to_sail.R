@@ -26,13 +26,30 @@ adjust_prospect_to_sail <- function(sail_version, spec_sensor, input_prospect,
                                     brown_lop = NULL){
 
   # for all versions of 4SAIL: get green vegetation
-  inprospect_green <- prospect::define_Input_PROSPECT(input_prospect[1,],
-                                                      chl[1], car[1], ant[1],
-                                                      brown[1], ewt[1], lma[1],
-                                                      prot[1], cbc[1],
-                                                      n_struct[1], alpha[1])
-  green_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
-                                  Input_PROSPECT = inprospect_green)
+  if (utils::packageVersion("prospect")<'2.0.0'){
+    inprospect_green <- prospect::define_Input_PROSPECT(input_prospect[1,],
+                                                        chl[1], car[1], ant[1],
+                                                        brown[1], ewt[1], lma[1],
+                                                        prot[1], cbc[1],
+                                                        n_struct[1], alpha[1])
+    green_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
+                                    Input_PROSPECT = inprospect_green)
+    names(green_lop) <- c('wvl', 'reflectance', 'transmittance')
+  } else {
+    inprospect_green <- prospect::define_input_prospect(input_prospect = input_prospect[1,],
+                                                        chl = chl[1],
+                                                        car = car[1],
+                                                        ant = ant[1],
+                                                        brown = brown[1],
+                                                        ewt = ewt[1],
+                                                        lma = lma[1],
+                                                        prot = prot[1],
+                                                        cbc = cbc[1],
+                                                        n_struct = n_struct[1],
+                                                        alpha = alpha[1])
+    green_lop <- prospect::prospect(spec_prospect = spec_sensor,
+                                    input_prospect = inprospect_green)
+  }
   if (sail_version =='4SAIL2'){
     if (is.null(input_prospect)){
       input_prospect <- data.frame('chl' = chl, 'car' = car, 'ant' = ant,
@@ -57,9 +74,16 @@ adjust_prospect_to_sail <- function(sail_version, spec_sensor, input_prospect,
           message('1 set only curently defined. Switch to 4SAIL')
           sail_version <- '4SAIL'
         } else {
-          inprospect_brown <- prospect::define_Input_PROSPECT(input_prospect[2,])
-          brown_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
-                                          Input_PROSPECT = inprospect_brown)
+          if (utils::packageVersion("prospect")<'2.0.0'){
+            inprospect_brown <- prospect::define_Input_PROSPECT(input_prospect[2,])
+            brown_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
+                                            Input_PROSPECT = inprospect_brown)
+            names(brown_lop) <- c('wvl', 'reflectance', 'transmittance')
+          } else {
+            inprospect_brown <- prospect::define_input_prospect(input_prospect = input_prospect[2,])
+            brown_lop <- prospect::prospect(spec_prospect = spec_sensor,
+                                            input_prospect = inprospect_brown)
+          }
         }
       }
     }

@@ -12,7 +12,8 @@ prosail_hybrid_train(
   replacement = FALSE,
   method = "liquidSVM",
   verbose = FALSE,
-  progressBar = FALSE
+  progressBar = FALSE,
+  options = NULL
 )
 }
 \arguments{
@@ -25,13 +26,17 @@ prosail_hybrid_train(
 \item{replacement}{Boolean. subsets generated with / without replacement}
 
 \item{method}{character. which machine learning regression method used?
-default = SVM with liquidSVM. svmRadial and svmLinear from caret package
-also implemented. More to come}
+default = SVM with liquidSVM.
+set nu-svr for RBF SVM with kernlab package
+set svmRadial or svmLinear from SVM with caret package
+More to come}
 
 \item{verbose}{boolean. when set to TRUE, prints message if hyperparameter
 adjustment performed during training}
 
 \item{progressBar}{boolean. should progressbar be displayed?}
+
+\item{options}{list}
 }
 \value{
 models_mlr list. ML regression models trained for the retrieval of

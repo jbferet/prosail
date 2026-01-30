@@ -23,11 +23,11 @@ test_that("hybrid inversion ok", {
   # produce LUT
   res <- generate_lut_prosail(SAILversion = '4SAIL',
                               input_prosail = input_prosail,
-                              spec_prospect = spec_prospect_fullrange,
+                              spec_prospect = prosail::spec_prospect_full_range,
                               spec_soil = prosail::spec_soil_ossl,
                               spec_atm = prosail::spec_atm)
   brf_lut_1nm <- res$brf
-  brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda,
+  brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda,
                                           srf = srf,
                                           input_refl_table = brf_lut_1nm)
   # identify spectral bands in LUT
@@ -38,7 +38,7 @@ test_that("hybrid inversion ok", {
   # train model
   modelSVR <- prosail_hybrid_train(brf_lut = brf_lut_noise,
                                    input_variables = input_prosail$lai,
-                                   method = 'svmLinear')
+                                   method = 'nu-svr')
 
   ###########################################################
   # perform prediction based on models in previous steps

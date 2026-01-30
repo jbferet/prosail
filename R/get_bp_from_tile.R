@@ -55,8 +55,11 @@ get_bp_from_tile <- function(individual_plot, plot_id, raster_path, bp_vars,
   # for each parameter
   for (parm in bp_vars){
     # define file name and check if exists
-    bp_var_path[[parm]] <- file.path(output_dir, paste(site_name, plot_id,
-                                                       parm, sep = '_'))
+    output_dir_mean <- file.path(output_dir, 'mean')
+    dir.create(path = output_dir_mean, showWarnings = FALSE, recursive = TRUE)
+    bp_var_path[[parm]] <- file.path(output_dir_mean,
+                                     paste(site_name, plot_id, parm, sep = '_'))
+
     output_dir_sd <- file.path(output_dir, 'sd')
     dir.create(path = output_dir_sd, showWarnings = FALSE, recursive = TRUE)
     bp_var_sd_path[[parm]] <- file.path(output_dir_sd, paste(site_name, plot_id,

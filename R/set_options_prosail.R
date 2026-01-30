@@ -19,6 +19,8 @@ set_options_prosail <- function(fun, options = NULL){
   if (fun == 'train_prosail_inversion'){
     if (is.null(options$codistribution_lai))
       options$codistribution_lai <- TRUE
+    if (is.null(options$Bs))
+      options$Bs <- TRUE
     if (is.null(options$type_distrib))
       options$type_distrib <- NULL
     if (is.null(options$gaussian_distrib))
@@ -34,7 +36,7 @@ set_options_prosail <- function(fun, options = NULL){
     if (is.null(options$nb_models))
       options$nb_models <- 20
     if (is.null(options$replacement))
-      options$replacement <- TRUE
+      options$replacement <- FALSE
     if (is.null(options$noise_level))
       options$noise_level <- NULL
     if (is.null(options$spec_prospect))
@@ -82,6 +84,16 @@ set_options_prosail <- function(fun, options = NULL){
     if (is.null(options$filetype))
       options$filetype <- 'GTiff'
 
+  }
+  if (fun == 'optimize_nusvr'){
+    if (is.null(options$C))
+      options$C <- list('lower' = 0.1, 'upper' = 1000)
+    if (is.null(options$nu))
+      options$nu <- list('lower' = 0.01, 'upper' = 0.75)
+    if (is.null(options$sigma))
+      options$sigma <- list('lower' = 0.01, 'upper' = 10)
+    if (is.null(options$maxit))
+      options$maxit <- 50
   }
   return(options)
 }

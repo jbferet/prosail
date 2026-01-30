@@ -206,7 +206,7 @@ input_prosail <- get_input_prosail(atbd = TRUE,
 ```{r Generate_brf_lut_atbd}
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            spec_prospect = spec_prospect_fullrange,
+                            spec_prospect = prosail::spec_prospect_full_range,
                             spec_soil = spec_soil,
                             spec_atm = spec_atm)
 brf_lut_1nm <- res$brf
@@ -218,7 +218,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_atbd}
-brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda, 
+brf_lut <- apply_sensor_characteristics(wvl = prosail::spec_prospect_full_range$lambda, 
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT
@@ -417,7 +417,7 @@ input_prosail <- get_input_prosail(minval = minval, maxval = maxval,
 ```{r Generate_brf_lut_user}
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
-                            spec_prospect = spec_prospect_fullrange,
+                            spec_prospect = prosail::spec_prospect_full_range,
                             spec_soil = spec_soil,
                             spec_atm = spec_atm)
 brf_lut_1nm <- res$brf
@@ -428,7 +428,7 @@ input_prosail$albedo <- res$albedo
 
 - Apply sensor SRF
 ```{r Apply_SRF_user}
-brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_fullrange$lambda, 
+brf_lut <- apply_sensor_characteristics(wvl = prosail::spec_prospect_full_range$lambda, 
                                         srf = srf, 
                                         input_refl_table = brf_lut_1nm)
 # identify spectral bands in LUT

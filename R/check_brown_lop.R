@@ -8,11 +8,20 @@
 #' @export
 
 check_brown_lop <- function(brown_lop, lambda, input_prospect){
-  if  (!'Reflectance' %in%names(brown_lop) |
-       !'Transmittance' %in%names(brown_lop) |
-       !'wvl' %in%names(brown_lop)){
-    message('brown_lop must include "wvl", "Reflectance" and "Transmittance"')
-    stop()
+  if (utils::packageVersion("prospect")<'2.0.0'){
+    if  (!'Reflectance' %in% names(brown_lop) |
+         !'Transmittance' %in% names(brown_lop) |
+         !'wvl' %in% names(brown_lop)){
+      message('brown_lop must include "wvl", "Reflectance" and "Transmittance"')
+      stop()
+    }
+  } else {
+    if  (!'reflectance' %in% names(brown_lop) |
+         !'transmittance' %in% names(brown_lop) |
+         !'wvl' %in% names(brown_lop)){
+      message('brown_lop must include "wvl", "reflectance" and "transmittance"')
+      stop()
+    }
   }
   # spectral domain for brown vegetation matching input optical domain
   if (length(setdiff(lambda, brown_lop$wvl))>0){

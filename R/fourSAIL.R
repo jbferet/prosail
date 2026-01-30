@@ -36,8 +36,8 @@ fourSAIL  <- function(lop, type_lidf = 2, lidf_a = 60, lidf_b = NULL,
   ############################ #
   #	LEAF OPTICAL PROPERTIES	##
   ############################ #
-  rho <- lop$Reflectance
-  tau <- lop$Transmittance
+  rho <- lop$reflectance
+  tau <- lop$transmittance
 
   #	Geometric quantities
   rd <- pi/180
@@ -202,10 +202,10 @@ fourSAIL  <- function(lop, type_lidf = 2, lidf_a = 60, lidf_b = NULL,
     #	Treatment of the hotspot-effect
     alf <- 1e6
     #	Apply correction 2/(K+k) suggested by F.-M. Breon
-    if (hotspot>0) 
+    if (hotspot>0)
       alf <- (dso/hotspot)*2./(ks+ko)
     # inserted H. Bach 1/3/04
-    if (alf>200) 
+    if (alf>200)
       alf <- 200
     if (alf==0){
       #	The pure hotspot - no shadow
