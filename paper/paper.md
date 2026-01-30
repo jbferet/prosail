@@ -385,7 +385,7 @@ exact SRF.
 
 ```r
 # get the spectral response function (SRF) for Sentinel-2A
-srf_s2 <- get_radiometry('Sentinel_2A')
+srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
 
 # get the SRF corresponding to a sensor defined by user. 
 # Hyperspectral sensor: 10 nm spectral sampling & 10 nm fwhm for all bands
@@ -393,8 +393,8 @@ wl <- seq(400, 2500, by = 10)
 fwhm <- rep(x = 10, length = length(wl))
 spectral_properties = data.frame(wl = wl, fwhm = fwhm)
 sensor_name <- 'Hyperspectral_Sensor'
-srf_hsi <- get_radiometry(sensor_name = sensor_name,
-                          spectral_properties = spectral_properties)
+srf_hsi <- get_spectral_response_function(sensor_name = sensor_name,
+                                          spectral_properties = spectral_properties)
 
 ```
 
@@ -438,7 +438,8 @@ parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60, 'soil_brightness' = 1,
 
 # define soil reflectance (set as prior knowledge) and spec_soil variable
 rsoil <- parm_set$soil_brightness*spec_soil_ossl$soil_01
-spec_soil <- cbind(spec_soil_ossl$lambda, rsoil)
+spec_soil <- data.frame('lambda' = spec_soil_ossl$lambda, 
+                        'refl' = rsoil)
 
 # simulate canopy BRF with 1 nm sampling
 truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
@@ -455,23 +456,23 @@ brf_1nm <- compute_brf(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
 # invert PROSAIL on BRF with 1 nm spectral sampling
 est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                           lower_bound = lb, upper_bound = ub, type_lidf = 2, 
-                          spec_prospect_sensor = spec_prospect_fullrange,
+                          spec_prospect_sensor = spec_prospect_full_range,
                           spec_atm_sensor = spec_atm, 
                           spec_soil_sensor = spec_soil, 
                           parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
-srf_s2 <- get_radiometry(sensor_name = 'Sentinel_2A')
-spec_prospect <- spec_prospect_fullrange
-lambda <- spec_prospect_fullrange$lambda
+srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
+spec_prospect <- spec_prospect_full_range
+lambda <- spec_prospect_full_range$lambda
 brf_S2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
                                        input_refl_table = brf_1nm$BRF)
 spec_prospect_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                                input_refl_table = spec_prospect)
+                                                 input_refl_table = spec_prospect)
 spec_soil_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                            input_refl_table = spec_soil)
+                                             input_refl_table = spec_soil)
 spec_atm_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                           input_refl_table = spec_atm)
+                                            input_refl_table = spec_atm)
 
 # invert PROSAIL on Sentinel-2 BRF
 est_s2 <- invert_prosail(brf_mes = brf_S2, initialization = init,
@@ -512,7 +513,7 @@ prior_info <- list('mean' = data.frame('lidf_a' = 60),
 # function for lidf_a
 est_1nm_p <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                             lower_bound = lb, upper_bound = ub,
-                            spec_prospect_sensor = spec_prospect_fullrange,
+                            spec_prospect_sensor = spec_prospect_full_range,
                             spec_atm_sensor = spec_atm, 
                             spec_soil_sensor = spec_soil,
                             type_lidf = 2, parm_set = parm_set,
@@ -601,7 +602,7 @@ using the three spectral bands corresponding to green channel (B3), red channel
 
 ```r
 # define sensor to simulate with PROSAIL
-srf <- get_radiometry('Sentinel_2')
+srf <- get_spectral_response_function(sensor_name = 'Sentinel_2')
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'fcover', 'fapar')
@@ -612,7 +613,7 @@ for (parm in parms_to_estimate)
   selected_bands[[parm]] <- c('B3','B4','B8')
 
 # define output directory where LUTs will be saved
-prosail_dir <- './HybridInversion'
+prosail_dir <- './hybrid_inversion'
 
 # define ranges for geometry of acquisition
 geom_acq <- list('min' = data.frame('tto' = 0, 'tts' = 20, 'psi' = 0), 
@@ -637,8 +638,8 @@ input_prosail <- get_input_prosail(atbd = TRUE, geom_acq = geom_acq)
 # generate a LUT with 1 nm spectral sampling
 res <- generate_lut_prosail(SAILversion = '4SAIL', 
                             input_prosail = input_prosail,
-                            spec_prospect = spec_prospect_fullrange,
-                            spec_soil = spec_soil, spec_atm = spec_atm)
+                            spec_prospect = spec_prospect_full_range,
+                            spec_soil = spec_soil_atbd_v2, spec_atm = spec_atm)
 
 # include fcover and fAPAR (derived from SAIL reflectance / absortion factors)
 # in the pool of variables to explain
@@ -725,7 +726,7 @@ stac_items <- s2_search(start = "2021-05-13", level = "L2A", tile = "30SWJ")
 
 # download files with sen2proc
 dir.create(path = safe_dir, showWarnings = FALSE, recursive = TRUE)
-safe_path <- cdse_download(stac_items, outdir = safe_dir)
+safe_path <- cdse_download(x = stac_items, outdir = safe_dir)
 
 # define area of interest included in S2 tile
 aoi_bbox <- st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
@@ -758,8 +759,8 @@ geom_acq <- list('min' = data.frame('tto' = min(s2_geom$VZA, na.rm = T),
                                     'psi' = max(abs(s2_geom$SAA-s2_geom$VAA), 
                                                 na.rm = T)))
 # get sensor response for Sentinel-2
-srf <- get_radiometry('Sentinel_2B')
-bandname <- srf$spectral_bands
+srf <- get_spectral_response_function(sensor_name = 'Sentinel_2B')
+band_names <- srf$spectral_bands
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'fcover', 'fapar', 'chl')
@@ -778,13 +779,16 @@ modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                     output_dir = out_BP)
 
 # apply SVR on S2 L2A reflectance
+options <- set_options_prosail(fun = 'apply_prosail_inversion')
+options$multiplying_factor <- 10000
+options$tiling <- TRUE
 BPvars <- apply_prosail_inversion(raster_path = raster_path, 
-                                  hybrid_model = modelSVR, 
-                                  output_path = out_BP,
-                                  selected_bands = selected_bands, 
-                                  bandname = bandname, 
                                   mask_path = mask_path, 
-                                  multiplying_factor = 10000)
+                                  hybrid_model = modelSVR, 
+                                  output_dir = out_BP,
+                                  band_names = band_names, 
+                                  selected_bands = selected_bands, 
+                                  options = options)
 ```
 
 
@@ -797,13 +801,23 @@ implemented in `prosail` are compared to those produced with SNAP in Figure
 ![Biophysical properties estimated with `prosail` vs Biophysical properties estimated with SNAP. \label{fig:SNAP_prosail}](compare_SNAP_prosail.png){ width=90% }
 
 The two methods show relatively good consistency with Pearson correlation 
-coefficient ranging between 0.99 and 1.00 for the three variables.
-Differences remain between the two implementations, including differences in the 
-version of the PROSPECT model (SNAP uses a version anterior to PROSPECT-D), and 
-differences in the soil reflectance used to produce the BRF LUT. 
-These differences between the two approaches contribute to explain the 
-differences observed between corresponding biophysical properties, particularly 
-for lower vegetation cover, for which BRF is more influenced by soil reflectance. 
+coefficient ranging between 0.99 and 1.00 for LAI, and superior to 0.97 for 
+fCover and fAPAR.
+Algorithmic differences remain between the results obtained from the biophysical 
+processor of the SNAP toolbox and the inversion obtained with `prosail`, 
+including: 
+- the version of the PROSPECT model: SNAP uses a version anterior to PROSPECT-D,
+- the machine learning algorithm. 
+
+The differences in the retrieval of the vegetation biophysical properties suggest
+differences in the soil properties accounted for in simulations with low LAI, 
+despite our efforts to reproduce the workflow described in the ATBD [@weiss2020]. 
+
+Additional tests performed over other sites (on both croplands and forests) 
+showed similar performances. 
+
+The availability of open source and fully parameterizable inversion procedures 
+should contribute to improve reproducibility of currently available softwares.
 
 # Conclusion
 
