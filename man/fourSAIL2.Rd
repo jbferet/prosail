@@ -23,21 +23,9 @@ fourSAIL2(
 )
 }
 \arguments{
-<<<<<<< HEAD
-<<<<<<< HEAD
-\item{leafgreen}{list. includes reflectance and transmittance for vegetation #1 (e.g. green vegetation)}
-
-\item{leafbrown}{list. includes reflectance and transmittance for vegetation #2 (e.g. brown vegetation)}
-=======
-\item{leafgreen}{dataframe. leaf optical properties #1 (e.g. green vegetation)}
-
-\item{leafbrown}{dataframe. leaf optical properties #2 (e.g. brown vegetation)}
->>>>>>> dev
-=======
 \item{leafgreen}{dataframe. leaf optical properties #1 (e.g. green veg)}
 
 \item{leafbrown}{dataframe. leaf optical properties #2 (e.g. brown veg)}
->>>>>>> dev
 
 \item{TypeLidf}{numeric. Type of leaf inclination distribution function}
 

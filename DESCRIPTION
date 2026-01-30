@@ -39,7 +39,8 @@ Imports:
     XML,
     truncnorm,
     magrittr,
-    stringr
+    stringr,
+    terra
 Remotes: github::jbferet/prospect, 
          gitlab::jbferet/bigRaster
 VignetteBuilder: knitr
