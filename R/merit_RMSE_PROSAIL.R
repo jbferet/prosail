@@ -2,7 +2,7 @@
 #'
 #' @param xinit numeric. Vector of input variables to estimate
 #' @param parms_xinit character. name of parameters corresponding to xinit
-#' @param brf_mes  numeric. measured BRF
+#' @param refl_mes  numeric. measured surface reflectance
 #' @param spec_prospect_sensor list. Includes optical constants for PROSPECT
 #' @param spec_soil_sensor list. Includes soil reflectance (either 2 references
 #' for optimization of psoil, or a unique spectrun)
@@ -18,7 +18,7 @@
 #'
 #' @return fc estimates of the parameters
 #' @export
-merit_rmse_prosail <- function(xinit, parms_xinit, brf_mes,
+merit_rmse_prosail <- function(xinit, parms_xinit, refl_mes,
                                spec_prospect_sensor, spec_soil_sensor,
                                spec_atm_sensor, parms_to_estimate,
                                input_prosail, type_lidf, prior_info = NULL,
@@ -44,12 +44,14 @@ merit_rmse_prosail <- function(xinit, parms_xinit, brf_mes,
                   lai = input_prosail$lai, hotspot = input_prosail$hotspot,
                   tts = input_prosail$tts, tto = input_prosail$tto,
                   psi = input_prosail$psi, rsoil = rsoil)
-  # Computes BRF based on outputs from PROSAIL and sun position
-  brf_mod <- compute_brf(rdot = refl$rdot, rsot = refl$rsot,
-                         tts = input_prosail$tts,
-                         spec_atm_sensor = spec_atm_sensor)
+  # Computes refl based on outputs from PROSAIL and sun position
+  refl_mod <- compute_surf_refl(rdot = refl$rdot, rsot = refl$rsot,
+                                tts = input_prosail$tts,
+                                spec_atm_sensor = spec_atm_sensor)
   # compute cost
-  fc <- cost_function_rmse_prosail(brf_mes = brf_mes, brf_mod$BRF, xprior,
+  fc <- cost_function_rmse_prosail(refl_mes = refl_mes,
+                                   refl_mod = refl_mod$surf_refl,
+                                   xprior = xprior,
                                    prior_info = prior_info)
   return(fc)
 }

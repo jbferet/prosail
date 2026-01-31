@@ -1,10 +1,10 @@
-#' This function generates a LUT of PROSAIL outputs, including brf, fapar,
+#' This function generates a LUT of PROSAIL outputs, including surface reflectance, fapar,
 #' fcover and albedo, based on a table of input variables for prosail model
 #'
 #' @param input_prosail list. PROSAIL input variables
 #' @param spec_prospect list. Includes optical constants required for PROSPECT
 #' @param spec_soil list. Includes either a set of OSSL library reflectance
-#' spectra, or minimum reflectance and maximum reflectance
+#' spectra, reflectance spectra from S2 ATBD v2, or minimum reflectance and maximum reflectance
 #' @param spec_atm list. direct and diffuse radiation for clear conditions
 #' @param band_names character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
@@ -13,7 +13,7 @@
 #' - Set to NULL if use PROSPECT to generate it
 #' @param progress boolean. set TRUE for progress bar during production of LUT
 #'
-#' @return LUT numeric. list of brf, fcover, fapar and albedo corresponding
+#' @return LUT numeric. list of surf_refl, fcover, fapar and albedo corresponding
 #' to input_prosail
 #' @importFrom progress progress_bar
 #' @export
@@ -24,7 +24,7 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                                  progress = TRUE){
 
   nb_samples <- length(input_prosail[[1]])
-  brf <- list()
+  surf_refl <- list()
   fcover <- fapar <- albedo <- c()
   split_nb <- round(nb_samples/10)
   if (progress)
@@ -74,11 +74,11 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                            zeta = input_prosail[i,]$zeta,
                            brown_lop = brown_lop)
     }
-    # Computes brf based on outputs from PROSAIL and sun position
-    brf[[i]] <- compute_brf(rdot = refl_sail$rdot,
-                            rsot = refl_sail$rsot,
-                            tts = input_prosail$tts[[i]],
-                            spec_atm_sensor = spec_atm)
+    # Computes surf_refl based on outputs from PROSAIL and sun position
+    surf_refl[[i]] <- compute_surf_refl(rdot = refl_sail$rdot,
+                                        rsot = refl_sail$rsot,
+                                        tts = input_prosail$tts[[i]],
+                                        spec_atm_sensor = spec_atm)
     fcover[i] <- refl_sail$fcover
     fapar[i] <- compute_fapar(abs_dir = refl_sail$abs_dir,
                               abs_hem = refl_sail$abs_hem,
@@ -89,8 +89,8 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                                 tts = input_prosail$tts[[i]],
                                 spec_atm_sensor = spec_atm)
   }
-  brf <- do.call(cbind,brf)
-  row.names(brf) <- band_names
-  return(list('brf' = brf, 'fcover' = fcover,
+  surf_refl <- do.call(cbind,surf_refl)
+  row.names(surf_refl) <- band_names
+  return(list('surf_refl' = surf_refl, 'fcover' = fcover,
               'fapar' = fapar, 'albedo' = albedo))
 }

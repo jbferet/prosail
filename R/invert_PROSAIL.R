@@ -1,6 +1,6 @@
 #' Performs PROSAIL inversion using iterative optimization
 #' in order to define estimate a set of user defined parameters
-#' @param brf_mes numeric. measured BRF to be used during inversion
+#' @param refl_mes numeric. measured surface reflectance used during inversion
 #' @param initialization list. Initial guess of parms_to_estimate
 #' @param lower_bound list. Lower bound
 #' @param upper_bound list. Upper bound
@@ -20,7 +20,7 @@
 #' @importFrom pracma fmincon
 #' @export
 
-invert_prosail  <- function(brf_mes, initialization = NULL, lower_bound,
+invert_prosail  <- function(refl_mes, initialization = NULL, lower_bound,
                             upper_bound, spec_prospect_sensor, spec_atm_sensor,
                             spec_soil_sensor, type_lidf, parm_set,
                             merit_function = 'merit_rmse_prosail',
@@ -54,7 +54,7 @@ invert_prosail  <- function(brf_mes, initialization = NULL, lower_bound,
   names(ub) <- names(parms_to_invert$upper_bound)
   res_inv <- fmincon(x0 = xinit, fn = merit_function, gr = NULL,
                      parms_xinit = names(parms_to_invert$initialization),
-                     brf_mes = brf_mes,
+                     refl_mes = refl_mes,
                      spec_prospect_sensor = spec_prospect_sensor,
                      spec_soil_sensor = spec_soil_sensor,
                      spec_atm_sensor = spec_atm_sensor,

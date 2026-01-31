@@ -6,7 +6,7 @@
 #' @param minval list. min val for input parms sampled to produce a training LUT
 #' @param maxval list. max val for input parms sampled to produce a training LUT
 #' @param output_dir character. path for results
-#' @param brf_lut list. user-defined BRF LUT used to run the hybrid inversion
+#' @param refl_lut list. user-defined surface reflectance LUT used to run the hybrid inversion
 #' @param geom_acq list. geometry of acquisition: min and max tts, tto & psi
 #' @param srf list. Spectral response function obtained from
 #' @param parms_to_estimate list. list of input parameters to be estimated
@@ -24,8 +24,8 @@
 #' - replacement bolean. is there replacement in subsampling?
 #' - noise_level list. noise added to reflectance (defined per input parm)
 #' - spec_prospect list. Includes optical constants required for PROSPECT
-#' - spec_soil list. Includes either a set of OSSL library reflectance spectra,
-#' or minimum reflectance and maximum reflectance
+#' - spec_soil list. Includes either a set of OSSL library reflectance
+#' spectra, reflectance spectra from S2 ATBD v2, or minimum reflectance and maximum reflectance
 #' - spec_atm list. direct and diffuse radiation for clear conditions variable
 #' during training step
 #' - method character. which machine learning regression method should be used?
@@ -35,12 +35,12 @@
 #' adjustment performed during training
 #'
 #' @return modelsSVR list. regression models trained for the retrieval of
-#' input_variables based on brf_lut
+#' input_variables based on refl_lut
 #' @export
 
 train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
                                     minval = NULL, maxval = NULL,
-                                    output_dir = './', brf_lut = NULL,
+                                    output_dir = './', refl_lut = NULL,
                                     geom_acq = NULL, srf = NULL,
                                     parms_to_estimate = 'lai',
                                     selected_bands = NULL, options = NULL){
@@ -105,7 +105,7 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
 
     if (atbd == TRUE | !is.null(minval) | !is.null(maxval)){
       if (verbose==TRUE){
-        message('parms to generate BRF LUT provided by user in "input_prosail"')
+        message('parms to generate surface reflectance LUT provided by user in "input_prosail"')
         message('following input variables will be ignored: ')
         message('"atbd" "minval" "maxval" "type_distrib" "gaussian_distrib"')
       }
@@ -136,18 +136,18 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
   if (!options$Bs)
     input_prosail$soil_brightness <- input_prosail$soil_ID <- NULL
 
-  if (!is.null(brf_lut)){
+  if (!is.null(refl_lut)){
     for (parm in parms_to_estimate){
-      if (!is.null(brf_lut[[parm]])){
-        brf_lut_noise[[parm]] <- brf_lut[[parm]]
+      if (!is.null(refl_lut[[parm]])){
+        refl_lut_noise[[parm]] <- refl_lut[[parm]]
       } else {
-        message('Please make sure brf_lut is a list with elements ')
+        message('Please make sure refl_lut is a list with elements ')
         message('corresponding to parms_to_estimate')
       }
     }
   } else {
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
-    ### 2- PRODUCE BRF from input_prosail & ddefault spectral sampling = 1nm  ##
+    ### 2- PRODUCE refl from input_prosail & ddefault spectral sampling = 1nm  ##
     ### == == == == == == == == == == == == == == == == == == == == == == == ###
     # define default spec_prospect, spec_soil and spec_atm if undefined
     if (is.null(spec_prospect))
@@ -166,17 +166,17 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
       spec_atm <- prosail::spec_atm
     # check if same spectral sampling for all key variables
     check_spectral_sampling(spec_prospect, spec_soil, spec_atm)
-    # generate LUT of BRF corresponding to input_prosail, for a sensor
+    # generate LUT of refl corresponding to input_prosail, for a sensor
 
     if (!'fcover' %in% parms_to_estimate &
         !'albedo' %in% parms_to_estimate &
         !'fapar' %in% parms_to_estimate){
-      brf_lut <- generate_lut_brf(SAILversion = SAILversion,
-                                  input_prosail = input_prosail,
-                                  spec_prospect = spec_prospect,
-                                  spec_soil = spec_soil,
-                                  spec_atm = spec_atm,
-                                  brown_lop = brown_lop)
+      refl_lut <- generate_lut_surf_refl(SAILversion = SAILversion,
+                                         input_prosail = input_prosail,
+                                         spec_prospect = spec_prospect,
+                                         spec_soil = spec_soil,
+                                         spec_atm = spec_atm,
+                                         brown_lop = brown_lop)
     } else if ('fcover' %in% parms_to_estimate |
                'albedo' %in% parms_to_estimate |
                'fapar' %in% parms_to_estimate){
@@ -186,7 +186,7 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
                                   spec_soil = spec_soil,
                                   spec_atm = spec_atm,
                                   brown_lop = brown_lop)
-      brf_lut <- res$brf
+      refl_lut <- res$surf_refl
       input_prosail$fcover <- res$fcover
       input_prosail$fapar <- res$fapar
       input_prosail$albedo <- res$albedo
@@ -198,15 +198,15 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     # apply sensor spectral response function if provided
     wvl <- spec_prospect$lambda
     if (!is.null(srf)) {
-      if (!length(srf$spectral_bands)==nrow(brf_lut)){
-        brf_lut <- apply_sensor_characteristics(wvl = wvl, srf = srf,
-                                                input_refl_table = brf_lut)
+      if (!length(srf$spectral_bands)==nrow(refl_lut)){
+        refl_lut <- apply_sensor_characteristics(wvl = wvl, srf = srf,
+                                                 refl = refl_lut)
         spec_sensor <- prepare_sensor_simulation(spec_prospect = spec_prospect,
                                                  spec_soil = spec_soil,
                                                  spec_atm = spec_atm,
                                                  srf = srf)
       }
-      rownames(brf_lut) <- srf$spectral_bands
+      rownames(refl_lut) <- srf$spectral_bands
     }
 
     # write parameters LUT
@@ -216,9 +216,9 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     write.table(x = format(output, digits=3), file = filename,append = FALSE,
                 quote = FALSE, col.names = names(input_prosail),
                 row.names = FALSE, sep = '\t')
-    # Write BRF LUT corresponding to parameters LUT
+    # Write refl LUT corresponding to parameters LUT
     filename <- file.path(output_dir,'PROSAIL_LUT_Reflectance.txt')
-    write.table(x = format(t(brf_lut), digits=5), file = filename,
+    write.table(x = format(t(refl_lut), digits=5), file = filename,
                 append = FALSE, quote = FALSE,
                 col.names = spec_sensor$spec_prospect_sensor$lambda,
                 row.names = FALSE,sep = '\t')
@@ -233,17 +233,17 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     ###     4- add noise to reflectance data                              ###
     ### == == == == == == == == == == == == == == == == == == == == == == ###
     # if noise_level == NULL then use the same strategy than ATBD
-    brf_lut_noise <- list()
+    refl_lut_noise <- list()
     if (is.null(noise_level)){
       if (srf$sensor %in% c('Sentinel_2', 'Sentinel_2A', 'Sentinel_2B')){
-        brf_lut_noise_all <- apply_noise_atbd(brf_lut)
+        refl_lut_noise_all <- apply_noise_atbd(refl_lut = refl_lut)
         for (parm in parms_to_estimate)
-          brf_lut_noise[[parm]] <- brf_lut_noise_all[bands_to_select[[parm]],]
+          refl_lut_noise[[parm]] <- refl_lut_noise_all[bands_to_select[[parm]],]
       } else {
         for (parm in parms_to_estimate) {
           noise_level[[parm]] <- 0.01
-          refl_subset <- brf_lut[bands_to_select[[parm]],]
-          brf_lut_noise[[parm]] <- refl_subset +
+          refl_subset <- refl_lut[bands_to_select[[parm]],]
+          refl_lut_noise[[parm]] <- refl_subset +
             refl_subset*matrix(rnorm(nrow(refl_subset)*ncol(refl_subset),
                                      mean = 0,
                                      sd = noise_level[[parm]]),
@@ -255,8 +255,8 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
       for (parm in parms_to_estimate){
         if (is.null(noise_level[[parm]]))
           noise_level[[parm]] <- 0.01
-        refl_subset <- brf_lut[bands_to_select[[parm]],]
-        brf_lut_noise[[parm]] <- refl_subset +
+        refl_subset <- refl_lut[bands_to_select[[parm]],]
+        refl_lut_noise[[parm]] <- refl_subset +
           refl_subset*matrix(rnorm(nrow(refl_subset)*ncol(refl_subset),
                                    mean = 0,
                                    sd = noise_level[[parm]]),
@@ -274,7 +274,7 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     message(paste('training regression model for', parm))
     ColParm <- which(parm==names(input_prosail))
     input_variables <- input_prosail[[ColParm]]
-    model_svr[[parm]] <- prosail_hybrid_train(brf_lut = brf_lut_noise[[parm]],
+    model_svr[[parm]] <- prosail_hybrid_train(refl_lut = refl_lut_noise[[parm]],
                                               input_variables = input_variables,
                                               nb_bagg = nb_models,
                                               replacement = replacement,

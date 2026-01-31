@@ -2,7 +2,7 @@
 #'
 #' @param regression_models list. regression models produced by
 #' prosail_hybrid_train
-#' @param refl numeric. LUT of BRF used for training
+#' @param refl numeric. LUT of surface reflectance used for training
 #' @param progressBar boolean. should progressbar be displayed?
 #'
 #' @return HybridRes list. Estimated values corresponding to refl. Includes

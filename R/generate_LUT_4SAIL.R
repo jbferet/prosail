@@ -3,7 +3,7 @@
 #' @param input_prosail list. PROSAIL input variables
 #' @param spec_prospect list. Includes optical constants required for PROSPECT
 #' @param spec_soil list. Includes either a set of OSSL library reflectance
-#' spectra, or minimum reflectance and maximum reflectance
+#' spectra, reflectance spectra from S2 ATBD v2, or minimum reflectance and maximum reflectance
 #' @param spec_atm list. direct and diffuse radiation for clear conditions
 #' @param band_names character. Name of the spectral bands of the sensor
 #' @param SAILversion character. choose between 4SAIL and 4SAIL2
@@ -22,7 +22,7 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
                                SAILversion ='4SAIL', brown_lop = NULL){
 
   nb_samples <- length(input_prosail[[1]])
-  rdot <- rsot <- rsdt <- rddt <-  brf <- list()
+  rdot <- rsot <- rsdt <- rddt <-  refl <- list()
   split_nb <- round(nb_samples/10)
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
@@ -73,19 +73,19 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
     rsot[[i]] <- refl_sail$rsot
     rsdt[[i]] <- refl_sail$rsdt
     rddt[[i]] <- refl_sail$rddt
-    # Computes BRF based on outputs from PROSAIL and sun position
-    brf[[i]] <- compute_brf(rdot = refl_sail$rdot, rsot = refl_sail$rsot,
-                            tts = input_prosail$tts[[i]],
-                            spec_atm_sensor = spec_atm)
+    # Computes surface reflectance based on outputs from PROSAIL and sun position
+    refl[[i]] <- compute_surf_refl(rdot = refl_sail$rdot, rsot = refl_sail$rsot,
+                                   tts = input_prosail$tts[[i]],
+                                   spec_atm_sensor = spec_atm)
   }
-  brf <- do.call(cbind,brf)
+  refl <- do.call(cbind,refl)
   rdot <- do.call(cbind,rdot)
   rsot <- do.call(cbind,rsot)
   rsdt <- do.call(cbind,rsdt)
   rddt <- do.call(cbind,rddt)
-  row.names(brf) <- row.names(rdot) <- row.names(rsot) <- band_names
+  row.names(refl) <- row.names(rdot) <- row.names(rsot) <- band_names
   row.names(rsdt) <- row.names(rddt) <- band_names
-  return(list('brf' = brf, 'rdot' = rdot, 'rsot' = rsot,
+  return(list('surface_refl' = refl, 'rdot' = rdot, 'rsot' = rsot,
               'rsdt' = rsdt, 'rddt' = rddt))
 }
 

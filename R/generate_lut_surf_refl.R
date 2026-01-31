@@ -1,9 +1,9 @@
-#' generates a LUT of brf based on a table of input variables for prosail model
+#' generates a LUT of surface reflectance based on a table of input variables for prosail model
 #'
 #' @param input_prosail list. PROSAIL input variables
 #' @param spec_prospect list. Includes optical constants required for PROSPECT
 #' @param spec_soil list. Includes either a set of OSSL library reflectance
-#' spectra, or minimum reflectance and maximum reflectance
+#' spectra, reflectance spectra from S2 ATBD v2, or minimum reflectance and maximum reflectance
 #' @param spec_atm list. Includes direct and diffuse radiation for
 #' clear conditions
 #' @param band_names character. Name of the spectral bands of the sensor
@@ -12,16 +12,16 @@
 #' - WVL, Reflectance, Transmittance
 #' - Set to NULL if use PROSPECT to generate it
 #'
-#' @return brf numeric. matrix of brf corresponding to input_prosail
+#' @return surf_refl numeric. matrix of surf_refl corresponding to input_prosail
 #' @importFrom progress progress_bar
 #' @export
 
-generate_lut_brf <- function(input_prosail, spec_prospect, spec_soil, spec_atm,
-                             band_names = NULL, SAILversion = '4SAIL',
-                             brown_lop = NULL){
+generate_lut_surf_refl <- function(input_prosail, spec_prospect, spec_soil, spec_atm,
+                                   band_names = NULL, SAILversion = '4SAIL',
+                                   brown_lop = NULL){
 
   nb_samples <- length(input_prosail[[1]])
-  brf <- list()
+  surf_refl <- list()
   split_nb <- round(nb_samples/10)
   pb <- progress_bar$new(
     format = "Generate LUT [:bar] :percent in :elapsed",
@@ -68,13 +68,13 @@ generate_lut_brf <- function(input_prosail, spec_prospect, spec_soil, spec_atm,
                       zeta = input_prosail[i,]$zeta,
                       brown_lop = brown_lop)
     }
-    # Computes brf based on outputs from PROSAIL and sun position
-    brf[[i]] <- compute_brf(rdot = refl$rdot,
-                            rsot = refl$rsot,
-                            tts = input_prosail$tts[[i]],
-                            spec_atm_sensor = spec_atm)
+    # Computes surface reflectance based on outputs from PROSAIL and sun position
+    surf_refl[[i]] <- compute_surf_refl(rdot = refl$rdot,
+                                        rsot = refl$rsot,
+                                        tts = input_prosail$tts[[i]],
+                                        spec_atm_sensor = spec_atm)
   }
-  brf <- do.call(cbind,brf)
-  row.names(brf) <- band_names
-  return(brf)
+  surf_refl <- do.call(cbind,surf_refl)
+  row.names(surf_refl) <- band_names
+  return(surf_refl)
 }

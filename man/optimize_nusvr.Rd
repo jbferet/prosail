@@ -7,7 +7,7 @@
 optimize_nusvr(lut, options = NULL)
 }
 \arguments{
-\item{lut}{numeric. LUT of BRF used for training}
+\item{lut}{numeric. LUT of surface reflectance used for training}
 
 \item{options}{numeric. biophysical parameter corresponding to refl}
 }

@@ -1,21 +1,21 @@
-#' This function applies additive and multiplicative noise to BRF data
+#' This function applies additive and multiplicative noise to reflectance
 #' - if additive_noise and multiplicative_noise are defined with a unique value,
 #' noise is homogeneous across all spectrum
 #' - if additive_noise and multiplicative_noise are the same length as the nb
-#' of spectral bands (rows in brf_lut), noise is specific to each spectral band
+#' of spectral bands (rows in refl_lut), noise is specific to each spectral band
 #'
-#' @param brf_lut numeric. BRF LUT
+#' @param refl_lut numeric. reflectance look up table
 #' @param additive_noise numeric. additive noise (0 = 0%, 1 = 100%)
 #' @param multiplicative_noise numeric. multiplicative noise (0 = 0%, 1 = 100%)
 #'
-#' @return brf_lut_noise numeric.
+#' @return refl_lut_noise numeric.
 #' @export
 
-apply_noise_addmult <- function(brf_lut, additive_noise = 0.01,
+apply_noise_addmult <- function(refl_lut, additive_noise = 0.01,
                                 multiplicative_noise = 0.02){
-  nb_wl <- nrow(brf_lut)
-  nb_samples <- ncol(brf_lut)
-  # add noise to BRF
+  nb_wl <- nrow(refl_lut)
+  nb_samples <- ncol(refl_lut)
+  # add noise to reflectance
   if (length(additive_noise)==1){
     add_comp <- matrix(rnorm(nb_wl*nb_samples,0,additive_noise),
                        nrow = nb_wl)
@@ -36,8 +36,8 @@ apply_noise_addmult <- function(brf_lut, additive_noise = 0.01,
                                            sd = multiplicative_noise[i]),
                               ncol = nb_samples)
   }
-  brf_lut_noise <- brf_lut*(1+(mult_comp)) + add_comp
-  return(brf_lut_noise)
+  refl_lut_noise <- refl_lut*(1+(mult_comp)) + add_comp
+  return(refl_lut_noise)
 }
 
 

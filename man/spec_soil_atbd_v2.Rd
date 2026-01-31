@@ -3,8 +3,7 @@
 \docType{data}
 \name{spec_soil_atbd_v2}
 \alias{spec_soil_atbd_v2}
-\title{soil reflectance from OSSL database identified for PROSAIL simulations based
-on S2 ATBD v2}
+\title{soil reflectance from Sentinel-2 ATBD v2 identified for PROSAIL simulations}
 \format{
 A dataframe including 2101 rows and 2 columns
 \itemize{

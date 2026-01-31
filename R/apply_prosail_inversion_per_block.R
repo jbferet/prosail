@@ -19,7 +19,6 @@
 #' - progressBar boolean. if progress bar required
 #' - filetype character. driver for raster file
 #'
-#'
 #' @return res character. path for output files corresponding to
 #' biophysical properties
 #' @importFrom progressr handlers progressor with_progress
@@ -90,9 +89,9 @@ apply_prosail_inversion_per_block <- function(raster_path, mask_path = NULL,
     if (filetype == 'EHdr')
       formatfile <- 'ENVI'
     bp_var_path[[parm]] <- file.path(output_dir, paste(raster_name, parm,
-                                                        sep = '_'))
+                                                       sep = '_'))
     bp_var_sd_path[[parm]] <- file.path(output_dir,paste(raster_name, parm,
-                                                          'STD', sep = '_'))
+                                                         'STD', sep = '_'))
 
     if (filetype %in% c('GTiff', 'COG')){
       bp_var_path[[parm]] <- paste0(bp_var_path[[parm]],'.tiff')
@@ -127,9 +126,8 @@ apply_prosail_inversion_per_block <- function(raster_path, mask_path = NULL,
       # add name for variables
 
       if (!inherits(hybrid_model[[parm]][[1]], what = 'liquidSVM') &
-          !inherits(hybrid_model[[parm]][[1]], what = 'ksvm')){
+          !inherits(hybrid_model[[parm]][[1]], what = 'ksvm'))
         colnames(block_val) <- colnames(hybrid_model[[parm]][[1]]$trainingData)[-1]
-      }
 
       mean_estimate_full <- NA*vector(length = full_length)
       sd_estimate_full <- NA*vector(length = full_length)

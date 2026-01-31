@@ -26,17 +26,17 @@ test_that("hybrid inversion ok", {
                               spec_prospect = prosail::spec_prospect_full_range,
                               spec_soil = prosail::spec_soil_ossl,
                               spec_atm = prosail::spec_atm)
-  brf_lut_1nm <- res$brf
-  brf_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda,
+  refl_lut_1nm <- res$surf_refl
+  refl_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda,
                                           srf = srf,
-                                          input_refl_table = brf_lut_1nm)
+                                          refl = refl_lut_1nm)
   # identify spectral bands in LUT
-  rownames(brf_lut) <- srf$spectral_bands
+  rownames(refl_lut) <- srf$spectral_bands
   # add noise
-  subset_refl <- brf_lut[Bands2Select$lai,]
-  brf_lut_noise <- apply_noise_atbd(subset_refl)
+  subset_refl <- refl_lut[Bands2Select$lai,]
+  refl_lut_noise <- apply_noise_atbd(refl_lut = subset_refl)
   # train model
-  modelSVR <- prosail_hybrid_train(brf_lut = brf_lut_noise,
+  modelSVR <- prosail_hybrid_train(refl_lut = refl_lut_noise,
                                    input_variables = input_prosail$lai,
                                    method = 'nu-svr')
 
@@ -45,6 +45,6 @@ test_that("hybrid inversion ok", {
   # the prediction returns mean value obtained form the ensemble of regression
   # models for each sample, as well as corresponding standard deviation
   hybrid_res <- prosail_hybrid_apply(regression_models = modelSVR,
-                                    refl = brf_lut_noise)
+                                    refl = refl_lut_noise)
   expect_true(cor.test(hybrid_res$MeanEstimate, input_prosail$lai)$estimate>0.7)
 })

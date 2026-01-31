@@ -1,5 +1,4 @@
-#' soil reflectance from OSSL database identified for PROSAIL simulations based
-#' on S2 ATBD v2
+#' soil reflectance from Sentinel-2 ATBD v2 identified for PROSAIL simulations 
 #'
 #' corresponds to spectral bands, and a selection of 7 soil reflectances
 #'

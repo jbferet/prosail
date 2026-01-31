@@ -1,6 +1,6 @@
 #' This function optimizes kernlab nu svr model using bayesian optimization
 #'
-#' @param lut numeric. LUT of BRF used for training
+#' @param lut numeric. LUT of surface reflectance used for training
 #' @param options numeric. biophysical parameter corresponding to refl
 #'
 #' @return list of optimized hyperparameters

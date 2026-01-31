@@ -1,34 +1,35 @@
-#' This function applies noise defined in S2 ATBD to BRF LUT
+#' This function applies noise defined in S2 ATBD to reflectance
+#' look up table
 #'
-#' @param brf_lut numeric. BRF LUT
+#' @param refl_lut numeric. reflectance look up table
 #'
-#' @return brf_lut_noise numeric.
+#' @return refl_lut_noise numeric.
 #' @export
 
-apply_noise_atbd <- function(brf_lut){
+apply_noise_atbd <- function(refl_lut){
   ad <- ai <- 0.01
   md <- mi <- 0.02
-  wl_b2_b3 <- which(row.names(brf_lut)=='B2' | row.names(brf_lut)=='B3')
-  wl_misc <- which(!row.names(brf_lut)=='B2' & !row.names(brf_lut)=='B3')
-  brf_lut_noise <- 0*brf_lut
+  wl_b2_b3 <- which(row.names(refl_lut)=='B2' | row.names(refl_lut)=='B3')
+  wl_misc <- which(!row.names(refl_lut)=='B2' & !row.names(refl_lut)=='B3')
+  refl_lut_noise <- 0*refl_lut
 
   # add multiplicative noise to B2 and B3
-  ad_full <- matrix(rnorm(length(wl_b2_b3)*ncol(brf_lut),0,ad),
+  ad_full <- matrix(rnorm(length(wl_b2_b3)*ncol(refl_lut),0,ad),
                     nrow = length(wl_b2_b3))
-  ai_full <- matrix(rnorm(length(wl_b2_b3)*ncol(brf_lut),0,ai),
+  ai_full <- matrix(rnorm(length(wl_b2_b3)*ncol(refl_lut),0,ai),
                     nrow = length(wl_b2_b3))
-  md_full <- matrix(rnorm(length(wl_b2_b3)*ncol(brf_lut),0,md),
+  md_full <- matrix(rnorm(length(wl_b2_b3)*ncol(refl_lut),0,md),
                     nrow = length(wl_b2_b3))
-  MIfull <- matrix(rnorm(length(wl_b2_b3)*ncol(brf_lut),0,mi),
+  MIfull <- matrix(rnorm(length(wl_b2_b3)*ncol(refl_lut),0,mi),
                    nrow = length(wl_b2_b3))
-  brf_lut_noise[wl_b2_b3,] <- brf_lut[wl_b2_b3,]*(1+(md_full+MIfull)) +
+  refl_lut_noise[wl_b2_b3,] <- refl_lut[wl_b2_b3,]*(1+(md_full+MIfull)) +
     ad_full + ai_full
 
   # add multiplicative noise to other bands
-  ad_full <- matrix(rnorm(length(wl_misc)*ncol(brf_lut),0,ad),
+  ad_full <- matrix(rnorm(length(wl_misc)*ncol(refl_lut),0,ad),
                     nrow = length(wl_misc))
-  md_full <- matrix(rnorm(length(wl_misc)*ncol(brf_lut),0,md),
+  md_full <- matrix(rnorm(length(wl_misc)*ncol(refl_lut),0,md),
                     nrow = length(wl_misc))
-  brf_lut_noise[wl_misc,] <- brf_lut[wl_misc,]*(1+md_full) + ad_full
-  return(brf_lut_noise)
+  refl_lut_noise[wl_misc,] <- refl_lut[wl_misc,]*(1+md_full) + ad_full
+  return(refl_lut_noise)
 }

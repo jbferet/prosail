@@ -2,16 +2,18 @@
 % Please edit documentation in R/apply_noise_atbd.R
 \name{apply_noise_atbd}
 \alias{apply_noise_atbd}
-\title{This function applies noise defined in S2 ATBD to BRF LUT}
+\title{This function applies noise defined in S2 ATBD to reflectance
+look up table}
 \usage{
-apply_noise_atbd(brf_lut)
+apply_noise_atbd(refl_lut)
 }
 \arguments{
-\item{brf_lut}{numeric. BRF LUT}
+\item{refl_lut}{numeric. reflectance look up table}
 }
 \value{
-brf_lut_noise numeric.
+refl_lut_noise numeric.
 }
 \description{
-This function applies noise defined in S2 ATBD to BRF LUT
+This function applies noise defined in S2 ATBD to reflectance
+look up table
 }

@@ -1,9 +1,9 @@
 #' This function trains a regression model to estimate a set of variables
 #' from spectral data
 #'
-#' @param brf_lut numeric. LUT of BRF used for training
+#' @param refl_lut numeric. LUT of surface reflectance used for training
 #' @param input_variables numeric. biophysical parameter corresponding to refl
-#' @param nb_bagg numeric. nb of individual subsets generated from brf_lut
+#' @param nb_bagg numeric. nb of individual subsets generated from refl_lut
 #' @param replacement Boolean. subsets generated with / without replacement
 #' @param method character. which machine learning regression method used?
 #' default = SVM with liquidSVM.
@@ -16,7 +16,7 @@
 #' @param options list
 #'
 #' @return models_mlr list. ML regression models trained for the retrieval of
-#' input_variables based on brf_lut
+#' input_variables based on refl_lut
 #' @importFrom stats predict
 #' @importFrom progress progress_bar
 #' @importFrom simsalapar tryCatch.W.E
@@ -26,7 +26,7 @@
 #' @importFrom stringr str_split
 #' @export
 
-prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
+prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 20,
                                  replacement = FALSE, method = 'liquidSVM',
                                  verbose = FALSE, progressBar = FALSE,
                                  options = NULL){
@@ -36,16 +36,16 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
   # split the LUT into nb_bagg subsets
   nb_samples <- length(input_variables)
-  if (dim(brf_lut)[2]==nb_samples)
-    brf_lut <- t(brf_lut)
-  # if subsets are generated from brf_lut with replacement
+  if (dim(refl_lut)[2]==nb_samples)
+    refl_lut <- t(refl_lut)
+  # if subsets are generated from refl_lut with replacement
   if (replacement==TRUE){
     subsets <- list()
     samples_per_run <- round(nb_samples/nb_bagg)
     for (run in seq_len(nb_bagg))
       subsets[[run]] <- sample(seq_len(nb_samples), samples_per_run,
                                replace = TRUE)
-    # if subsets are generated from brf_lut without replacement
+    # if subsets are generated from refl_lut without replacement
   } else if (replacement==FALSE){
     subsets <- split(sample(seq_len(nb_samples)),seq_len(nb_bagg))
   }
@@ -58,10 +58,10 @@ prosail_hybrid_train <- function(brf_lut, input_variables, nb_bagg = 20,
       format = "Training SVR [:bar] :percent in :elapsedfull , eta = :eta",
       total = nb_bagg, clear = FALSE, width= 100)
 
-  brf_lut <- data.frame(brf_lut)
+  refl_lut <- data.frame(refl_lut)
   for (i in seq_len(nb_bagg)){
     training_set <- list()
-    training_set$X <- brf_lut %>% dplyr::slice(subsets[i][[1]])
+    training_set$X <- refl_lut %>% dplyr::slice(subsets[i][[1]])
     training_set$Y <- input_variables[subsets[i][[1]]]
 
     # if using caret

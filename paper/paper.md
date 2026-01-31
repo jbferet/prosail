@@ -42,8 +42,8 @@ vegetation at both the leaf and canopy levels, taking into account factors such
 as leaf chemical content, leaf structure, canopy architecture, and viewing and 
 illumination angles.
 
-PROSAIL's ability to simulate bidirectional reflectance factor (BRF) under 
-various conditions makes it a valuable tool for agricultural monitoring, 
+PROSAIL's ability to simulate plant canopy spectral and directional reflectance 
+under various conditions makes it a valuable tool for agricultural monitoring, 
 ecological studies, and climate research, where PROSAIL can be used to simulate 
 vegetation optical properties [@poulter2023]. 
 It is also used in combination with inversion procedures to retrieve vegetation 
@@ -58,10 +58,10 @@ information to solve an ill-posed problem.
 Here, we introduce `prosail`, an R package which provides multiple versions of 
 the model PROSAIL, coupled with the latest versions of PROSPECT distributed with 
 the R package `prospect` [@feret2024]. 
-The package includes functions to run simulations of BRF in forward mode for 
-various optical sensors, as well as functions to apply user defined spectral 
-response function (SRF), allowing simulation of any optical sensor with known or 
-approximated BRF.
+The package includes functions to run simulations of surface reflectance in 
+forward mode for various optical sensors, as well as functions to apply user 
+defined spectral response function (SRF), allowing simulation of any optical 
+sensor with known or approximated surface reflectance.
 It also includes functions for model inversion using iterative 
 optimization with and without prior information, as well as a module dedicated 
 to hybrid inversion, combining physical modeling and machine learning 
@@ -100,9 +100,9 @@ Radiative Transfer* DART model [@gastellu2015], which allows for explicit
 triangular meshes or turbid voxels that can be derived from LiDAR acquisitions.
 
 RTMs are increasingly used in remote sensing applications, in combination with 
-machine learning: RTMs are used to produce a BRF dataset with corresponding 
-vegetation properties, which are then used as training data to adjust a 
-regression model with a machine learning algorithm. 
+machine learning: RTMs are used to produce a surface reflectance dataset with 
+corresponding vegetation properties, which are then used as training data to 
+adjust a regression model with a machine learning algorithm. 
 Such strategies, commonly referred to as hybrid methods [@verrelst2015], show 
 multiple advantages : simulations are used in place of extensive in situ 
 sampling, allowing regression model adjustment on virtually any source of 
@@ -151,11 +151,11 @@ aiming at experimenting for the estimation vegetation biophysical properties
 from optical remote sensing using RTM. 
 These functions include : 
 
-- the simulation of BRF for any optical sensor, based on their SRF
+- the simulation of surface reflectance for any optical sensor based on their SRF
 
-- the production of look-up-tables (LUTs) for simulated sensor BRF and 
-corresponding PROSAIL input parameters, with or without additive and 
-multiplicative noise
+- the production of look-up-tables (LUTs) for simulated sensor surface 
+reflectance and corresponding PROSAIL input parameters, with or without 
+additive and multiplicative noise
 
 - the application of iterative optimization with possible added prior 
 information on data tables
@@ -307,34 +307,38 @@ zeta <- 1               # tree shape factor
 
 # run PROSAIL with 4SAIL2
 ref_4sail2 <- prosail(SAILversion = '4SAIL2', input_prospect = input_prospect,
-                       type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
-                       hotspot = hotspot, tts = tts, tto = tto, psi = psi, 
-                       rsoil = rsoil, fraction_brown = fraction_brown, 
-                       diss = diss, cv = cv, zeta = zeta)
+                      type_lidf = type_lidf, lidf_a = lidf_a, lai = lai,
+                      hotspot = hotspot, tts = tts, tto = tto, psi = psi, 
+                      rsoil = rsoil, fraction_brown = fraction_brown, 
+                      diss = diss, cv = cv, zeta = zeta)
 
 ```
 
-## Computation of BRF from PROSAIL outputs
+## Computation of surface reflectance from PROSAIL outputs
 
-The BRF results from the combination of hemispherical-directional and 
-bi-directional reflectance factors with the relative contribution of direct and
-diffuse radiation. 
+The surface reflectance results from the combination of 
+hemispherical-directional and bi-directional reflectance factors with the 
+relative contribution of direct and diffuse radiation. 
 The direct and diffuse radiations are defined as described by [@francois2002]. 
-Users can then compute BRF by setting a global contribution of diffuse skylight 
-radiation with the `skyl` parameter, which is the share of diffuse flux in 
-global radiation. 
+Users can then compute surface reflectance by setting a global contribution of 
+diffuse skylight radiation with the `skyl` parameter, which is the share of 
+diffuse flux in global radiation. 
 Alternatively, the direct and diffuse radiations can taken into account by 
 computing `skyl` based on the equation proposed by [@spitters1986], knowing the 
 sun zenith angle and assuming clear sky conditions. 
 
 ```r
-# Compute BRF with known skyl
-brf_4sail <- compute_brf(rdot = ref_4sail$rdot, rsot = ref_4sail$rsot,
-                         skyl = 0.23, spec_atm_sensor = spec_atm)
+# Compute surface reflectance with known skyl
+surf_refl_4sail <- compute_surf_refl(rdot = ref_4sail$rdot, 
+                                     rsot = ref_4sail$rsot,
+                                     skyl = 0.23, 
+                                     spec_atm_sensor = spec_atm)
 
-# Compute BRF assuming clear sky conditions and using sun zenith angle
-brf_4sail <- compute_brf(rdot = ref_4sail$rdot, rsot = ref_4sail$rsot,
-                         tts = 40, spec_atm_sensor = spec_atm)
+# Compute surface reflectance using sun zenith angle (clear sky conditions)
+surf_refl_4sail <- compute_surf_refl(rdot = ref_4sail$rdot, 
+                                     rsot = ref_4sail$rsot,
+                                     tts = 40, 
+                                     spec_atm_sensor = spec_atm)
 
 ```
 
@@ -360,9 +364,9 @@ albedo_4sail <- compute_albedo(rsdstar = ref_4sail$rsdstar,
 
 ```
 
-## Simulating sensor BRF
+## Simulating surface reflectance acquired by a sensor 
 
-The simulation of sensor BRF requires the SRF of the sensor. 
+The simulation of sensor surface reflectance requires the SRF of the sensor. 
 A selection of SRF corresponding to multiple sensors is already implemented in 
 `prosail` :
 
@@ -391,10 +395,10 @@ srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
 # Hyperspectral sensor: 10 nm spectral sampling & 10 nm fwhm for all bands
 wl <- seq(400, 2500, by = 10)
 fwhm <- rep(x = 10, length = length(wl))
-spectral_properties = data.frame(wl = wl, fwhm = fwhm)
+spectral_props = data.frame(wl = wl, fwhm = fwhm)
 sensor_name <- 'Hyperspectral_Sensor'
 srf_hsi <- get_spectral_response_function(sensor_name = sensor_name,
-                                          spectral_properties = spectral_properties)
+                                          spectral_properties = spectral_props)
 
 ```
 
@@ -419,9 +423,11 @@ multivariable function with nonlinear constraints.
 This procedure is based on the function `fmincon` included in the package 
 `pracma`.
 The default criterion for the cost function corresponds to the root mean square 
-error (RMSE) between a reference BRF and BRF simulated with PROSAIL. 
+error (RMSE) between a reference surface reflectance and surface reflectance 
+simulated with PROSAIL. 
 The code below provides an example of iterative optimization applied to
-simulated BRF at native spectral sampling (1 nm), and to Sentinel-2 BRF. 
+simulated surface reflectance at native spectral sampling (1 nm), and to 
+Sentinel-2 surface reflectance. 
 
 ```r
 # define initial value, lower and upper bounds for inversion
@@ -438,23 +444,25 @@ parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60, 'soil_brightness' = 1,
 
 # define soil reflectance (set as prior knowledge) and spec_soil variable
 rsoil <- parm_set$soil_brightness*spec_soil_ossl$soil_01
-spec_soil <- data.frame('lambda' = spec_soil_ossl$lambda, 
+spec_soil <- data.frame('lambda' = spec_soil$lambda, 
                         'refl' = rsoil)
 
-# simulate canopy BRF with 1 nm sampling
+# simulate canopy surface reflectance with 1 nm sampling
 truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
                     'lai' = 3,  'lidf_a' = 60, 'n_struct' = 1.8)
 refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
-                     ant = parm_set$ant, brown = parm_set$brown, 
-                     ewt = truth$ewt, lma = truth$lma, type_lidf = 2, 
-                     lai = truth$lai, hotspot = parm_set$hotspot, 
-                     lidf_a = init$lidf_a, rsoil = rsoil, tts = parm_set$tts, 
-                     tto = parm_set$tto, psi = parm_set$psi)
-brf_1nm <- compute_brf(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
-                       tts = parm_set$tts, spec_atm_sensor = spec_atm)
+                    ant = parm_set$ant, brown = parm_set$brown, 
+                    ewt = truth$ewt, lma = truth$lma, type_lidf = 2, 
+                    lai = truth$lai, hotspot = parm_set$hotspot, 
+                    lidf_a = init$lidf_a, rsoil = rsoil, tts = parm_set$tts, 
+                    tto = parm_set$tto, psi = parm_set$psi)
+surf_refl_1nm <- compute_surf_refl(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
+                                   tts = parm_set$tts, 
+                                   spec_atm_sensor = spec_atm)
 
-# invert PROSAIL on BRF with 1 nm spectral sampling
-est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
+# invert PROSAIL on surface reflectance with 1 nm spectral sampling
+est_1nm <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl, 
+                          initialization = init,
                           lower_bound = lb, upper_bound = ub, type_lidf = 2, 
                           spec_prospect_sensor = spec_prospect_full_range,
                           spec_atm_sensor = spec_atm, 
@@ -465,17 +473,18 @@ est_1nm <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
 srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
 spec_prospect <- spec_prospect_full_range
 lambda <- spec_prospect_full_range$lambda
-brf_S2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                       input_refl_table = brf_1nm$BRF)
+surf_refl_S2 <- apply_sensor_characteristics(wvl = lambda, 
+                                             srf = srf_s2, 
+                                             refl = surf_refl_1nm$surf_refl)
 spec_prospect_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                                 input_refl_table = spec_prospect)
+                                                 refl = spec_prospect)
 spec_soil_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                             input_refl_table = spec_soil)
+                                             refl = spec_soil)
 spec_atm_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
-                                            input_refl_table = spec_atm)
+                                            refl = spec_atm)
 
-# invert PROSAIL on Sentinel-2 BRF
-est_s2 <- invert_prosail(brf_mes = brf_S2, initialization = init,
+# invert PROSAIL on Sentinel-2 surface reflectance
+est_s2 <- invert_prosail(refl_mes = surf_refl_S2, initialization = init,
                          lower_bound = lb, upper_bound = ub,
                          spec_prospect_sensor = spec_prospect_s2,
                          spec_atm_sensor = spec_atm_s2, 
@@ -500,7 +509,8 @@ definition of a probability density function corresponding to the average leaf
 angle `lidf_a`. 
 A weighting factor associated to the relative importance of this prior 
 information with respect to the main criterion to minimize (RMSE between 
-reference BRF and simulated BRF) can also be adjusted.
+reference surface reflectance and simulated surface reflectance) can also be 
+adjusted.
 
 
 ```r
@@ -509,9 +519,10 @@ prior_info <- list('mean' = data.frame('lidf_a' = 60),
                    'sd' = data.frame('lidf_a' = 10), 
                    'weight_prior' = 0.01)
 
-# invert PROSAIL on BRF with 1 nm spectral sampling and probability density 
-# function for lidf_a
-est_1nm_p <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
+# invert PROSAIL on surface reflectance with 1 nm spectral sampling and 
+# probability density function for lidf_a
+est_1nm_p <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl, 
+                            initialization = init,
                             lower_bound = lb, upper_bound = ub,
                             spec_prospect_sensor = spec_prospect_full_range,
                             spec_atm_sensor = spec_atm, 
@@ -519,8 +530,9 @@ est_1nm_p <- invert_prosail(brf_mes = brf_1nm$BRF, initialization = init,
                             type_lidf = 2, parm_set = parm_set,
                             prior_info =  prior_info)
 
-# invert PROSAIL on Sentinel-2 BRF and probability density function for lidf_a
-est_s2_p <- invert_prosail(brf_mes = brf_S2, initialization = init,
+# invert PROSAIL on Sentinel-2 surface reflectance and probability density 
+# function for lidf_a
+est_s2_p <- invert_prosail(refl_mes = surf_refl_S2, initialization = init,
                            lower_bound = lb, upper_bound = ub,
                            spec_prospect_sensor = spec_prospect_s2,
                            spec_atm_sensor = spec_atm_s2, 
@@ -534,16 +546,17 @@ est_s2_p <- invert_prosail(brf_mes = brf_S2, initialization = init,
 
 Hybrid model inversion is defined here as a two-step inversion procedure: 
 
-- run RTM to produce a simulated LUT including sensor BRF and corresponding 
-PROSAIL input parameters, including vegetation properties. 
+- run RTM to produce a simulated LUT including sensor surface reflectance and 
+corresponding PROSAIL input parameters, including vegetation properties. 
 
 - train a machine learning regression algorithm to estimate a vegetation 
-property or a set of vegetation properties of interest from sensor BRF.
+property or a set of vegetation properties of interest from sensor surface 
+reflectance.
 
 The next subsections describe the strategy followed by the hybrid inversion 
 implemented in `prosail`.
 
-### Simulating BRF data to prepare for regression model training 
+### Simulating surface reflectance to prepare for regression model training 
 
 Several factors need to be accounted for when preparing for the training stage 
 of the regression models : 
@@ -551,14 +564,15 @@ of the regression models :
 - the sampling strategy (range, distribution, co-distributions for input 
 parameters)
 
-- the addition of additive and multiplicative noise to the simulated BRF
+- the addition of additive and multiplicative noise to the simulated surface
+reflectance
 
 - the definition of spectral bands to be used for the training of the regression
 model
 
 The default parameterization of `prosail` hybrid inversion relies on the 
-production of a BRF LUT compliant with the specifications defined in the ATBD 
-for the Biophysical Processor of the Sentinel toolbox [@weiss2020]. 
+production of a surface reflectance LUT compliant with the specifications 
+defined in the ATBD for the Biophysical Processor of the Sentinel toolbox [@weiss2020]. 
 However, each step of the simulation of a training LUT can be defined by user.
 
 
@@ -589,7 +603,7 @@ retrieval performances as those obtained with the SNAP toolbox.
 Figure \ref{fig:hybrid} summarizes the workflow applied to perform hybrid 
 inversion. 
 The function `train_prosail_inversion` combines all aforementioned steps to 
-produce BRF simulations and  train SVR models. 
+produce surface reflectance simulations and train SVR models. 
 It provides regression models as outputs, which can then be directly used to 
 estimate vegetation biophysical properties from data tables or raster data. 
 
@@ -646,22 +660,22 @@ res <- generate_lut_prosail(SAILversion = '4SAIL',
 input_prosail$fcover <- res$fcover
 input_prosail$fapar <- res$fapar
 
-# apply Sentinel-2 SRF to get sensor BRF
-BRF_LUT <- apply_sensor_characteristics(wvl = lambda, srf = srf, 
-                                        input_refl_table = res$brf)
+# apply Sentinel-2 SRF to get sensor surface reflectance
+surf_refl_LUT <- apply_sensor_characteristics(wvl = lambda, srf = srf, 
+                                        refl = res$surf_refl)
 # identify spectral bands in LUT
-rownames(BRF_LUT) <- srf$spectral_bands
+rownames(surf_refl_LUT) <- srf$spectral_bands
 
 # apply noise and produce a LUT for each parameter
-BRF_LUT_Noise <- list()
+surf_refl_noise <- list()
 for (parm in parms_to_estimate) 
-  BRF_LUT_Noise[[parm]] <- apply_noise_atbd(brf_lut = BRF_LUT)
+  surf_refl_noise[[parm]] <- apply_noise_atbd(refl_lut = surf_refl_LUT)
 
 # train a set of SVR models for each parameter
 modelSVR <- list()
 for (parm in parms_to_estimate){
   input_variables <- input_prosail[[parm]]
-  modelSVR[[parm]] <- prosail_hybrid_train(brf_lut = BRF_LUT_Noise[[parm]],
+  modelSVR[[parm]] <- prosail_hybrid_train(refl_lut = surf_refl_noise[[parm]],
                                            input_variables = input_variables)
 }
 
@@ -673,12 +687,12 @@ The prediction returns mean value obtained form the ensemble of regression
 models for each sample, as well as corresponding standard deviation.
 
 ```r
-MeanEstimate <- StdEstimate <- list()
+mean_estimate <- sd_estimate <- list()
 for (parm in parms_to_estimate){
   HybridRes <- prosail_hybrid_apply(regression_models = modelSVR[[parm]],
-                                    refl = BRF_LUT_Noise[[parm]])
-  MeanEstimate[[parm]] <- HybridRes$MeanEstimate
-  StdEstimate[[parm]] <- HybridRes$StdEstimate
+                                    refl = surf_refl_noise[[parm]])
+  mean_estimate[[parm]] <- HybridRes$MeanEstimate
+  sd_estimate[[parm]] <- HybridRes$StdEstimate
 }
 
 ```

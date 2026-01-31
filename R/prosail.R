@@ -66,18 +66,18 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
                                  fraction_brown = fraction_brown)
   #	SAIL: CANOPY REFLECTANCE
   if (SAILversion == '4SAIL'){
-    Ref <- fourSAIL(lop = lop$green_lop,
-                    type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
-                    lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
-                    rsoil = rsoil)
-  } else if (SAILversion == '4SAIL2'){
-    Ref <- fourSAIL2(leaf_green = lop$green_lop, leaf_brown = lop$brown_lop,
+    refl <- fourSAIL(lop = lop$green_lop,
                      type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
                      lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
-                     rsoil = rsoil, fraction_brown = fraction_brown,
-                     diss = diss, cv = cv, zeta = zeta)
+                     rsoil = rsoil)
+  } else if (SAILversion == '4SAIL2'){
+    refl <- fourSAIL2(leaf_green = lop$green_lop, leaf_brown = lop$brown_lop,
+                      type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
+                      lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
+                      rsoil = rsoil, fraction_brown = fraction_brown,
+                      diss = diss, cv = cv, zeta = zeta)
   }
-  return(Ref)
+  return(refl)
 }
 
 

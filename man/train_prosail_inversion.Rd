@@ -11,7 +11,7 @@ train_prosail_inversion(
   minval = NULL,
   maxval = NULL,
   output_dir = "./",
-  brf_lut = NULL,
+  refl_lut = NULL,
   geom_acq = NULL,
   srf = NULL,
   parms_to_estimate = "lai",
@@ -30,7 +30,7 @@ train_prosail_inversion(
 
 \item{output_dir}{character. path for results}
 
-\item{brf_lut}{list. user-defined BRF LUT used to run the hybrid inversion}
+\item{refl_lut}{list. user-defined surface reflectance LUT used to run the hybrid inversion}
 
 \item{geom_acq}{list. geometry of acquisition: min and max tts, tto & psi}
 
@@ -54,8 +54,8 @@ parameters sampled with gaussian distribution
 \item replacement bolean. is there replacement in subsampling?
 \item noise_level list. noise added to reflectance (defined per input parm)
 \item spec_prospect list. Includes optical constants required for PROSPECT
-\item spec_soil list. Includes either a set of OSSL library reflectance spectra,
-or minimum reflectance and maximum reflectance
+\item spec_soil list. Includes either a set of OSSL library reflectance
+spectra, reflectance spectra from S2 ATBD v2, or minimum reflectance and maximum reflectance
 \item spec_atm list. direct and diffuse radiation for clear conditions variable
 during training step
 \item method character. which machine learning regression method should be used?
@@ -67,7 +67,7 @@ adjustment performed during training
 }
 \value{
 modelsSVR list. regression models trained for the retrieval of
-input_variables based on brf_lut
+input_variables based on refl_lut
 }
 \description{
 This function performs full training for hybrid inversion using SVR with

@@ -75,8 +75,8 @@ get_atbd_v3_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
                                     max_lai = t_gauss_parms$max$lai,
                                     vmin_0 = codistribution_lai$vmin_0[[parm]],
                                     vmax_0 = codistribution_lai$vmax_0[[parm]],
-                                   vmin_lai_max = codistribution_lai$vmin_lai_max[[parm]],
-                                   vmax_lai_max = codistribution_lai$vmax_lai_max[[parm]])
+                                    vmin_lai_max = codistribution_lai$vmin_lai_max[[parm]],
+                                    vmax_lai_max = codistribution_lai$vmax_lai_max[[parm]])
       input_prosail[[parm]] <- v_star
     }
   }
@@ -99,14 +99,14 @@ get_atbd_v3_lut_input <- function(nb_samples = 2000, geom_acq = NULL,
   # set geometry of acquisition
   if (is.null(geom_acq))
     geom_acq <- data.frame('min' = c('tto' = 0, 'tts' = 20, 'psi' = 0),
-                          'max' = c('tto' = 10, 'tts' = 30, 'psi' = 360))
+                           'max' = c('tto' = 10, 'tts' = 30, 'psi' = 360))
   if (inherits(geom_acq, "list"))
     geom_acq <- data.frame('min' = c('tto' = geom_acq$min$tto,
-                                    'tts' = geom_acq$min$tts,
-                                    'psi' = geom_acq$min$psi),
-                          'max' = c('tto' = geom_acq$max$tto,
-                                    'tts' = geom_acq$max$tts,
-                                    'psi' = geom_acq$max$psi))
+                                     'tts' = geom_acq$min$tts,
+                                     'psi' = geom_acq$min$psi),
+                           'max' = c('tto' = geom_acq$max$tto,
+                                     'tts' = geom_acq$max$tts,
+                                     'psi' = geom_acq$max$psi))
   input_prosail$tts <- runif(n = nb_samples, min = geom_acq['tts', 'min'],
                              max = geom_acq['tts', 'max'])
   input_prosail$tto <- runif(n = nb_samples, min = geom_acq['tto', 'min'],
