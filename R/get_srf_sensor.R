@@ -1,10 +1,9 @@
 #' reads spectral response from known sensor
 #' spectral response from Sentinel-2 is already defined
 #' @param sensor_name character. name of the sensor
-#' @param spectral_properties list. list of spectral properties including
-#' wl = central wavelength and fwhm = corresponding fwhm
-#' @param srf_path character. path for the file where srf should be
-#' saved as CSV
+#' @param wl numeric. central wavelength of spectral bands
+#' @param fwhm numeric. fwhm of spectral bands defined by wl
+#' @param srf_path character. path for the file where srf should be saved as CSV
 #' @param save_srf boolean. Should srf be saved in file?
 #'
 #' @return srf list. Spectral response function, corresponding spectral bands,
@@ -13,11 +12,13 @@
 #' @importFrom utils read.csv write.table
 #' @export
 
-get_spectral_response_function <- function(sensor_name = 'user_defined',
-                                           spectral_properties = NULL,
-                                           srf_path = './',
-                                           save_srf = TRUE){
+get_srf_sensor <- function(sensor_name = 'user_defined',
+                           wl = NULL,
+                           fwhm = NULL,
+                           srf_path = './',
+                           save_srf = TRUE){
 
+  spectral_properties <- list('wl' = wl, 'fwhm' = fwhm)
   # == == == == == == == == == == == == == == == == == == == == == == == == =
   ### if the spectral response function of the sensor is already defined  ###
   # == == == == == == == == == == == == == == == == == == == == == == == == =
@@ -70,15 +71,15 @@ get_spectral_response_function <- function(sensor_name = 'user_defined',
   }  else {
     # check if spectral properties are provided in order to compute spectral
     # response based on gaussian assumption
-    if (!is.null(spectral_properties)){
-      if (!'wl' %in% names(spectral_properties) | ! 'fwhm' %in% names(spectral_properties)){
+    if (!is.null(spectral_properties$wl) | !is.null(spectral_properties$fwhm)){
+      if (is.null(spectral_properties$wl) | is.null(spectral_properties$fwhm)){
         message('Input variable "spectral_properties" expected to include fields')
         message('- wl (central wavelengths of bands in nm) ')
         message('- fwhl (fwhm of spectral bands in nm)')
         message('Please correct this input variable & provide proper info ')
         stop()
-      } else if ('wl' %in% names(spectral_properties) &
-                 'fwhm' %in% names(spectral_properties)){
+      } else if (!is.null(spectral_properties$wl) &
+                 !is.null(spectral_properties$fwhm)){
         # check if proper spectral range
         if (max(spectral_properties$wl)<400 | min(spectral_properties$wl)>2500){
           message('Spectral bands in "spectral_properties" should be defined in nm')
@@ -86,9 +87,9 @@ get_spectral_response_function <- function(sensor_name = 'user_defined',
           stop()
         }
         # produce spectral response per channel
-        srf <- compute_srf(wvl = spectral_properties$wl,
-                           fwhm = spectral_properties$fwhm,
-                           sensor_name = sensor_name)
+        srf <- get_srf(wvl = spectral_properties$wl,
+                       fwhm = spectral_properties$fwhm,
+                       sensor_name = sensor_name)
         # save srf as csv
         srf_save <- cbind(srf$original_bands,format(srf$spectral_response,
                                                     digits = 4,
@@ -156,10 +157,14 @@ get_spectral_response_function <- function(sensor_name = 'user_defined',
 
 #' @rdname prosail-deprecated
 #' @export
-GetRadiometry <- function(SensorName = 'Custom',
+GetRadiometry <- function(SensorName = 'user_defined',
                           SpectralProps = NULL,
                           Path_SensorResponse = './',
                           SaveSRF = TRUE){
-  .Deprecated("get_spectral_response_function")
-  get_spectral_response_function(SensorName, SpectralProps, Path_SensorResponse, SaveSRF)
+  .Deprecated("get_srf_sensor")
+  get_srf_sensor(sensor_name = SensorName,
+                 wl = SpectralProps$wl,
+                 fwhm = SpectralProps$fwhm,
+                 srf_path = Path_SensorResponse,
+                 save_srf = SaveSRF)
 }

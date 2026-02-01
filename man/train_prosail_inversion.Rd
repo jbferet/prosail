@@ -43,7 +43,7 @@ train_prosail_inversion(
 \item{options}{list. options for train_prosail_inversion
 \itemize{
 \item codistribution_lai boolean. TRUE: codistrib with LAI accounted for
-\item type_distrib  list. Type of distribution. 'Uniform' or 'Gaussian'
+\item type_distrib  list. Type of distribution. 'uniform' or 'gaussian'
 \item gaussian_distrib  list. Mean value and STD corresponding to the
 parameters sampled with gaussian distribution
 \item parm_set list. list of input parameters set to a specific value

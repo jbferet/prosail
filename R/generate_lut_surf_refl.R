@@ -69,10 +69,10 @@ generate_lut_surf_refl <- function(input_prosail, spec_prospect, spec_soil, spec
                       brown_lop = brown_lop)
     }
     # Computes surface reflectance based on outputs from PROSAIL and sun position
-    surf_refl[[i]] <- compute_surf_refl(rdot = refl$rdot,
-                                        rsot = refl$rsot,
-                                        tts = input_prosail$tts[[i]],
-                                        spec_atm_sensor = spec_atm)
+    surf_refl[[i]] <- get_surf_refl(rdot = refl$rdot,
+                                    rsot = refl$rsot,
+                                    tts = input_prosail$tts[[i]],
+                                    spec_atm_sensor = spec_atm)
   }
   surf_refl <- do.call(cbind,surf_refl)
   row.names(surf_refl) <- band_names

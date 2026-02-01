@@ -34,7 +34,7 @@ set_options_prosail <- function(fun, options = NULL){
     if (is.null(options$nb_samples))
       options$nb_samples <- 2000
     if (is.null(options$nb_models))
-      options$nb_models <- 20
+      options$nb_models <- 10
     if (is.null(options$replacement))
       options$replacement <- FALSE
     if (is.null(options$noise_level))

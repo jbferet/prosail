@@ -74,9 +74,9 @@ generate_lut_4sail <- function(input_prosail, spec_prospect, spec_soil,
     rsdt[[i]] <- refl_sail$rsdt
     rddt[[i]] <- refl_sail$rddt
     # Computes surface reflectance based on outputs from PROSAIL and sun position
-    refl[[i]] <- compute_surf_refl(rdot = refl_sail$rdot, rsot = refl_sail$rsot,
-                                   tts = input_prosail$tts[[i]],
-                                   spec_atm_sensor = spec_atm)
+    refl[[i]] <- get_surf_refl(rdot = refl_sail$rdot, rsot = refl_sail$rsot,
+                               tts = input_prosail$tts[[i]],
+                               spec_atm_sensor = spec_atm)
   }
   refl <- do.call(cbind,refl)
   rdot <- do.call(cbind,rdot)
@@ -97,7 +97,12 @@ Generate_LUT_4SAIL <- function(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM,
                                BandNames = NULL, SAILversion ='4SAIL',
                                BrownLOP = NULL){
   .Deprecated("generate_lut_4sail")
-  generate_lut_4sail(InputPROSAIL, SpecPROSPECT, SpecSOIL, SpecATM, BandNames,
-                     SAILversion, BrownLOP)
+  generate_lut_4sail(input_prosail = InputPROSAIL,
+                     spec_prospect = SpecPROSPECT,
+                     spec_soil = SpecSOIL,
+                     spec_atm = SpecATM,
+                     band_names = BandNames,
+                     SAILversion = SAILversion,
+                     brown_lop = BrownLOP)
 }
 

@@ -91,8 +91,11 @@ PRO4SAIL <- function(Spec_Sensor = NULL, Input_PROSPECT = NULL, N = 1.5,
                      fraction_brown = 0.0, diss = 0.0, Cv = 1, Zeta = 1,
                      SAILversion = '4SAIL', BrownLOP = NULL){
   .Deprecated("prosail")
-  prosail(Spec_Sensor, Input_PROSPECT, N, CHL, CAR, ANT, BROWN, EWT, LMA, PROT,
-          CBC, alpha, TypeLidf, LIDFa, LIDFb, lai, q, tts, tto, psi, rsoil,
-          fraction_brown, diss, Cv, Zeta, SAILversion, BrownLOP)
+  prosail(spec_sensor = Spec_Sensor, input_prospect = Input_PROSPECT,
+          n_struct = N, chl = CHL, car = CAR, ant = ANT, brown = BROWN,
+          ewt = EWT, lma = LMA, prot = PROT, cbc = CBC, alpha = alpha,
+          type_lidf = TypeLidf, lidf_a = LIDFa, lidf_b = LIDFb, lai = lai,
+          hotspot = q, tts = tts, tto = tto, psi = psi, rsoil = rsoil,
+          fraction_brown = fraction_brown, diss = diss, cv = Cv, zeta = Zeta,
+          SAILversion = SAILversion, brown_lop = BrownLOP)
 }
-

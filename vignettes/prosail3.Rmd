@@ -66,12 +66,13 @@ variables.
 
 # Define input PROSAIL parameters for the simulation of a training LUT
 
-The production of a surface reflectance LUT requires a variable `input_prosail` as input. 
+The production of a surface reflectance LUT requires a variable `input_prosail` 
+as input. 
 When running  __4SAIL__, the expected list of parameters includes: 
-`lai`, `lidf_a`, `hotspot`, `n_struct`, `chl`, `lma`, `cw_rel`, `brown`, `psoil`, `ewt`, 
-`cbc`, `prot`,  `ant`, `car`, `tts`, `tto`, `psi`, `type_lidf` and `alpha` 
-(note that `type_lidf` and `alpha` are usually set to their default value, 
-`type_lidf = 2` and `alpha = 40`).
+`lai`, `lidf_a`, `hotspot`, `n_struct`, `chl`, `lma`, `cw_rel`, `brown`, 
+`psoil`, `ewt`, `cbc`, `prot`,  `ant`, `car`, `tts`, `tto`, `psi`, `type_lidf` 
+and `alpha` (note that `type_lidf` and `alpha` are usually set to their default 
+value, `type_lidf = 2` and `alpha = 40`).
 
 There are currently three ways to define `input_prosail`. 
 The function `get_input_prosail` allows generating `input_prosail`:  
@@ -82,7 +83,7 @@ Sentinel-2 toolbox.
 
 - when setting min and max values for a list of parameters (`minval` and 
 `maxval`) as well as the type of distribution for each parameter (`uniform` or 
-`Gaussian`), `input_prosail` is generated following these criteria. Gaussian 
+`gaussian`), `input_prosail` is generated following these criteria. Gaussian 
 distribution also requires definition of a list `gaussian_distrib` including 
 `Mean` and `Std` for each input parameter when relevant.
 
@@ -90,9 +91,6 @@ Finally, users can define their own `input_prosail` values based on the
 distribution and co-distribution of their choice. When `input_prosail` is 
 provided as input, the options corresponding to the function `get_input_prosail` 
 are ignored. 
-
-
-
 
 
 # Run PROSAIL inversion following distributions and co-distibutions from ATBD
@@ -105,13 +103,13 @@ This function is expecting the variables `spec_prospect`, `spec_soil` and
 `spec_atm` to share the same spectral sampling. 
 An error message will be displayed if this is not the case. 
 
-The surface reflectance LUT obtained then corresponds to spectral information covering the 
-spectral domain from 400 nm to 2500 nm with 1 nm spectral sampling, unless these 
-variables were modified by user. 
+The surface reflectance LUT obtained then corresponds to spectral information 
+covering the spectral domain from 400 nm to 2500 nm with 1 nm spectral sampling, 
+unless these variables were modified by user. 
 This can be the case when adjusting `spec_soil` based on soil reflectance 
 extracted from an acquisition. 
-In this case, `spec_prospect` and `spec_atm` should be adjusted in order to match 
-the sensor characteristics before `train_prosail_inversion` is called.
+In this case, `spec_prospect` and `spec_atm` should be adjusted in order to 
+match the sensor characteristics before `train_prosail_inversion` is called.
 
 
 ## Apply sensor spectral response function (SRF) to the surface reflectance LUT
@@ -122,10 +120,10 @@ __Sentinel-2A__, __Sentinel-2B__, __Landsat 7__, __Landsat 8__, __Landsat 9__,
 __Venus__, __MODIS__, __Pleiades 1A__, __Pleiades 1B__ and __SPOT 6-7__.
 
 The SRF of these sensors can then be obtained by calling the function 
-`get_spectral_response_function` and providing the name of the sensor of interest
+`get_srf_sensor` and providing the name of the sensor of interest
 as input variable `sensor_name`.
 
-Alternatively, SRF can be computed from `get_spectral_response_function` by 
+Alternatively, SRF can be computed from `get_srf_sensor` by 
 defining a list `spectral_properties` including `wl` which corresponds to the 
 central wavelength and `fwhm` which corresponds to the fwhm. 
 In this case, the sensor bands are assumed to have a gaussian response.
@@ -160,8 +158,8 @@ estimation of lai, chl, ewt and lma when using Sentinel-2 data.
 ```{r train_prosail_inversion}
 library(prosail)
 # get sensor response for Sentinel-2
-sensor_name <- 'Sentinel_2'
-srf <- get_spectral_response_function(sensor_name)
+sensor_name <- 'sentinel_2'
+srf <- get_srf_sensor(sensor_name = sensor_name)
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
@@ -183,10 +181,10 @@ geom_acq$min <- data.frame('tto' = 0, 'tts' = 20, 'psi' = 0)
 geom_acq$max <- data.frame('tto' = 10, 'tts' = 30, 'psi' = 360)
 
 # train model
-modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
-                                    atbd = TRUE, geom_acq = geom_acq, 
-                                    srf = srf, selected_bands = selected_bands, 
-                                    output_dir = prosail_path)
+hybrid_mod <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
+                                      atbd = TRUE, geom_acq = geom_acq, 
+                                      srf = srf, selected_bands = selected_bands, 
+                                      output_dir = prosail_path)
 ```
 
 
@@ -196,7 +194,7 @@ down as follows:
 - produce input_prosail
 ```{r generate_input_prosail_atbd}
 input_prosail <- get_input_prosail(atbd = TRUE, 
-                                 geom_acq = geom_acq)
+                                   geom_acq = geom_acq)
 
 ```
 
@@ -205,7 +203,7 @@ input_prosail <- get_input_prosail(atbd = TRUE,
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
                             spec_prospect = prosail::spec_prospect_full_range,
-                            spec_soil = spec_soil,
+                            spec_soil = prosail::spec_soil_atbd_v2,
                             spec_atm = spec_atm)
 refl_lut_1nm <- res$surf_refl
 input_prosail$fcover <- res$fcover
@@ -217,8 +215,8 @@ input_prosail$albedo <- res$albedo
 - Apply sensor SRF
 ```{r Apply_SRF_atbd}
 refl_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda, 
-                                         srf = srf, 
-                                         input_refl_table = refl_lut_1nm)
+                                         srf = srf,
+                                         refl =  refl_lut_1nm)
 # identify spectral bands in LUT
 rownames(refl_lut) <- srf$spectral_bands
 ```
@@ -232,10 +230,11 @@ for (parm in parms_to_estimate)
 
 - Train SVM regression model
 ```{r Train_SVR}
-modelSVR <- list()
+hybrid_mod <- list()
 for (parm in parms_to_estimate)
-  modelSVR[[parm]] <- prosail_hybrid_train(refl_lut = refl_lut_noise[[parm]],
-                                           input_variables = input_prosail[[parm]])
+  hybrid_mod[[parm]] <- prosail_hybrid_train(refl_lut = refl_lut_noise[[parm]],
+                                             nb_bagg = 10,
+                                             input_variables = input_prosail[[parm]])
 ```
 
 
@@ -254,12 +253,12 @@ This is of course not recommended, and used only for illustrative purpose.
 # perform prediction based on models in previous steps
 # the prediction returns mean value obtained form the ensemble of regression 
 # models for each sample, as well as corresponding standard deviation
-MeanEstimate <- StdEstimate <- list()
+mean_estimate <- sd_estimate <- list()
 for (parm in parms_to_estimate){
-  HybridRes <- prosail_hybrid_apply(regression_models = modelSVR[[parm]],
-                                    refl = refl_lut_noise[[parm]])
-  MeanEstimate[[parm]] <- HybridRes$MeanEstimate
-  StdEstimate[[parm]] <- HybridRes$StdEstimate
+  estimated_bp <- prosail_hybrid_apply(regression_models = hybrid_mod[[parm]],
+                                       refl = refl_lut_noise[[parm]])
+  mean_estimate[[parm]] <- estimated_bp$mean_estimate
+  sd_estimate[[parm]] <- estimated_bp$sd_estimate
 }
 ```
 
@@ -286,7 +285,7 @@ xylim <- list('lai' = c(0.0,12), 'chl' = c(20,90), 'ewt' = c(0.0,0.04),
 for (parm in parms_to_estimate){
   # create dataframe and plot results
   Results <- data.frame('measured' = input_prosail[[parm]], 
-                        'estimated' = MeanEstimate[[parm]])
+                        'estimated' = mean_estimate[[parm]])
   statsReg1 <- cor.test(Results$measured, Results$estimated)$estimate
   statsReg2 <- rmserr(Results$measured, Results$estimated)$rmse
   statsReg <- paste0("r = ", round(statsReg1,2), ", RMSE = ", 
@@ -312,16 +311,16 @@ The resulting estimated values are displayed:
 
 
 <p float="left">
-  <img src="../man/figures/Hybrid_Inversion/CHL_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/chl_atbd.png" width="50%" />
   <img src="../man/figures/Hybrid_Inversion/lai_atbd.png" width="50%" />
 </p>
 <p float="left">
-  <img src="../man/figures/Hybrid_Inversion/EWT_atbd.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/LMA_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/ewt_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/lma_atbd.png" width="50%" />
 </p>
 <p float="left">
-  <img src="../man/figures/Hybrid_Inversion/fCover_atbd.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/fAPAR_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/fcover_atbd.png" width="50%" />
+  <img src="../man/figures/Hybrid_Inversion/fapar_atbd.png" width="50%" />
 </p>
 <p float="left">
   <img src="../man/figures/Hybrid_Inversion/albedo_atbd.png" width="50%" />
@@ -344,36 +343,36 @@ In this second example, the range and distribution of the input PROSAIL
 variables are defined by user. 
 This allows additional flexibility when adjusting regression models. 
 Users are then expected to provide min and max value for parameters which should 
-follow a uniform or Gaussian distribution. 
+follow a uniform or gaussian distribution. 
 
 ```{r user_defined_distribution}
 # define output directory where LUTs will be saved
-prosail_path <- 'HybridInversion_User'
+prosail_path <- 'hybrid_inversion_user'
 dir.create(path = prosail_path, showWarnings = FALSE,recursive = TRUE)
 
 # define min and max values for PROSAIL input variables
 minval <- data.frame('n_struct' = 1.0, 'chl' = 10, 'car' = 0, 'ant' = 0, 
-                     'ewt' =0.001, 'lma' = 0.001, 'brown'=0.01, 'psoil' = 0.0, 
-                     'lidf_a' = 30, 'lai' = 0.1, 'hotspot'=0.1, 'tto' = 0, 
-                     'tts' = 20, 'psi' = 100)
+                     'ewt' =0.001, 'lma' = 0.001, 'brown'=0.01, 'lai' = 0.1, 
+                     'soil_brightness' = 0.3, 'lidf_a' = 30, 'hotspot'=0.1, 
+                     'tto' = 0, 'tts' = 20, 'psi' = 100)
 maxval <- data.frame('n_struct' = 2.0, 'chl' = 60, 'car' = 15, 'ant' = 5, 
-                     'ewt' =0.045, 'lma' = 0.040, 'brown'=0.5, 'psoil' = 1.0, 
-                     'lidf_a' = 70, 'lai' = 5.0,'hotspot'=0.5,'tto' = 5,
-                     'tts' = 30, 'psi' = 150)
+                     'ewt' =0.045, 'lma' = 0.040, 'brown'=0.5, 'lai' = 5.0,
+                     'soil_brightness' = 3, 'lidf_a' = 70, 'hotspot'=0.5,
+                     'tto' = 5, 'tts' = 30, 'psi' = 150)
 
-# Define distribution for PROSAIL input variables: 'Gaussian' or 'Uniform'
-type_distrib <- data.frame('chl' = 'Gaussian', 'car' = 'Uniform', 
-                          'ant' = 'Uniform', 'brown'='Uniform', 
-                          'ewt' = 'Uniform', 'lma' = 'Uniform',
-                          'n_struct' = 'Uniform', 'psoil' = 'Uniform', 
-                          'lidf_a' = 'Uniform', 'lai' = 'Gaussian',
-                          'hotspot'='Uniform', 'tto' = 'Uniform', 
-                          'tts' = 'Uniform', 'psi' = 'Uniform')
+# Define distribution for PROSAIL input variables: 'gaussian' or 'uniform'
+type_distrib <- data.frame('chl' = 'gaussian', 'car' = 'uniform', 
+                           'ant' = 'uniform', 'brown'='uniform', 
+                           'ewt' = 'uniform', 'lma' = 'uniform',
+                           'n_struct' = 'uniform', 'soil_brightness' = 'uniform', 
+                           'lidf_a' = 'uniform', 'lai' = 'gaussian',
+                           'hotspot'='uniform', 'tto' = 'uniform', 
+                           'tts' = 'uniform', 'psi' = 'uniform')
 
-# define mean and STD for gaussian distributions
-Mean <- data.frame('chl'=45,'lai' = 2.5)
-Std <- Mean/2
-gaussian_distrib <- list('Mean' = Mean, 'Std' = Std)
+# define mean and standard deviation for gaussian distributions
+mean_var <- data.frame('chl'=45,'lai' = 2.5)
+sd_var <- mean_var/2
+gaussian_distrib <- list('mean' = mean_var, 'sd' = sd_var)
 ```
 
 A multiplicative noise can also be defined and applied to simulated reflectance. 
@@ -392,14 +391,16 @@ Once these parameters are defined, user can run `train_prosail_inversion` in
 order to produce SVR model for each variable to estimate.
 
 ```{r user_defined_train}
-modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
-                                    srf = srf, 
-                                    minval = minval, maxval = maxval, 
-                                    type_distrib = type_distrib, 
-                                    gaussian_distrib = gaussian_distrib, 
-                                    selected_bands = selected_bands, 
-                                    noise_level = noise_level, 
-                                    output_dir = prosail_path)
+options <- set_options_prosail(fun = 'train_prosail_inversion')
+options$type_distrib <- type_distrib
+options$gaussian_distrib <- gaussian_distrib
+options$noise_level <- noise_level
+hybrid_mod <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
+                                      srf = srf, 
+                                      minval = minval, maxval = maxval, 
+                                      selected_bands = selected_bands, 
+                                      output_dir = prosail_path, 
+                                      options = options)
 ```
 
 This processing steps resulting from `train_prosail_inversion` can be broken 
@@ -410,7 +411,7 @@ down as follows:
 ```{r generate_input_prosail_user}
 input_prosail <- get_input_prosail(minval = minval, maxval = maxval, 
                                    type_distrib = type_distrib, 
-                                   get_input_prosail = gaussian_distrib)
+                                   gaussian_distrib = gaussian_distrib)
 ```
 
 - produce reflectance LUT
@@ -418,7 +419,7 @@ input_prosail <- get_input_prosail(minval = minval, maxval = maxval,
 res <- generate_lut_prosail(SAILversion = '4SAIL',
                             input_prosail = input_prosail,
                             spec_prospect = prosail::spec_prospect_full_range,
-                            spec_soil = spec_soil,
+                            spec_soil = spec_soil_atbd_v2,
                             spec_atm = spec_atm)
 refl_lut_1nm <- res$surf_refl
 input_prosail$fcover <- res$fcover
@@ -430,22 +431,22 @@ input_prosail$albedo <- res$albedo
 ```{r Apply_SRF_user}
 refl_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda, 
                                          srf = srf, 
-                                         input_refl_table = refl_lut_1nm)
+                                         refl = refl_lut_1nm)
 # identify spectral bands in LUT
 rownames(refl_lut) <- srf$spectral_bands
 ```
 
 - Add noise in reflectance and produce SVR model
 ```{r Noise_user}
-refl_lut_noise <- modelSVR <- list()
+refl_lut_noise <- hybrid_mod <- list()
 for (parm in parms_to_estimate){
   subsetRefl <- refl_lut[selected_bands[[parm]],]
   refl_lut_noise[[parm]] <- subsetRefl + 
     subsetRefl*matrix(rnorm(nrow(subsetRefl)*ncol(subsetRefl),
                             0,noise_level[[parm]]),
                       nrow = nrow(subsetRefl))
-  modelSVR[[parm]] <- prosail_hybrid_train(refl_lut = refl_lut_noise[[parm]],
-                                           input_variables = input_prosail[[parm]])
+  hybrid_mod[[parm]] <- prosail_hybrid_train(refl_lut = refl_lut_noise[[parm]],
+                                             input_variables = input_prosail[[parm]])
 }
 ```
 
@@ -465,12 +466,12 @@ This is of course not recommended, and used only for illustrative purpose.
 # perform prediction based on models in previous steps
 # the prediction returns mean value obtained form the ensemble of regression 
 # models for each sample, as well as corresponding standard deviation
-MeanEstimate <- StdEstimate <- list()
+mean_estimate <- sd_estimate <- list()
 for (parm in parms_to_estimate){
-  HybridRes <- prosail_hybrid_apply(regression_models = modelSVR[[parm]],
-                                    refl = refl_lut_noise[[parm]])
-  MeanEstimate[[parm]] <- HybridRes$MeanEstimate
-  StdEstimate[[parm]] <- HybridRes$StdEstimate
+  hybrid_res <- prosail_hybrid_apply(regression_models = hybrid_mod[[parm]],
+                                     refl = refl_lut_noise[[parm]])
+  mean_estimate[[parm]] <- hybrid_res$mean_estimate
+  sd_estimate[[parm]] <- hybrid_res$sd_estimate
 }
 ```
 
@@ -493,7 +494,7 @@ xylim <- list('lai' = c(minval$lai, maxval$lai),
 for (parm in parms_to_estimate){
   # create dataframe and plot results
   Results <- data.frame('measured' = input_prosail[[parm]], 
-                        'estimated' = MeanEstimate[[parm]])
+                        'estimated' = mean_estimate[[parm]])
   statsReg1 <- cor.test(Results$measured, Results$estimated)$estimate
   statsReg2 <- rmserr(Results$measured, Results$estimated)$rmse
   statsReg <- paste0("r = ", round(statsReg1,2), 

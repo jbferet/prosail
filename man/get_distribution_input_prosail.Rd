@@ -24,11 +24,11 @@ get_distribution_input_prosail(
 
 \item{nb_samples}{numeric. Number of samples to be generated}
 
-\item{type_distrib}{list. uniform/Gaussian distribution to be applied.}
+\item{type_distrib}{list. uniform/gaussian distribution to be applied.}
 
-\item{mean}{list. mean value for parameters with Gaussian distribution}
+\item{mean}{list. mean value for parameters with gaussian distribution}
 
-\item{sd}{list. standard deviation for parameters with Gaussian distribution}
+\item{sd}{list. standard deviation for parameters with gaussian distribution}
 }
 \value{
 input_prosail list. list of nb_samples input parameters for

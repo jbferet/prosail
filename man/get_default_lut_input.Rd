@@ -12,7 +12,7 @@ get_default_lut_input(
 )
 }
 \arguments{
-\item{type_distrib}{list. uniform/Gaussian distribution to apply.}
+\item{type_distrib}{list. uniform/gaussian distribution to apply.}
 
 \item{gaussian_distrib}{list. mean & sd for parms with gaussian dist}
 

@@ -14,8 +14,9 @@
 get_spec_sensor <- function(sensor_name = 'user_defined',
                             spectral_properties = NULL,
                             srf_path = NULL){
-  srf <- get_spectral_response_function(sensor_name = sensor_name,
-                        spectral_properties = spectral_properties,
+  srf <- get_srf_sensor(sensor_name = sensor_name,
+                        wl = spectral_properties$wl,
+                        fwhm = spectral_properties$fwhm,
                         srf_path = srf_path)
   if (is.null(srf)) stop()
   # adjust optical constants from 1 nm sampling to S2 spectral sampling

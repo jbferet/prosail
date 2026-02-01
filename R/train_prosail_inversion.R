@@ -13,7 +13,7 @@
 #' @param selected_bands list. bands used for regression for each input param
 #' @param options list. options for train_prosail_inversion
 #' - codistribution_lai boolean. TRUE: codistrib with LAI accounted for
-#' - type_distrib  list. Type of distribution. 'Uniform' or 'Gaussian'
+#' - type_distrib  list. Type of distribution. 'uniform' or 'gaussian'
 #' - gaussian_distrib  list. Mean value and STD corresponding to the
 #' parameters sampled with gaussian distribution
 #' - parm_set list. list of input parameters set to a specific value
@@ -123,6 +123,8 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
       }
     }
   } else {
+    if (!is.null(minval$soil_brightness))
+      options$Bs <- TRUE
     input_prosail <- get_input_prosail(atbd = atbd, geom_acq = geom_acq,
                                        codistribution_lai = codistribution_lai,
                                        minval = minval, maxval = maxval,
@@ -153,7 +155,7 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
     if (is.null(spec_prospect))
       spec_prospect <- prosail::spec_prospect_full_range
     if (is.null(spec_soil) & !is.null(input_prosail$soil_ID)){
-      if (atbd == TRUE | tolower(atbd) == 'v2'){
+      if (atbd == TRUE | tolower(atbd) == 'v2' | options$Bs == TRUE){
         spec_soil <- prosail::spec_soil_atbd_v2
       } else if (tolower(atbd) == 'v3'){
         spec_soil <- prosail::spec_soil_atbd_v2

@@ -5,9 +5,9 @@
 #' @param maxval list. maximum value for a list of parameters randomly produced
 #' @param parm_set list. parameters to be set to a given value
 #' @param nb_samples numeric. Number of samples to be generated
-#' @param type_distrib list. uniform/Gaussian distribution to be applied.
-#' @param mean list. mean value for parameters with Gaussian distribution
-#' @param sd list. standard deviation for parameters with Gaussian distribution
+#' @param type_distrib list. uniform/gaussian distribution to be applied.
+#' @param mean list. mean value for parameters with gaussian distribution
+#' @param sd list. standard deviation for parameters with gaussian distribution
 #'
 #' @return input_prosail list. list of nb_samples input parameters for
 #' prosail simulation
@@ -21,15 +21,15 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL,
                                            sd = NULL){
 
   if (is.null(type_distrib))
-    type_distrib <- data.frame('chl'='Uniform', 'car'='Uniform',
-                              'ant' = 'Uniform', 'ewt' = 'Uniform',
-                              'lma' = 'Uniform', 'brown'='Uniform',
-                              'prot' = 'Uniform', 'cbc' = 'Uniform',
-                              'n_struct' = 'Uniform', 'psoil' = 'Uniform',
-                              'soil_brightness' = 'Uniform',
-                              'lidf_a' = 'Uniform', 'lai' = 'Uniform',
-                              'hotspot'='Uniform', 'tto' = 'Uniform',
-                              'tts' = 'Uniform', 'psi' = 'Uniform')
+    type_distrib <- data.frame('chl'='uniform', 'car'='uniform',
+                              'ant' = 'uniform', 'ewt' = 'uniform',
+                              'lma' = 'uniform', 'brown'='uniform',
+                              'prot' = 'uniform', 'cbc' = 'uniform',
+                              'n_struct' = 'uniform', 'psoil' = 'uniform',
+                              'soil_brightness' = 'uniform',
+                              'lidf_a' = 'uniform', 'lai' = 'uniform',
+                              'hotspot'='uniform', 'tto' = 'uniform',
+                              'tts' = 'uniform', 'psi' = 'uniform')
   # define all input parameters from PROSAIL
   NAs <- NA*vector(length = nb_samples)
   input_prosail <- data.frame('chl' = NAs, 'car' = NAs, 'ant' = NAs,
@@ -95,12 +95,12 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL,
   for (i in seq_len(length(minval))){
     sel <- names(minval)[i]
     # if uniform distribution
-    if (type_distrib[[sel]] == 'Uniform')
+    if (tolower(type_distrib[[sel]]) == 'uniform')
       input_prosail[[sel]] <- runif(nb_samples,
                                     min = minval[1,i],
                                     max = maxval[1,i])
-    # if Gaussian distribution
-    if (type_distrib[[sel]] == 'Gaussian'){
+    # if gaussian distribution
+    if (tolower(type_distrib[[sel]]) == 'gaussian'){
       set.seed(42)
       input_prosail[[sel]] <- truncnorm::rtruncnorm(n = nb_samples,
                                                     a = minval[[sel]],
@@ -109,5 +109,6 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL,
                                                     sd = sd[[sel]])
     }
   }
+  input_prosail$soil_ID <- sample(x = 7, size = nb_samples, replace = T)
   return(input_prosail)
 }

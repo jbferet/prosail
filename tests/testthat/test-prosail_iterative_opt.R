@@ -22,10 +22,10 @@ test_that("PROSAIL iterative optimization", {
                       lidf_a = parm_set$lidf_a, rsoil = rsoil,
                       tts = parm_set$tts, tto = parm_set$tto,
                       psi = parm_set$psi)
-  surf_refl_1nm <- compute_surf_refl(rdot = refl_1nm$rdot,
-                                     rsot = refl_1nm$rsot,
-                                     tts = parm_set$tts,
-                                     spec_atm_sensor = spec_atm)
+  surf_refl_1nm <- get_surf_refl(rdot = refl_1nm$rdot,
+                                 rsot = refl_1nm$rsot,
+                                 tts = parm_set$tts,
+                                 spec_atm_sensor = spec_atm)
   # invert 1 nm data
   spec_soil_sensor <- spec_soil_ossl[c('lambda', 'soil_01')]
   names(spec_soil_sensor) <- c('lambda', 'refl')

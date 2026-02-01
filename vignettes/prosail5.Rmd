@@ -44,15 +44,15 @@ sensor response function to all optical constants used in PROSAIL.
 # apply sensor characteristics to PROSPECT optical constants
 wvl <- prosail::spec_prospect_full_range$lambda
 spec_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                            input_refl_table = spec_prospect_full_range,
+                                            refl = spec_prospect_full_range,
                                             srf = srf)
 # apply sensor characteristics to atmospheric properties
 spec_atm_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                                input_refl_table = spec_atm,
+                                                refl = spec_atm,
                                                 srf = srf)
 # apply sensor characteristics to soil properties
 spec_soil_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                                 input_refl_table = spec_soil,
+                                                 refl = spec_soil,
                                                  srf = srf)
 ```
 
@@ -81,22 +81,22 @@ refl_sensor <- prosail(spec_sensor = spec_sensor,
                        rsoil = spec_soil_sensor$max_refl)
 
 # Computes surface reflectance based on outputs from prosail and sun position
-surf_refl_sensor <- compute_surf_refl(rdot = refl_sensor$rdot, 
-                                      rsot = refl_sensor$rsot, 
-                                      tts = tts,
-                                      spec_atm_sensor = spec_atm_sensor)
+surf_refl_sensor <- get_surf_refl(rdot = refl_sensor$rdot, 
+                                  rsot = refl_sensor$rsot, 
+                                  tts = tts,
+                                  spec_atm_sensor = spec_atm_sensor)
 
 # Computes fAPAR based on outputs from PROSAIL and sun position
-fapar_sensor <- compute_fapar(abs_dir = refl_sensor$abs_dir, 
-                              abs_hem = refl_sensor$abs_hem, 
-                              tts = tts, 
-                              spec_atm_sensor = spec_atm_sensor)
+fapar_sensor <- get_fapar(abs_dir = refl_sensor$abs_dir, 
+                          abs_hem = refl_sensor$abs_hem, 
+                          tts = tts, 
+                          spec_atm_sensor = spec_atm_sensor)
 
 # Computes albedo based on outputs from PROSAIL and sun position
-albedo_sensor <- compute_albedo(rsdstar = refl_sensor$rsdstar, 
-                                rddstar = refl_sensor$rddstar, 
-                                tts = tts,
-                                spec_atm_sensor = spec_atm_sensor)
+albedo_sensor <- get_albedo(rsdstar = refl_sensor$rsdstar, 
+                            rddstar = refl_sensor$rddstar, 
+                            tts = tts,
+                            spec_atm_sensor = spec_atm_sensor)
 ```
 
 ### Use alternative implementation of machine learning algorithm for hybrid inversion

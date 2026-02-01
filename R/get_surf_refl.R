@@ -15,7 +15,7 @@
 #' @return surf_refl numeric. surface reflectance
 #' @export
 
-compute_surf_refl  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
+get_surf_refl  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
 
   ############################## #
   ##	direct / diffuse light	##

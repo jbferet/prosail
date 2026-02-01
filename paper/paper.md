@@ -329,17 +329,16 @@ sun zenith angle and assuming clear sky conditions.
 
 ```r
 # Compute surface reflectance with known skyl
-surf_refl_4sail <- compute_surf_refl(rdot = ref_4sail$rdot, 
-                                     rsot = ref_4sail$rsot,
-                                     skyl = 0.23, 
-                                     spec_atm_sensor = spec_atm)
+surf_refl_4sail <- get_surf_refl(rdot = ref_4sail$rdot, 
+                                 rsot = ref_4sail$rsot,
+                                 skyl = 0.23, 
+                                 spec_atm_sensor = spec_atm)
 
 # Compute surface reflectance using sun zenith angle (clear sky conditions)
-surf_refl_4sail <- compute_surf_refl(rdot = ref_4sail$rdot, 
-                                     rsot = ref_4sail$rsot,
-                                     tts = 40, 
-                                     spec_atm_sensor = spec_atm)
-
+surf_refl_4sail <- get_surf_refl(rdot = ref_4sail$rdot, 
+                                 rsot = ref_4sail$rsot,
+                                 tts = 40, 
+                                 spec_atm_sensor = spec_atm)
 ```
 
 ## Computation of fAPAR and albedo
@@ -349,19 +348,18 @@ canopy absorptance for direct solar incident flux and canopy absorptance for
 hemispherical diffuse incident flux.
 
 ```r
-fapar_4sail <- compute_fapar(abs_dir = ref_4sail$abs_dir,
-                             abs_hem = ref_4sail$abs_hem,
-                             tts = tts, spec_atm_sensor = spec_atm)
+fapar_4sail <- get_fapar(abs_dir = ref_4sail$abs_dir,
+                         abs_hem = ref_4sail$abs_hem,
+                         tts = tts, spec_atm_sensor = spec_atm)
 ```
 
 Finally, the albedo can be derived from direct solar incident flux and 
 hemispherical diffuse incident flux.
 
 ```r
-albedo_4sail <- compute_albedo(rsdstar = ref_4sail$rsdstar,
-                               rddstar = ref_4sail$rddstar,
-                               tts = tts, spec_atm_sensor = spec_atm)
-
+albedo_4sail <- get_albedo(rsdstar = ref_4sail$rsdstar,
+                           rddstar = ref_4sail$rddstar,
+                           tts = tts, spec_atm_sensor = spec_atm)
 ```
 
 ## Simulating surface reflectance acquired by a sensor 
@@ -384,12 +382,12 @@ A selection of SRF corresponding to multiple sensors is already implemented in
 
 Users can also define the sensor of their choice, either by providing central 
 wavelength and full width at half maximum (fwhm) corresponding to each band and 
-assuming Gaussian response for each band, or by providing a file describing the 
+assuming gaussian response for each band, or by providing a file describing the 
 exact SRF. 
 
 ```r
 # get the spectral response function (SRF) for Sentinel-2A
-srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
+srf_s2 <- get_srf_sensor(sensor_name = 'Sentinel_2A')
 
 # get the SRF corresponding to a sensor defined by user. 
 # Hyperspectral sensor: 10 nm spectral sampling & 10 nm fwhm for all bands
@@ -397,7 +395,7 @@ wl <- seq(400, 2500, by = 10)
 fwhm <- rep(x = 10, length = length(wl))
 spectral_props = data.frame(wl = wl, fwhm = fwhm)
 sensor_name <- 'Hyperspectral_Sensor'
-srf_hsi <- get_spectral_response_function(sensor_name = sensor_name,
+srf_hsi <- get_srf_sensor(sensor_name = sensor_name,
                                           spectral_properties = spectral_props)
 
 ```
@@ -456,9 +454,9 @@ refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
                     lai = truth$lai, hotspot = parm_set$hotspot, 
                     lidf_a = init$lidf_a, rsoil = rsoil, tts = parm_set$tts, 
                     tto = parm_set$tto, psi = parm_set$psi)
-surf_refl_1nm <- compute_surf_refl(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
-                                   tts = parm_set$tts, 
-                                   spec_atm_sensor = spec_atm)
+surf_refl_1nm <- get_surf_refl(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
+                               tts = parm_set$tts, 
+                               spec_atm_sensor = spec_atm)
 
 # invert PROSAIL on surface reflectance with 1 nm spectral sampling
 est_1nm <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl, 
@@ -470,7 +468,7 @@ est_1nm <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl,
                           parm_set = parm_set)
 
 # convert spectral input based on Sentinel-2 SRF
-srf_s2 <- get_spectral_response_function(sensor_name = 'Sentinel_2A')
+srf_s2 <- get_srf_sensor(sensor_name = 'Sentinel_2A')
 spec_prospect <- spec_prospect_full_range
 lambda <- spec_prospect_full_range$lambda
 surf_refl_S2 <- apply_sensor_characteristics(wvl = lambda, 
@@ -590,8 +588,8 @@ The standard deviation can also be derived from this ensemble of predictors.
 However, standard deviation may not provide accurate model uncertainty 
 quantification [@palmer2022].
 
-The default parameterization of this inversion strategy uses an ensemble of 20 
-SVR models, each of them trained with 100 samples. 
+The default parameterization of this inversion strategy uses an ensemble of 10 
+SVR models, each of them trained with 200 samples. 
 Therefore, only 2000 samples are required for the training stage, which is 
 relatively low compared to the 41472 cases used for the training of the 
 artificial neural networks used in the SNAP toolbox. 
@@ -616,7 +614,7 @@ using the three spectral bands corresponding to green channel (B3), red channel
 
 ```r
 # define sensor to simulate with PROSAIL
-srf <- get_spectral_response_function(sensor_name = 'Sentinel_2')
+srf <- get_srf_sensor(sensor_name = 'Sentinel_2')
 
 # define parameters to estimate
 parms_to_estimate <- c('lai', 'fcover', 'fapar')
@@ -691,8 +689,8 @@ mean_estimate <- sd_estimate <- list()
 for (parm in parms_to_estimate){
   HybridRes <- prosail_hybrid_apply(regression_models = modelSVR[[parm]],
                                     refl = surf_refl_noise[[parm]])
-  mean_estimate[[parm]] <- HybridRes$MeanEstimate
-  sd_estimate[[parm]] <- HybridRes$StdEstimate
+  mean_estimate[[parm]] <- HybridRes$mean_estimate
+  sd_estimate[[parm]] <- HybridRes$sd_estimate
 }
 
 ```
@@ -773,7 +771,7 @@ geom_acq <- list('min' = data.frame('tto' = min(s2_geom$VZA, na.rm = T),
                                     'psi' = max(abs(s2_geom$SAA-s2_geom$VAA), 
                                                 na.rm = T)))
 # get sensor response for Sentinel-2
-srf <- get_spectral_response_function(sensor_name = 'Sentinel_2B')
+srf <- get_srf_sensor(sensor_name = 'Sentinel_2B')
 band_names <- srf$spectral_bands
 
 # define parameters to estimate

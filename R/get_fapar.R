@@ -16,8 +16,8 @@
 #'
 #' @return fapar numeric. fAPAR
 #' @export
-compute_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
-                           par_range = c(400, 700)){
+get_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
+                       par_range = c(400, 700)){
 
   ############################## #
   ##	direct / diffuse light	##
@@ -31,7 +31,7 @@ compute_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
   par_difo <- skyl*ed
   top <- (abs_dir*par_diro+abs_hem*par_difo)
   par_domain <- which(spec_atm_sensor$lambda >= par_range[1] &
-                       spec_atm_sensor$lambda <= par_range[2])
+                        spec_atm_sensor$lambda <= par_range[2])
   fapar <- sum(top[par_domain])/sum(par_diro[par_domain]+par_difo[par_domain])
   return(fapar)
 }
@@ -40,6 +40,6 @@ compute_fapar  <- function(abs_dir, abs_hem, tts, spec_atm_sensor,
 #' @export
 Compute_fAPAR  <- function(abs_dir, abs_hem, tts, SpecATM_Sensor,
                            PAR_range = c(400, 700)){
-  .Deprecated("compute_fapar")
-  compute_fapar(abs_dir, abs_hem, tts, SpecATM_Sensor, PAR_range)
+  .Deprecated("get_fapar")
+  get_fapar(abs_dir, abs_hem, tts, SpecATM_Sensor, PAR_range)
 }

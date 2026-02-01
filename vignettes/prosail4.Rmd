@@ -83,24 +83,20 @@ library(preprocS2)
 library(sf)
 
 # 1- define input & output directories
-output_dir_s2 <- './S2_images'
+output_dir_s2 <- './s2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
 # save aoi as vector file
 aoi_path <- 'barrax_aoi.GPKG'
-sf::st_write(obj = aoi, dsn = aoi_path, driver = 'GPKG')
-
-# get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
-path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
+sf::write_sf(obj = aoi, dsn = aoi_path, driver = 'GPKG')
 
 # 3- get S2 acquisition and geometry of acquisition for study area
 options <- set_options_preprocS2(fun = 'get_s2_raster')
 options$geom_acq <- TRUE
-options$overwrite <- FALSE
+options$overwrite <- TRUE
 list_files <- get_s2_raster(aoi_path = aoi_path, datetime = datetime, 
                             output_dir = output_dir_s2, 
-                            path_S2tilinggrid = path_S2tilinggrid, 
-                            site_name = 'Barrax', options = options)
+                            site_name = 'barrax', options = options)
 # Sentinel-2 L2A reflectance
 refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
@@ -114,7 +110,7 @@ geometryAcquisition <- list_files$geometryAcquisition
 The RGB representation of the Sentinel-2 acquisition is displayed below. 
 <p>
 
-<img src="../man/figures/S2/SiteRGB.png" width="100%" height="100%" class="center">
+<img src="../man/figures/S2/s2_rgb.png" width="100%" height="100%" class="center">
 
 </p>
 
@@ -140,11 +136,11 @@ over smaller raster data.
 library(prosail)
 output_dir_BP <- './PROSAIL'
 # get sensor response for Sentinel-2
-sensor_name <- 'Sentinel_2'
-srf <- get_spectral_response_function(sensor_name)
+sensor_name <- 'sentinel_2'
+srf <- get_srf_sensor(sensor_name)
 
 # define parameters to estimate
-parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar', 'albedo')
+parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar')
 
 # define spectral bands required to train SVR model for each variable
 selected_bands <- list('lai' = c('B3','B4','B8'), 
@@ -159,11 +155,11 @@ angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datet
                                         path_bbox = aoi_path)
 # define ranges for zenith angles of acquisition
 geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
-                                   'tts' = angles_path$MinAngle['sza'], 
-                                   'psi' = angles_path$MinAngle['psi']), 
-                'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
-                                   'tts' = angles_path$MaxAngle['sza'], 
-                                   'psi' = angles_path$MaxAngle['psi']))
+                                    'tts' = angles_path$MinAngle['sza'], 
+                                    'psi' = angles_path$MinAngle['psi']), 
+                 'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
+                                    'tts' = angles_path$MaxAngle['sza'], 
+                                    'psi' = angles_path$MaxAngle['psi']))
 
 # users can define geom_acq following their own conditions by following the list 
 # structure above if preprocS2 is not applied to get imagery
@@ -173,11 +169,12 @@ geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
 # the R package caret instead of liquidSVM
 options <- set_options_prosail(fun = 'train_prosail_inversion')
 options$method <- 'liquidSVM'
-modelSVR <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
-                                    atbd = TRUE, geom_acq = geom_acq, srf = srf, 
-                                    selected_bands = selected_bands, 
-                                    output_dir = output_dir_BP, 
-                                    method = options$method)
+hybrid_model <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
+                                        atbd = TRUE, geom_acq = geom_acq, 
+                                        srf = srf, 
+                                        selected_bands = selected_bands, 
+                                        output_dir = output_dir_BP, 
+                                        options = options)
 
 # apply regression model on Sentinel-2 raster data
 # S2 imagery is provided with reflectance defined as integer between 0 and 10000
@@ -187,11 +184,11 @@ options <- set_options_prosail(fun = 'apply_prosail_inversion',
                                options = options)
 options$multiplying_factor = 10000
 BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
-                                  hybrid_model = modelSVR, 
+                                  hybrid_model = hybrid_model, 
                                   output_dir = output_dir_BP,
                                   selected_bands = selected_bands, 
                                   band_names = srf$spectral_bands, 
-                                  mask_path = vegetation_mask, 
+                                  mask_path = SCL, 
                                   options = options)
 ```
 
@@ -199,18 +196,18 @@ BPvars <- apply_prosail_inversion(raster_path = refl_L2A,
 Assessed biophysical properties computed with `apply_prosail_inversion` are then 
 saved as individual raster files. 
 For each biophysical variable, the mean value and standard deviation defined by 
-the input variable `nb_models` from `modelSVR` (default = 20 models) is saved.
+the input variable `nb_models` from `hybrid_model` (default = 10 models) is saved.
 
 The biophysical variables `chl`, `lai`, `fapar` and `fcover` are displayed 
 below:
 
 <p float="left">
-  <img src="../man/figures/S2/CHL.png" width="50%" />
+  <img src="../man/figures/S2/chl.png" width="50%" />
   <img src="../man/figures/S2/lai.png" width="50%" />
 </p>
 <p float="left">
-  <img src="../man/figures/S2/fAPAR.png" width="50%" />
-  <img src="../man/figures/S2/fCover.png" width="50%" />
+  <img src="../man/figures/S2/fapar.png" width="50%" />
+  <img src="../man/figures/S2/fcover.png" width="50%" />
 </p>
 
 

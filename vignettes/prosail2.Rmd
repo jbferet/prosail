@@ -154,8 +154,8 @@ input_prospect <- data.frame('chl' = c(40,5), 'car' = c(8,5), 'ant' = c(0,1),
 # define additional 4SAIL2 parameters
 fraction_brown <- 0.5
 diss <- 0.5
-Cv <- 1
-Zeta <- 1
+cv <- 1
+zeta <- 1
 
 # run prosail with 4SAIL2
 refl_prosail2 <- prosail(SAILversion = '4SAIL2',
@@ -169,7 +169,7 @@ refl_prosail2 <- prosail(SAILversion = '4SAIL2',
 
 ## Compute simplified surface reflectance under the assumption of clear conditions conditions
 
-The function `compute_surf_refl` computes the surface reflectance in the 
+The function `get_surf_refl` computes the surface reflectance in the 
 direction of the observer, by combining both hemispherical-directional and 
 bi-directional reflectance factors.
 The direct and diffuse light are taken into account as described by 
@@ -181,41 +181,41 @@ by [Spitters et al., 1986](https://www.sciencedirect.com/science/article/pii/016
 # refl_prosail is the variable obtained when running prosail as in the previous 
 # illustration.
 # spec_atm corresponds to the direct and diffuse radiation solar spectra
-surf_refl_4SAIL <- compute_surf_refl(rdot = refl_prosail$rdot,
-                                     rsot = refl_prosail$rsot,
-                                     tts = tts,
-                                     spec_atm_sensor = spec_atm)
-surf_refl_4SAIL2 <- compute_surf_refl(rdot = refl_prosail2$rdot,
-                                      rsot = refl_prosail2$rsot,
-                                      tts = tts,
-                                      spec_atm_sensor = spec_atm)
+surf_refl_4SAIL <- get_surf_refl(rdot = refl_prosail$rdot,
+                                 rsot = refl_prosail$rsot,
+                                 tts = tts,
+                                 spec_atm_sensor = spec_atm)
+surf_refl_4SAIL2 <- get_surf_refl(rdot = refl_prosail2$rdot,
+                                  rsot = refl_prosail2$rsot,
+                                  tts = tts,
+                                  spec_atm_sensor = spec_atm)
 
 ```
 
 ## Compute fraction of absorbed photosyntehtically active radiation (fAPAR)
 
-The function `compute_fapar` computes the fAPAR in the direction of the observer, 
+The function `get_fapar` computes the fAPAR in the direction of the observer, 
 by combining both canopy absorptance for direct solar incident flux and canopy 
 absorptance for hemispherical diffuse incident flux. 
 
 ```{r compute fAPAR}
-fapar_4sail <- compute_fapar(abs_dir = refl_prosail$abs_dir,
-                             abs_hem = refl_prosail$abs_hem,
-                             tts = tts,
-                             spec_atm_sensor = spec_atm)
+fapar_4sail <- get_fapar(abs_dir = refl_prosail$abs_dir,
+                         abs_hem = refl_prosail$abs_hem,
+                         tts = tts,
+                         spec_atm_sensor = spec_atm)
 ```
 
 ## Compute albedo
 
-The function `compute_albedo` computes the albedo by combining the contribution 
+The function `get_albedo` computes the albedo by combining the contribution 
 of direct solar incident flux (rsdstar) and the contribution of hemispherical 
 diffuse incident flux (rddstar). 
 
 ```{r compute albedo}
-albedo_4SAIL <- compute_albedo(rsdstar = refl_prosail$rsdstar,
-                               rddstar = refl_prosail$rddstar,
-                               tts = tts,
-                               spec_atm_sensor = spec_atm)
+albedo_4SAIL <- get_albedo(rsdstar = refl_prosail$rsdstar,
+                           rddstar = refl_prosail$rddstar,
+                           tts = tts,
+                           spec_atm_sensor = spec_atm)
 ```
 
 ## Simulating sensor reflectance
@@ -241,8 +241,7 @@ sensor_name <- 'Sentinel_2A'
 # if interested in a different satellite, please use srf_path to 
 # locate the SRF file expected to be named 'sensor_name_spectral_response.csv' 
 # (separator = tabulations)
-SRF_S2 <- get_spectral_response_function(sensor_name = sensor_name, 
-                                         srf_path = NULL)
+SRF_S2 <- get_srf_sensor(sensor_name = sensor_name, srf_path = NULL)
 ```
 
 Other satellites can be simulated as long as the SRF is provided as CSV file, 
@@ -263,7 +262,7 @@ WL <- seq(400, 2400, by = 10)
 # fwhm is a vector giving fwhm for each band in nanometer
 fwhm <- 10+ 0*seq(400, 2400, by = 10)
 # compute corresponding SRF
-SRF_SH <- compute_srf(WL,fwhm)
+SRF_SH <- get_srf(wvl = WL,fwhm = fwhm)
 ```
 
 Then, reflectance can be converted from 1-nm spectral sampling (default 
@@ -275,5 +274,5 @@ The following example uses SRF corresponding to Sentinel-2 sensor.
 wvl <- prosail::spec_prospect_full_range$lambda
 surf_refl_4SAIL_S2 <- apply_sensor_characteristics(wvl = wvl,
                                                    srf = SRF_S2,
-                                                   input_refl_table = surf_refl_4SAIL)
+                                                   refl = surf_refl_4SAIL)
 ```

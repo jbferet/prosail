@@ -32,7 +32,7 @@ get_input_prosail(
 
 \item{maxval}{list. max val for input parameters}
 
-\item{type_distrib}{list. Type of distribution: 'Uniform' or 'Gaussian'}
+\item{type_distrib}{list. Type of distribution: 'uniform' or 'gaussian'}
 
 \item{gaussian_distrib}{list. Mean & SD for parms sampled with gaussian dist}
 

@@ -8,7 +8,7 @@ from spectral data}
 prosail_hybrid_train(
   refl_lut,
   input_variables,
-  nb_bagg = 20,
+  nb_bagg = 10,
   replacement = FALSE,
   method = "liquidSVM",
   verbose = FALSE,

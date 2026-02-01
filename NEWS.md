@@ -21,6 +21,7 @@ prepare for JOSS submission
 - adjust range of ewt to avoid extremely high values when calling 'get_atbd_v3_lut_input'
 - add support for package prospect v2.0
 - use surface reflectance instead of brf
+- update vignettes and figures
 
 ##fix 
 - fixed bug when introducing OSSL soil and disactivate OSSL for v3 beta

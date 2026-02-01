@@ -26,7 +26,7 @@
 #' @importFrom stringr str_split
 #' @export
 
-prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 20,
+prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 10,
                                  replacement = FALSE, method = 'liquidSVM',
                                  verbose = FALSE, progressBar = FALSE,
                                  options = NULL){
@@ -34,6 +34,7 @@ prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 20,
   if (method == 'liquidSVM' & is_liquidSVM_available=='')
     method <- 'nu-svr'
   x <- y <- ymean <- ystdmin <- ystdmax <- NULL
+  tuned_model <- NULL
   # split the LUT into nb_bagg subsets
   nb_samples <- length(input_variables)
   if (dim(refl_lut)[2]==nb_samples)
@@ -225,7 +226,9 @@ PROSAIL_Hybrid_Train <- function(BRF_LUT, InputVar, nbEnsemble = 20,
                                  method = 'liquidSVM',
                                  verbose = FALSE, progressBar = FALSE){
   .Deprecated("prosail_hybrid_train")
-  prosail_hybrid_train(BRF_LUT, InputVar, nbEnsemble, WithReplacement,
-                       method, verbose, progressBar)
+  prosail_hybrid_train(refl_lut = BRF_LUT, input_variables = InputVar,
+                       nb_bagg = nbEnsemble, replacement = WithReplacement,
+                       method = method, verbose = verbose,
+                       progressBar = progressBar)
 }
 

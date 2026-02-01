@@ -7,7 +7,7 @@
 #' @param codistribution_lai boolean. TRUE accounts for codistribution with LAI
 #' @param minval list. min val for input parameters
 #' @param maxval list. max val for input parameters
-#' @param type_distrib  list. Type of distribution: 'Uniform' or 'Gaussian'
+#' @param type_distrib  list. Type of distribution: 'uniform' or 'gaussian'
 #' @param gaussian_distrib  list. Mean & SD for parms sampled with gaussian dist
 #' @param parm_set list. list of input parameters set to a specific value
 #' @param nb_samples numeric. number of samples in training LUT
@@ -91,6 +91,11 @@ get_InputPROSAIL <- function(atbd = FALSE, GeomAcq = NULL, Codist_LAI = TRUE,
                              TypeDistrib = NULL, GaussianDistrib = NULL,
                              ParmSet = NULL, nbSamples = 2000, verbose = FALSE){
   .Deprecated("get_input_prosail")
-  get_input_prosail(atbd, GeomAcq, Codist_LAI, minval, maxval, TypeDistrib,
-                    GaussianDistrib, ParmSet, nbSamples, verbose)
+  get_input_prosail(atbd = atbd, geom_acq = GeomAcq,
+                    codistribution_lai = Codist_LAI,
+                    minval = minval, maxval = maxval,
+                    type_distrib = TypeDistrib,
+                    gaussian_distrib = GaussianDistrib,
+                    parm_set = ParmSet, nb_samples = nbSamples,
+                    verbose = verbose)
 }

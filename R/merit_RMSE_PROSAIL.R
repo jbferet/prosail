@@ -45,9 +45,9 @@ merit_rmse_prosail <- function(xinit, parms_xinit, refl_mes,
                   tts = input_prosail$tts, tto = input_prosail$tto,
                   psi = input_prosail$psi, rsoil = rsoil)
   # Computes refl based on outputs from PROSAIL and sun position
-  refl_mod <- compute_surf_refl(rdot = refl$rdot, rsot = refl$rsot,
-                                tts = input_prosail$tts,
-                                spec_atm_sensor = spec_atm_sensor)
+  refl_mod <- get_surf_refl(rdot = refl$rdot, rsot = refl$rsot,
+                            tts = input_prosail$tts,
+                            spec_atm_sensor = spec_atm_sensor)
   # compute cost
   fc <- cost_function_rmse_prosail(refl_mes = refl_mes,
                                    refl_mod = refl_mod$surf_refl,

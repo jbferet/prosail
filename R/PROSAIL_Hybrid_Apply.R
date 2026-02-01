@@ -6,8 +6,8 @@
 #' @param progressBar boolean. should progressbar be displayed?
 #'
 #' @return HybridRes list. Estimated values corresponding to refl. Includes
-#' - MeanEstimate = mean value for the ensemble regression model
-#' - StdEstimate = std value for the ensemble regression model
+#' - mean_estimate = mean value for the ensemble regression model
+#' - sd_estimate = std value for the ensemble regression model
 #' @importFrom stats predict
 #' @importFrom matrixStats rowSds
 #' @importFrom progress progress_bar
@@ -49,8 +49,8 @@ prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){
   estimated_val <- do.call(cbind,estimated_val)
   mean_estimate <- rowMeans(estimated_val)
   sd_estimate <- rowSds(estimated_val)
-  return(list("MeanEstimate" = mean_estimate,
-              "StdEstimate" = sd_estimate))
+  return(list("mean_estimate" = mean_estimate,
+              "sd_estimate" = sd_estimate))
 }
 
 

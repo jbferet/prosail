@@ -1,6 +1,6 @@
 #' Sets default values for PROSAIL LUT simulation when not defined by user
 #'
-#' @param type_distrib list. uniform/Gaussian distribution to apply.
+#' @param type_distrib list. uniform/gaussian distribution to apply.
 #' @param gaussian_distrib  list. mean & sd for parms with gaussian dist
 #' @param minval list. minimum value for a list of parameters randomly produced
 #' @param maxval list. maximum value for a list of parameters randomly produced
@@ -14,13 +14,14 @@ get_default_lut_input <- function(type_distrib = NULL,
                                   maxval = NULL){
 
   # define mean / sd for gaussian
-  if (is.null(gaussian_distrib)) gaussian_distrib <- list('mean'=NULL,'sd'=NULL)
+  if (is.null(gaussian_distrib))
+    gaussian_distrib <- list('mean'=NULL,'sd'=NULL)
   # check consistency between type_distrib and gaussian_distrib
   if (!is.null(type_distrib)){
     names_dist <- names(type_distrib)
-    which_gauss <- which(type_distrib=='Gaussian')
+    which_gauss <- which(type_distrib=='gaussian')
     if (length(which_gauss)>0){
-      names_gauss <- names(gaussian_distrib$Mean)
+      names_gauss <- names(gaussian_distrib$mean)
       sel_gauss <- names_dist[which_gauss]
       match_gauss <- match(sel_gauss, names_gauss)
       which_missed <- sel_gauss[which(is.na(match_gauss))]
@@ -47,13 +48,13 @@ get_default_lut_input <- function(type_distrib = NULL,
   }
   # define uniform / gaussian distribution
   if (is.null(type_distrib))
-    type_distrib <- data.frame('chl'='Uniform', 'car'='Uniform', 'ant'='Uniform',
-                              'brown'='Uniform', 'ewt' = 'Uniform',
-                              'lma' = 'Uniform', 'n_struct' = 'Uniform',
-                              'psoil' = 'Uniform', 'lidf_a' = 'Uniform',
-                              'lai' = 'Uniform', 'hotspot'='Uniform',
-                              'tto' = 'Uniform','tts' = 'Uniform',
-                              'psi' = 'Uniform', 'soil_brightness' = 'Uniform')
+    type_distrib <- data.frame('chl'='uniform', 'car'='uniform', 'ant'='uniform',
+                              'brown'='uniform', 'ewt' = 'uniform',
+                              'lma' = 'uniform', 'n_struct' = 'uniform',
+                              'psoil' = 'uniform', 'lidf_a' = 'uniform',
+                              'lai' = 'uniform', 'hotspot'='uniform',
+                              'tto' = 'uniform','tts' = 'uniform',
+                              'psi' = 'uniform', 'soil_brightness' = 'uniform')
   # define min and max values
   if (is.null(minval))
     minval <- data.frame('chl' = 10, 'car' = 0, 'ewt' = 0.01, 'ant' = 0,
@@ -83,5 +84,7 @@ get_default_LUT_input <- function(TypeDistrib = NULL,
                                   minval = NULL,
                                   maxval = NULL){
   .Deprecated("get_default_lut_input")
-  get_default_lut_input(TypeDistrib, GaussianDistrib, minval, maxval)
+  get_default_lut_input(type_distrib = TypeDistrib,
+                        gaussian_distrib = GaussianDistrib,
+                        minval = minval, maxval = maxval)
 }

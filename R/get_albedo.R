@@ -17,8 +17,8 @@
 #'
 #' @return albedo numeric. albedo
 #' @export
-compute_albedo  <- function(rsdstar, rddstar, tts, spec_atm_sensor,
-                            par_range = c(400, 2400)){
+get_albedo  <- function(rsdstar, rddstar, tts, spec_atm_sensor,
+                        par_range = c(400, 2400)){
 
   ############################## #
   ##	direct / diffuse light	##
@@ -43,6 +43,6 @@ compute_albedo  <- function(rsdstar, rddstar, tts, spec_atm_sensor,
 #' @export
 Compute_albedo  <- function(rsdstar, rddstar, tts, SpecATM_Sensor,
                             PAR_range = c(400, 2400)){
-  .Deprecated("compute_albedo")
-  compute_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range)
+  .Deprecated("get_albedo")
+  get_albedo(rsdstar, rddstar, tts, SpecATM_Sensor, PAR_range)
 }

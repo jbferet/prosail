@@ -18,17 +18,17 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
                                             mean = NULL, sd = NULL){
 
   if (is.null(type_distrib)){
-    type_distrib <- data.frame('chl'='Uniform', 'car'='Uniform',
-                              'ant' = 'Uniform', 'ewt' = 'Uniform',
-                              'lma' = 'Uniform', 'brown'='Uniform',
-                              'prot' = 'Uniform', 'cbc' = 'Uniform',
-                              'n_struct' = 'Uniform', 'psoil' = 'Uniform',
-                              'soil_brightness' = 'Uniform',
-                              'lidf_a' = 'Uniform', 'lai' = 'Uniform',
-                              'hotspot'='Uniform', 'tto' = 'Uniform',
-                              'tts' = 'Uniform', 'psi' = 'Uniform',
-                              'fraction_brown' = 'Uniform', 'diss' = 'Uniform',
-                              'cv' = 'Uniform', 'zeta' = 'Uniform')
+    type_distrib <- data.frame('chl'='uniform', 'car'='uniform',
+                              'ant' = 'uniform', 'ewt' = 'uniform',
+                              'lma' = 'uniform', 'brown'='uniform',
+                              'prot' = 'uniform', 'cbc' = 'uniform',
+                              'n_struct' = 'uniform', 'psoil' = 'uniform',
+                              'soil_brightness' = 'uniform',
+                              'lidf_a' = 'uniform', 'lai' = 'uniform',
+                              'hotspot'='uniform', 'tto' = 'uniform',
+                              'tts' = 'uniform', 'psi' = 'uniform',
+                              'fraction_brown' = 'uniform', 'diss' = 'uniform',
+                              'cv' = 'uniform', 'zeta' = 'uniform')
   }
   # define all input parameters from PROSAIL
   input_prosail <- list('chl' = c(), 'car' = c(), 'ant' = c(), 'brown' = c(),
@@ -90,13 +90,13 @@ get_distribution_input_prosail2 <- function(minval, maxval, parm_set,
   for (i in seq_len(length(minval))){
     sel <- names(minval)[i]
     # if uniform distribution
-    if (type_distrib[[sel]] == 'Uniform'){
+    if (tolower(type_distrib[[sel]]) == 'uniform'){
       input_prosail[[sel]] <- array(runif(nb_samples,
                                           min = minval[1,i],
                                           max = maxval[1,i]),
                                     dim = c(nb_samples,1))
       # if Gaussian distribution
-    } else if (type_distrib[[sel]] == 'Gaussian'){
+    } else if (tolower(type_distrib[[sel]]) == 'gaussian'){
       set.seed(42)
       input_prosail[[sel]] <- truncnorm::rtruncnorm(n = nb_samples,
                                                     a = minval[[sel]],

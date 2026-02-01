@@ -75,19 +75,19 @@ generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                            brown_lop = brown_lop)
     }
     # Computes surf_refl based on outputs from PROSAIL and sun position
-    surf_refl[[i]] <- compute_surf_refl(rdot = refl_sail$rdot,
-                                        rsot = refl_sail$rsot,
-                                        tts = input_prosail$tts[[i]],
-                                        spec_atm_sensor = spec_atm)
+    surf_refl[[i]] <- get_surf_refl(rdot = refl_sail$rdot,
+                                    rsot = refl_sail$rsot,
+                                    tts = input_prosail$tts[[i]],
+                                    spec_atm_sensor = spec_atm)
     fcover[i] <- refl_sail$fcover
-    fapar[i] <- compute_fapar(abs_dir = refl_sail$abs_dir,
-                              abs_hem = refl_sail$abs_hem,
-                              tts = input_prosail$tts[[i]],
-                              spec_atm_sensor = spec_atm)
-    albedo[i] <- compute_albedo(rsdstar = refl_sail$rsdstar,
-                                rddstar = refl_sail$rddstar,
-                                tts = input_prosail$tts[[i]],
-                                spec_atm_sensor = spec_atm)
+    fapar[i] <- get_fapar(abs_dir = refl_sail$abs_dir,
+                          abs_hem = refl_sail$abs_hem,
+                          tts = input_prosail$tts[[i]],
+                          spec_atm_sensor = spec_atm)
+    albedo[i] <- get_albedo(rsdstar = refl_sail$rsdstar,
+                            rddstar = refl_sail$rddstar,
+                            tts = input_prosail$tts[[i]],
+                            spec_atm_sensor = spec_atm)
   }
   surf_refl <- do.call(cbind,surf_refl)
   row.names(surf_refl) <- band_names

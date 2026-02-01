@@ -17,8 +17,8 @@ prosail_hybrid_train}
 \value{
 HybridRes list. Estimated values corresponding to refl. Includes
 \itemize{
-\item MeanEstimate = mean value for the ensemble regression model
-\item StdEstimate = std value for the ensemble regression model
+\item mean_estimate = mean value for the ensemble regression model
+\item sd_estimate = std value for the ensemble regression model
 }
 }
 \description{
