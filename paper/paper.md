@@ -116,7 +116,9 @@ applications, despite the main assumption of vegetation as a homogeneous turbid
 medium, where leaves are randomly distributed within the canopy, which is not 
 accurate for row crops and heterogeneous canopies.
 
-Various softwares currently allow application of hybrid inversion with PROSAIL 
+# State of the field
+
+Various softwares currently provide procedures for hybrid inversion with PROSAIL 
 simulations. 
 The *Sentinel Toolbox Application Platform* (SNAP) includes the 
 `Biophysical Processor` module [@weiss2020], which provides an implementation of 
@@ -148,7 +150,7 @@ stages or different vegetation types.
 
 The R package `prosail` also provides a set of functions to help researchers 
 aiming at experimenting for the estimation vegetation biophysical properties 
-from optical remote sensing using RTM. 
+from optical remote sensing using RTM with open-source solutions.
 These functions include : 
 
 - the simulation of surface reflectance for any optical sensor based on their SRF
@@ -167,10 +169,10 @@ The package `prosail` does not intend to provide the same computational
 efficiency as SNAP. 
 It does not provide a collection of models and methods as comprehensive as those 
 provided with the ARTMO box neither. 
-`prosail` provides a flexible framework to experiment with a hybrid inversion 
-procedure with simple yet fast and efficient training stage, allowing 
-experimenting on strategies for training data sampling, introduction of noise, 
-feature selection over any type of optical sensor. 
+`prosail` provides a flexible ope source framework to experiment with hybrid 
+inversion procedures, using simple yet fast and efficient training stage, 
+allowing experimenting on strategies for training data sampling, introduction 
+of noise, feature selection over any type of optical sensor. 
 It is particularly suitable for research and development, in order to identify 
 potential and limitations of inversion strategies and parameterizations.
 Resulting regression models can be applied on remote sensing data, but it may 
@@ -181,9 +183,48 @@ Alternative PROSAIL implementations can be found at
 [this webpage](http://teledetection.ipgp.jussieu.fr/prosail/).
 This includes distributions in matlab, python and fortran programming languages. 
 Note that alternative PROSAIL implementations are also available in packages 
-written in [python](https://github.com/earth-chris/xleaf), 
+written in [python](https://github.com/jgomezdans/prosail), 
 [Julia](https://github.com/RemoteSensingTools/CanopyOptics.jl) and 
 [R](https://github.com/ashiklom/rrtm).
+
+# Software design
+
+`prosail` uses the R package `prospect` [@feret2024] for the 
+simulation of leaf optical properties. 
+It provides a user-friendly and modular set of functions, in order to run 
+simulations of vegetation canopy reflectance, and to predict vegetation 
+biophysical properties using various inversion strategies. 
+Model inversion is a multi-step procedure requiring simulation of sensor 
+reflectance in order to train a machine learning regression algorithm, then 
+applicable to any new data source, including raster data from airborne and 
+spaceborne sensors. 
+
+- The generation of realistic reflectance simulations requires definition of 
+input parameter sampling strategy, accounting for sensor SRF and uncertainties. 
+`prosail` provides functions to produce this training dataset as a unique step 
+following standard parameterization, or step by step, in order for users to 
+understand the logic, or adjust each step to their needs.
+
+- A limited number of machine learning algorithms is currently provided, but the 
+software design will allow integration of additional algorithms in future 
+versions.
+
+- Raster processing is mainly handled with the `terra` [@terra] package, to 
+ensure compatibility with most raster data formats. 
+
+- `prosail` can be used in combination with 
+[`preprocS2`](https://jbferet.gitlab.io/preprocs2/), a package dedicated to 
+downloading and preprocessing of Earth observation data following the 
+[STAC](https://stacspec.org/en) specification, in order to produce a fully 
+automated image access and processing workflow.
+
+# Research impact statement
+
+`prosail` has been used in multiple research publications since its early 
+developments [@hauser2021], [@ferreira2026], [@feret2026].
+It is currently used in multiple research projects, and is actively maintained. 
+
+
 
 # Overview
 
@@ -193,10 +234,11 @@ PROSAIL requires information intrinsic to vegetation :
 
 - leaf optical properties, including leaf directional hemispherical reflectance 
 and transmittance. 
-These leaf optical properties can be simulated with the R package `prospect`
+These leaf optical properties are simulated with the R package `prospect`
 [@feret2024] and readers are invited to refer to the documentation of this 
 package for a comprehensive description of the leaf chemical and structure 
 parameters accounted for by the various versions of the PROSPECT model. 
+Measured leaf optical properties can also be used instead of simulated ones.
 
 - LAI, which is defined as the one-sided green leaf area per 
 unit ground surface area in broadleaf canopies. 
@@ -824,7 +866,6 @@ including:
 The differences in the retrieval of the vegetation biophysical properties suggest
 differences in the soil properties accounted for in simulations with low LAI, 
 despite our efforts to reproduce the workflow described in the ATBD [@weiss2020]. 
-
 Additional tests performed over other sites (on both croplands and forests) 
 showed similar performances. 
 
@@ -837,12 +878,11 @@ We introduce `prosail`, an R package dedicated to the canopy reflectance model
 PROSAIL, coupling PROSPECT and SAIL. 
 `prosail` is coupled with the R package `prospect` in order to allow 
 seamless integration of future versions of the leaf model. 
-It allows simulation of bi-directional reflectance factor for any type of 
-optical sensor if the spectral response function is available, including 
-multispectral sensors and hyperspectral sensors. 
+It allows simulation of bi-directional reflectance factor and surface 
+reflectance for any type of optical sensor based on their spectral response, 
+including multispectral sensors and hyperspectral sensors. 
 The package also includes a collection of inversion procedures, including 
-iterative optimization with and without prior information, and hybrid inversion 
-applicable to data tables and raster data. 
+iterative optimization with and without prior information, and hybrid inversion. 
 
 The estimation of vegetation biophysical properties with `prosail` hybrid 
 inversion is consistent with estimations produced with the method implemented in
@@ -870,5 +910,12 @@ The authors acknowledge financial support from Agence Nationale de la Recherche
 (BioCop project — ANR-17-CE32-0001).
 We are grateful to Wout Verhoef for the development of the initial version of 
 the 4SAIL and 4SAIL2 models. 
+We are grateful to Stéphane Jacquemoud and Frédéric Baret for the development 
+of the initial version of the prospect model.
+
+# AI Usage Disclosure
+
+No generative AI tools were used in the development of this software, the 
+writing of this manuscript, or the preparation of supporting materials.
 
 # References

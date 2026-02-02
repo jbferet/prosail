@@ -112,7 +112,37 @@ abstract = {Leaf mass per area (LMA) and leaf equivalent water thickness (EWT) a
 	pages = {6027},
 	author = {J.-B. Féret and F. de Boissieu},
 	title = {prospect: an R package to link leaf optical properties with their chemical and structural properties with the leaf model PROSPECT},
-	journal = {Journal of Open Source Software} }
+	journal = {Journal of Open Source Software}
+}
+
+@Inbook{feret2026,
+author="Féret, J.-B. and de  Boissieu, F. and Lang, M.",
+editor="Rocchini, Duccio",
+title="A Plant Trait-Based Approach to Map Forest Biodiversity Using Imaging Spectroscopy and Physical Modeling",
+bookTitle="R Coding for Ecology",
+year="2026",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="161--182",
+abstract="This chapter provides a workflow taking advantage of imaging spectroscopy and physical modeling to assess a set of vegetation traits then used to feed remotely sensed (RS) diversity mapping techniques in the context of forest ecosystems. This approach intends to explicitly account for vegetation traits related to structural, compositional, and functional properties when computing diversity metrics. This study is based on three main R packages. The packages prospect and prosail are used to assess vegetation biophysical properties from imaging spectroscopy data: Leaf Area Index, leaf chlorophyll content, equivalent water thickness, and leaf mass per area. Prosail includes functions to run the radiative transfer model PROSAIL in both forward mode (simulation of canopy reflectance) and inverse mode (assessment of vegetation biophysical properties from canopy reflectance). The package biodivMapR is then used to compute various diversity metrics from these vegetation biophysical properties, including $\alpha$- and $\beta$-diversity metrics usually obtained from species inventories in ecological applications, and a set of functional metrics. This workflow is illustrated with an application on imaging spectroscopy data acquired from a temperate forest site. Validation is based on inventories collected on a plot network. Results show consistent estimation of $\alpha$-diversity, moderate agreement between observed, and RS $\beta$-diversity metrics. Further investigations are required for the validation of functional diversity metrics.",
+isbn="978-3-031-99665-8",
+doi="10.1007/978-3-031-99665-8_7",
+url="https://doi.org/10.1007/978-3-031-99665-8_7"
+}
+
+
+@article{ferreira2026,
+  author={Ferreira, Vitória Barbosa and Féret, Jean-Baptiste and Atzberger, Clement and Guillemot, Joannès and Campoe, Otávio and Maire, Guerric le},
+  journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
+  title={Enhancing PROSAIL Inversion: Key Considerations and Practical Insights},
+  year={2026},
+  volume={19},
+  number={},
+  pages={1378-1390},
+  keywords={Soil;Accuracy;Genotypes;Trees (botanical);Reflectivity;Forestry;Chlorophyll;Vegetation mapping;Remote sensing;Mathematical models;Biophysical properties retrieval;PROSAIL;radiative transfer model (RTM) inversion},
+  doi={10.1109/JSTARS.2025.3635001}
+}
+
 
 @article{ francois2002,
 	author = {{C. François} and {C. Ottlé} and {A. Olioso} and {L. Prévot} and {N. Bruguier} and {Y. Ducros}},
@@ -140,6 +170,20 @@ URL = {https://www.mdpi.com/2072-4292/7/2/1667},
 ISSN = {2072-4292},
 ABSTRACT = {Satellite and airborne optical sensors are increasingly used by scientists, and policy makers, and managers for studying and managing forests, agriculture crops, and urban areas. Their data acquired with given instrumental specifications (spectral resolution, viewing direction, sensor field-of-view, etc.) and for a specific experimental configuration (surface and atmosphere conditions, sun direction, etc.) are commonly translated into qualitative and quantitative Earth surface parameters. However, atmosphere properties and Earth surface 3D architecture often confound their interpretation. Radiative transfer models capable of simulating the Earth and atmosphere complexity are, therefore, ideal tools for linking remotely sensed data to the surface parameters. Still, many existing models are oversimplifying the Earth-atmosphere system interactions and their parameterization of sensor specifications is often neglected or poorly considered. The Discrete Anisotropic Radiative Transfer (DART) model is one of the most comprehensive physically based 3D models simulating the Earth-atmosphere radiation interaction from visible to thermal infrared wavelengths. It has been developed since 1992. It models optical signals at the entrance of imaging radiometers and laser scanners on board of satellites and airplanes, as well as the 3D radiative budget, of urban and natural landscapes for any experimental configuration and instrumental specification. It is freely distributed for research and teaching activities. This paper presents DART physical bases and its latest functionality for simulating imaging spectroscopy of natural and urban landscapes with atmosphere, including the perspective projection of airborne acquisitions and LIght Detection And Ranging (LIDAR) waveform and photon counting signals.},
 DOI = {10.3390/rs70201667}
+}
+
+@article{hauser2021,
+title = {Towards scalable estimation of plant functional diversity from Sentinel-2: In-situ validation in a heterogeneous (semi-)natural landscape},
+journal = {Remote Sensing of Environment},
+volume = {262},
+pages = {112505},
+year = {2021},
+issn = {0034-4257},
+doi = {10.1016/j.rse.2021.112505},
+url = {https://www.sciencedirect.com/science/article/pii/S0034425721002236},
+author = {Leon T. Hauser and Jean-Baptiste Féret and Nguyen {An Binh} and Niels {van der Windt} and Ângelo F. Sil and Joris Timmermans and Nadejda A. Soudzilovskaia and Peter M. {van Bodegom}},
+keywords = {Biodiversity, Plant functional diversity, Terrestrial ecosystems, Remote sensing, Sentinel-2, Multispectral, Radiative transfer modeling, PROSAIL, ARTMO, Traitbased, Ecology, Montesinho, Portugal, Canopy diversity, LMA, Leaf mass per area, LAI, Leaf area index, CAB, Chloropyll content},
+abstract = {Large-scale high-resolution satellite observations of plant functional diversity patterns will greatly benefit our ability to study ecosystem functioning. Here, we demonstrate a potentially scalable approach that uses aggregate plant traits estimated from radiative transfer model (RTM) inversion of Sentinel-2 satellite images to calculate community patterns of plant functional diversity. Trait retrieval relied on simulations and Look-up Tables (LUTs) generated by a RTM rather than heavily depending on a priori field data and data-driven statistical learning. This independence from in-situ training data benefits its scalability as relevant field data remains scarce and difficult to acquire. We ran a total of three different inversion algorithms that are representative of commonly applied approaches and we used two different metrics to calculate functional diversity. In tandem with Sentinel-2 image-based estimation of plant traits, we measured Leaf Area Index (LAI), leaf Chlorophyll content (CAB), and Leaf Mass per Area (LMA) in-situ in a (semi-)natural heterogeneous landscape (Montesinho region) located in northern Portugal. Sampling plots were scaled and georeferenced to match the satellite observed pixels and thereby allowed for a direct one-to-one posterior ground truth validation of individual traits and functional diversity. Across approaches, we observe a reasonable correspondence between the satellite-based retrievals and the in-situ observations in terms of the relative distribution of individual trait means and plant functional diversity across locations despite the heterogeneity of the landscape and canopies. The functional diversity estimates, based on a combination of canopy and leaf traits, were robust against estimation biases in trait means. Particularly, the convex hull volume estimate of functional diversity showed strong concordance with in-situ observations across all three inversion methods (Spearman's ρ: 0.67–0.80). The remotely sensed estimates of functional diversity also related to in-situ taxonomic diversity (Spearman's ρ: 0.55–0.63). Our work highlights the potential and challenges of RTM-based functional diversity metrics to study spatial community-level ecological patterns using currently operational and publicly available Sentinel-2 imagery. While further validation and assessment across different ecosystems and larger datasets are needed, the study contributes towards a further maturation of scalable, spatially, and temporally explicit methods for functional diversity assessments from space.}
 }
 
 @article{jacquemoud1990,
@@ -364,3 +408,10 @@ PAGES = {4697--4712},
 URL = {https://gmd.copernicus.org/articles/14/4697/2021/},
 DOI = {10.5194/gmd-14-4697-2021}
 }
+
+ @Manual{terra,
+    title = {terra: Spatial Data Analysis},
+    author = {Robert J. Hijmans},
+    year = {2025},
+    note = {R package version 1.8-60},
+    url = {https://CRAN.R-project.org/package=terra},
