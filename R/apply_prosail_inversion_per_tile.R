@@ -42,7 +42,8 @@ apply_prosail_inversion_per_tile <- function(raster_path, mask_path = NULL,
   # list of biophysical variables to compute
   bp_vars <- names(hybrid_model)
   # define grid
-  plots <- get_grid_bp(raster_path, cellsize = tile_size)
+  plots <- get_grid_bp(raster_path = raster_path,
+                       cellsize = tile_size)
   site_name <- tools::file_path_sans_ext(basename(raster_name))
 
   # for each plot

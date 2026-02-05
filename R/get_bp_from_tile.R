@@ -41,11 +41,17 @@ get_bp_from_tile <- function(individual_plot, plot_id, raster_path, bp_vars,
   rast_val <- terra::values(rast_obj)
 
   # define valid pixels
-  sel_pixels <- seq_len(dim(rast_obj)[1]*dim(rast_obj)[2])
   mask_obj <- NULL
   if (!is.null(mask_path)){
     mask_obj <- terra::rast(mask_path)
     mask_obj <- terra::crop(x = mask_obj, y = individual_plot)
+    sel_pixels <- which(terra::values(mask_obj)==1)
+  } else if (is.null(mask_path)){
+    mask_obj <- 1+0*terra::rast(raster_path)[[1]]
+    mask_obj <- terra::crop(x = mask_obj, y = individual_plot)
+    elim <- which(is.na(terra::values(mask_obj)))
+    if (length(elim)>0)
+      mask_obj[elim] <-0
     sel_pixels <- which(terra::values(mask_obj)==1)
   }
   rast_val <- rast_val[sel_pixels, ]

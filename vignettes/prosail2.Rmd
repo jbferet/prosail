@@ -26,9 +26,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Run `prosail` in direct mode
+## run `prosail` in direct mode
 
-### Input variables
+### input variables
 The function `prosail` runs PROSAIL for individual canopy reflectances and 
 expects the following input variables.
 
@@ -108,7 +108,7 @@ seen from nadir direction)
 such as experimental measurements is available. If PROSPECT is used to define 
 both green and brown leaves, leave `brown_lop` undefined, or set to `NULL`
 
-### Output variables
+### output variables
 `prosail` returns a list containing : 
 
 * `rddt`: bi-hemispherical reflectance factor
@@ -128,15 +128,16 @@ library(prosail)
 input_prospect <- data.frame('chl' = 40, 'car' = 8, 'ant' = 0.0, 
                              'ewt' = 0.01, 'lma' = 0.009, 'n_struct' = 1.5)
 # define input variables for SAIL. 
-lai <- 5      # LAI
-hotspot <- 0.1      # Hot spot parameter
-type_lidf <- 2 # leaf inclination distribution function 
-lidf_a <- 30   # mean leaf angle
-tts <- 30     # geometry of acquisition: sun zenith angle
-tto <- 10     # geometry of acquisition: observer zenith angle
-psi <- 90     # geometry of acquisition: sun-observer azimuth 
+lai <- 5        # LAI
+hotspot <- 0.1  # Hot spot parameter
+type_lidf <- 2  # leaf inclination distribution function 
+lidf_a <- 30    # mean leaf angle
+tts <- 30       # geometry of acquisition: sun zenith angle
+tto <- 10       # geometry of acquisition: observer zenith angle
+psi <- 90       # geometry of acquisition: sun-observer azimuth 
 rsoil <- spec_soil_atbd_v2$soil_01 # soil reflectance 
-# - spec_soil: min_refl and max_refl
+# several soil optical properties are available
+# - spec_soil: dark ($min_refl) and bright ($max_refl) soil reflectance
 # - spec_soil_atbd_v2 : selection of 7 reflectance spectral used in S2 ATBD v2
 # - spec_soil_ossl: selection of 47 reflectance spectral representative of OSSL
 
@@ -167,7 +168,7 @@ refl_prosail2 <- prosail(SAILversion = '4SAIL2',
 ```
 
 
-## Compute simplified surface reflectance under the assumption of clear conditions conditions
+## compute simplified surface reflectance under the assumption of clear conditions conditions
 
 The function `get_surf_refl` computes the surface reflectance in the 
 direction of the observer, by combining both hemispherical-directional and 
@@ -192,7 +193,7 @@ surf_refl_4SAIL2 <- get_surf_refl(rdot = refl_prosail2$rdot,
 
 ```
 
-## Compute fraction of absorbed photosyntehtically active radiation (fAPAR)
+## compute fraction of absorbed photosyntehtically active radiation (fAPAR)
 
 The function `get_fapar` computes the fAPAR in the direction of the observer, 
 by combining both canopy absorptance for direct solar incident flux and canopy 
@@ -205,7 +206,7 @@ fapar_4sail <- get_fapar(abs_dir = refl_prosail$abs_dir,
                          spec_atm_sensor = spec_atm)
 ```
 
-## Compute albedo
+## compute albedo
 
 The function `get_albedo` computes the albedo by combining the contribution 
 of direct solar incident flux (rsdstar) and the contribution of hemispherical 
@@ -218,7 +219,7 @@ albedo_4SAIL <- get_albedo(rsdstar = refl_prosail$rsdstar,
                            spec_atm_sensor = spec_atm)
 ```
 
-## Simulating sensor reflectance
+## simulating sensor reflectance
 
 The simulation of surface reflectance measured by a sensor requires the Spectral Response Function (SRF) of 
 the sensor.
