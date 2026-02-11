@@ -110,4 +110,7 @@ also implemented.
 Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling 
 `train_prosail_inversion` to choose between the alternative implementations. 
 
-Additional methods may be implemented with the support of users. 
+Set `method <- 'nu-svr'` when calling `train_prosail_inversion` to use 
+`kernlab::ksvm` with rbf kernel.
+
+Additional methods can be implemented with the support of users. 

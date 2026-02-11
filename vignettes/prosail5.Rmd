@@ -13,7 +13,7 @@ output:
     number_sections: true
 vignette: >
   \usepackage[utf8]{inputenc}
-  %\VignetteIndexEntry{5. Miscellaneous}
+  %\VignetteIndexEntry{5. hybrid inversion imaging spectroscopy}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -28,6 +28,22 @@ knitr::opts_chunk$set(
 
 This tutorial will guide you through the application of `prosail` in order to 
 produce biophysical properties from hybrid inversion.
+
+This is the tutorial associated to the book chapter 
+[`A Plant Trait-Based Approach to Map Forest Biodiversity Using Imaging Spectroscopy and Physical Modeling`](https://doi.org/10.1007/978-3-031-99665-8_7), which is part of the 
+book [`R Coding for Ecology`](https://link.springer.com/book/10.1007/978-3-031-99665-8), 
+in the **Use R!** book series (Springer).
+
+The full tutorial including spectral diversity mapping is available [here](https://jbferet.github.io/biodivMapR/articles/biodivMapR_05.html)
+
+**Warning**: this tutorial is appropriate with prosail v3.0.0 and later.
+please install the 'dev_joss' branch if the master branch is <3.0.0
+
+```{r, install prosail}
+devtools::install_gitlab('jbferet/prosail@dev_joss')
+```
+
+
 
 ## download imaging spectroscopy data required for the tutorial
 
@@ -47,6 +63,21 @@ reflectance (10000 = 100% reflectance).
 The data should be placed in a directory defined as `data_dir` in the next code 
 chunk.
 
+Figure 1 shows an RGB representation of the imaging spectroscopy data acquired 
+over the Fabas forest.
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/05_rgb_hyspex.png"
+knitr::include_graphics(url)
+```
+
+<center>
+  Fig. 1. color composition of Hyspex imaging spectroscopy acquisition. 
+  
+  R = 661 nm, G = 559 nm, B = 458 nm. 
+</center> 
+<p>&nbsp;</p>
+
 
 ## define input / output directories
 
@@ -63,8 +94,8 @@ if (rstudioapi::isAvailable())
 library(prosail)
 
 # 1.1- define input & output directories
-data_dir <- './01_DATA'
-prosail_dir <- './03_RESULTS/prosail_inversion'
+data_dir <- './01_DATA/fabas'
+prosail_dir <- './03_RESULTS/fabas/prosail_inversion'
 prosail_tiles <- file.path(prosail_dir, 'tiles')
 dir.create(prosail_tiles, showWarnings = F, recursive = T)
 ```
@@ -153,7 +184,6 @@ low_trans <- which(transmittance$Transmittance<0.85)
 noise <- which((sensor_bands > 2200 & sensor_bands < 2205))
 # combine bands to discard
 wl_elim <- c(low_trans, noise)
-
 ```
 
 
@@ -251,7 +281,6 @@ should be provided, ideally.
 # define geometry of acquisition based on location and time of acquisition
 geom_acq <- data.frame(min = c('tto' = 0, 'tts' = 50, 'psi' = 0), 
                        max = c('tto' = 15, 'tts' = 70, 'psi' = 360))
-
 ```
 
 #### input parameter distribution
@@ -341,14 +370,15 @@ BPvars <- apply_prosail_inversion(raster_path = input_raster_path,
 The maps corresponding to the biophysical variables estimated from imaging 
 spectroscopy data are displayed below. 
 
-<p float="left">
-  <img src="../man/figures/chl_fabas.png" width="50%" />
-  <img src="../man/figures/lai_fabas.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/ewt_fabas.png" width="50%" />
-  <img src="../man/figures/lma_fabas.png" width="50%" />
-</p>
-  Fig. 1. Estimation of `chl`, `lai`, `ewt`, `lma` from a the inversion of 
-  prosail applied to the imaging spectroscopy raster acquired over the Fabas 
-  forest.
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/05_bp_prosail.png"
+knitr::include_graphics(url)
+```
+
+<center>
+  Fig. 2. maps of vegetation biophysical variables  `chl`, `lai`, `ewt` and 
+  `lma` obtained over the Fabas forest. 
+  The variables were estimated from physical model hybrid inversion applied to 
+  imaging spectroscopy and performed with the `prosail` package.
+</center> 
+<p>&nbsp;</p>

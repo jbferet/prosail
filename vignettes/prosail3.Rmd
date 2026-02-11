@@ -49,12 +49,14 @@ the [Algorithm Theoretical Based Document](http://step.esa.int/docs/extra/ATBD_S
 The general workflow is described in Figure 1, and will be described in details 
 in the following tutorials.
 
-<p float="center">
-  <img src="../man/figures/Hybrid_Inversion/FlowChart_HybridInversion.png" width="80%" />
-</p>
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/Hybrid_Inversion/FlowChart_HybridInversion.png"
+knitr::include_graphics(url)
+```
 <center>
   Fig. 1. Workflow of PROSAIL hybrid inversion implemented in the package `prosail`.
 </center> 
+
 
 The default hybrid inversion implemented in  `prosail` is built around __4SAIL__ 
 and support vector regression (SVR) as machine learning algorithm.
@@ -309,22 +311,26 @@ for (parm in parms_to_estimate){
 
 The resulting estimated values are displayed: 
 
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/Hybrid_Inversion/hybrid_atbd.png"
+knitr::include_graphics(url)
+```
 
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/chl_atbd.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/lai_atbd.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/ewt_atbd.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/lma_atbd.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/fcover_atbd.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/fapar_atbd.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/albedo_atbd.png" width="50%" />
-</p>
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/chl_atbd.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/lai_atbd.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/ewt_atbd.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/lma_atbd.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/fcover_atbd.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/fapar_atbd.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/albedo_atbd.png" width="50%" /> -->
+<!-- </p> -->
 <center>
   Fig. 2. Estimation of `chl`, `lai`, `ewt`, `lma`, `fcover`, `fapar` and 
   `albedo` from a simulated dataset corresponding to Sentinel-2 reflectance 
@@ -519,21 +525,25 @@ for (parm in parms_to_estimate){
 The resulting estimated values are displayed: 
 
 
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/CHL_user.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/lai_user.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/EWT_user.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/LMA_user.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/fCover_user.png" width="50%" />
-  <img src="../man/figures/Hybrid_Inversion/fAPAR_user.png" width="50%" />
-</p>
-<p float="left">
-  <img src="../man/figures/Hybrid_Inversion/albedo_user.png" width="50%" />
-</p>
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/Hybrid_Inversion/hybrid_user.png"
+knitr::include_graphics(url)
+```
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/CHL_user.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/lai_user.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/EWT_user.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/LMA_user.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/fCover_user.png" width="50%" /> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/fAPAR_user.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/Hybrid_Inversion/albedo_user.png" width="50%" /> -->
+<!-- </p> -->
 <center>
   Fig. 3. Estimation of `chl`, `lai`, `ewt`, `lma`, `fcover`, `fapar` and 
   `albedo` from a simulated dataset corresponding to Sentinel-2 reflectance using 

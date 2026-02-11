@@ -48,9 +48,11 @@ found in [Verhoef & Bach, 2007](https://doi.org/10.1016/j.rse.2006.12.013) and
 [Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844), from which the
 figure below is borrowed.
 
-<center>
-  <img align="bottom" width="50%" height="50%" src="../man/figures/FourStreamRT.png">
-</center> 
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/FourStreamRT.png"
+knitr::include_graphics(url)
+```
 <center>
   Fig. 1. Four-stream RT modeling concept as applied in SAIL model ([Verhoef et al., 2007](https://doi.org/10.1109/TGRS.2007.895844)).
 </center> 
