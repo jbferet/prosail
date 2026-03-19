@@ -22,15 +22,17 @@ test_that("PROSAIL iterative optimization", {
   brf_1nm <- prosail::Compute_BRF(rdot = Refl_1nm$rdot,
                                   rsot = Refl_1nm$rsot,
                                   tts = ParmSet$tts,
-                                  SpecATM_Sensor = SpecATM)
+                                  SpecATM_Sensor = spec_atm)
   # invert 1 nm data
-  est <- Invert_PROSAIL(brfMES = brf_1nm$BRF,
+  spec_soil_sensor <- spec_soil_ossl[c('lambda', 'soil_01')]
+  names(spec_soil_sensor) <- c('lambda', 'refl')
+  est <- Invert_PROSAIL(brfMES = brf_1nm$surf_refl,
                         InitialGuess = Init,
                         LowerBound = LB,
                         UpperBound = UB,
-                        SpecPROSPECT_Sensor = SpecPROSPECT_FullRange,
-                        SpecATM_Sensor = SpecATM,
-                        SpecSOIL_Sensor = SpecSOIL,
+                        SpecPROSPECT_Sensor = spec_prospect_full_range,
+                        SpecATM_Sensor = spec_atm,
+                        SpecSOIL_Sensor = spec_soil_sensor,
                         TypeLidf = 2, ParmSet = ParmSet)
 
   nerr <- list()
