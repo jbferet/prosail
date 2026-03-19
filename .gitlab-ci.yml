@@ -40,6 +40,7 @@ deps:
 check:
   stage: check
   script:
+  - R -e "install.packages('sf', repos='https://cloud.r-project.org/', dependencies=TRUE)"
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "error")'
   - R -e 'devtools::install()'
   only:
