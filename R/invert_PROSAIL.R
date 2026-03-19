@@ -20,27 +20,31 @@
 #' @importFrom pracma fmincon
 #' @export
 
-invert_prosail  <- function(refl_mes, initialization = NULL, lower_bound,
-                            upper_bound, spec_prospect_sensor, spec_atm_sensor,
-                            spec_soil_sensor, type_lidf, parm_set,
-                            merit_function = 'merit_rmse_prosail',
-                            prior_info = NULL){
-
+invert_prosail <- function(refl_mes, initialization = NULL, lower_bound,
+                           upper_bound, spec_prospect_sensor, spec_atm_sensor,
+                           spec_soil_sensor, type_lidf, parm_set,
+                           merit_function = "merit_rmse_prosail",
+                           prior_info = NULL) {
   # define parameters included in inversion or set
-  parms_to_invert <- which_parms_to_invert(initialization = initialization,
-                                           lower_bound = lower_bound,
-                                           upper_bound = upper_bound,
-                                           parm_set = parm_set)
+  parms_to_invert <- which_parms_to_invert(
+    initialization = initialization,
+    lower_bound = lower_bound,
+    upper_bound = upper_bound,
+    parm_set = parm_set
+  )
 
   # set names for spec_soil_sensor if needed
   if (length(names(spec_soil_sensor)) == 2 &
-      !all(names(spec_soil_sensor) %in% c('lambda', 'refl')))
-    names(spec_soil_sensor) <- c('lambda', 'refl')
+    !all(names(spec_soil_sensor) %in% c("lambda", "refl"))) {
+    names(spec_soil_sensor) <- c("lambda", "refl")
+  }
 
   parms_to_prior <- NULL
-  if (!is.null(prior_info)){
-    prior_info_sort <- which_parm_prior(prior_mean = prior_info$mean,
-                                        prior_sd = prior_info$sd)
+  if (!is.null(prior_info)) {
+    prior_info_sort <- which_parm_prior(
+      prior_mean = prior_info$mean,
+      prior_sd = prior_info$sd
+    )
     prior_info$mean <- prior_info_sort$mean
     prior_info$sd <- prior_info_sort$sd
     parms_to_prior <- prior_info_sort$parms_to_prior
@@ -52,19 +56,21 @@ invert_prosail  <- function(refl_mes, initialization = NULL, lower_bound,
   names(lb) <- names(parms_to_invert$lower_bound)
   ub <- as.numeric(parms_to_invert$upper_bound)
   names(ub) <- names(parms_to_invert$upper_bound)
-  res_inv <- fmincon(x0 = xinit, fn = merit_function, gr = NULL,
-                     parms_xinit = names(parms_to_invert$initialization),
-                     refl_mes = refl_mes,
-                     spec_prospect_sensor = spec_prospect_sensor,
-                     spec_soil_sensor = spec_soil_sensor,
-                     spec_atm_sensor = spec_atm_sensor,
-                     parms_to_estimate = parms_to_invert$parms_to_estimate,
-                     input_prosail = parms_to_invert$input_prosail,
-                     type_lidf = type_lidf,
-                     prior_info = prior_info, parms_to_prior = parms_to_prior,
-                     method = "SQP", A = NULL, b = NULL, Aeq = NULL, beq = NULL,
-                     lb = lb, ub = ub, hin = NULL, heq = NULL, tol = 1e-14,
-                     maxfeval = 2000, maxiter = 2000)
+  res_inv <- fmincon(
+    x0 = xinit, fn = merit_function, gr = NULL,
+    parms_xinit = names(parms_to_invert$initialization),
+    refl_mes = refl_mes,
+    spec_prospect_sensor = spec_prospect_sensor,
+    spec_soil_sensor = spec_soil_sensor,
+    spec_atm_sensor = spec_atm_sensor,
+    parms_to_estimate = parms_to_invert$parms_to_estimate,
+    input_prosail = parms_to_invert$input_prosail,
+    type_lidf = type_lidf,
+    prior_info = prior_info, parms_to_prior = parms_to_prior,
+    method = "SQP", A = NULL, b = NULL, Aeq = NULL, beq = NULL,
+    lb = lb, ub = ub, hin = NULL, heq = NULL, tol = 1e-14,
+    maxfeval = 2000, maxiter = 2000
+  )
   parms_to_invert$input_prosail[parms_to_invert$parms_to_estimate] <- res_inv$par
   return(parms_to_invert$input_prosail)
 }
@@ -72,16 +78,49 @@ invert_prosail  <- function(refl_mes, initialization = NULL, lower_bound,
 
 #' @rdname prosail-deprecated
 #' @export
-Invert_PROSAIL  <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
-                            SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
-                            TypeLidf, ParmSet, MeritFunction = 'Merit_RMSE_PROSAIL',
-                            PriorInfoMean = NULL, PriorInfoSD = NULL,
-                            WeightPrior = 0.01){
+Invert_PROSAIL <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
+                           SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
+                           TypeLidf, ParmSet, MeritFunction = "Merit_RMSE_PROSAIL",
+                           PriorInfoMean = NULL, PriorInfoSD = NULL,
+                           WeightPrior = 0.01) {
   .Deprecated("invert_prosail")
-  prior_info <- list('mean' = PriorInfoMean,
-                     'SD' = PriorInfoSD,
-                     'weight_prior' = WeightPrior)
-  invert_prosail(brfMES, InitialGuess, LowerBound, UpperBound,
-                 SpecPROSPECT_Sensor, SpecATM_Sensor, SpecSOIL_Sensor,
-                 TypeLidf, ParmSet, MeritFunction, prior_info)
+
+  prior_info <- list(
+    "mean" = PriorInfoMean,
+    "SD" = PriorInfoSD,
+    "weight_prior" = WeightPrior
+  )
+  if (is.null(PriorInfoMean) || is.null(PriorInfoSD)){
+    prior_info <- NULL
+  }
+
+  new_names <- c(
+    "CHL" = "chl", "CAR" = "car", "ANT" = "ant", "BROWN" = "brown",
+    "EWT" = "ewt",
+    "LMA" = "lma", "PROT" = "prot", "CBC" = "cbc", "N" = "n_struct",
+    "alpha" = "alpha",
+    "LIDFa" = "lidf_a", "LIDFb" = "lidf_b", "lai" = "lai",
+    "q" = "hotspot", "tto" = "tto", "psi" = "psi", "psoil" = "psoil"
+  )
+
+  names(InitialGuess) <- new_names[names(InitialGuess)]
+  names(LowerBound) <- new_names[names(LowerBound)]
+  names(UpperBound) <- new_names[names(UpperBound)]
+  names(ParmSet) <- new_names[names(ParmSet)]
+  if (MeritFunction == "Merit_RMSE_PROSAIL"){
+    MeritFunction = "merit_rmse_prosail"
+  }
+  invert_prosail(
+    refl_mes = brfMES,
+    initialization = InitialGuess,
+    lower_bound = LowerBound,
+    upper_bound = UpperBound,
+    spec_prospect_sensor = SpecPROSPECT_Sensor,
+    spec_atm_sensor = SpecATM_Sensor, 
+    spec_soil_sensor = SpecSOIL_Sensor,
+    type_lidf = TypeLidf, 
+    parm_set = ParmSet, 
+    merit_function = MeritFunction, 
+    prior_info = prior_info
+  )
 }
