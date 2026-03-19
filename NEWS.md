@@ -1,3 +1,31 @@
+# prosail v3.0.0
+
+prepare for JOSS submission
+
+## changes
+- license MIT
+- function names more compliant with standards when not critical (lowercase)
+- input variable names more compliant with standards (lowercase)
+- update vignettes
+- update names of sensor spectral response characteristics (lower_case)
+- add deprecated functions from previous versions (<3.0.0)
+- add set_compatibility_input_prosail to ensure compatibility of variable names
+- add parameters for S2 ATBD v3 (beta)
+- add kernlab::ksvm as svm regression method to skip liquidSVM
+- add bayesian optimization for hyperparamter tuning of kernlab::ksvm  
+- add soil database from ATBD v2
+- add OSSL soil database (from ATBD v3)
+- add possibility to perform hybrid inversion on raster tiles with terra and vrt
+- change variable names to be consistent with packages preprocS2 and biodivMapR
+- change 'get_radiometry' to 'get_spectral_response_function'
+- adjust range of ewt to avoid extremely high values when calling 'get_atbd_v3_lut_input'
+- add support for package prospect v2.0
+- use surface reflectance instead of brf
+- update vignettes and figures
+
+##fix 
+- fixed bug when introducing OSSL soil and disactivate OSSL for v3 beta
+
 # prosail v2.5.10
 
 ## addition

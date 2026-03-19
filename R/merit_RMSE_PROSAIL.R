@@ -1,0 +1,76 @@
+#' Merit function for PROSAIL inversion
+#'
+#' @param xinit numeric. Vector of input variables to estimate
+#' @param parms_xinit character. name of parameters corresponding to xinit
+#' @param refl_mes  numeric. measured surface reflectance
+#' @param spec_prospect_sensor list. Includes optical constants for PROSPECT
+#' @param spec_soil_sensor list. Includes soil reflectance (either 2 references
+#' for optimization of psoil, or a unique spectrun)
+#' @param spec_atm_sensor list. Includes diffuse and direct light
+#' refractive index, specific absorption coefs and corresponding spectral bands
+#' @param parms_to_estimate  numeric. rank of variables to be inverted
+#' to be estimated through inversion
+#' @param input_prosail dataframe. full set of PROSAIL input variables
+#' @param type_lidf  numeric. type of leaf inclination distribution function
+#' @param prior_info list. prior mean, sd & weight of parms defined as xprior
+#' @param parms_to_prior numeric. rank of parameters to be used with prior info
+#' to modulate its importance
+#'
+#' @return fc estimates of the parameters
+#' @export
+merit_rmse_prosail <- function(xinit, parms_xinit, refl_mes,
+                               spec_prospect_sensor, spec_soil_sensor,
+                               spec_atm_sensor, parms_to_estimate,
+                               input_prosail, type_lidf, prior_info = NULL,
+                               parms_to_prior = NULL){
+
+  xinit[xinit<0] <- 0
+  input_prosail[parms_to_estimate] <- xinit[match(parms_xinit,
+                                                  parms_to_estimate)]
+  xprior <- input_prosail[parms_to_prior]
+
+  if (!is.null(input_prosail$soil_brightness)){
+    rsoil <- input_prosail$soil_brightness*spec_soil_sensor$refl
+  } else if (is.null(input_prosail$soil_brightness) &
+             ! is.null(input_prosail$psoil)){
+    rsoil <- input_prosail$psoil*spec_soil_sensor$max_refl +
+      (1-input_prosail$psoil)*spec_soil_sensor$min_refl
+  }
+  # call PROSAIL to get reflectance from 4 fluxes
+  refl <- prosail(spec_sensor = spec_prospect_sensor,
+                  input_prospect = input_prosail,
+                  type_lidf = type_lidf, lidf_a = input_prosail$lidf_a,
+                  lidf_b = input_prosail$lidf_b,
+                  lai = input_prosail$lai, hotspot = input_prosail$hotspot,
+                  tts = input_prosail$tts, tto = input_prosail$tto,
+                  psi = input_prosail$psi, rsoil = rsoil)
+  # Computes refl based on outputs from PROSAIL and sun position
+  refl_mod <- get_surf_refl(rdot = refl$rdot, rsot = refl$rsot,
+                            tts = input_prosail$tts,
+                            spec_atm_sensor = spec_atm_sensor)
+  # compute cost
+  fc <- cost_function_rmse_prosail(refl_mes = refl_mes,
+                                   refl_mod = refl_mod$surf_refl,
+                                   xprior = xprior,
+                                   prior_info = prior_info)
+  return(fc)
+}
+
+
+#' @rdname prosail-deprecated
+#' @export
+Merit_RMSE_PROSAIL <- function(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
+                               SpecSOIL_Sensor, SpecATM_Sensor, Parms2Estimate,
+                               Parm2Set = NULL, ParmSet = NULL, InVar, TypeLidf,
+                               PriorInfoMean = NULL, PriorInfoSD = NULL,
+                               Parms2Prior = NULL, WeightPrior = 0.01){
+  prior_info <- list('mean' = PriorInfoMean,
+                     'SD' = PriorInfoSD,
+                     'weight_prior' = WeightPrior)
+  .Deprecated("merit_rmse_prosail")
+  merit_rmse_prosail(xinit, parms_xinit, brfMES, SpecPROSPECT_Sensor,
+                     SpecSOIL_Sensor, SpecATM_Sensor, Parms2Estimate,
+                     InVar, type_lidf = 2, prior_info = prior_info,
+                     parms_to_prior = Parms2Prior)
+}
+

@@ -3,14 +3,14 @@ title: "4. Estimate vegetation properties from optical images"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
-  html_vignette:
-    number_sections: true
   html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+  html_vignette:
+    number_sections: true
 vignette: >
   \usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{4. Estimate vegetation properties from optical images}
@@ -64,51 +64,41 @@ Optionally, `preprocS2` can download the geometry of acquisition corresponding
 to the S2 acquisition by setting `geomAcq = T` and providing authentication to 
 the [CDSE](https://dataspace.copernicus.eu/analyse/apis).
 
-These products are available from the STAC catalog provided by the 
-[Sentinel-hub](https://dataspace.copernicus.eu/analyse/apis/sentinel-hub) 
-Catalog API via [Copernicus Dataspace](https://dataspace.copernicus.eu/).
+Authentication for CDSE should be obtained by activating an OAuth clients ID, 
+following [`this link`](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings). 
+Please make sure you copy the password related to your OAuth clients ID as you 
+will not be able to access it once you close the page.
 
-To be able to download data from the Sentinel-hub STAC Catalog API via 
-[Copernicus Dataspace](https://dataspace.copernicus.eu/), 
-create an account on the CDSE plateform, and activate the **OAuth clients**
-following [this link](https://shapps.dataspace.copernicus.eu/dashboard/#/account/settings).
-Then add your credentials to your `~/.Renviron`:
-
-```r
-usethis::edit_r_environ()
-```
-
-and add the following lines before saving the `~/.Renviron` file. 
-
-```r
-PREPROCS2_CDSE_ID = "sh-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
-PREPROCS2_CDSE_SECRET = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-```
-
-Access to geometry of acquisition is provided by the R package 
+Access to geometry of acquisition is provided by the package 
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
 
+Make sure you follow the procedure described in the 
+[`preprocS2`](https://jbferet.gitlab.io/preprocs2/) installation doc 
+to save credentials for CDSE and OAuth client ID in your `~/.Renviron` file. 
+
+
 ```{r download_S2_product}
-# define input & output directories
-output_dir_s2 <- './S2_images'
+# library
+library(preprocS2)
+library(sf)
+
+# 1- define input & output directories
+output_dir_s2 <- './s2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
 # save aoi as vector file
-path_aoi <- 'barrax_aoi.GPKG'
-sf::st_write(obj = aoi, dsn = path_aoi, driver = 'GPKG')
+aoi_path <- 'barrax_aoi.GPKG'
+sf::write_sf(obj = aoi, dsn = aoi_path, driver = 'GPKG')
 
-# get tiling grid kml from https://sentiwiki.copernicus.eu/web/s2-products
-path_S2tilinggrid <- 'Sentinel-2_tiling_grid.kml'
-
+# 3- get S2 acquisition and geometry of acquisition for study area
 options <- set_options_preprocS2(fun = 'get_s2_raster')
 options$geom_acq <- TRUE
-options$overwrite <- FALSE
-list_files <- get_s2_raster(aoi_path = path_aoi, datetime = datetime, 
+options$overwrite <- TRUE
+list_files <- get_s2_raster(aoi_path = aoi_path, datetime = datetime, 
                             output_dir = output_dir_s2, 
-                            path_S2tilinggrid = path_S2tilinggrid, 
-                            site_name = 'Barrax', options = options)
+                            site_name = 'barrax', options = options)
 # Sentinel-2 L2A reflectance
-Refl_L2A <- list_files$Refl_L2A
+refl_L2A <- list_files$Refl_L2A
 # Sentinel-2 binary mask identifying vegetation, discarding clouds & shadows
 vegetation_mask <- list_files$vegetation_mask
 # Sentinel-2 mask from provider ( = SCL from ESA products)
@@ -116,6 +106,22 @@ SCL <- list_files$provider_mask
 # Sentinel-2 geometry of acquisition (if requested from CDSE)
 geometryAcquisition <- list_files$geometryAcquisition
 ```
+
+The RGB representation of the Sentinel-2 acquisition is displayed below. 
+
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/S2/s2_rgb.png"
+knitr::include_graphics(url)
+```
+<!-- <p> -->
+<!-- <img src="../man/figures/S2/s2_rgb.png" width="100%" height="100%" class="center"> -->
+<!-- </p> -->
+<center>
+  Fig. 1. RGB representation of a sentinel-2 acquisition (L2A) over Barrax, 
+  Spain (2021-05-13).
+</center> 
+
 
 # Training and application of hybrid inversion model 
 
@@ -137,63 +143,105 @@ over smaller raster data.
 ```{r Hybrid_Inversion}
 library(prosail)
 output_dir_BP <- './PROSAIL'
-dir.create(path = output_dir_BP, showWarnings = FALSE,recursive = TRUE)
 # get sensor response for Sentinel-2
-SensorName <- 'Sentinel_2'
-SRF <- GetRadiometry(SensorName)
+sensor_name <- 'sentinel_2'
+srf <- get_srf_sensor(sensor_name)
 
 # define parameters to estimate
-Parms2Estimate <- c('lai', 'CHL', 'EWT', 'LMA', 'fCover', 'fAPAR', 'albedo')
+parms_to_estimate <- c('lai', 'chl', 'ewt', 'lma', 'fcover', 'fapar')
 
 # define spectral bands required to train SVR model for each variable
-S2BandSelect <- Bands2Select <- list()
-for (parm in Parms2Estimate){
-  S2BandSelect[[parm]] <- c('B3','B4','B5','B6','B7','B8','B11','B12')
-  Bands2Select[[parm]] <- match(S2BandSelect[[parm]],SRF$Spectral_Bands)
-}
-ImgBandNames <- SRF$Spectral_Bands
+selected_bands <- list('lai' = c('B3','B4','B8'), 
+                       'fcover' = c('B3','B4','B8'), 
+                       'fapar' = c('B3','B4','B8'), 
+                       'chl' = c('B3','B4','B5','B6','B7','B8'), 
+                       'ewt' = c('B8A','B11','B12'), 
+                       'lma' = c('B8A','B11','B12'))
 
 # get S2 geometry from preprocS2
 angles_path <- preprocS2::get_s2_angles(path_angles = geometryAcquisition[[datetime]], 
-                                        path_bbox = path_bbox)
+                                        path_bbox = aoi_path)
 # define ranges for zenith angles of acquisition
-GeomAcq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
-                                   'tts' = angles_path$MinAngle['sza'], 
-                                   'psi' = angles_path$MinAngle['psi']), 
-                'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
-                                   'tts' = angles_path$MaxAngle['sza'], 
-                                   'psi' = angles_path$MaxAngle['psi']))
+geom_acq <- list('min' = data.frame('tto' = angles_path$MinAngle['vza'],
+                                    'tts' = angles_path$MinAngle['sza'], 
+                                    'psi' = angles_path$MinAngle['psi']), 
+                 'max' = data.frame('tto' = angles_path$MaxAngle['vza'], 
+                                    'tts' = angles_path$MaxAngle['sza'], 
+                                    'psi' = angles_path$MaxAngle['psi']))
 
-# users can define GeomAcq following their own conditions by following the list 
+# users can define geom_acq following their own conditions by following the list 
 # structure above if preprocS2 is not applied to get imagery
 
 # train regression model
-# set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in the 
-# R package caret instead of liquidSVM
-modelSVR <- train_prosail_inversion(Parms2Estimate = Parms2Estimate,
-                                    atbd = TRUE, GeomAcq = GeomAcq, 
-                                    SRF = SRF, 
-                                    Bands2Select = Bands2Select, 
-                                    Path_Results = output_dir_BP, 
-                                    method = 'liquidSVM')
+
+# set method = 'svmRadial' or method = 'svmLinear' to use SVR implemented in 
+# the R package caret instead of liquidSVM
+options <- set_options_prosail(fun = 'train_prosail_inversion')
+options$method <- 'liquidSVM'
+hybrid_model <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
+                                        atbd = TRUE, geom_acq = geom_acq, 
+                                        srf = srf, 
+                                        selected_bands = selected_bands, 
+                                        output_dir = output_dir_BP, 
+                                        options = options)
 
 # apply regression model on Sentinel-2 raster data
-# bigRaster = F by default. Do not mention it if the package is not installed
-# Sentinel-2 imagery is provided with reflectance defined as integer between 0 and 10000
-# Adapt MultiplyingFactor if not the case 
-# MultiplyingFactor = 1 if reflectance defined between 0 and 1
-BPvars <- Apply_prosail_inversion(raster_path = Refl_L2A, 
-                                  HybridModel = modelSVR, 
-                                  PathOut = output_dir_BP,
-                                  SelectedBands = S2BandSelect, 
-                                  bandname = ImgBandNames, 
-                                  MaskRaster = vegetation_mask, 
-                                  bigRaster = F, 
-                                  MultiplyingFactor = 10000)
+# S2 imagery is provided with reflectance defined as integer between 0 and 10000
+# Adapt multiplying_factor if not the case 
+# multiplying_factor = 1 if reflectance defined between 0 and 1
+options <- set_options_prosail(fun = 'apply_prosail_inversion',
+                               options = options)
+options$multiplying_factor = 10000
+BPvars <- apply_prosail_inversion(raster_path = refl_L2A, 
+                                  hybrid_model = hybrid_model, 
+                                  output_dir = output_dir_BP,
+                                  selected_bands = selected_bands, 
+                                  band_names = srf$spectral_bands, 
+                                  mask_path = SCL, 
+                                  options = options)
 ```
 
 
-Assessed biophysical properties computed with `Apply_prosail_inversion` are then 
+Assessed biophysical properties computed with `apply_prosail_inversion` are then 
 saved as individual raster files. 
 For each biophysical variable, the mean value and standard deviation defined by 
-the input variable `nbModels` from `modelSVR` (default = 20 models) is saved.
+the input variable `nb_models` from `hybrid_model` (default = 10 models) is saved.
+
+The biophysical variables `chl`, `lai`, `fapar` and `fcover` are displayed 
+below:
+
+
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/S2/hybrid_inversion_barrax.png"
+knitr::include_graphics(url)
+```
+<center>
+  Fig. 2. biophysical properties estimated from `prosail` hybrid inversion: 
+  `chl`, `lai`, `fcover`, `fapar`.
+</center> 
+
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/S2/chl.png" width="50%" /> -->
+<!--   <img src="../man/figures/S2/lai.png" width="50%" /> -->
+<!-- </p> -->
+<!-- <p float="left"> -->
+<!--   <img src="../man/figures/S2/fapar.png" width="50%" /> -->
+<!--   <img src="../man/figures/S2/fcover.png" width="50%" /> -->
+<!-- </p> -->
+
+
+# Comparison with SNAP outputs 
+
+The LAI, fAPAR and fCover are compared with the values produced with the 
+Biophysical Processor of the SNAP toolbox over the same acquisition
+The comparison is diplayed in the figure below. 
+It shows that the two implementations provides consistent estimation for these 
+variables when following the ATBD sampling strategy for the training samples, 
+despite the differences in terms of machine learning algorithm. 
+
+<p>
+
+<img src="../man/figures/Hybrid_Inversion/compare_SNAP_prosail.png" width="100%" height="100%" class="center">
+
+</p>

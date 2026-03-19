@@ -8,8 +8,8 @@
 A dataframe including 2101 rows and 10 columns
 \itemize{
 \item \emph{lambda}: wavelength, between 400 nm and 2500 nm
-\item \emph{Direct_Light}: reflectance of direct light
-\item \emph{Diffuse_Light}: reflectance of diffuse light
+\item \emph{Direct_Light}: direct radiation solar spectra
+\item \emph{Diffuse_Light}: diffuse radiation solar spectra
 }
 }
 \usage{
