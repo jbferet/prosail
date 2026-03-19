@@ -4,29 +4,31 @@
 
 [![licence](https://img.shields.io/badge/Licence-MIT-blue.svg)](https://www.r-project.org/Licenses/MIT)
 [![Build Status](https://gitlab.com/jbferet/prosail/badges/master/pipeline.svg)](https://gitlab.com/jbferet/prosail/pipelines/latest)
+[![status](https://joss.theoj.org/papers/993d57e5a349d7365161dda9cccfd58f/status.svg)](https://joss.theoj.org/papers/993d57e5a349d7365161dda9cccfd58f)
 
 # 1 Requirements
 
-## Install `devtools`
+## Install `remotes`
 
-Install the package `devtools` following the [instructions](https://www.r-project.org/nosvn/pandoc/devtools.html) depending on your operating system. 
+Install the package `remotes`:
 
+```
+install.packages("remotes")
+```
 
 ## Install `prospect`
 
 Install the package `prospect` with the following command line in R session:
 ```
-devtools::install_github('jbferet/prospect')
+remotes::install_github('jbferet/prospect')
 ```
 
-## Install liquidSVM
+## Install liquidSVM (optional)
 
 `prosail` uses Support Vector Regression (SVR) for hybrid inversion. 
 
 The default SVM implementation is currently based on the package 
 [`liquidSVM`](http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R/documentation.html).
-A SVM implementation based on the R package [`caret`](https://topepo.github.io/caret/) 
-is also available.
 
 [`liquidSVM`](https://arxiv.org/pdf/1702.06899v1.pdf) provides very efficient and 
 fully-integrated hyper-parameter selection, multithreading and GPU support. 
@@ -38,7 +40,7 @@ To install `liquidSVM`, please follow installation instructions provided in the
 
 ### !!! WINDOWS USERS !!!
 
-Once `liquidSVM` is installed, you may need to add the 32bit DLL into the R library. 
+Once `liquidSVM` is installed, you will need to add the 32bit DLL into the R library. 
 This `i386` directory should be downloaded [here](https://gitlab.com/jbferet/myshareddata/-/tree/master/LiquidSVM_32bits) 
 and copied into the local directory on your computer, where the binary codes of liquidSVM are installed:
 
@@ -46,22 +48,37 @@ and copied into the local directory on your computer, where the binary codes of 
 
 ### If liquidSVM installation fails
 
-`liquidSVM` is a suggested package, so the installation of `prosail` should succeed 
-even without `liquidSVM`. 
-Two main functions using `liquidSVM` as default may be impacted: `train_prosail_inversion` 
-and `PROSAIL_Hybrid_Train`. 
+`liquidSVM` is a suggested package, so the installation of `prosail` should 
+succeed even without `liquidSVM`. 
+Two main functions using `liquidSVM` as default may be impacted: 
+`train_prosail_inversion` and `prosail_hybrid_train`. 
 
-If the installation of `liquidSVM` does not succeed, please define `method = 'svmRadial'` 
-or `method = 'svmLinear'` as optional input variable. 
-This will use the caret implementation, but it will require longer training stage.
+If `liquidSVM` is not properly installed, `prosail` automatically switches to 
+the `ksvm` function of the [`kernlab`](https://cran.r-project.org/web/packages/kernlab/kernlab.pdf) 
+package with nu regression and RBF kernel. 
+This is also accessible if setting `method <- 'nu-svr'` when calling 
+`train_prosail_inversion` and `prosail_hybrid_train`. 
 
+An SVM implementation based on the R package [`caret`](https://topepo.github.io/caret/) 
+is also available, with linear (`method <- 'nu-svr'`) or RBF 
+(`method <- 'nu-svr'`) kernel.
+
+<span style="color:red">**WARNING : **</span> 
+**optimal performances are obtained with liquidSVM.**
+**caret implementation may need significantly longer time for training and application stages.**
 
 # 2 Install `prosail`
 
 The package `prosail` can then be installed with the following command line in R session:
 ```
-devtools::install_github('jbferet/prosail')
+remotes::install_github('jbferet/prosail')
 ```
+
+<span style="color:red">**WARNING : **</span> 
+**many functions have been renamed in v3.0 of the package.**
+**The documentation has been updated accordingly.**
+**Please refer to the documentation for additional information.**
+
 
 # 3 Tutorial
 
@@ -76,7 +93,8 @@ devtools::install_github('jbferet/prosail')
 <!-- ) -->
 <!-- ``` -->
 
-A tutorial vignette is available [here](https://jbferet.gitlab.io/prosail/articles/prosail1.html).
+The tutorial vignettes start 
+[here](https://jbferet.gitlab.io/prosail/articles/prosail1.html).
 
 
 # 4 Acknowledgments / Fundings
