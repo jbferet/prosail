@@ -3,6 +3,7 @@
 export("%>%")
 export(Apply_Noise_LUT)
 export(Apply_prosail_inversion)
+export(Compute_BRF)
 export(Compute_SRF)
 export(Compute_albedo)
 export(Compute_fAPAR)

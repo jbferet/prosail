@@ -31,3 +31,16 @@ get_surf_refl  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
   surf_refl <- (rdot*par_difo+rsot*par_diro)/(par_diro+par_difo)
   return(data.frame('surf_refl' = surf_refl))
 }
+
+#' @rdname prosail-deprecated
+#' @export
+Compute_BRF <- function(rdot, rsot, tts, SpecATM_Sensor, skyl = NULL){
+  .Deprecated("get_surf_refl")
+  get_surf_refl(
+    rdot = rdot,
+    rsot = rsot,
+    tts = tts,
+    spec_atm_sensor = SpecATM_Sensor,
+    skyl = skyl
+  )
+}
