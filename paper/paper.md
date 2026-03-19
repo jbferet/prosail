@@ -566,7 +566,7 @@ vegetation biophysical properties from data tables or raster data.
 ![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.tif){ width=75% }
 
 The code below illustrates the training stage with `train_prosail_inversion`, 
-to estimate LAI, fCover and fAPAR from Sentinel-2, using the three spectral 
+to estimate LAI, fCover and fAPAR from Sentinel-2, using the spectral 
 bands corresponding to green channel (B3), red channel (B4) and near infrared 
 channel (B8) as specified in the ATBD document.
 
@@ -655,10 +655,10 @@ for (parm in parms_to_estimate){
 ### Application to imagery data
 
 We illustrate how to run `prosail` hybrid inversion on Sentinel-2 imagery.
-Sentinel-2 imagery handling requires the installation of 
+Handling Sentinel-2 imagery requires the installation of 
 [`preprocs2`](https://jbferet.gitlab.io/preprocs2/), a package dedicated to 
 downloading and preprocessing of Sentinel-2 data from different providers. 
-It also requires the package `sf` to handle vector data. 
+Manipulating vector data requires the package `sf`. 
 
 For the sake of comparison between biophysical variables produced from 
 SNAP and those produced with the `prosail` hybrid inversion, the Sentinel-2 
