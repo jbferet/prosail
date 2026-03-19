@@ -1,4 +1,4 @@
-image: thomaschln/r-devtools
+image: rocker/geospatial:4.5
 
 # gitlab-ci file inspired from https://www.r-bloggers.com/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
 
@@ -20,8 +20,8 @@ before_script:
   - find $R_LIBS_DIR/* -maxdepth 0 ! -name $(basename $R_LIBS_USER) -type d -exec rm -r {} +
   - ls $R_LIBS_DIR
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
-  - apt-get update
-  - apt-get install -y qpdf pandoc git libcurl4-openssl-dev libgit2-dev libudunits2-dev libnetcdf-dev libproj-dev libgeos-dev libgdal-dev netcdf-bin libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev
+  - apt-get update && apt-get install -y qpdf
+  # pandoc git libcurl4-openssl-dev libgit2-dev libudunits2-dev libnetcdf-dev libproj-dev libgeos-dev libgdal-dev netcdf-bin libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev
 
 
 stages:
@@ -41,7 +41,7 @@ deps:
 check:
   stage: check
   script:
-  - R -e "install.packages(c('sf', 'systemfonts', 'textshaping'), repos='https://cloud.r-project.org/', dependencies=TRUE)"
+  - R -e "remotes::install_cran(c('systemfonts', 'textshaping'))"
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "error")'
   - R -e 'devtools::install()'
   only:
