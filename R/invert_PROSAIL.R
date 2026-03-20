@@ -100,7 +100,7 @@ Invert_PROSAIL <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
     "LMA" = "lma", "PROT" = "prot", "CBC" = "cbc", "N" = "n_struct",
     "alpha" = "alpha",
     "LIDFa" = "lidf_a", "LIDFb" = "lidf_b", "lai" = "lai",
-    "q" = "hotspot", "tto" = "tto", "psi" = "psi", "psoil" = "psoil"
+    "q" = "hotspot", "tts" = "tts", "tto" = "tto", "psi" = "psi", "psoil" = "psoil"
   )
 
   names(InitialGuess) <- new_names[names(InitialGuess)]
@@ -118,9 +118,9 @@ Invert_PROSAIL <- function(brfMES, InitialGuess = NULL, LowerBound, UpperBound,
     spec_prospect_sensor = SpecPROSPECT_Sensor,
     spec_atm_sensor = SpecATM_Sensor, 
     spec_soil_sensor = SpecSOIL_Sensor,
-    type_lidf = TypeLidf, 
-    parm_set = ParmSet, 
-    merit_function = MeritFunction, 
+    type_lidf = TypeLidf,
+    parm_set = ParmSet,
+    merit_function = MeritFunction,
     prior_info = prior_info
   )
 }
