@@ -11,8 +11,8 @@ apply_sensor_characteristics <- function(wvl, refl, srf){
 
   refl <- data.frame(refl)
   nb_bands_origin <- length(wvl)
-  if (dim(srf$spectral_response)[1]==nb_bands_origin)
-    srf$spectral_response <- t(srf$spectral_response)
+  # if (dim(srf$spectral_response)[1]==nb_bands_origin)
+  #   srf$spectral_response <- t(srf$spectral_response)
   nb_bands_sensor <- dim(srf$spectral_response)[1]
   array_input <- cbind(matrix(wvl,ncol = 1),refl)
   refl_sensor <- list()

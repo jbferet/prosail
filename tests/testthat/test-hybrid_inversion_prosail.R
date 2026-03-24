@@ -13,10 +13,11 @@ test_that("hybrid inversion ok", {
   # define inputs for PROSAIL following ATBD
   input_prosail <- get_input_prosail(atbd = TRUE, geom_acq = geom_acq)
   # produce LUT
+  spec_prospect_full_range <- prosail::spec_prospect_full_range
   res <- generate_lut_prosail(SAILversion = '4SAIL',
                               input_prosail = input_prosail,
-                              spec_prospect = prosail::spec_prospect_full_range,
-                              spec_soil = prosail::spec_soil_ossl,
+                              spec_prospect = spec_prospect_full_range,
+                              spec_soil = prosail::spec_soil_atbd_v2,
                               spec_atm = prosail::spec_atm)
   refl_lut_1nm <- res$surf_refl
   refl_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda,

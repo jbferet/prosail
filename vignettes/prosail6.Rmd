@@ -1,5 +1,5 @@
 ---
-title: "6. Miscellaneous"
+title: "6. PROSAIL inversion with iterative optimization"
 author: "Jean-Baptiste Féret, Florian de Boissieu"
 date: "`r Sys.Date()`"
 output:
@@ -13,7 +13,7 @@ output:
     number_sections: true
 vignette: >
   \usepackage[utf8]{inputenc}
-  %\VignetteIndexEntry{5. Miscellaneous}
+  %\VignetteIndexEntry{6. PROSAIL inversion with iterative optimization}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -26,91 +26,137 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Additional tips when running PROSAIL
 
-### Adjust soil properties based on external source (e.g. image to process)
+PROSAIL inversion is ill-posed. 
+Therefore, standard iterative optimization algorithms consisting in minimizing a 
+cost function will converge towards local minimum dependent on initial 
+conditions, unless global optimization algorithms are applied, or prior 
+information is used. 
 
-The `prosail` package does not include an exhaustive soil database. 
-Therefore, it may be possible that soil optical properties corresponding to a 
-scene in an optical image do not correspond to the default dry and wet soil 
-reflectance defined as default soil properties.
-In such case, users can define soil properties based on pixels corresponding 
-bare soil and picked in the image, assuming that these exist.
-The soil optical properties will then already have sensor spectral response. 
-In this case, if users want to define custom soil properties, they need to apply 
-sensor response function to all optical constants used in PROSAIL.
+Inversion strategies based on iterative optimization with or without prior 
+information are implemented in `prosail`. 
 
-```{r simulate_LUT_Alternative}
-# apply sensor characteristics to PROSPECT optical constants
-wvl <- prosail::spec_prospect_full_range$lambda
-spec_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                            refl = spec_prospect_full_range,
-                                            srf = srf)
-# apply sensor characteristics to atmospheric properties
-spec_atm_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                                refl = spec_atm,
-                                                srf = srf)
-# apply sensor characteristics to soil properties
-spec_soil_sensor <- apply_sensor_characteristics(wvl = wvl,
-                                                 refl = spec_soil,
-                                                 srf = srf)
+
+## Iterative optimization with no prior information
+
+The main iterative optimization algorithm is based on the minimization of a 
+multivariable function with nonlinear constraints, and uses the function 
+`fmincon` included in the package `pracma`.
+The default criterion for the cost function corresponds to the root mean square 
+error (RMSE) between a reference surface reflectance and surface reflectance 
+simulated with PROSAIL. 
+Iterative optimization is applied to simulated surface reflectance at native 
+spectral sampling (1 nm), and to Sentinel-2 surface reflectance as follows:
+
+```{r iterative_no_prior}
+# define initial value, lower and upper bounds for inversion
+init <- data.frame('chl' = 40, 'car' = 10, 'ewt' = 0.01, 'lma' = 0.01, 
+                   'lai' = 3, 'lidf_a' = 50, 'n_struct' = 1.5)
+lb <- data.frame('chl' = 5, 'car' = 1, 'ewt' = 0.002, 'lma' = 0, 
+                 'lai' = 0.5, 'lidf_a' = 30, 'n_struct' = 1)
+ub <- data.frame('chl' = 80, 'car' = 20, 'ewt' = 0.03, 'lma' = 0.03, 
+                 'lai' = 6, 'lidf_a' = 80, 'n_struct' = 3)
+
+# define parameters set for inversion
+parm_set <- data.frame('tts' = 40, 'tto' = 0, 'psi' = 60, 'soil_brightness' = 1,
+                       'ant' = 0, 'brown' = 0, 'hotspot' = 0.1)
+
+# define soil reflectance (set as prior knowledge) and spec_soil variable
+rsoil <- parm_set$soil_brightness*spec_soil_ossl$soil_01
+spec_soil <- data.frame('lambda' = spec_soil$lambda, 
+                        'refl' = rsoil)
+
+# simulate canopy surface reflectance with 1 nm sampling
+truth <- data.frame('chl' = 60, 'car' = 8, 'ewt' = 0.015, 'lma' = 0.005,
+                    'lai' = 3,  'lidf_a' = 60, 'n_struct' = 1.8)
+refl_1nm <- prosail(n_struct = truth$n_struct, chl = truth$chl, car = truth$car,
+                    ant = parm_set$ant, brown = parm_set$brown, 
+                    ewt = truth$ewt, lma = truth$lma, type_lidf = 2, 
+                    lai = truth$lai, hotspot = parm_set$hotspot, 
+                    lidf_a = init$lidf_a, rsoil = rsoil, tts = parm_set$tts, 
+                    tto = parm_set$tto, psi = parm_set$psi)
+surf_refl_1nm <- get_surf_refl(rdot = refl_1nm$rdot, rsot = refl_1nm$rsot,
+                               tts = parm_set$tts, 
+                               spec_atm_sensor = spec_atm)
+
+# invert PROSAIL on surface reflectance with 1 nm spectral sampling
+est_1nm <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl, 
+                          initialization = init,
+                          lower_bound = lb, upper_bound = ub, type_lidf = 2, 
+                          spec_prospect_sensor = spec_prospect_full_range,
+                          spec_atm_sensor = spec_atm, 
+                          spec_soil_sensor = spec_soil, 
+                          parm_set = parm_set)
+
+# convert spectral input based on Sentinel-2 SRF
+srf_s2 <- get_srf_sensor(sensor_name = 'Sentinel_2A')
+spec_prospect <- spec_prospect_full_range
+lambda <- spec_prospect_full_range$lambda
+surf_refl_S2 <- apply_sensor_characteristics(wvl = lambda, 
+                                             srf = srf_s2, 
+                                             refl = surf_refl_1nm$surf_refl)
+spec_prospect_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
+                                                 refl = spec_prospect)
+spec_soil_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
+                                             refl = spec_soil)
+spec_atm_s2 <- apply_sensor_characteristics(wvl = lambda, srf = srf_s2, 
+                                            refl = spec_atm)
+
+# invert PROSAIL on Sentinel-2 surface reflectance
+est_s2 <- invert_prosail(refl_mes = surf_refl_S2, initialization = init,
+                         lower_bound = lb, upper_bound = ub,
+                         spec_prospect_sensor = spec_prospect_s2,
+                         spec_atm_sensor = spec_atm_s2, 
+                         spec_soil_sensor = spec_soil_s2,
+                         type_lidf = 2, parm_set = parm_set)
+
 ```
 
-This conversion can also be done using a unique function `prepare_sensor_simulation`: 
+## Iterative optimization with prior information
 
-```{r conversion_SRF_OptCst}
-# apply sensor characteristics to PROSPECT optical constants
-properties_sensor <- prepare_sensor_simulation(spec_prospect = spec_prospect_full_range,
-                                               spec_soil = spec_soil,
-                                               spec_atm = spec_atm,
-                                               srf = srf)
-spec_sensor <- properties_sensor$spec_prospect_sensor
-spec_soil_sensor <- properties_sensor$spec_soil_sensor
-spec_atm_sensor <- properties_sensor$spec_atm_sensor
+Prior information can be added to the cost function in order to regularize the 
+ill-posed inverse problem ([Combal et al., 2003](https://doi.org/10.1016/S0034-4257(02)00035-4)).
+Multiple possibilities exist to account for prior information: 
+
+- the definition of `initialization` variable according to initial assumptions
+
+- the addition of a term corresponding to the probability density function of 
+part or all of the parameters to be estimated in the cost function. 
+
+The code blow illustrates the introduction of prior information on LIDF, with the 
+definition of a probability density function corresponding to the average leaf 
+angle `lidf_a`. 
+A weighting factor associated to the relative importance of this prior 
+information with respect to the main criterion to minimize (RMSE between 
+reference surface reflectance and simulated surface reflectance) can also be 
+adjusted.
+
+
+```{r iterative_prior}
+# define prior information on average leaf angle lidf_a
+prior_info <- list('mean' = data.frame('lidf_a' = 60), 
+                   'sd' = data.frame('lidf_a' = 10), 
+                   'weight_prior' = 0.01)
+
+# invert PROSAIL on surface reflectance with 1 nm spectral sampling and 
+# probability density function for lidf_a
+est_1nm_p <- invert_prosail(refl_mes = surf_refl_1nm$surf_refl, 
+                            initialization = init,
+                            lower_bound = lb, upper_bound = ub,
+                            spec_prospect_sensor = spec_prospect_full_range,
+                            spec_atm_sensor = spec_atm, 
+                            spec_soil_sensor = spec_soil,
+                            type_lidf = 2, parm_set = parm_set,
+                            prior_info =  prior_info)
+
+# invert PROSAIL on Sentinel-2 surface reflectance and probability density 
+# function for lidf_a
+est_s2_p <- invert_prosail(refl_mes = surf_refl_S2, initialization = init,
+                           lower_bound = lb, upper_bound = ub,
+                           spec_prospect_sensor = spec_prospect_s2,
+                           spec_atm_sensor = spec_atm_s2, 
+                           spec_soil_sensor = spec_soil_s2,
+                           type_lidf = 2, parm_set = parm_set,
+                           prior_info =  prior_info)
+
 ```
-
-... Then surface reflectance, fAPAR and albedo can be computed based on these values:
-
-```{r apply_srf_reflectance}
-# WL is a vector giving central wavelength for each band in nanometer
-# fwhm is a vector giving fwhm for each band in nanometer
-refl_sensor <- prosail(spec_sensor = spec_sensor,
-                       chl = 40, car = 10, ewt = 0.01, ant = 0, lma = 0.01, 
-                       n_struct = 1.5, type_lidf = 2, lidf_a = 50, lai = 4, 
-                       hotspot = 0.1, tts = 27, tto = 0, psi = 100, 
-                       rsoil = spec_soil_sensor$max_refl)
-
-# Computes surface reflectance based on outputs from prosail and sun position
-surf_refl_sensor <- get_surf_refl(rdot = refl_sensor$rdot, 
-                                  rsot = refl_sensor$rsot, 
-                                  tts = tts,
-                                  spec_atm_sensor = spec_atm_sensor)
-
-# Computes fAPAR based on outputs from PROSAIL and sun position
-fapar_sensor <- get_fapar(abs_dir = refl_sensor$abs_dir, 
-                          abs_hem = refl_sensor$abs_hem, 
-                          tts = tts, 
-                          spec_atm_sensor = spec_atm_sensor)
-
-# Computes albedo based on outputs from PROSAIL and sun position
-albedo_sensor <- get_albedo(rsdstar = refl_sensor$rsdstar, 
-                            rddstar = refl_sensor$rddstar, 
-                            tts = tts,
-                            spec_atm_sensor = spec_atm_sensor)
-```
-
-### Use alternative implementation of machine learning algorithm for hybrid inversion
-
-The default machine learning algorithm is support vector regression from the 
-package `liquidSVM`. However, multiple users experienced difficulties installing 
-this package. 
-Therefore, an alternative SVR implementation based on the package `caret` is 
-also implemented.
-
-Set `method <- 'svmLinear'` or `method <- 'svmRadial'` when calling 
-`train_prosail_inversion` to choose between the alternative implementations. 
-
-Set `method <- 'nu-svr'` when calling `train_prosail_inversion` to use 
-`kernlab::ksvm` with rbf kernel.
-
-Additional methods can be implemented with the support of users. 
