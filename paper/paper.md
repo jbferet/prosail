@@ -44,10 +44,6 @@ including
 
 - fractional vegetation cover (fCover)
 
-The retrieval accuracy of these properties depends on the spectral 
-characteristics of the sensor: solving an ill-posed problem requires sufficient 
-spectral information. 
-
 We introduce `prosail`, an R package which provides multiple versions of 
 the model PROSAIL, coupled `prospect` [@feret2024]. 
 `prosail` simulates surface reflectance in forward mode for various optical 
@@ -276,40 +272,38 @@ should contribute to improve reproducibility of currently available softwares.
 
 # Conclusion
 
-We introduce `prosail`, an R package dedicated to the canopy reflectance model 
-PROSAIL. 
-`prosail` simulates canopy reflectance for optical sensors based on their 
-spectral response. 
-The package includes inversion based on iterative optimization and ML/RTM 
-inversion. 
+`prosail` is an R package dedicated to the canopy reflectance model PROSAIL, 
+simulating reflectance from optical sensors based on their spectral response. 
+It includes inversion based on iterative optimization and ML/RTM inversion. 
 
-The estimation of vegetation biophysical properties with `prosail` hybrid 
-inversion is consistent with estimations from SNAP. 
+Vegetation biophysical properties estimated with a hybrid inversion are 
+consistent with estimations from SNAP. 
 
 `prosail` hybrid inversion does not intend to be computationally as efficient as 
-SNAP and may not meet requirements for large scale vegetation monitoring 
-applications. 
+SNAP. 
+It is not appropriate for regional to global scale vegetation monitoring. 
 `prosail` hybrid inversion offers a fully adjustable hybrid inversion framework, 
 including an original parsimonious ML regression method, allowing fast and 
 efficient training. 
 It is a valuable tool for experimenting on the potential and limitation of 
-physically-based retrieval of vegetation traits from various types of optical 
-sensors, including airborne imaging spectroscopy, as well satellite missions 
-already operational and in preparation. 
+physically-based retrieval of vegetation traits from optical sensors, including 
+satellite missions already operational and in preparation. 
 
 # Availability
 
-`prosail` is an open-source software package made available under the MIT license. 
+`prosail` is an open-source software made available under the MIT license. 
 Tutorials are available at [https://jbferet.gitlab.io/prosail/](https://jbferet.gitlab.io/prosail/).
 
 # Acknowledgements
 
-The authors acknowledge financial support from Agence Nationale de la Recherche 
-(BioCop project — ANR-17-CE32-0001).
-We are grateful to Wout Verhoef for the development of the initial version of 
-the 4SAIL and 4SAIL2 models. 
-We are grateful to Stéphane Jacquemoud and Frédéric Baret for the development 
-of the initial version of the prospect model.
+This work was supported in part by CNES through the TOSCA project SYLVOSANSAT, 
+by the Agence Nationale de la Recherche (ANR) through the BioCop project 
+(ANR-17-CE32-0001-01), and by government funding managed by ANR under the 
+France 2030 program as part of the PEPR FORESTT, MONITOR, reference number 
+ANR-24-PEFO-0003.
+We are grateful to Wout Verhoef for the 4SAIL and 4SAIL2 models. 
+We are grateful to Stéphane Jacquemoud and Frédéric Baret for the initial 
+version of the PROSPECT model.
 
 # AI Usage Disclosure
 
