@@ -32,8 +32,9 @@ stages:
 deps:
   stage: deps
   script:
-  - R -e 'devtools::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch")'
-  - R -e 'devtools::install_deps(dependencies=T)'
+  - R -e 'install.packages("remotes", type = "source")'
+  - R -e 'remotes::install_cran("liquidSVM", repos="http://pnp.mathematik.uni-stuttgart.de/isa/steinwart/software/R", build_opts="--no-multiarch")'
+  - R -e 'remotes::install_deps(dependencies=T)'
   only:
     - master
     - schedules
@@ -41,7 +42,8 @@ deps:
 check:
   stage: check
   script:
-  - R -e "devtools::install_cran(c('systemfonts', 'textshaping'))"
+  - R -e 'install.packages("remotes", type = "source")'
+  - R -e "remotes::install_cran(c('systemfonts', 'textshaping'))"
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"), error_on = "error")'
   - R -e 'devtools::install()'
   only:
