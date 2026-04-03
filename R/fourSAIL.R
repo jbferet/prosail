@@ -11,8 +11,8 @@
 #' if type_lidf ==2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param hotspot numeric. Hot Spot parameter
-#' @param tts numeric. Sun zeith angle
-#' @param tto numeric. Observer zeith angle
+#' @param tts numeric. Sun zenith angle
+#' @param tto numeric. Observer zenith angle
 #' @param psi numeric. Azimuth Sun / Observer
 #' @param rsoil numeric. Soil reflectance
 #'

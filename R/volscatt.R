@@ -41,9 +41,11 @@ volscatt <- function(tts,tto,psi,ttl){
   # ............................................................................
 
   cosbts <- 5
-  if (abs(ss)>1e-6) cosbts <- -cs/ss
   cosbto <- 5
-  if (abs(so)>1e-6) cosbto <- -co/so
+  if (abs(ss)>1e-6)
+    cosbts <- -cs/ss
+  if (abs(so)>1e-6)
+    cosbto <- -co/so
   if (abs(cosbts)<1){
     bts <- acos(cosbts)
     ds <- ss

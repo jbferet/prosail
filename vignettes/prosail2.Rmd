@@ -64,10 +64,16 @@ If no value, their default value is set.
     * Define `type_lidf=1` if you want to use the original LIDF introduced by 
     [Verhoef (1998)](https://edepot.wur.nl/210943).
         * if `type_lidf=1` then `lidf_a` controls the average leaf slope and 
-        `lidf_b` controls the distribution's bimodality
+        `lidf_b` controls the distribution's bimodality as described in the 
+        table hereafter.
         * This LIDF requires |lidf_a| + |lidf_b| < 1
+    * Define `type_lidf=2` if you want to use the 
+    [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) 
+    characterized by the average leaf inclination angle in degree.
+        * if `type_lidf=2` then `lidf_a` controls the average leaf angle
+
         
-| LIDF type    |   lidf_a   |   lidf_b   
+| LIDF type    |   lidf_a  |   lidf_b  | 
 | :----------: |:---------:|:---------:|
 | Planophile   |     1     |     0     |
 | Erectophile  |    -1     |     0     |
@@ -75,11 +81,6 @@ If no value, their default value is set.
 | Extremophile |     0     |     1     |
 | Spherical    |   -0.35   |   -0.15   |
 | Uniform      |     0     |     0     |
-
-    * Define `type_lidf=2` if you want to use the 
-    [ellipsoidal distribution function](https://www.sciencedirect.com/science/article/pii/0168192386900109) 
-    characterized by the average leaf inclination angle in degree
-        * if `type_lidf=2` then `lidf_a` controls the average leaf angle
 
 * `lai`: leaf area index
 
