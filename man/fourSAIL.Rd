@@ -36,9 +36,9 @@ if type_lidf ==2, unused}
 
 \item{hotspot}{numeric. Hot Spot parameter}
 
-\item{tts}{numeric. Sun zeith angle}
+\item{tts}{numeric. Sun zenith angle}
 
-\item{tto}{numeric. Observer zeith angle}
+\item{tto}{numeric. Observer zenith angle}
 
 \item{psi}{numeric. Azimuth Sun / Observer}
 
