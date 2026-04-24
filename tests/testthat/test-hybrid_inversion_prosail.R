@@ -21,8 +21,8 @@ test_that("hybrid inversion ok", {
                               spec_atm = prosail::spec_atm)
   refl_lut_1nm <- res$surf_refl
   refl_lut <- apply_sensor_characteristics(wvl = spec_prospect_full_range$lambda,
-                                          srf = srf,
-                                          refl = refl_lut_1nm)
+                                           srf = srf,
+                                           refl = refl_lut_1nm)
   # identify spectral bands in LUT
   rownames(refl_lut) <- srf$spectral_bands
   # add noise
@@ -30,8 +30,8 @@ test_that("hybrid inversion ok", {
   refl_lut_noise <- apply_noise_atbd(refl_lut = subset_refl)
   # train model
   hybrid_model <- prosail_hybrid_train(refl_lut = refl_lut_noise,
-                                   input_variables = input_prosail$lai,
-                                   method = 'nu-svr')
+                                       input_variables = input_prosail$lai,
+                                       method = 'nu-svr')
 
   ###########################################################
   # perform prediction based on models in previous steps
