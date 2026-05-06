@@ -21,7 +21,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
     bigRaster,
-    liquidSVM,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
