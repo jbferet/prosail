@@ -67,7 +67,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side e.g. using incompatible environment components/versions (Make sure that you have read the [documentation](https://jbferet.gitlab.io/prosail/). If you are looking for support, you might want to check [this section](#i-have-a-question)).
-- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/jbferet/prosailissues?q=label%3Abug).
+- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/jbferet/prosail/issues?q=label%3Abug).
 - Also make sure to search the internet (including Stack Overflow) to see if users outside of the GitHub community have discussed the issue.
 - Collect information about the bug:
   - Stack trace (Traceback)
@@ -131,19 +131,12 @@ include Setup of env, IDE and typical getting started instructions?
 
 ### Improving The Documentation
 
-The documentation is not systematically kept up-to-date with the update of the package, due to lack of time from the main developers. We apologize if these tutorials raise errors. 
-If this is the case, pleasse report errors by submitting an issue. Any  help identifying the error will be appreciated!
+The documentation is not systematically kept up-to-date with the update of the package, due to lack of time from the main developers. 
+We apologize if these tutorials raise errors. 
+If this is the case, please report errors by submitting an issue. 
+Any  help identifying the error will be appreciated!
 Updates, improvements and corrections of the documentation are very welcome. 
 
-
-## Styleguides
-### Commit Messages
-<!-- TODO
-
--->
-
-## Join The Project Team
-<!-- TODO -->
 
 <!-- omit in toc -->
 ## Attribution
