@@ -221,16 +221,6 @@ knitr::include_graphics(url)
   `chl`, `lai`, `fcover`, `fapar`.
 </center> 
 
-<!-- <p float="left"> -->
-<!--   <img src="../man/figures/S2/chl.png" width="50%" /> -->
-<!--   <img src="../man/figures/S2/lai.png" width="50%" /> -->
-<!-- </p> -->
-<!-- <p float="left"> -->
-<!--   <img src="../man/figures/S2/fapar.png" width="50%" /> -->
-<!--   <img src="../man/figures/S2/fcover.png" width="50%" /> -->
-<!-- </p> -->
-
-
 # Comparison with SNAP outputs 
 
 The LAI, fAPAR and fCover are compared with the values produced with the 
@@ -240,8 +230,8 @@ It shows that the two implementations provides consistent estimation for these
 variables when following the ATBD sampling strategy for the training samples, 
 despite the differences in terms of machine learning algorithm. 
 
-<p>
 
-<img src="../man/figures/Hybrid_Inversion/compare_SNAP_prosail.png" width="100%" height="100%" class="center">
-
-</p>
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/Hybrid_Inversion/compare_SNAP_prosail.png"
+knitr::include_graphics(url)
+```

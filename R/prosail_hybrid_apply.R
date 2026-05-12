@@ -12,7 +12,7 @@
 #' @importFrom matrixStats rowSds
 #' @importFrom progress progress_bar
 #' @importFrom methods is
-#' @importFrom kernlab xmatrix
+#' @importFrom kernlab xmatrix predict
 #' @export
 
 prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){

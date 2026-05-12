@@ -27,6 +27,8 @@
 #' @importFrom matrixStats rowSds
 #' @importFrom tools file_path_sans_ext
 #' @importFrom utils installed.packages
+#' @importFrom stats predict
+#' @importFrom kernlab predict
 #' @export
 #'
 apply_prosail_inversion_per_block <- function(raster_path, mask_path = NULL,

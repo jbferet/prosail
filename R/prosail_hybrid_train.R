@@ -17,7 +17,6 @@
 #'
 #' @return models_mlr list. ML regression models trained for the retrieval of
 #' input_variables based on refl_lut
-#' @importFrom stats predict
 #' @importFrom progress progress_bar
 #' @importFrom simsalapar tryCatch.W.E
 #' @importFrom caret train trainControl
