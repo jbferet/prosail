@@ -12,7 +12,7 @@ transmittance instead of Transmittance
 'check_spectral_sampling', 'generate_lut_4sail', 'generate_lut_prosail', 
 'generate_lut_surf_refl', 'get_distribution_input_prosail', 'get_input_prosail', 
 'get_srf', 'get_srf_sensor', 'get_surf_refl', 'prosail', 
-'set_compatibility_input_prosail', '', '', ''
+'set_compatibility_input_prosail'
 - added seed as option for function 'train_prosail_inversion'
 
 ## changes

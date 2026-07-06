@@ -101,6 +101,7 @@ library(prosail)
 data_dir <- './01_DATA/fabas'
 prosail_dir <- './03_RESULTS/fabas/prosail_inversion'
 prosail_tiles <- file.path(prosail_dir, 'tiles')
+dir.create(data_dir, showWarnings = F, recursive = T)
 dir.create(prosail_tiles, showWarnings = F, recursive = T)
 ```
 
