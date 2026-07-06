@@ -105,21 +105,21 @@ fourSAIL2  <- function(leaf_green, leaf_brown, type_lidf = 2, lidf_a = 60,
     # if only green leaves
     if (fraction_brown==0.0){
       fb <- 0.5
-      leaf_brown$Reflectance <- leaf_green$Reflectance
-      leaf_brown$Transmittance <- leaf_green$Transmittance
+      leaf_brown$reflectance <- leaf_green$reflectance
+      leaf_brown$transmittance <- leaf_green$transmittance
     }
     if (fraction_brown==1.0){
       fb <- 0.5
-      leaf_green$Reflectance <- leaf_brown$Reflectance
-      leaf_green$Transmittance <- leaf_brown$Transmittance
+      leaf_green$reflectance <- leaf_brown$reflectance
+      leaf_green$transmittance <- leaf_brown$transmittance
     }
     s <- (1.0-diss)*fb*(1.0-fb)
     # rho1 & tau1 : green foliage
     # rho2 & tau2 : brown foliage (bottom layer)
-    rho1 <- ((1-fb-s)*leaf_green$Reflectance+s*leaf_brown$Reflectance)/(1-fb)
-    tau1 <- ((1-fb-s)*leaf_green$Transmittance+s*leaf_brown$Transmittance)/(1-fb)
-    rho2 <- (s*leaf_green$Reflectance+(fb-s)*leaf_brown$Reflectance)/fb
-    tau2 <- (s*leaf_green$Transmittance+(fb-s)*leaf_brown$Transmittance)/fb
+    rho1 <- ((1-fb-s)*leaf_green$reflectance+s*leaf_brown$reflectance)/(1-fb)
+    tau1 <- ((1-fb-s)*leaf_green$transmittance+s*leaf_brown$transmittance)/(1-fb)
+    rho2 <- (s*leaf_green$reflectance+(fb-s)*leaf_brown$reflectance)/fb
+    tau2 <- (s*leaf_green$transmittance+(fb-s)*leaf_brown$transmittance)/fb
 
     # angular distance, compensation of shadow length
     #	Calculate geometric factors associated with extinction and scattering

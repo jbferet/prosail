@@ -1,23 +1,33 @@
-#' This function applied noise on a matrix
+#' This function applies noise on a matrix
 #'
-#' @param lut numeric. Matrix including data to add noise to
-#' @param noise_level numeric. value of the normal noise proportional to lut to
-#' apply on lut
+#' @param refl_lut numeric. reflectance LUT provided as a matrix or dataframe
+#' @param noise_level numeric. value of the normal noise proportional to refl_lut
+#' to be applied on refl_lut
 #' @param noise_type character.
 #' - relative: noise proportional to actual value to add noise to
 #' - absolute: noise not proportional to actual value to add noise to
 #'
-#' @return lut_noise numeric. Matrix including data with added noise
+#' @return lut_noise numeric. Matrix including data with added noise, same type
+#' as refl_lut
 #' @export
-
-apply_noise_lut <- function(lut, noise_level = 0, noise_type = 'relative'){
-  nb_features <- nrow(lut)
-  nb_samples <- ncol(lut)
+#' @examples
+#' input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+#' refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+#'                                  spec_prospect = prosail::spec_prospect_full_range,
+#'                                  spec_soil = prosail::spec_soil_atbd_v2,
+#'                                  spec_atm = prosail::spec_atm)
+#' refl_lut_noise <- apply_noise_lut(refl_lut = refl_lut$surf_refl,
+#'                                   noise_level = 0.02,
+#'                                   noise_type = 'relative')
+#'
+apply_noise_lut <- function(refl_lut, noise_level = 0, noise_type = 'relative'){
+  nb_features <- nrow(refl_lut)
+  nb_samples <- ncol(refl_lut)
   if (noise_type == 'relative'){
-    lut_noise <- lut + lut*matrix(rnorm(nb_features*nb_samples,0,noise_level),
+    lut_noise <- refl_lut + refl_lut*matrix(rnorm(nb_features*nb_samples,0,noise_level),
                                   nrow = nb_features)
   } else if (noise_type == 'absolute'){
-    lut_noise <- lut + matrix(rnorm(nb_features*nb_samples,0,noise_level),
+    lut_noise <- refl_lut + matrix(rnorm(nb_features*nb_samples,0,noise_level),
                               nrow = nb_features)
   }
   return(lut_noise)

@@ -42,8 +42,8 @@ in the same range
 }}
 }
 \value{
-res character. path for output files corresponding to
-biophysical properties
+list. path for rasters corresponding to mean and standard deviation
+for biophysical properties of interest
 }
 \description{
 This function applies ML regression on raster data in order to estimate

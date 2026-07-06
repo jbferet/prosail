@@ -19,8 +19,8 @@
 #' - tile_size numeric. size of individual tiles in meters
 #' - filetype character. driver for raster file
 #'
-#' @return res character. path for output files corresponding to
-#' biophysical properties
+#' @return list. path for rasters corresponding to mean and standard deviation
+#' for biophysical properties of interest
 #' @importFrom progressr handlers progressor with_progress
 #' @importFrom tools file_path_sans_ext
 #' @export

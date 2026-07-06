@@ -1,6 +1,15 @@
 #' reads spectral response from known sensor
 #' spectral response from Sentinel-2 is already defined
-#' @param sensor_name character. name of the sensor
+#' @param sensor_name character. name of the sensor. predefined sensor SRF:
+#' - Sentinel_2, Sentinel_2A, Sentinel_2B, Sentinel_2C
+#' - Venus
+#' - Landsat_8, Landsat_9
+#' - MODIS
+#' - SPOT_6_7
+#' - PLEIADES_1A and 1B
+#' - user defined possible if providing central wl and FWHM for each band, or
+#' srf file. see example in repository and reproduce proper format
+#' https://github.com/jbferet/prosail/blob/master/data-raw/Sentinel_2A_Spectral_Response.csv
 #' @param wl numeric. central wavelength of spectral bands
 #' @param fwhm numeric. fwhm of spectral bands defined by wl
 #' @param srf_path character. path for the file where srf should be saved as CSV
@@ -11,7 +20,16 @@
 #'
 #' @importFrom utils read.csv write.table
 #' @export
-
+#' @examples
+#' srf_2a <- get_srf_sensor(sensor_name = 'sentinel-2a')
+#' srf_2b <- get_srf_sensor(sensor_name = 'Sentinel-2B')
+#' srf_2c <- get_srf_sensor(sensor_name = 'S2C')
+#' srf_venus <- get_srf_sensor(sensor_name = 'venus')
+#' srf_modis <- get_srf_sensor(sensor_name = 'Modis')
+#' srf_user_defined <- get_srf_sensor(sensor_name = 'mysensor',
+#'                                    wl = seq(400, 1000, by = 100),
+#'                                    fwhm = rep(x = 100, 7), save_srf = FALSE)
+#'
 get_srf_sensor <- function(sensor_name = 'user_defined',
                            wl = NULL,
                            fwhm = NULL,
@@ -96,6 +114,8 @@ get_srf_sensor <- function(sensor_name = 'user_defined',
                                                     scientific = FALSE))
         colnames(srf_save) <- c('SR_WL',srf$spectral_bands)
         if (save_srf==TRUE){
+          if (!dir.exists(srf_path))
+            dir.create(path = srf_path, showWarnings = F, recursive = T)
           path_srf <- file.path(srf_path,
                                 paste0(sensor_name,'_spectral_response.csv'))
           message('Saving sensor spectral response function here:')

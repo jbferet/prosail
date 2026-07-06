@@ -53,3 +53,12 @@ generate input_prosail, following
 \item or distribution defined in user
 }
 }
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 2000,
+                                   geom_acq = data.frame('min' = c('tto' = 0,
+                                                                   'tts' = 20,
+                                                                   'psi' = 0),
+                                                         'max' = c('tto' = 10,
+                                                                   'tts' = 30,
+                                                                   'psi' = 360)))
+}

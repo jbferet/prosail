@@ -22,3 +22,11 @@ refl_sensor numeric. Output spectral data, sensor resolution
 reads spectral response from known sensor
 spectral response from Sentinel-2 is already defined
 }
+\examples{
+srf <- get_srf_sensor(sensor_name = 'sentinel-2a')
+spec_prospect_sensor <- apply_sensor_characteristics(
+    wvl = prospect::spec_prospect_full_range$lambda,
+    prospect::spec_prospect_full_range,
+    srf = srf)
+
+}

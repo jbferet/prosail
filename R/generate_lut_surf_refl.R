@@ -15,7 +15,13 @@
 #' @return surf_refl numeric. matrix of surf_refl corresponding to input_prosail
 #' @importFrom progress progress_bar
 #' @export
-
+#' @examples
+#' input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+#' refl_lut <- generate_lut_surf_refl(input_prosail = input_prosail,
+#'                                    spec_prospect = prosail::spec_prospect_full_range,
+#'                                    spec_soil = prosail::spec_soil_atbd_v2,
+#'                                    spec_atm = prosail::spec_atm)
+#'
 generate_lut_surf_refl <- function(input_prosail, spec_prospect, spec_soil, spec_atm,
                                    band_names = NULL, SAILversion = '4SAIL',
                                    brown_lop = NULL){
@@ -39,7 +45,7 @@ generate_lut_surf_refl <- function(input_prosail, spec_prospect, spec_soil, spec
         (1-input_prosail[i,]$psoil)*spec_soil$min_refl
     }
     # if 4SAIL
-    if (SAILversion=='4SAIL'){
+    if (toupper(SAILversion)=='4SAIL'){
       refl <- prosail(spec_sensor = spec_prospect,
                       input_prospect = input_prosail[i,],
                       type_lidf = input_prosail[i,]$type_lidf,
@@ -50,7 +56,7 @@ generate_lut_surf_refl <- function(input_prosail, spec_prospect, spec_soil, spec
                       tts = input_prosail[i,]$tts,
                       tto = input_prosail[i,]$tto,
                       psi = input_prosail[i,]$psi, rsoil = rsoil)
-    } else if (SAILversion=='4SAIL2'){
+    } else if (toupper(SAILversion)=='4SAIL2'){
       refl <- prosail(spec_sensor = spec_prospect,
                       input_prospect = input_prosail[i,],
                       type_lidf = input_prosail[i,]$type_lidf,

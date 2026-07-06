@@ -41,3 +41,11 @@ corresponding to input_prosail
 \description{
 generates a LUT of 4SAIL outputs based on a table of prosail input variables
 }
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+refl_lut <- generate_lut_4sail(input_prosail = input_prosail,
+                               spec_prospect = prosail::spec_prospect_full_range,
+                               spec_soil = prosail::spec_soil_atbd_v2,
+                               spec_atm = prosail::spec_atm)
+
+}

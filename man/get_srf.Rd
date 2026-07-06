@@ -22,3 +22,9 @@ for which SRF is defined
 Computes spectral response function based on wavelength and fwhm
 characteristics
 }
+\examples{
+srf2 <- get_srf(wvl = seq(400, 1000, by = 100),
+                fwhm = rep(x = 100, 7),
+                sensor_name = 'my_sensor')
+
+}

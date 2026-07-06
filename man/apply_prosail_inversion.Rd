@@ -44,7 +44,7 @@ in the same range
 }}
 }
 \value{
-res character. path for output files corresponding to
+bp_path list. list of path for output files corresponding to
 biophysical properties
 }
 \description{

@@ -66,6 +66,9 @@ train_prosail_inversion <- function(input_prosail = NULL, atbd = FALSE,
   # create output directory
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+  # define seed
+  set.seed(options$seed)
+
   # define bands to select for inversion of each parms_to_estimate
   if (is.null(selected_bands)){
     bands_to_select <- NULL

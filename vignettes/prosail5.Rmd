@@ -34,7 +34,11 @@ This is the tutorial associated to the book chapter
 book [`R Coding for Ecology`](https://link.springer.com/book/10.1007/978-3-031-99665-8), 
 in the **Use R!** book series (Springer).
 
-The full tutorial including spectral diversity mapping is available [here](https://jbferet.github.io/biodivMapR/articles/biodivMapR_05.html)
+The full tutorial including spectral diversity mapping with the `biodivMapR` 
+package is available [here](https://jbferet.github.io/biodivMapR/articles/biodivMapR_05.html).
+
+Please visit the main [biodivMapR webpage](https://jbferet.github.io/biodivMapR)
+and follow instructions for installation.
 
 **Warning**: this tutorial is appropriate with prosail v3.0.0 and later.
 please install the 'dev_joss' branch if the master branch is <3.0.0

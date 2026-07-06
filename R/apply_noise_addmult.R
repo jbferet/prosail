@@ -4,13 +4,22 @@
 #' - if additive_noise and multiplicative_noise are the same length as the nb
 #' of spectral bands (rows in refl_lut), noise is specific to each spectral band
 #'
-#' @param refl_lut numeric. reflectance look up table
+#' @param refl_lut numeric. reflectance look up table provided as a matrix or dataframe
 #' @param additive_noise numeric. additive noise (0 = 0%, 1 = 100%)
 #' @param multiplicative_noise numeric. multiplicative noise (0 = 0%, 1 = 100%)
 #'
-#' @return refl_lut_noise numeric.
+#' @return refl_lut_noise numeric. same type as refl_lut
 #' @export
-
+#' @examples
+#' input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+#' refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+#'                                  spec_prospect = prosail::spec_prospect_full_range,
+#'                                  spec_soil = prosail::spec_soil_atbd_v2,
+#'                                  spec_atm = prosail::spec_atm)
+#' refl_lut_noise <- apply_noise_addmult(refl_lut = refl_lut$surf_refl,
+#'                                       additive_noise = 0.01,
+#'                                       multiplicative_noise = 0.02)
+#'
 apply_noise_addmult <- function(refl_lut, additive_noise = 0.01,
                                 multiplicative_noise = 0.02){
   nb_wl <- nrow(refl_lut)

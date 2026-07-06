@@ -55,8 +55,21 @@ adjust_prospect_to_sail(
 \item{brown_lop}{dataframe. brown leaf optical properties, when available}
 }
 \value{
-invisible
+list of leaf optical properties corresponding to green leaf optical
+properties, and brown leaf optical properties if requested
 }
 \description{
 adjust prospect inputs and run prospect in preparation for 4SAIL or 4SAIL2
+}
+\examples{
+lop <- adjust_prospect_to_sail(sail_version = '4SAIL',
+                               spec_sensor = prosail::spec_prospect_full_range,
+                               input_prospect = data.frame('chl' = 50,
+                                                           'car' = 10,
+                                                           'ant' = 0,
+                                                           'brown' = 0.2,
+                                                           'ewt' = 0.015,
+                                                           'lma' = 0.01,
+                                                           'n_struct' = 1.5))
+
 }

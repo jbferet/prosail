@@ -19,15 +19,14 @@
 #' - progressBar boolean. if progress bar required
 #' - filetype character. driver for raster file
 #'
-#' @return res character. path for output files corresponding to
-#' biophysical properties
+#' @return list. path for rasters corresponding to mean and standard deviation
+#' for biophysical properties of interest
 #' @importFrom progressr handlers progressor with_progress
-#' @importFrom raster raster brick blockSize readStart readStop getValues
-#' writeStart writeStop writeValues
+#' @importFrom raster raster brick blockSize readStart readStop getValues writeStart writeStop writeValues
 #' @importFrom matrixStats rowSds
 #' @importFrom tools file_path_sans_ext
 #' @importFrom utils installed.packages
-#' @importFrom stats predict
+# @importFrom stats predict
 #' @importFrom kernlab predict
 #' @export
 #'

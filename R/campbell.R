@@ -4,6 +4,7 @@
 #' inclination angle in degree (ala)
 #' Campbell 1986
 #' @param ala average leaf angle
+#'
 #' @return foliar_distrib list. lidf and litab
 #' @export
 #'

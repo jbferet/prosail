@@ -22,3 +22,11 @@ invisible
 check if spectral sampling is identical between spec_prospect, spec_soil,
 spec_atm
 }
+\examples{
+# matching spectral domains
+check_spectral_sampling(
+    spec_prospect = prospect::spec_prospect_full_range,
+    spec_soil = prosail::spec_soil_atbd_v2,
+    spec_atm = prosail::spec_atm)
+
+}

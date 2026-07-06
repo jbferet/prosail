@@ -27,17 +27,39 @@ knitr::opts_chunk$set(
 ```
 
 This tutorial is based on the estimation of vegetation properties from 
-Sentinel-2 data and `prosail` hybrid inversion. 
+Sentinel-2 images and `prosail` hybrid inversion. 
 It provides the full framework step by step, including Sentinel-2 data download, 
 image preprocessing and masking, hybrid model training, and the application of 
 the model on an image. 
 
 
+# installation of `preprocS2`
+
+The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used to 
+access Sentinel-2 data. 
+`preprocS2` is a basic wrapper of different R packages allowing access to STAC 
+catalogs, such as [`rstac`](https://brazil-data-cube.github.io/rstac/), 
+[`CDSE`](https://zivankaraman.github.io/CDSE/) and 
+[`rstactheia`](https://forge.inrae.fr/teledec/rstactheia).
+It aims at downloading and preparing Sentinel-2 images for further processings 
+using R packages such as `prosail`.
+
+Please visit the webpage dedicated to [`preprocS2`](https://jbferet.gitlab.io/preprocs2/)
+and follow the installation procedure. 
+
 # Identifying and downloading Sentinel-2 images
 
 The Sentinel-2 acquisition corresponds to the Barrax area in Spain. 
 Barrax is a well-studied area for remote sensing applications on crop monitoring. 
-A polygon corresponding to the study area can be downloaded from a repository. 
+
+[Sentinel-hub](https://browser.dataspace.copernicus.eu/?zoom=12&lat=39.06065&lng=-2.13238&themeId=DEFAULT-THEME&visualizationUrl=U2FsdGVkX19ygPtduKVETQXB2nFxaScLJzXrryULgCj1wP1rpi10GT%2F7mVLRqdcAshmDfC8D6iE9Onke%2BQTsJJ90Hu35jFerk3GJcr0s4%2FDV0U3NFYNAl9mCthFjtELl&datasetId=S2_L2A_CDAS&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR&demSource3D=%22MAPZEN%22&cloudCoverage=30&dateMode=SINGLE) 
+is then used in order to identify an acquisition with minimum cloud cover.
+
+Once a date of acquisition is identified, the S2 product is then downloaded. 
+`preprocS2` will download S2 data from a STAC catalog based on spatial and 
+temporal information.
+The default STAC collection is `sentinel-2-l2a` from the Microsoft Planetary 
+computer catalog.
 
 ```{r identify_S2_product}
 # libraries
@@ -47,18 +69,12 @@ library(sf)
 aoi_bbox <- sf::st_bbox(obj = c('xmin' = 571626, 'ymin' = 4324941, 
                                 'xmax' = 582995, 'ymax' = 4331253))
 aoi <- preprocS2::bbox_to_poly(aoi_bbox, crs = 32630)
+
+# save aoi as vector file
+aoi_path <- 'barrax_aoi.GPKG'
+sf::write_sf(obj = aoi, dsn = aoi_path, driver = 'GPKG')
+
 ```
-
-[Sentinel-hub](https://apps.sentinel-hub.com/eo-browser/?zoom=11&lat=39.09836&lng=-2.01462&themeId=DEFAULT-THEME&visualizationUrl=https%3A%2F%2Fservices.sentinel-hub.com%2Fogc%2Fwms%2Fbd86bcc0-f318-402b-a145-015f85b9427e&datasetId=S2L2A&fromTime=2021-05-13T00%3A00%3A00.000Z&toTime=2021-05-13T23%3A59%3A59.999Z&layerId=1_TRUE_COLOR) 
-is then used in order to identify an acquisition with minimum cloud cover.
-
-Once a date of acquisition is identified, the S2 product is then downloaded. 
-The R package [`preprocS2`](https://jbferet.gitlab.io/preprocs2/) is used for 
-this purpose. 
-`preprocS2` will download S2 data from a STAC catalog based on spatial and 
-temporal information.
-The default STAC collection is `sentinel-2-l2a` from the Planetary computer 
-catalog.
 
 Optionally, `preprocS2` can download the geometry of acquisition corresponding 
 to the S2 acquisition by setting `geomAcq = T` and providing authentication to 
@@ -72,9 +88,9 @@ will not be able to access it once you close the page.
 Access to geometry of acquisition is provided by the package 
 [`CDSE`](https://zivankaraman.github.io/CDSE/).
 
-Make sure you follow the procedure described in the 
-[`preprocS2`](https://jbferet.gitlab.io/preprocs2/) installation doc 
-to save credentials for CDSE and OAuth client ID in your `~/.Renviron` file. 
+**Make sure you follow the procedure described in the **
+**[`preprocS2`](https://jbferet.gitlab.io/preprocs2/) installation doc **
+**to save credentials for CDSE and OAuth client ID in your `~/.Renviron` file. **
 
 
 ```{r download_S2_product}
@@ -86,9 +102,6 @@ library(sf)
 output_dir_s2 <- './s2_images'
 dir.create(path = output_dir_s2, showWarnings = F, recursive = T)
 datetime <- '2021-05-13'
-# save aoi as vector file
-aoi_path <- 'barrax_aoi.GPKG'
-sf::write_sf(obj = aoi, dsn = aoi_path, driver = 'GPKG')
 
 # 3- get S2 acquisition and geometry of acquisition for study area
 options <- set_options_preprocS2(fun = 'get_s2_raster')

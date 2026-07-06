@@ -183,6 +183,7 @@ geom_acq$min <- data.frame('tto' = 0, 'tts' = 20, 'psi' = 0)
 geom_acq$max <- data.frame('tto' = 10, 'tts' = 30, 'psi' = 360)
 
 # train model
+set.seed(42)
 hybrid_mod <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                       atbd = TRUE, geom_acq = geom_acq, 
                                       srf = srf, selected_bands = selected_bands, 
@@ -401,6 +402,7 @@ options <- set_options_prosail(fun = 'train_prosail_inversion')
 options$type_distrib <- type_distrib
 options$gaussian_distrib <- gaussian_distrib
 options$noise_level <- noise_level
+options$seed <- 42
 hybrid_mod <- train_prosail_inversion(parms_to_estimate = parms_to_estimate,
                                       srf = srf, 
                                       minval = minval, maxval = maxval, 

@@ -14,7 +14,11 @@
 #' @param skyl numeric. values for skyl
 #' @return surf_refl numeric. surface reflectance
 #' @export
-
+#' @examples
+#' refl <- prosail()
+#' refl_surf <- get_surf_refl(refl$rdot, refl$rsot, tts = 30,
+#'                            spec_atm_sensor = prosail::spec_atm)
+#'
 get_surf_refl  <- function(rdot, rsot, tts, spec_atm_sensor, skyl = NULL){
 
   ############################## #

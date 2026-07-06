@@ -49,6 +49,8 @@ set_options_prosail <- function(fun, options = NULL){
       options$method <- 'liquidSVM'
     if (is.null(options$verbose))
       options$verbose <- FALSE
+    if (is.null(options$seed))
+      options$seed <- 42
   }
   if (fun == 'apply_prosail_inversion'){
     if (is.null(options$multiplying_factor))

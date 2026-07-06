@@ -17,8 +17,20 @@
 #' @param fraction_brown numeric. fraction of brown vegetation (0-1)
 #' @param brown_lop dataframe. brown leaf optical properties, when available
 #'
-#' @return invisible
+#' @return list of leaf optical properties corresponding to green leaf optical
+#' properties, and brown leaf optical properties if requested
 #' @export
+#' @examples
+#' lop <- adjust_prospect_to_sail(sail_version = '4SAIL',
+#'                                spec_sensor = prosail::spec_prospect_full_range,
+#'                                input_prospect = data.frame('chl' = 50,
+#'                                                            'car' = 10,
+#'                                                            'ant' = 0,
+#'                                                            'brown' = 0.2,
+#'                                                            'ewt' = 0.015,
+#'                                                            'lma' = 0.01,
+#'                                                            'n_struct' = 1.5))
+#'
 
 adjust_prospect_to_sail <- function(sail_version, spec_sensor, input_prospect,
                                     chl, car, ant, brown, ewt, lma, prot, cbc,
@@ -27,26 +39,21 @@ adjust_prospect_to_sail <- function(sail_version, spec_sensor, input_prospect,
 
   # for all versions of 4SAIL: get green vegetation
   if (utils::packageVersion("prospect")<'2.0.0'){
-    inprospect_green <- prospect::define_Input_PROSPECT(input_prospect[1,],
-                                                        chl[1], car[1], ant[1],
-                                                        brown[1], ewt[1], lma[1],
-                                                        prot[1], cbc[1],
-                                                        n_struct[1], alpha[1])
-    green_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
-                                    Input_PROSPECT = inprospect_green)
-    names(green_lop) <- c('wvl', 'reflectance', 'transmittance')
+    message('please update prospect version to v2.0 or more')
+    stop()
+    # inprospect_green <- prospect::define_Input_PROSPECT(input_prospect[1,],
+    #                                                     chl[1], car[1], ant[1],
+    #                                                     brown[1], ewt[1], lma[1],
+    #                                                     prot[1], cbc[1],
+    #                                                     n_struct[1], alpha[1])
+    # green_lop <- prospect::PROSPECT(SpecPROSPECT = spec_sensor,
+    #                                 Input_PROSPECT = inprospect_green)
+    # names(green_lop) <- c('wvl', 'reflectance', 'transmittance')
   } else {
-    inprospect_green <- prospect::define_input_prospect(input_prospect = input_prospect[1,],
-                                                        chl = chl[1],
-                                                        car = car[1],
-                                                        ant = ant[1],
-                                                        brown = brown[1],
-                                                        ewt = ewt[1],
-                                                        lma = lma[1],
-                                                        prot = prot[1],
-                                                        cbc = cbc[1],
-                                                        n_struct = n_struct[1],
-                                                        alpha = alpha[1])
+    inprospect_green <- prospect::define_input_prospect(
+      input_prospect = input_prospect[1,], chl = chl[1], car = car[1],
+      ant = ant[1], brown = brown[1], ewt = ewt[1], lma = lma[1],
+      prot = prot[1], cbc = cbc[1], n_struct = n_struct[1], alpha = alpha[1])
     green_lop <- prospect::prospect(spec_prospect = spec_sensor,
                                     input_prospect = inprospect_green)
   }

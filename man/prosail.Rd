@@ -46,7 +46,7 @@ refractive index, specific absorption coefficients and spectral bands}
 
 \item{car}{numeric. carotenoid content (microg.cm-2)}
 
-\item{ant}{numeric. anthocyain content (microg.cm-2)}
+\item{ant}{numeric. anthocyanin content (microg.cm-2)}
 
 \item{brown}{numeric. brown pigment content (Arbitrary units)}
 
@@ -56,19 +56,19 @@ refractive index, specific absorption coefficients and spectral bands}
 
 \item{prot}{numeric. protein content  (g.cm-2)}
 
-\item{cbc}{numeric. NonProtCarbon-based constituent content (g.cm-2)}
+\item{cbc}{numeric. Carbon-based constituent content (g.cm-2)}
 
 \item{alpha}{numeric. Solid angle for incident light at surface of leaf}
 
 \item{type_lidf}{numeric. Type of leaf inclination distribution function}
 
 \item{lidf_a}{numeric.
-if type_lidf ==1, controls the average leaf slope
-if type_lidf ==2, controls the average leaf angle}
+if type_lidf == 1, controls the average leaf slope
+if type_lidf == 2, controls the average leaf angle}
 
 \item{lidf_b}{numeric.
-if type_lidf ==1, controls the distribution's bimodality
-if type_lidf ==2, unused}
+if type_lidf == 1, controls the distribution's bimodality
+if type_lidf == 2, unused}
 
 \item{lai}{numeric. Leaf Area Index}
 
@@ -102,6 +102,8 @@ if type_lidf ==2, unused}
 }
 \value{
 list. rdot,rsot,rddt,rsdt
+each output is provided as an output with spectral bands corresponding to
+spec_sensor$lambda
 rdot: hemispherical-directional reflectance factor in viewing direction
 rsot: bi-directional reflectance factor
 rsdt: directional-hemispherical reflectance factor for solar incident flux
@@ -109,4 +111,23 @@ rddt: bi-hemispherical reflectance factor
 }
 \description{
 PROSAIL simulation based on a set of combinations of input parameters
+}
+\examples{
+# with 4sail
+refl <- prosail(input_prospect <- data.frame('chl' = 50, 'car' = 10, 'ant' = 5,
+                                             'brown' = 0.0, 'ewt' = 0.015,
+                                             'lma' = 0.01, 'n_struct' = 1.5),
+                lai = 5, lidf_a = 50, type_lidf = 2, hotspot = 0.5,
+                rsoil = prosail::spec_soil$min_refl)
+
+# with 4sail2
+input_prospect <- data.frame('chl' = c(40,5), 'car' = c(8,5), 'ant' = c(0,1),
+                             'ewt' = c(0.01,0.005), 'lma' = c(0.009,0.008),
+                             'brown' = c(0.0,0.5), 'n_struct' = c(1.5,2))
+
+refl <- prosail(SAILversion = '4SAIL2', input_prospect = input_prospect,
+                lai = 5, lidf_a = 50, type_lidf = 2, hotspot = 0.5,
+                fraction_brown = 0.5, diss = 1.0, cv = 1, zeta = 1,
+                rsoil = prosail::spec_soil$min_refl)
+
 }

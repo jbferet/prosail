@@ -7,6 +7,12 @@
 #'
 #' @return invisible
 #' @export
+#' @examples
+#' # matching spectral domains
+#' check_spectral_sampling(
+#'     spec_prospect = prospect::spec_prospect_full_range,
+#'     spec_soil = prosail::spec_soil_atbd_v2,
+#'     spec_atm = prosail::spec_atm)
 #'
 check_spectral_sampling <- function(spec_prospect, spec_soil, spec_atm){
   l1 <- spec_prospect$lambda

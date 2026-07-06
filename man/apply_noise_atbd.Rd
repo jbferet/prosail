@@ -8,12 +8,21 @@ look up table}
 apply_noise_atbd(refl_lut)
 }
 \arguments{
-\item{refl_lut}{numeric. reflectance look up table}
+\item{refl_lut}{numeric. reflectance look up table provided as a matrix or dataframe}
 }
 \value{
-refl_lut_noise numeric.
+refl_lut_noise numeric. same type as refl_lut
 }
 \description{
 This function applies noise defined in S2 ATBD to reflectance
 look up table
+}
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+                                 spec_prospect = prosail::spec_prospect_full_range,
+                                 spec_soil = prosail::spec_soil_atbd_v2,
+                                 spec_atm = prosail::spec_atm)
+refl_lut_noise <- apply_noise_atbd(refl_lut = refl_lut$surf_refl)
+
 }

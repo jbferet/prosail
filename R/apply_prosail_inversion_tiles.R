@@ -18,14 +18,10 @@
 #' @param tile_size numeric. size of individual tiles in meters
 #' @param filetype character. driver for raster file
 #'
-#' @return res character. path for output files corresponding to
+#' @return bp_var_path list. path for output files corresponding to
 #' biophysical properties
 #' @importFrom progressr handlers progressor with_progress
-#' @importFrom raster raster brick blockSize readStart readStop getValues
-#' writeStart writeStop writeValues
-#' @importFrom matrixStats rowSds
 #' @importFrom tools file_path_sans_ext
-#' @importFrom utils installed.packages
 #' @export
 
 apply_prosail_inversion_tiles <- function(raster_path, hybrid_model, output_dir,

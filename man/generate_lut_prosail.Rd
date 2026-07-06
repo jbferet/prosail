@@ -46,3 +46,11 @@ to input_prosail
 This function generates a LUT of PROSAIL outputs, including surface reflectance, fapar,
 fcover and albedo, based on a table of input variables for prosail model
 }
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+                                 spec_prospect = prosail::spec_prospect_full_range,
+                                 spec_soil = prosail::spec_soil_atbd_v2,
+                                 spec_atm = prosail::spec_atm)
+
+}

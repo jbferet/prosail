@@ -2,15 +2,15 @@
 % Please edit documentation in R/apply_noise_lut.R
 \name{apply_noise_lut}
 \alias{apply_noise_lut}
-\title{This function applied noise on a matrix}
+\title{This function applies noise on a matrix}
 \usage{
-apply_noise_lut(lut, noise_level = 0, noise_type = "relative")
+apply_noise_lut(refl_lut, noise_level = 0, noise_type = "relative")
 }
 \arguments{
-\item{lut}{numeric. Matrix including data to add noise to}
+\item{refl_lut}{numeric. reflectance LUT provided as a matrix or dataframe}
 
-\item{noise_level}{numeric. value of the normal noise proportional to lut to
-apply on lut}
+\item{noise_level}{numeric. value of the normal noise proportional to refl_lut
+to be applied on refl_lut}
 
 \item{noise_type}{character.
 \itemize{
@@ -19,8 +19,20 @@ apply on lut}
 }}
 }
 \value{
-lut_noise numeric. Matrix including data with added noise
+lut_noise numeric. Matrix including data with added noise, same type
+as refl_lut
 }
 \description{
-This function applied noise on a matrix
+This function applies noise on a matrix
+}
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+                                 spec_prospect = prosail::spec_prospect_full_range,
+                                 spec_soil = prosail::spec_soil_atbd_v2,
+                                 spec_atm = prosail::spec_atm)
+refl_lut_noise <- apply_noise_lut(refl_lut = refl_lut$surf_refl,
+                                  noise_level = 0.02,
+                                  noise_type = 'relative')
+
 }

@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Jean-Baptiste Feret \email{jb.feret@teledetection.fr} (\href{https://orcid.org/0000-0002-0151-1334}{ORCID}) [copyright holder]
   \item Florian de Boissieu \email{florian.deboissieu@inrae.fr} (\href{https://orcid.org/0000-0002-2185-9952}{ORCID})
 }
 

@@ -16,6 +16,14 @@
 #'
 #' @return input_prosail
 #' @export
+#' @examples
+#' input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 2000,
+#'                                    geom_acq = data.frame('min' = c('tto' = 0,
+#'                                                                    'tts' = 20,
+#'                                                                    'psi' = 0),
+#'                                                          'max' = c('tto' = 10,
+#'                                                                    'tts' = 30,
+#'                                                                    'psi' = 360)))
 
 get_input_prosail <- function(atbd = FALSE, geom_acq = NULL,
                               codistribution_lai = TRUE, minval = NULL,

@@ -4,9 +4,16 @@
 #' @param refl numeric. input spectral data (unique sample)
 #' @param srf list. Spectral response & Spectral Bands of the sensor & Original
 #' Bands for which srf is defined
+#'
 #' @return refl_sensor numeric. Output spectral data, sensor resolution
 #' @export
-
+#' @examples
+#' srf <- get_srf_sensor(sensor_name = 'sentinel-2a')
+#' spec_prospect_sensor <- apply_sensor_characteristics(
+#'     wvl = prospect::spec_prospect_full_range$lambda,
+#'     prospect::spec_prospect_full_range,
+#'     srf = srf)
+#'
 apply_sensor_characteristics <- function(wvl, refl, srf){
 
   refl <- data.frame(refl)

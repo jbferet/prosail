@@ -28,3 +28,9 @@ radiative transfer model, Agronomie
 Es = direct
 Ed = diffuse
 }
+\examples{
+refl <- prosail()
+refl_surf <- get_surf_refl(refl$rdot, refl$rsot, tts = 30,
+                           spec_atm_sensor = prosail::spec_atm)
+
+}

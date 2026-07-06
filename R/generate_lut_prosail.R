@@ -17,7 +17,13 @@
 #' to input_prosail
 #' @importFrom progress progress_bar
 #' @export
-
+#' @examples
+#' input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+#' refl_lut <- generate_lut_prosail(input_prosail = input_prosail,
+#'                                  spec_prospect = prosail::spec_prospect_full_range,
+#'                                  spec_soil = prosail::spec_soil_atbd_v2,
+#'                                  spec_atm = prosail::spec_atm)
+#'
 generate_lut_prosail <- function(input_prosail, spec_prospect, spec_soil,
                                  spec_atm, band_names = NULL,
                                  SAILversion = '4SAIL', brown_lop = NULL,

@@ -44,7 +44,7 @@ in the same range}
 \item{filetype}{character. driver for raster file}
 }
 \value{
-res character. path for output files corresponding to
+bp_var_path list. path for output files corresponding to
 biophysical properties
 }
 \description{

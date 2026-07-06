@@ -1,3 +1,25 @@
+# prosail v3.1.0
+
+adjustments following JOSS reviewing stage
+
+## fix
+- adjust fourSAIL2 to prospect v2.0: use reflectance instead of Reflectance, 
+transmittance instead of Transmittance
+
+## additions
+- added examples for functions 'adjust_prospect_to_sail', 'apply_noise_addmult', 
+'apply_noise_atbd', 'apply_noise_lut', 'apply_sensor_characteristics', 
+'check_spectral_sampling', 'generate_lut_4sail', 'generate_lut_prosail', 
+'generate_lut_surf_refl', 'get_distribution_input_prosail', 'get_input_prosail', 
+'get_srf', 'get_srf_sensor', 'get_surf_refl', 'prosail', 
+'set_compatibility_input_prosail', '', '', ''
+- added seed as option for function 'train_prosail_inversion'
+
+## changes
+- updated vignettes 2, 3, 4, 5
+- prospect v 1.x not supported anymore
+
+
 # prosail v3.0.0
 
 prepare for JOSS submission

@@ -9,7 +9,11 @@
 #' for which SRF is defined
 #' @importFrom stats dnorm
 #' @export
-
+#' @examples
+#' srf2 <- get_srf(wvl = seq(400, 1000, by = 100),
+#'                 fwhm = rep(x = 100, 7),
+#'                 sensor_name = 'my_sensor')
+#'
 get_srf <- function(wvl, fwhm, sensor_name = 'user_defined'){
 
   # define full spectral domain in optical domain

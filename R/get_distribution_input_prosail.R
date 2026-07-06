@@ -14,7 +14,16 @@
 #' @importFrom stats runif rnorm sd
 #' @importFrom truncnorm rtruncnorm
 #' @export
-
+#' @examples
+#' distrib_inputs <- get_distribution_input_prosail(
+#'     minval = data.frame('chl' = 5, 'car' = 1, 'lai' = 0.5),
+#'     maxval = data.frame('chl' = 60, 'car' = 12, 'lai' = 6),
+#'     parm_set = list('type_lidf' = 2, 'lidf_a' = 60),
+#'     type_distrib = list('chl' = 'uniform',
+#'                         'car' = 'uniform',
+#'                         'lai' = 'gaussian'),
+#'     mean = list('lai' = 3), sd = list('lai' = 2), nb_samples = 200)
+#'
 get_distribution_input_prosail <- function(minval = NULL, maxval = NULL,
                                            parm_set = NULL, nb_samples = 2000,
                                            type_distrib = NULL, mean = NULL,
@@ -84,31 +93,55 @@ get_distribution_input_prosail <- function(minval = NULL, maxval = NULL,
     for (i in set_to_default)
       input_prosail[[i]] <- default[,i]
   }
-  # define input_prosail # 2 Set parameters
+  # define input_prosail # 2 Set parameters defined by user
   if (length(parm_set)>0){
-    for (i in seq_len(length(parm_set))){
-      sel <- which(input_prosail_names==names(parm_set)[i])
-      input_prosail[[sel]] <- parm_set[,i]
+    for (parm in names(parm_set)){
+      sel <- which(input_prosail_names==parm)
+      input_prosail[[sel]] <- parm_set[[parm]]
     }
   }
+  # if (length(parm_set)>0){
+  #   for (i in seq_len(length(parm_set))){
+  #     sel <- which(input_prosail_names==names(parm_set)[i])
+  #     input_prosail[[sel]] <- parm_set[,i]
+  #   }
+  # }
+
   # define input_prosail # 3 random parameters
-  for (i in seq_len(length(minval))){
-    sel <- names(minval)[i]
+  for (parm in names(minval)){
     # if uniform distribution
-    if (tolower(type_distrib[[sel]]) == 'uniform')
-      input_prosail[[sel]] <- runif(nb_samples,
-                                    min = minval[1,i],
-                                    max = maxval[1,i])
+    if (tolower(type_distrib[[parm]]) == 'uniform')
+      input_prosail[[parm]] <- runif(nb_samples,
+                                     min = minval[[parm]],
+                                     max = maxval[[parm]])
     # if gaussian distribution
-    if (tolower(type_distrib[[sel]]) == 'gaussian'){
+    if (tolower(type_distrib[[parm]]) == 'gaussian'){
       set.seed(42)
-      input_prosail[[sel]] <- truncnorm::rtruncnorm(n = nb_samples,
-                                                    a = minval[[sel]],
-                                                    b = maxval[[sel]],
-                                                    mean = mean[[sel]],
-                                                    sd = sd[[sel]])
+      input_prosail[[parm]] <- truncnorm::rtruncnorm(n = nb_samples,
+                                                     a = minval[[parm]],
+                                                     b = maxval[[parm]],
+                                                     mean = mean[[parm]],
+                                                     sd = sd[[parm]])
     }
   }
+
+  # for (i in seq_len(length(minval))){
+  #   sel <- names(minval)[i]
+  #   # if uniform distribution
+  #   if (tolower(type_distrib[[sel]]) == 'uniform')
+  #     input_prosail[[sel]] <- runif(nb_samples,
+  #                                   min = minval[1,i],
+  #                                   max = maxval[1,i])
+  #   # if gaussian distribution
+  #   if (tolower(type_distrib[[sel]]) == 'gaussian'){
+  #     set.seed(42)
+  #     input_prosail[[sel]] <- truncnorm::rtruncnorm(n = nb_samples,
+  #                                                   a = minval[[sel]],
+  #                                                   b = maxval[[sel]],
+  #                                                   mean = mean[[sel]],
+  #                                                   sd = sd[[sel]])
+  #   }
+  # }
   input_prosail$soil_ID <- sample(x = 7, size = nb_samples, replace = T)
   return(input_prosail)
 }

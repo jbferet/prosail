@@ -22,7 +22,7 @@ before_script:
   - echo '.libPaths("'${R_LIBS_USER}'")' > .Rprofile
   - apt-get update && apt-get install -y qpdf
   # pandoc git libcurl4-openssl-dev libgit2-dev libudunits2-dev libnetcdf-dev libproj-dev libgeos-dev libgdal-dev netcdf-bin libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev
-
+  # - apt-get install -y qpdf pandoc git libcurl4-openssl-dev libgit2-dev libudunits2-dev libnetcdf-dev libproj-dev libgeos-dev libgdal-dev netcdf-bin gdal-bin aria2 libpython2-dev libjq-dev libprotobuf-dev protobuf-compiler libv8-dev libssl-dev libcairo2-dev
 
 stages:
   - deps

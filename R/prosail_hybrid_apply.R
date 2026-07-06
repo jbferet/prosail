@@ -8,11 +8,11 @@
 #' @return HybridRes list. Estimated values corresponding to refl. Includes
 #' - mean_estimate = mean value for the ensemble regression model
 #' - sd_estimate = std value for the ensemble regression model
-#' @importFrom stats predict
 #' @importFrom matrixStats rowSds
 #' @importFrom progress progress_bar
 #' @importFrom methods is
 #' @importFrom kernlab xmatrix predict
+# @importFrom stats predict
 #' @export
 
 prosail_hybrid_apply <- function(regression_models, refl, progressBar = FALSE){

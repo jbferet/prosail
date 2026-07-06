@@ -5,20 +5,20 @@
 #' @param n_struct numeric. Leaf structure parameter
 #' @param chl numeric. chlorophyll content (microg.cm-2)
 #' @param car numeric. carotenoid content (microg.cm-2)
-#' @param ant numeric. anthocyain content (microg.cm-2)
+#' @param ant numeric. anthocyanin content (microg.cm-2)
 #' @param brown numeric. brown pigment content (Arbitrary units)
 #' @param ewt numeric. Equivalent Water Thickness (g.cm-2)
 #' @param lma numeric. Leaf Mass per Area (g.cm-2)
 #' @param prot numeric. protein content  (g.cm-2)
-#' @param cbc numeric. NonProtCarbon-based constituent content (g.cm-2)
+#' @param cbc numeric. Carbon-based constituent content (g.cm-2)
 #' @param alpha numeric. Solid angle for incident light at surface of leaf
 #' @param type_lidf numeric. Type of leaf inclination distribution function
 #' @param lidf_a numeric.
-#' if type_lidf ==1, controls the average leaf slope
-#' if type_lidf ==2, controls the average leaf angle
+#' if type_lidf == 1, controls the average leaf slope
+#' if type_lidf == 2, controls the average leaf angle
 #' @param lidf_b numeric.
-#' if type_lidf ==1, controls the distribution's bimodality
-#' if type_lidf ==2, unused
+#' if type_lidf == 1, controls the distribution's bimodality
+#' if type_lidf == 2, unused
 #' @param lai numeric. Leaf Area Index
 #' @param hotspot numeric. Hot Spot parameter
 #' @param tts numeric. Sun zeith angle
@@ -37,12 +37,32 @@
 #' - Set to NULL if use PROSPECT to generate it
 #'
 #' @return list. rdot,rsot,rddt,rsdt
+#' each output is provided as an output with spectral bands corresponding to
+#' spec_sensor$lambda
 #' rdot: hemispherical-directional reflectance factor in viewing direction
 #' rsot: bi-directional reflectance factor
 #' rsdt: directional-hemispherical reflectance factor for solar incident flux
 #' rddt: bi-hemispherical reflectance factor
 #' @import prospect
 #' @export
+#' @examples
+#' # with 4sail
+#' refl <- prosail(input_prospect <- data.frame('chl' = 50, 'car' = 10, 'ant' = 5,
+#'                                              'brown' = 0.0, 'ewt' = 0.015,
+#'                                              'lma' = 0.01, 'n_struct' = 1.5),
+#'                 lai = 5, lidf_a = 50, type_lidf = 2, hotspot = 0.5,
+#'                 rsoil = prosail::spec_soil$min_refl)
+#'
+#' # with 4sail2
+#' input_prospect <- data.frame('chl' = c(40,5), 'car' = c(8,5), 'ant' = c(0,1),
+#'                              'ewt' = c(0.01,0.005), 'lma' = c(0.009,0.008),
+#'                              'brown' = c(0.0,0.5), 'n_struct' = c(1.5,2))
+#'
+#' refl <- prosail(SAILversion = '4SAIL2', input_prospect = input_prospect,
+#'                 lai = 5, lidf_a = 50, type_lidf = 2, hotspot = 0.5,
+#'                 fraction_brown = 0.5, diss = 1.0, cv = 1, zeta = 1,
+#'                 rsoil = prosail::spec_soil$min_refl)
+#'
 prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
                     chl = 40.0, car = 8.0, ant = 0.0, brown = 0.0, ewt = 0.01,
                     lma = NULL, prot = 0.0, cbc = 0.0, alpha = 40.0,
@@ -65,12 +85,12 @@ prosail <- function(spec_sensor = NULL, input_prospect = NULL, n_struct = 1.5,
                                  brown_lop = brown_lop,
                                  fraction_brown = fraction_brown)
   #	SAIL: CANOPY REFLECTANCE
-  if (SAILversion == '4SAIL'){
+  if (toupper(SAILversion) == '4SAIL'){
     refl <- fourSAIL(lop = lop$green_lop,
                      type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
                      lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,
                      rsoil = rsoil)
-  } else if (SAILversion == '4SAIL2'){
+  } else if (toupper(SAILversion) == '4SAIL2'){
     refl <- fourSAIL2(leaf_green = lop$green_lop, leaf_brown = lop$brown_lop,
                       type_lidf = type_lidf, lidf_a = lidf_a, lidf_b = lidf_b,
                       lai = lai, hotspot = hotspot, tts = tts, tto = tto, psi = psi,

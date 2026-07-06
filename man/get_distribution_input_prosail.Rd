@@ -38,3 +38,14 @@ prosail simulation
 This function generates distribution of biophysical parameters used as input
 parameters in prosail
 }
+\examples{
+distrib_inputs <- get_distribution_input_prosail(
+    minval = data.frame('chl' = 5, 'car' = 1, 'lai' = 0.5),
+    maxval = data.frame('chl' = 60, 'car' = 12, 'lai' = 6),
+    parm_set = list('type_lidf' = 2, 'lidf_a' = 60),
+    type_distrib = list('chl' = 'uniform',
+                        'car' = 'uniform',
+                        'lai' = 'gaussian'),
+    mean = list('lai' = 3), sd = list('lai' = 2), nb_samples = 200)
+
+}

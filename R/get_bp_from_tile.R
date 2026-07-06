@@ -26,7 +26,7 @@
 #' @importFrom matrixStats rowSds
 #' @importFrom terra rast crop values writeRaster
 #' @importFrom kernlab predict
-#' @importFrom stats predict
+# @importFrom stats predict
 #' @importFrom tools file_path_sans_ext
 #' @export
 

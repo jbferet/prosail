@@ -124,7 +124,7 @@ both green and brown leaves, leave `brown_lop` undefined, or set to `NULL`
 * `rsdstar`: contribution of direct solar incident flux to albedo
 * `rddstar`: contribution of hemispherical diffuse incident flux to albedo
 
-```{r prosail direct mode}
+```{r prosail direct mode 4sail}
 library(prosail)
 # define input variables for PROSPECT. 
 # refer to prospect tutorial for default values
@@ -150,6 +150,23 @@ refl_prosail <- prosail(input_prospect = input_prospect,
                         hotspot = hotspot, tts = tts, tto = tto, psi = psi, 
                         rsoil = rsoil)
 
+```
+
+Figure 1 illustrates the four reflectance factors produced with the function 
+`prosail` parameterized as above, using the sail version `4SAIL`.
+
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/prosail_outputs/prosail_outputs.png"
+knitr::include_graphics(url)
+```
+<center>
+  Fig. 1. Illustration of reflectance factors rdot, rsot, rsdt and rddt 
+  produced with `prosail` using the sail version `4SAIL`.
+</center> 
+
+
+```{r prosail direct mode 4sail2}
 # run prosail with 4SAIL2
 # define leaf chemical constituents corresponding green and brown leaves
 input_prospect <- data.frame('chl' = c(40,5), 'car' = c(8,5), 'ant' = c(0,1), 
@@ -169,6 +186,21 @@ refl_prosail2 <- prosail(SAILversion = '4SAIL2',
                          fraction_brown = fraction_brown, diss = diss, cv = cv, 
                          zeta = zeta)
 ```
+
+Figure 2 illustrates the four reflectance factors produced with the function 
+`prosail` parameterized as above, using the sail version `4SAIL2`.
+The introduction of leaf optical properties including brown pigments is 
+particularly noticeable in the red edge spectral domain at the 'shoulder' 
+transitioning with near infrared domain (~750 nm)
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/prosail_outputs/prosail2_outputs.png"
+knitr::include_graphics(url)
+```
+<center>
+  Fig. 2. Illustration of reflectance factors rdot, rsot, rsdt and rddt 
+  produced with `prosail` using the sail version `4SAIL2`.
+</center> 
 
 
 ## compute simplified surface reflectance under the assumption of clear conditions conditions
@@ -195,6 +227,20 @@ surf_refl_4SAIL2 <- get_surf_refl(rdot = refl_prosail2$rdot,
                                   spec_atm_sensor = spec_atm)
 
 ```
+
+
+Figure 3 illustrates the sensor reflectance obtained with `4SAIL` and `4SAIL2`, 
+following the same parameterization as above. 
+
+```{r, eval=TRUE, echo = FALSE, out.width="100%"}
+url <- "https://gitlab.com/jbferet/myshareddata/-/raw/master/prosail_vignette_illustrations/prosail_outputs/prosail_sensor reflectance.png"
+knitr::include_graphics(url)
+```
+<center>
+  Fig. 3. Illustration of sensor reflectance produced with `prosail` using the 
+  sail versions `4SAIL` and `4SAIL2`.
+</center> 
+
 
 ## compute fraction of absorbed photosyntehtically active radiation (fAPAR)
 

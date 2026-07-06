@@ -41,3 +41,11 @@ surf_refl numeric. matrix of surf_refl corresponding to input_prosail
 \description{
 generates a LUT of surface reflectance based on a table of input variables for prosail model
 }
+\examples{
+input_prosail <- get_input_prosail(atbd = TRUE, nb_samples = 100)
+refl_lut <- generate_lut_surf_refl(input_prosail = input_prosail,
+                                   spec_prospect = prosail::spec_prospect_full_range,
+                                   spec_soil = prosail::spec_soil_atbd_v2,
+                                   spec_atm = prosail::spec_atm)
+
+}

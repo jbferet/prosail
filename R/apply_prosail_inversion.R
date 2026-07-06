@@ -21,7 +21,7 @@
 #' - progressBar boolean. if progress bar required
 #' - filetype character. driver for raster file
 #'
-#' @return res character. path for output files corresponding to
+#' @return bp_path list. list of path for output files corresponding to
 #' biophysical properties
 #' @importFrom tools file_path_sans_ext
 #' @importFrom terra vrt

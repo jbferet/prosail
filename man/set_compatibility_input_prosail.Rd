@@ -2,7 +2,15 @@
 % Please edit documentation in R/set_compatibility_input_prosail.R
 \name{set_compatibility_input_prosail}
 \alias{set_compatibility_input_prosail}
-\title{make sure of the compatibility of variable names between versions of prosail}
+\title{make sure of the compatibility of variable names between versions of prosail
+converts
+\itemize{
+\item old_names: 'CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'CBC', 'PROT',
+'q', 'Cw_rel', 'N', 'Cv', 'Zeta', 'LIDFa', 'LIDFb', 'TypeLidf'
+into
+\item new_names: 'chl', 'car', 'ant', 'brown', 'ewt', 'lma', 'cbc', 'prot',
+'hotspot', 'cw_rel', 'n_struct', 'cv', 'zeta','lidf_a', 'lidf_b', 'type_lidf'
+}}
 \usage{
 set_compatibility_input_prosail(input_prosail)
 }
@@ -14,4 +22,19 @@ input_prosail numeric. updated input_prosail
 }
 \description{
 make sure of the compatibility of variable names between versions of prosail
+converts
+\itemize{
+\item old_names: 'CHL', 'CAR', 'ANT', 'BROWN', 'EWT', 'LMA', 'CBC', 'PROT',
+'q', 'Cw_rel', 'N', 'Cv', 'Zeta', 'LIDFa', 'LIDFb', 'TypeLidf'
+into
+\item new_names: 'chl', 'car', 'ant', 'brown', 'ewt', 'lma', 'cbc', 'prot',
+'hotspot', 'cw_rel', 'n_struct', 'cv', 'zeta','lidf_a', 'lidf_b', 'type_lidf'
+}
+}
+\examples{
+input_prosail <- data.frame('CHL' = 40, 'CAR' = 8, 'ANT' = 0, 'BROWN' = 0,
+                            'EWT' = 0.015, 'LMA' = 0.01, 'CBC' = 0, 'PROT' = 0,
+                            'q' = 0.5, 'N' = 1.5, 'Cv' = 1, 'Zeta' = 1,
+                            'LIDFa' = 50, 'TypeLidf' = 2)
+input_prosail <- set_compatibility_input_prosail(input_prosail)
 }
