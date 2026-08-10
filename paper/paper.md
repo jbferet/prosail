@@ -146,31 +146,28 @@ automated image access and processing workflow.
 # Research impact statement
 
 `prosail` has been used in multiple research publications since its early 
-developments [@hauser2021], [@ferreira2026], [@feret2026], [@kattenborn_temporal_2024].
-It is currently used in multiple research projects, and is actively maintained. 
+developments for applications in agriculture ([@verrelst2021]), ecology 
+([@hauser2021], [@feret2026]), forestry ([@ferreira2026]), and vegetation 
+monitoring in general [@kattenborn_temporal_2024].
+The model PROSAIL is used to analyze optical imagery acquired from UAV to 
+airborne to spaceborne sensors, including multispectral satellite (Sentinel-2, 
+Landsat) and imaging spectroscopy sensors (EnMAP, PRISMA, AVIRIS).
+This package is currently used in multiple research projects, and is actively 
+maintained. 
 
 
 # Overview
 
 ## PROSAIL simulation in forward mode
 
-PROSAIL requires information intrinsic to vegetation : 
+PROSAIL requires information intrinsic to vegetation, including leaf optical 
+properties simulated with `prospect`, or measured experimentally, LAI, and leaf 
+inclination distribution. 
 
-- leaf optical properties, either simulated with `prospect`, or measured
-experimentally.
-
-- LAI
-
-- Leaf inclination distribution, defined from different options of 
-*Leaf Inclination Distribution Functions* (LIDF). 
-
-- foliage hot spot parameter [@kuusk1991; @breon2002; @verhoefbach2007]
-
-PROSAIL also requires information extrinsic to vegetation : 
-
-- sun-observer geometry: sun and observer zenith angles, relative azimuth angle
-
-- soil reflectance
+PROSAIL also requires information extrinsic to vegetation, including the foliage 
+hot spot parameter [@kuusk1991; @breon2002; @verhoefbach2007], the sun-observer 
+geometry (sun and observer zenith angles, relative azimuth angle), and soil 
+reflectance.
 
 SAIL produces top-of-canopy bi-hemispherical reflectance factor, 
 directional-hemispherical reflectance factor for solar incident flux, 
@@ -239,7 +236,6 @@ properties from data tables or raster data.
 
 ![Workflow of PROSAIL hybrid inversion implemented in the package prosail. \label{fig:hybrid}](FlowChart_HybridInversion_JOSS.tif){ width=75% }
 
-
 ### Application to Sentinel-2 image and comparison with SNAP
 
 Once ML regression models are trained, `prosail` hybrid inversion can be applied
@@ -248,7 +244,8 @@ on Sentinel-2 imagery using the function `apply_prosail_inversion`.
 Biophysical variables produced with SNAP are compared to those produced
 with the `prosail` hybrid inversion.
 The Sentinel-2 Level-2A product corresponding to tile *30SWJ* acquired on
-*May 13th, 2021* was downloaded from the Copernicus Data Space Ecosystem
+*May 13th, 2021* over an agricultural landscape located next to Barrax (Spain)
+was downloaded from the Copernicus Data Space Ecosystem
 ([CDSE](https://browser.dataspace.copernicus.eu)).
 
 
@@ -260,12 +257,21 @@ inversion are compared to those produced with SNAP in Figure \ref{fig:SNAP_prosa
 The two methods show good consistency, with Pearson correlation 
 coefficient > 0.99 for LAI, and > 0.97 for fCover and fAPAR.
 Algorithmic differences remain between the two implementations, including: 
+
 - the version of the PROSPECT model: SNAP uses a version anterior to PROSPECT-D,
+
 - the ML algorithm. 
 
 Differences in soil properties accounted for in simulations with low LAI may 
 also contribute, despite efforts to reproduce the workflow described in the ATBD. 
 Additional tests performed over croplands and forests showed similar performances. 
+
+
+Figure \ref{fig:barrax} displays a set of biophysical properties mapped over the 
+region of interest.  
+
+![Leaf chlorophyll content, LAI, fCover and fAPAR mapped over the region of Barrax (Spain). \label{fig:barrax}](hybrid_inversion_barrax.png){ width=75% }
+
 
 The availability of open source and fully parameterizable inversion procedures 
 should contribute to improve reproducibility of currently available softwares.

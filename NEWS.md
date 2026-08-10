@@ -1,3 +1,14 @@
+# prosail v3.1.1
+
+Additional adjustments following JOSS reviewing stage
+
+## additions
+- added figure for hybrid inversion and mapping over Barrax
+- added a test to compare surface reflectance with fortran distribution for a specific configuration
+- added information on research impact section of JOSS paper
+
+
+
 # prosail v3.1.0
 
 adjustments following JOSS reviewing stage
