@@ -297,7 +297,7 @@ satellite missions already operational and in preparation.
 
 # Availability
 
-`prosail` is an open-source software made available under the MIT license. 
+`prosail` is an open-source software made available under the GNU GPL-3 license. 
 Tutorials are available at [https://jbferet.gitlab.io/prosail/](https://jbferet.gitlab.io/prosail/).
 
 # Acknowledgements
