@@ -101,7 +101,7 @@ The tutorial vignettes start
 
 This research was supported by the Agence Nationale de la Recherche ([ANR](https://anr.fr/en/open-calls-and-preannouncements/), France) through the young researchers project **BioCop** (ANR-17-CE32-0001)
 
-We thank [Ingo Steinwart](ingo.steinwart@mathematik.uni-stuttgart.de) and [Philipp Thomann](philipp.thomann@mathematik.uni-stuttgart.de) (Institute for Stochastics and Applications, University of Stuttgart, Germany) for the development of the package `liquidSVM`.
+We thank [Ingo Steinwart](mailto:ingo.steinwart@mathematik.uni-stuttgart.de) and [Philipp Thomann](mailto:philipp.thomann@mathematik.uni-stuttgart.de) (Institute for Stochastics and Applications, University of Stuttgart, Germany) for the development of the package `liquidSVM`.
 
 
 # 5 Citation
