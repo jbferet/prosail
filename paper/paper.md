@@ -75,7 +75,7 @@ within the canopy, which is not accurate for row crops and heterogeneous canopie
 
 # State of the field
 
-Various softwares allow hybrid inversion with PROSAIL simulations. 
+Various software allow hybrid inversion with PROSAIL simulations. 
 The *Sentinel Toolbox Application Platform* (SNAP) includes the 
 `Biophysical Processor` module [@weiss2020], combining PROSAIL simulations with 
 an artificial neural network regression model. 

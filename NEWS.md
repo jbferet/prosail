@@ -245,7 +245,7 @@ and 'Generate_LUT_BRF'
 # prosail v1.3.2
 
 ## Fix
-- fixed bug occuring when atbd == NULL
+- fixed bug occurring when atbd == NULL
 
 
 # prosail v1.3.1:
