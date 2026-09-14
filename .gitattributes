@@ -1,0 +1,5 @@
+/.zenodo.json export-ignore
+/.gitlab-ci.yml export-ignore
+/gitlab-ci export-ignore
+/.gitignore export-ignore
+/.github export-ignore
