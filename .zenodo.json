@@ -2,8 +2,7 @@
     "title": "PROSAIL leaf and canopy radiative transfer model and inversion routines",
     "publication_date": "2026-09-14",
     "access_right": "open",
-    "description": "The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. 
-              It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.",
+    "description": "The package prosail includes the canopy radiative transfer model PROSAIL coupled with the leaf model PROSPECT-PRO, the latest version of the PROSPECT leaf model. It also includes inversion routines based on iterative optimization and hybrid method in order to estimate vegetation properties (leaf and canopy) from sensor measurements.",
     "creators": [{"name": "Féret, Jean-Baptiste",
                   "affiliation": "UMR TETIS, INRAE, CIRAD, CNRS, AgroPariTech, Univ. Montpellier, France",
                   "orcid": "0000-0002-0151-1334"},
