@@ -15,14 +15,57 @@
         "Radiative transfer modeling",
         "Surface Reflectance",
         "Biophysical variables"],
-    "related_identifiers": [
-        {
-            "identifier": "https://gitlab.com/jbferet/prosail",
-            "relation": "isNewVersionOf",
-            "resource_type": "software",
-            "scheme": "url"
-        }
+
+
+  "related_identifiers": [
+      {
+        "identifier": "https://gitlab.com/jbferet/prosail",
+        "relation_type": {
+          "id": "isnewversionof",
+          "title": {
+            "de": "Ist eine neue Version von",
+            "en": "Is new version of"
+          }
+        },
+        "resource_type": {
+          "id": "software",
+          "title": {
+            "de": "Software",
+            "en": "Software"
+          }
+        },
+        "scheme": "url"
+      },
+      {
+        "identifier": "https://gitlab.com/jbferet/prosail/-/tree/v3.1.3",
+        "relation_type": {
+          "id": "isidenticalto",
+          "title": {
+            "de": "Ist identisch mit",
+            "en": "Is identical to"
+          }
+        },
+        "scheme": "url"
+      },
+      {
+        "identifier": "https://gitlab.com/jbferet/prosail",
+        "relation_type": {
+          "id": "iscompiledby",
+          "title": {
+            "de": "Kompiliert durch",
+            "en": "Is compiled by"
+          }
+        },
+        "scheme": "url"
+      }
     ],
+    "resource_type": {
+      "id": "software",
+      "title": {
+        "de": "Software",
+        "en": "Software"
+      }
+    },
     "license": "gpl-3.0-or-later",
     "upload_type": "software"
 }
