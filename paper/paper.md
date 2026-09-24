@@ -13,14 +13,16 @@ authors:
   - name: Jean-Baptiste Féret
     orcid: 0000-0002-0151-1334
     corresponding: true
-    affiliation: 1
+    affiliation: "1, 2"
   - name: Florian de Boissieu
     orcid: 0000-0002-2185-9952
     affiliation: 1
 affiliations:
  - name: TETIS, INRAE, AgroParisTech, CIRAD, CNRS, Université Montpellier, Montpellier, France
    index: 1
-date: 25 July 2025
+ - name: UMR PVBMT, CIRAD, Saint Pierre, La Réunion, France
+   index: 2
+date: 23 September 2026
 bibliography: paper.bib
 ---
 
@@ -75,19 +77,19 @@ within the canopy, which is not accurate for row crops and heterogeneous canopie
 
 # State of the field
 
-Various softwares allow hybrid inversion with PROSAIL simulations. 
+Various software packages allow hybrid inversion with PROSAIL simulations. 
 The *Sentinel Toolbox Application Platform* (SNAP) includes the 
 `Biophysical Processor` module [@weiss2020], combining PROSAIL simulations with 
 an artificial neural network regression model. 
 The sampling design of the training set is described in the 
-*Algorithmic Theoretical Background Document* (ATBD) [@weiss2020]).
+*Algorithmic Theoretical Background Document* (ATBD) [@weiss2020].
 Alternative distributions provide more interactive parameterization of the 
 inversion strategy, e.g. the *Automated Radiative Transfer Models Operator*
 (ARTMO) Matlab toolbox [@rivera2014].
 
 `prosail` does not intend to provide the same computational efficiency as SNAP. 
-It does not provide a collection of models and methods as comprehensive as those 
-provided with the ARTMO box neither. 
+It also does not provide a collection of models and methods as comprehensive as 
+those provided with the ARTMO toolbox. 
 `prosail` provides a flexible open source framework to experiment with hybrid 
 inversion procedures, using simple yet fast and efficient training stage, 
 allowing experimenting on training data sampling design, introduction 
@@ -109,12 +111,12 @@ Other options are available on
 
 `prosail` uses `prospect` [@feret2017; @feret2021] for the simulation of leaf optical properties. 
 It includes *4SAIL* [@verhoef2007], and *4SAIL2* [@verhoefbach2007], 
-a two layers version of *4SAIL* as canopy models. 
+a two-layer version of *4SAIL* as canopy models. 
 `prosail` provides user-friendly and modular functions to simulate vegetation 
 canopy reflectance, and to predict biophysical properties using inversion. 
 
 Hybrid inversion is a multi-step procedure requiring simulation of sensor 
-reflectance to train a ML regression algorithm, then applicable to any data 
+reflectance to train an ML regression algorithm, then applicable to any data 
 source collected from airborne and spaceborne sensors. 
 
 - The generation of realistic reflectance simulations requires definition of 
@@ -170,7 +172,7 @@ The SRF from multiple sensors is already implemented in `prosail`, listed when
 calling `srf_availability()`. 
 User-defined sensors require either defining central wavelength and full width at half 
 maximum (fwhm) for each band, assuming gaussian response, or the exact SRF 
-provided with a .csv files. 
+provided with a .csv file.
 
 
 ## PROSAIL hybrid inversion
@@ -188,12 +190,12 @@ defined in the ATBD for the Biophysical Processor of the Sentinel toolbox [@weis
 Each step of the simulation of a training LUT can be defined by user.
 
 
-### Training a ML regression algorithm
+### Training an ML regression algorithm
 
 The ML strategy implemented in `prosail` is a parsimonious ensemble method based 
 on a bootstrap aggregating (bagging) prediction of biophysical properties from 
 support vector regression (SVR) models.
-Each SVR model is trained with a limited number of samples, ensuring fast 
+Each SVR model is trained with a limited number of samples, ensuring a fast 
 training stage. 
 The predicted value corresponds to the mean prediction from a set of SVR models.
 The standard deviation is derived from this ensemble of predictors.
@@ -211,7 +213,7 @@ performances similar to SNAP.
 
 Figure \ref{fig:hybrid} summarizes the workflow applied to perform hybrid 
 inversion. 
-The function `train_prosail_inversion` combines aforementioned steps to 
+The function `train_prosail_inversion` combines the aforementioned steps to 
 simulate surface reflectance and train SVR models. 
 Obtained regression models are then used to estimate vegetation biophysical 
 properties from data tables or raster data. 
@@ -255,11 +257,12 @@ Vegetation biophysical properties estimated with a hybrid inversion are
 consistent with estimations from SNAP. 
 `prosail` hybrid inversion does not intend to be computationally as efficient as 
 SNAP. 
-The current version not appropriate for regional to global scale vegetation monitoring. 
+The current version is not appropriate for regional- to global-scale vegetation 
+monitoring.
 `prosail` hybrid inversion offers a fully adjustable hybrid inversion framework, 
 including an original parsimonious ML regression method, allowing fast and 
 efficient training. 
-It is a valuable tool for experimenting on the potential and limitation of 
+It is a valuable tool for experimenting on the potential and limitations of 
 physically-based retrieval of vegetation traits from optical sensors, including 
 satellite missions already operational and in preparation. 
 
