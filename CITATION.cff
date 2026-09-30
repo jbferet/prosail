@@ -1,0 +1,40 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Féret
+  given-names: Jean-Baptiste
+  orcid: "https://orcid.org/0000-0002-0151-1334"
+- family-names: Boissieu
+  given-names: Florian
+  name-particle: de
+  orcid: "https://orcid.org/0000-0002-2185-9952"
+contact:
+- family-names: Féret
+  given-names: Jean-Baptiste
+  orcid: "https://orcid.org/0000-0002-0151-1334"
+doi: 10.5281/zenodo.22751997
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Féret
+    given-names: Jean-Baptiste
+    orcid: "https://orcid.org/0000-0002-0151-1334"
+  - family-names: Boissieu
+    given-names: Florian
+    name-particle: de
+    orcid: "https://orcid.org/0000-0002-2185-9952"
+  date-published: 2026-09-29
+  doi: 10.21105/joss.10451
+  issn: 2475-9066
+  issue: 125
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 10451
+  title: "prosail: an R package to simulate canopy reflectance with the
+    coupled model PROSAIL (PROSPECT + SAIL)"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.10451"
+  volume: 11
+title: "`prosail`: an R package to simulate canopy reflectance with the
+  coupled model PROSAIL (PROSPECT + SAIL)"
