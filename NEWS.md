@@ -1,3 +1,14 @@
+# prosail v3.2.0
+
+Additional adjustments following JOSS reviewing stage
+
+## addition
+- apply_prosail_inversion: save mean and sd for vrt
+
+## changes
+- liquidSVM::svmRegression: set grid_choice = 2
+
+
 # prosail v3.1.3
 
 Additional adjustments following JOSS reviewing stage

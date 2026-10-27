@@ -76,7 +76,8 @@ prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 10,
 
     if (method == 'liquidSVM'){
       r1 <- tryCatch.W.E(tuned_model <- liquidSVM::svmRegression(training_set$X,
-                                                                 training_set$Y))
+                                                                 training_set$Y,
+                                                                 grid_choice = 2))
       if (!is.null(r1$warning)){
         msg <- r1$warning$message
         val_gamma <- stringr::str_split(string = msg,
@@ -89,14 +90,16 @@ prosail_hybrid_train <- function(refl_lut, input_variables, nb_bagg = 10,
           val_gamma <- as.numeric(val_gamma)
           tuned_model <- liquidSVM::svmRegression(training_set$X,
                                                   training_set$Y,
-                                                  min_gamma = val_gamma)
+                                                  min_gamma = val_gamma,
+                                                  grid_choice = 2)
         }
         if (!is.na(as.numeric(val_lambda))){
           if (verbose==TRUE) { message('Adjusting lambda accordingly')}
           val_lambda <- as.numeric(val_lambda)
           tuned_model <- liquidSVM::svmRegression(training_set$X,
                                                   training_set$Y,
-                                                  min_lambda = val_lambda)
+                                                  min_lambda = val_lambda,
+                                                  grid_choice = 2)
         }
       }
     } else if (method %in% c('nu-svr')){
